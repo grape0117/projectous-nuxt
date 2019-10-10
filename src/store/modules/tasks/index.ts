@@ -6,7 +6,8 @@ import { mutations } from './mutations'
 import { ITasksState } from './types'
 
 const state = {
-  tasks: []
+  tasks: [],
+  additionalTasks: []
 }
 export const tasks: Module<ITasksState, IRootState> = {
   namespaced: true,
