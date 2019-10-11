@@ -36,17 +36,18 @@ export default class Dragable extends Vue {
     return this.lists
   }
 
-  setList(value) {
-    console.log(value)
-  }
-
   @Lists.Action private fetchTasks!: any
+  @Lists.Mutation('tasks/SET_TASKS_TO_LIST') public setTaskToList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
   @Lists.State(state => state.lists.find((list: IList) => list.name === 'tasks').tasks) private tasks!: ITask
   @Lists.State(state => state.lists.find((list: IList) => list.name === 'additionalTasks').tasks) private additionalTasks!: ITask
 
   private async created() {
     await this.fetchTasks()
+
+    setInterval(() => {
+      this.setTaskToList({ listName: 'tasks', tasks: [...this.AllLists[0].tasks, {id: 2091, title: "NEW TASK NEW TASK"}] })
+    }, 1000)
   }
 }
 </script>
