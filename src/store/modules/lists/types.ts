@@ -1,6 +1,10 @@
-export interface ITasksState {
+export interface IListsState {
+  lists: IList[]
+}
+
+export interface IList {
+  name: string,
   tasks: ITask[]
-  additionalTasks: ITask[]
 }
 
 export interface ITask {

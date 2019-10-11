@@ -2,26 +2,14 @@
   <div class="tasks">
     <VueDragable
       class="tasks-list"
-      v-model="tasksList"
+      v-for="(list, index) in AllLists"
+      :key="index"
+      v-model="list.tasks"
       group="tasks"
       @start="drag=true" @end="drag=false"
     >
       <div
-        v-for="(element, index) in tasksList"
-        :key="index"
-        class="tasks-list__item"
-      >
-        {{element.title}}
-      </div>
-    </VueDragable>
-    <VueDragable
-      class="tasks-list"
-      v-model="additionalTasksList"
-      group="tasks"
-      @start="drag=true" @end="drag=false"
-    >
-      <div
-        v-for="(element, index) in additionalTasksList"
+        v-for="(element, index) in list.tasks"
         :key="index"
         class="tasks-list__item"
       >
@@ -34,36 +22,28 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { ITask } from '@/store/modules/tasks/types'
+import { ITask, IList } from '@/store/modules/lists/types'
 // @ts-ignore
 import VueDragable from '@/../node_modules/vuedraggable'
 
-const Tasks = namespace('tasks')
+const Lists = namespace('lists')
 
 // @ts-ignore
 @Component({ components: { VueDragable }})
 export default class Dragable extends Vue {
 
-  get tasksList() {
-    return this.tasks
+  get AllLists() {
+    return this.lists
   }
 
-  set tasksList(value) {
-    this.setTasks(value)
+  setList(value) {
+    console.log(value)
   }
 
-  get additionalTasksList() {
-    return this.additionalTasks
-  }
-
-  set additionalTasksList(value) {
-    this.setAdditionalTasks(value)
-  }
-  @Tasks.Mutation('tasks/SET_TASKS') public setTasks!: any
-  @Tasks.Mutation('tasks/SET_ADDITIONAL_TASKS') public setAdditionalTasks!: any
-  @Tasks.Action private fetchTasks!: any
-  @Tasks.State(state => state.tasks) private tasks!: ITask
-  @Tasks.State(state => state.additionalTasks) private additionalTasks!: ITask
+  @Lists.Action private fetchTasks!: any
+  @Lists.State(state => state.lists) private lists!: IList[]
+  @Lists.State(state => state.lists.find((list: IList) => list.name === 'tasks').tasks) private tasks!: ITask
+  @Lists.State(state => state.lists.find((list: IList) => list.name === 'additionalTasks').tasks) private additionalTasks!: ITask
 
   private async created() {
     await this.fetchTasks()
