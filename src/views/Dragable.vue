@@ -4,6 +4,8 @@
       class="tasks-list"
       v-for="(list, index) in AllLists"
       :key="index"
+      :value="list"
+      @input="updateList(list)"
       v-model="list.tasks"
       group="tasks"
       @start="drag=true" @end="drag=false"
@@ -31,17 +33,20 @@ const Lists = namespace('lists')
 // @ts-ignore
 @Component({ components: { VueDragable }})
 export default class Dragable extends Vue {
-
-  get AllLists() {
-    return this.lists
-  }
-
   @Lists.Action private fetchTasks!: any
   @Lists.Mutation('tasks/SET_TASKS_TO_LIST') public setTaskToList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
   @Lists.State(state => state.lists.find((list: IList) => list.name === 'tasks').tasks) private tasks!: ITask
   @Lists.State(state => state.lists.find((list: IList) => list.name === 'additionalTasks').tasks) private additionalTasks!: ITask
 
+  get AllLists() {
+    return this.lists
+  }
+
+  updateList(value: any) {
+    this.setTaskToList({listName: value.name, tasks: value.tasks})
+  }
+  
   private async created() {
     await this.fetchTasks()
 
