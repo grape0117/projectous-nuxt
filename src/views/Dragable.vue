@@ -5,7 +5,7 @@
     group="lists"
     @start="drag=true" @end="drag=false"
   >
-    <div 
+    <div
       v-for="(list, index) in allLists"
       :key="index"
       class="tasks-list-main"
@@ -28,7 +28,7 @@
         </div>
       </VueDragable>
     </div>
-    <div class="form-add-new-list">  
+    <div class="form-add-new-list">
       <input type="text" v-model="nameNewList" />
       <button @click="addNewListHandler">Add</button>
     </div>
