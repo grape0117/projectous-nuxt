@@ -5,10 +5,11 @@
       v-for="(list, index) in AllLists"
       :key="index"
       :value="list"
-      @input="updateList(list)"
       v-model="list.tasks"
       group="tasks"
-      @start="drag=true" @end="drag=false"
+      @input="updateList(list)"
+      @start="drag=true"
+      @end="drag=false"
     >
       <div
         v-for="(element, index) in list.tasks"
@@ -34,25 +35,31 @@ const Lists = namespace('lists')
 @Component({ components: { VueDragable }})
 export default class Dragable extends Vue {
   @Lists.Action private fetchTasks!: any
-  @Lists.Mutation('tasks/SET_TASKS_TO_LIST') public setTaskToList!: any
+  @Lists.Mutation('tasks/SET_TASKS_TO_LIST') private setTaskToList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
-  @Lists.State(state => state.lists.find((list: IList) => list.name === 'tasks').tasks) private tasks!: ITask
-  @Lists.State(state => state.lists.find((list: IList) => list.name === 'additionalTasks').tasks) private additionalTasks!: ITask
+  @Lists.State(state => state.lists.find((list: IList) =>
+    list.name === 'tasks').tasks) private tasks!: ITask
+  @Lists.State(state => state.lists.find((list: IList) =>
+    list.name === 'additionalTasks').tasks) private additionalTasks!: ITask
 
   get AllLists() {
     return this.lists
   }
 
-  updateList(value: any) {
+  private updateList(value: any) {
     this.setTaskToList({listName: value.name, tasks: value.tasks})
   }
-  
+
   private async created() {
     await this.fetchTasks()
 
     setInterval(() => {
-      this.setTaskToList({ listName: 'tasks', tasks: [...this.AllLists[0].tasks, {id: 2091, title: "NEW TASK NEW TASK"}] })
-    }, 1000)
+      this.setTaskToList({
+        listName: 'tasks',
+        tasks: [{id: 2091, title: 'NEW TASK NEW TASK'},
+        ...this.AllLists[0].tasks]
+      })
+    }, 5000)
   }
 }
 </script>
