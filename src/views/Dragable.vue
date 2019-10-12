@@ -1,6 +1,8 @@
 <template>
   <div class="tasks">
     <VueDragable
+      tag="ul"
+      handle=".handle"
       class="tasks-list"
       v-for="(list, index) in AllLists"
       :key="index"
@@ -11,13 +13,19 @@
       @start="drag=true"
       @end="drag=false"
     >
-      <div
-        v-for="(element, index) in list.tasks"
-        :key="index"
-        class="tasks-list__item"
+      <li
+          class="list-group-item tasks-list__item"
+          v-for="(element, index) in list.tasks"
+          :key="index"
       >
-        {{element.title}}
-      </div>
+        <i class="fa fa-align-justify handle"></i>
+
+        <span class="text"> </span> {{ index }}
+
+        <input type="text" class="form-control" v-model="element.title" />
+        <content-editable @createTaskFromEnter="createTaskFromEnter" v-bind:index="index" v-bind:next_work_day="element.next_work_day" v-bind:task="getTask(element.task_id)"></content-editable>
+        <i class="fa fa-times close" @click="removeAt(index)"></i> {{ getProjectFromTaskId(element.task_id) }}
+      </li>
     </VueDragable>
   </div>
 </template>
@@ -46,9 +54,15 @@ export default class Dragable extends Vue {
     return this.lists
   }
 
+    public getTask(task_id: any): object {
+        return this.$store.getters['tasks/getTaskById'](task_id)
+    }
+
   private updateList(value: any) {
     this.setTaskToList({listName: value.name, tasks: value.tasks})
   }
+
+
 
   private async created() {
     await this.fetchTasks()
