@@ -1,7 +1,7 @@
 // @ts-ignore
 import { MutationTree } from 'vuex'
 import { IListsState, ITask } from './types'
-import { FETCH_TASKS, SET_TASKS_TO_LIST } from './mutations-types'
+import { FETCH_TASKS, SET_TASKS_TO_LIST, SET_LISTS } from './mutations-types'
 
 export const mutations: MutationTree<IListsState> = {
   [FETCH_TASKS](state: IListsState, tasks: ITask[]) {
@@ -21,5 +21,8 @@ export const mutations: MutationTree<IListsState> = {
         return list
       }
     })
+  },
+  [SET_LISTS](state: IListsState, lists: any) {
+    state.lists = lists
   }
 }

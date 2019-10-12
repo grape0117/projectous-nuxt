@@ -1,2 +1,3 @@
-export const FETCH_TASKS = 'tasks/FETCH_TASKS'
-export const SET_TASKS_TO_LIST = 'tasks/SET_TASKS_TO_LIST'
+export const FETCH_TASKS = 'lists/FETCH_TASKS'
+export const SET_TASKS_TO_LIST = 'lists/SET_TASKS_TO_LIST'
+export const SET_LISTS = 'lists/SET_LISTS'
