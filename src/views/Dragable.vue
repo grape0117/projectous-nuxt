@@ -1,12 +1,12 @@
 <template>
   <VueDragable
     class="lists"
-    v-model="AllLists"
+    v-model="allLists"
     group="lists"
     @start="drag=true" @end="drag=false"
   >
     <div 
-      v-for="(list, index) in AllLists"
+      v-for="(list, index) in allLists"
       :key="index"
       class="tasks-list-main"
     >
@@ -28,6 +28,10 @@
         </div>
       </VueDragable>
     </div>
+    <div class="form-add-new-list">  
+      <input type="text" v-model="nameNewList" />
+      <button @click="addNewListHandler">Add</button>
+    </div>
   </VueDragable>
 </template>
 
@@ -46,18 +50,35 @@ export default class Dragable extends Vue {
   @Lists.Action private fetchTasks!: any
   @Lists.Mutation('lists/SET_TASKS_TO_LIST') private setTaskToList!: any
   @Lists.Mutation('lists/SET_LISTS') private setLists!: any
+  @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
   @Lists.State(state => state.lists.find((list: IList) =>
     list.name === 'tasks').tasks) private tasks!: ITask
   @Lists.State(state => state.lists.find((list: IList) =>
     list.name === 'additionalTasks').tasks) private additionalTasks!: ITask
 
-  get AllLists() {
+  private nameNewList: string = ''
+
+  set allLists(value: any) {
+    this.setLists(value)
+  }
+
+  get allLists() {
     return this.lists
   }
 
-  set AllLists(value) {
-    this.setLists(value)
+  private addNewListHandler() {
+    if (!this.nameNewList) {
+      return
+    }
+
+    if (this.allLists.some((list: IList) => list.name === this.nameNewList)) {
+      return
+    }
+
+    this.addNewList(this.nameNewList)
+
+    this.nameNewList = ''
   }
 
   private updateList(value: any) {
@@ -68,8 +89,8 @@ export default class Dragable extends Vue {
     await this.fetchTasks()
 
     setInterval(() => {
-      const tasksList = this.AllLists.find((list) => list.name === 'tasks');
-      const oldTasks = tasksList ? tasksList.tasks : [];
+      const tasksList = this.allLists.find((list: IList) => list.name === 'tasks')
+      const oldTasks = tasksList ? tasksList.tasks : []
 
       this.setTaskToList({
         listName: 'tasks',
@@ -105,5 +126,10 @@ export default class Dragable extends Vue {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.form-add-new-list {
+  padding: 30px;
+  margin-top: 40px;
 }
 </style>
