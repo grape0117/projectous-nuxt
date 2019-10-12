@@ -20,11 +20,11 @@
         @start="drag=true" @end="drag=false"
       >
         <div
-          v-for="(element, index) in list.tasks"
-          :key="index"
+          v-for="({ id }) in list.tasks"
+          :key="id"
           class="tasks-list__item"
         >
-          <p>{{ element.title }}</p>
+          <p>{{ id }}</p>
         </div>
       </VueDragable>
     </div>
@@ -68,16 +68,9 @@ export default class Dragable extends Vue {
   }
 
   private addNewListHandler() {
-    if (!this.nameNewList) {
-      return
-    }
-
-    if (this.allLists.some((list: IList) => list.name === this.nameNewList)) {
-      return
-    }
-
+    if (!this.nameNewList) return
+    if (this.allLists.some((list: IList) => list.name === this.nameNewList)) return
     this.addNewList(this.nameNewList)
-
     this.nameNewList = ''
   }
 
@@ -91,10 +84,11 @@ export default class Dragable extends Vue {
     setInterval(() => {
       const tasksList = this.allLists.find((list: IList) => list.name === 'tasks')
       const oldTasks = tasksList ? tasksList.tasks : []
+      const getRandomArbitrary = (min: number, max: number): number => Math.ceil(Math.random() * (max - min) + min)
 
       this.setTaskToList({
         listName: 'tasks',
-        tasks: [{id: 2091, title: 'NEW TASK NEW TASK'}, ...oldTasks]
+        tasks: [{id: getRandomArbitrary(1000, 999999), title: 'NEW TASK NEW TASK'}, ...oldTasks]
       })
     }, 5000)
   }
