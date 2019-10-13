@@ -1,11 +1,11 @@
 // @ts-ignore
 import { ActionTree } from 'vuex'
-import { IListsState } from '../lists/types'
+import { IModuleState} from './types'
 import { ITask } from '../tasks/types'
 import { IRootState } from '@/store/types'
-import { FETCH_TASKS } from './mutations-types'
+import { FETCH_TASKS } from '../lists/mutations-types'
 
-export const actions: ActionTree<IListsState, IRootState> = {
+export const actions: ActionTree<IModuleState, IRootState> = {
   async fetchTasks({ commit }: { commit: any }): Promise<ITask[]> {
     const response = await fetch('https://release.projectous.com/test-tasks')
     const { tasks } = await response.json()

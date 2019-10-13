@@ -23,8 +23,8 @@
         <span class="text"> </span> {{ index }}
 
         <input type="text" class="form-control" v-model="element.title" />
-        <content-editable @createTaskFromEnter="createTaskFromEnter" v-bind:index="index" v-bind:next_work_day="element.next_work_day" v-bind:task="getTask(element.task_id)"></content-editable>
-        <i class="fa fa-times close" @click="removeAt(index)"></i> {{ getProjectFromTaskId(element.task_id) }}
+        <content-editable v-bind:index="index" v-bind:next_work_day="element.next_work_day" v-bind:task="getTask(element.task_id)"></content-editable>
+        <i class="fa fa-times close"></i>
       </li>
     </VueDragable>
   </div>
@@ -34,13 +34,15 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { ITask, IList } from '@/store/modules/lists/types'
+import ContentEditable from './content-editable.vue'
+
 // @ts-ignore
 import VueDragable from '@/../node_modules/vuedraggable'
 
 const Lists = namespace('lists')
 
 // @ts-ignore
-@Component({ components: { VueDragable }})
+@Component({ components: { VueDragable, ContentEditable }})
 export default class Dragable extends Vue {
   @Lists.Action private fetchTasks!: any
   @Lists.Mutation('tasks/SET_TASKS_TO_LIST') private setTaskToList!: any
@@ -54,8 +56,8 @@ export default class Dragable extends Vue {
     return this.lists
   }
 
-    public getTask(task_id: any): object {
-        return this.$store.getters['tasks/getTaskById'](task_id)
+    getTask(task_id: any): object {
+        return {}//return this.$store.getters['tasks/getTaskById'](task_id)
     }
 
   private updateList(value: any) {
