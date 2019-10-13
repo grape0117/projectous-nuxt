@@ -1,5 +1,6 @@
 export interface IListsState {
-  lists: IList[]
+  lists: IList[],
+  allTasks: ITask[]
 }
 
 export interface IList {

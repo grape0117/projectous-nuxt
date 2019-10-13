@@ -15,17 +15,19 @@
         class="tasks-list"
         :value="list"
         v-model="list.tasks"
-      group="tasks"
-      @input="updateList(list)"
-      @start="drag=true"
-      @end="drag=false"
-    >
-      <div
-        v-for="({ id }) in list.tasks"
+        group="tasks"
+        @input="updateList(list)"
+        @start="drag=true"
+        @end="drag=false"
+      >
+        <div
+          v-for="({ id, task_id }, index) in list.tasks"
           :key="id"
           class="tasks-list__item"
+          v-if="getTaskById(task_id)"
         >
-          <p>{{ id }}</p>
+          <task-item :task="getTaskById(task_id)" />
+          <add-new-task-form :listTitle="list.name" :indexTask="index + 1" />
         </div>
       </VueDragable>
     </div>
@@ -42,16 +44,23 @@ import { namespace } from 'vuex-class'
 import { ITask, IList } from '@/store/modules/lists/types'
 // @ts-ignore
 import VueDragable from '@/../node_modules/vuedraggable'
+import TaskItem from './TaskItem.vue'
+import AddNewTaskForm from './AddNewTaskForm'
 
 const Lists = namespace('lists')
 
 // @ts-ignore
-@Component({ components: { VueDragable }})
+@Component({ components: {
+  VueDragable,
+  TaskItem,
+  AddNewTaskForm
+}})
 export default class Dragable extends Vue {
   @Lists.Action private fetchTasks!: any
   @Lists.Mutation('lists/SET_TASKS_TO_LIST') private setTaskToList!: any
   @Lists.Mutation('lists/SET_LISTS') private setLists!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
+  @Lists.Getter('getTaskById') private getTaskById!: any
   @Lists.State(state => state.lists) private lists!: IList[]
   @Lists.State(state => state.lists.find((list: IList) =>
     list.name === 'tasks').tasks) private tasks!: ITask
