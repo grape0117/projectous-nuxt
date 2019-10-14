@@ -1,5 +1,5 @@
 <template>
-  <VueDragable
+  <VueDraggable
     class="lists"
     v-model="allLists"
     group="lists"
@@ -11,7 +11,7 @@
       class="tasks-list-main"
     >
       <h3>{{ list.name }}</h3>
-      <VueDragable
+      <VueDraggable
         class="tasks-list"
         :value="list"
         v-model="list.tasks"
@@ -26,16 +26,16 @@
           class="tasks-list__item"
           v-if="getTaskById(task_id)"
         >
-          <task-item :task="getTaskById(task_id)" />
-          <add-new-task-form :listTitle="list.name" :indexTask="index + 1" />
+          <TaskItem :task="getTaskById(task_id)" />
+          <AddNewTaskForm :listTitle="list.name" :indexTask="index + 1" />
         </div>
-      </VueDragable>
+      </VueDraggable>
     </div>
     <div class="form-add-new-list">
       <input type="text" v-model="nameNewList" />
       <button @click="addNewListHandler">Add</button>
     </div>
-  </VueDragable>
+  </VueDraggable>
 </template>
 
 <script lang="ts">
@@ -43,15 +43,15 @@ import { Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { ITask, IList } from '@/store/modules/lists/types'
 // @ts-ignore
-import VueDragable from '@/../node_modules/vuedraggable'
+import VueDraggable from '@/../node_modules/vuedraggable'
 import TaskItem from './TaskItem.vue'
-import AddNewTaskForm from './AddNewTaskForm'
+import AddNewTaskForm from './AddNewTaskForm.vue'
 
 const Lists = namespace('lists')
 
 // @ts-ignore
 @Component({ components: {
-  VueDragable,
+  VueDraggable,
   TaskItem,
   AddNewTaskForm
 }})

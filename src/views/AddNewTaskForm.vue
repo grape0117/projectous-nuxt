@@ -1,32 +1,38 @@
 <template>
-    <div class="form-add-task" v-on:mouseleave="resetHandler">
-        <input v-if="isCreating" type="text" v-model="nameOfNewTask" v-on:keyup.enter="addNewTaskHandler" />
-        <span v-else v-on:click="setIsCreating(true)">+</span>
+    <div class="form-add-task" @mouseleave="resetHandler">
+        <input
+          v-if="isCreating"
+          v-model="nameOfNewTask"
+          ref="newTask"
+          type="text"
+          @keydown.enter="addNewTaskHandler"
+          @keydown.esc="resetHandler"
+        />
+        <span v-else @click="isCreating = true">+</span>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { ITask, IList } from '@/store/modules/lists/types'
 
 const Lists = namespace('lists')
 
-// @ts-ignore
-@Component({
-  props: {
-    listTitle: String,
-    indexTask: Number
-  }
-})
+@Component
 export default class TaskItem extends Vue {
+  @Prop({ required: true }) protected listTitle!: string
+  @Prop({ required: true }) protected indexTask!: number
   @Lists.Mutation('lists/ADD_NEW_TASK') private addNewTask!: any
 
   private isCreating: boolean = false
   private nameOfNewTask: string = ''
 
-  private setIsCreating(value) {
-    this.isCreating = value
+  @Watch('isCreating')
+  private isCreatingChanged(value: any) {
+    if (value) {
+      // @ts-ignore
+      this.$nextTick(() => this.$refs.newTask.focus())
+    }
   }
 
   private resetHandler() {
@@ -35,9 +41,8 @@ export default class TaskItem extends Vue {
   }
 
   private addNewTaskHandler() {
-    if (!this.nameOfNewTask) return;
+    if (!this.nameOfNewTask) return
     this.addNewTask({ listName: this.listTitle, index: this.indexTask, taskName: this.nameOfNewTask })
-
     this.resetHandler()
   }
 }
