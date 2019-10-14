@@ -44,8 +44,8 @@ import { namespace } from 'vuex-class'
 import { ITask, IList } from '@/store/modules/lists/types'
 // @ts-ignore
 import VueDraggable from '@/../node_modules/vuedraggable'
-import TaskItem from './TaskItem.vue'
-import AddNewTaskForm from './AddNewTaskForm.vue'
+import TaskItem from '@/components/draggable/TaskItem.vue'
+import AddNewTaskForm from '@/components/draggable/AddNewTaskForm.vue'
 
 const Lists = namespace('lists')
 
