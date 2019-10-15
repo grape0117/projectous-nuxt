@@ -1,6 +1,6 @@
 // @ts-ignore
 import { MutationTree } from 'vuex'
-import { IListsState, ITask, IList } from './types'
+import { IListsState, ITask, IList, IUserTask } from './types'
 import {
   FETCH_TASKS,
   SET_TASKS_TO_LIST,
@@ -10,20 +10,35 @@ import {
 } from './mutations-types'
 
 export const mutations: MutationTree<IListsState> = {
-  [FETCH_TASKS](state: IListsState, tasks: ITask[]) {
-    state.lists = state.lists.map(list => list.name === 'tasks' ? { ...list, tasks } : list)
+  [FETCH_TASKS](state: IListsState, payload: any) {
+    const sortableTasks = payload.userTasks
+      .map((userTask: IUserTask) => (
+        payload.allTasks.find((task: ITask) => (
+          userTask.task_id === task.id)
+        )
+      ))
+      .filter((task: ITask) => task.due_date)
+      .sort((a: ITask, b: ITask) => (
+        // @ts-ignore
+        new Date(b.due_date) - new Date(a.due_date)
+      ))
+
+    state.lists = state.lists.map(list => list.name === 'tasks' ? { ...list, tasks: sortableTasks } : list)
   },
   [SET_TASKS_TO_LIST](state: IListsState, payload: any) {
-    state.lists = state.lists.map(list => list.name === payload.listName ? { ...list, tasks: payload.tasks } : list)
+    const sortableTasks = payload.tasks
+      .sort((a: ITask, b: ITask) => (
+        // @ts-ignore
+        new Date(b.due_date) - new Date(a.due_date)
+      ))
+
+    state.lists = state.lists.map(list => list.name === payload.listName ? { ...list, tasks: sortableTasks } : list)
   },
   [SET_LISTS](state: IListsState, lists: any) {
     state.lists = lists
   },
   [ADD_NEW_LIST](state: IListsState, newNameList: string) {
     state.lists = [...state.lists, { name: newNameList, tasks: [] }]
-  },
-  [SET_ALL_TASKS](state: IListsState, tasks: ITask[]) {
-    state.allTasks = tasks
   },
   [ADD_NEW_TASK](state: IListsState, { listName, taskName, index }: any) {
     const getRandomArbitrary = (min: number, max: number): number => Math.ceil(Math.random() * (max - min) + min)

@@ -18,12 +18,11 @@
         @end="drag = false"
       >
         <div
-          v-for="({ id, task_id }, index) in list.tasks"
-          :key="id"
+          v-for="(task, index) in list.tasks"
+          :key="task.id"
           class="tasks-list__item"
-          v-if="getTaskById(task_id)"
         >
-          <TaskItem :task="getTaskById(task_id)" />
+          <TaskItem :task="task" />
           <AddNewTaskForm :listTitle="list.name" :indexTask="index + 1" />
         </div>
       </VueDraggable>
@@ -58,7 +57,6 @@ export default class Dragable extends Vue {
   @Lists.Mutation('lists/SET_TASKS_TO_LIST') private setTaskToList!: any
   @Lists.Mutation('lists/SET_LISTS') private setLists!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
-  @Lists.Getter('getTaskById') private getTaskById!: any
   @Lists.State(state => state.lists) private lists!: IList[]
   @Lists.State(
     state => state.lists.find((list: IList) => list.name === 'tasks').tasks

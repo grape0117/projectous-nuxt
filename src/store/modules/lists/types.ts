@@ -9,8 +9,13 @@ export interface IList {
 }
 
 export interface ITask {
-  id: string
+  due_date: string
+  id: number
   uuid: string | null
   sort_order: string | null
   title: string
+}
+
+export interface IUserTask {
+  task_id: number
 }
