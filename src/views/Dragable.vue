@@ -3,13 +3,10 @@
     class="lists"
     v-model="allLists"
     group="lists"
-    @start="drag=true" @end="drag=false"
+    @start="drag = true"
+    @end="drag = false"
   >
-    <div
-      v-for="(list, index) in allLists"
-      :key="index"
-      class="tasks-list-main"
-    >
+    <div v-for="(list, index) in allLists" :key="index" class="tasks-list-main">
       <h3>{{ list.name }}</h3>
       <VueDraggable
         class="tasks-list"
@@ -17,8 +14,8 @@
         v-model="list.tasks"
         group="tasks"
         @input="updateList(list)"
-        @start="drag=true"
-        @end="drag=false"
+        @start="drag = true"
+        @end="drag = false"
       >
         <div
           v-for="({ id, task_id }, index) in list.tasks"
@@ -49,12 +46,13 @@ import AddNewTaskForm from '@/components/draggable/AddNewTaskForm.vue'
 
 const Lists = namespace('lists')
 
-// @ts-ignore
-@Component({ components: {
-  VueDraggable,
-  TaskItem,
-  AddNewTaskForm
-}})
+@Component({
+  components: {
+    VueDraggable,
+    TaskItem,
+    AddNewTaskForm
+  }
+})
 export default class Dragable extends Vue {
   @Lists.Action private fetchTasks!: any
   @Lists.Mutation('lists/SET_TASKS_TO_LIST') private setTaskToList!: any
@@ -62,10 +60,15 @@ export default class Dragable extends Vue {
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.Getter('getTaskById') private getTaskById!: any
   @Lists.State(state => state.lists) private lists!: IList[]
-  @Lists.State(state => state.lists.find((list: IList) =>
-    list.name === 'tasks').tasks) private tasks!: ITask
-  @Lists.State(state => state.lists.find((list: IList) =>
-    list.name === 'additionalTasks').tasks) private additionalTasks!: ITask
+  @Lists.State(
+    state => state.lists.find((list: IList) => list.name === 'tasks').tasks
+  )
+  private tasks!: ITask
+  @Lists.State(
+    state =>
+      state.lists.find((list: IList) => list.name === 'additionalTasks').tasks
+  )
+  private additionalTasks!: ITask
 
   private nameNewList: string = ''
 
@@ -77,30 +80,36 @@ export default class Dragable extends Vue {
     return this.lists
   }
 
+  private async created() {
+    await this.fetchTasks()
+    // setInterval(() => {
+    //   const tasksList = this.allLists.find(
+    //     (list: IList) => list.name === 'tasks'
+    //   )
+    //   const oldTasks = tasksList ? tasksList.tasks : []
+    //   const getRandomArbitrary = (min: number, max: number): number =>
+    //     Math.ceil(Math.random() * (max - min) + min)
+    //   this.setTaskToList({
+    //     listName: 'tasks',
+    //     tasks: [
+    //       { id: getRandomArbitrary(1000, 999999), title: 'NEW TASK NEW TASK' },
+    //       ...oldTasks
+    //     ]
+    //   })
+    // }, 5000)
+  }
+
   private addNewListHandler() {
     if (!this.nameNewList) return
-    if (this.allLists.some((list: IList) => list.name === this.nameNewList)) return
+    if (this.allLists.some((list: IList) => list.name === this.nameNewList)) {
+      return
+    }
     this.addNewList(this.nameNewList)
     this.nameNewList = ''
   }
 
-  private updateList(value: any) {
-    this.setTaskToList({listName: value.name, tasks: value.tasks})
-  }
-
-  private async created() {
-    await this.fetchTasks()
-
-    setInterval(() => {
-      const tasksList = this.allLists.find((list: IList) => list.name === 'tasks')
-      const oldTasks = tasksList ? tasksList.tasks : []
-      const getRandomArbitrary = (min: number, max: number): number => Math.ceil(Math.random() * (max - min) + min)
-
-      this.setTaskToList({
-        listName: 'tasks',
-        tasks: [{id: getRandomArbitrary(1000, 999999), title: 'NEW TASK NEW TASK'}, ...oldTasks]
-      })
-    }, 5000)
+  private updateList({ name, tasks }: any) {
+    this.setTaskToList({ listName: name, tasks })
   }
 }
 </script>
