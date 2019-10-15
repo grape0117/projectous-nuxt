@@ -1,6 +1,6 @@
 export interface IModuleState {
     tasks: ITask[],
-    lookup: object,
+    lookup: any,
     displayed_tasks_plus0: ITask[],
     displayed_tasks_plus1: ITask[],
     displayed_tasks_plus2: ITask[],
@@ -18,18 +18,18 @@ export interface IModuleState {
 }
 
 export interface ITask {
-    id: number,
+    id: string,
     uuid: string | null,
-    sort_order: number | null,
+    sort_order: string | null,
     title: string,
-    company_id: number | null,
-    project_id: number | null,
+    company_id: string | null,
+    project_id: string | null,
     detail: string,
     note: string | null,
     status: string, // enum('reviewed','turned-in','completed','closed','open') NOT NULL DEFAULT 'open',
     priority: string, //` enum('today','this week','when possible','active','hold') NOT NULL DEFAULT 'active',
-    priority_set_at: Date | null,
-    order: number | null,
+    priority_set_at: string | null,
+    order: string | null,
     previous_task_id: number | null,
     next_task_id: number | null,
     parent_task_id: number | null,
