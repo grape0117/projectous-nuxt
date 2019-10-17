@@ -20,7 +20,7 @@ export const mutations: MutationTree<IListsState> = {
       .filter((task: ITask) => task.due_date)
       .sort((a: ITask, b: ITask) => (
         // @ts-ignore
-        new Date(b.due_date) - new Date(a.due_date)
+        new Date(a.due_date) - new Date(b.due_date)
       ))
 
     state.lists = state.lists.map(list => list.name === 'tasks' ? { ...list, tasks: sortableTasks } : list)
