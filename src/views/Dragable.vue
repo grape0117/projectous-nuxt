@@ -7,7 +7,9 @@
     @end="drag = false"
   >
     <div v-for="(list, index) in allLists" :key="index" class="tasks-list-main">
-      <h3>{{ list.name }}</h3>
+      <div class="list-title-block">
+        <h3>{{ list.name.substring(0, 3).toUpperCase() }}</h3>
+      </div>
       <VueDraggable
         class="tasks-list"
         :value="list"
@@ -106,8 +108,8 @@ export default class Dragable extends Vue {
     this.nameNewList = ''
   }
 
-  private updateList({ name, tasks }: any) {
-    this.setTaskToList({ listName: name, tasks })
+  private updateList({ name, tasks, dateTime }: any) {
+    this.setTaskToList({ listName: name, tasks, dateTime })
   }
 }
 </script>
@@ -115,9 +117,13 @@ export default class Dragable extends Vue {
 <style>
 .lists {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .tasks-list {
+  display: flex;
+  flex-direction: column;
   width: 200px;
   padding: 30px;
   margin: 10px;
@@ -128,6 +134,16 @@ export default class Dragable extends Vue {
   border: 1px solid black;
 }
 
+.list-title-block {
+  background-color: lightgray;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 15px;
+  padding-right: 15px;
+  width: 50px;
+}
+
 .tasks-list__item > p {
   margin: 0px;
   word-break: break-all;
@@ -135,8 +151,8 @@ export default class Dragable extends Vue {
 
 .tasks-list-main {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  align-items: stretch;
 }
 
 .form-add-new-list {

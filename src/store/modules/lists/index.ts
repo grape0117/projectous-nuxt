@@ -7,20 +7,7 @@ import { IListsState } from './types'
 
 const state = {
   allTasks: [],
-  lists: [
-    {
-      name: 'tasks',
-      tasks: []
-    },
-    {
-      name: 'additionalTasks',
-      tasks: []
-    },
-    {
-      name: 'againTasks',
-      tasks: []
-    }
-  ]
+  lists: []
 }
 export const lists: Module<IListsState, IRootState> = {
   namespaced: true,
