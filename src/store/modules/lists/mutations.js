@@ -1,4 +1,10 @@
-import { FETCH_TASKS, ADD_NEW_LIST, ADD_NEW_TASK } from './mutations-types'
+import {
+  FETCH_TASKS,
+  SET_TASKS_TO_LIST,
+  SET_LISTS,
+  ADD_NEW_LIST,
+  ADD_NEW_TASK
+} from './mutations-types'
 const dayOfWeek = {
   0: 'Monday',
   1: 'Tuesday',
@@ -9,6 +15,19 @@ const dayOfWeek = {
   6: 'Sundays'
 }
 export const mutations = {
+  /*[FETCH_TASKS](state: IListsState, tasks: ITask[]) {
+      state.lists = state.lists.map(list =>
+        list.name === 'tasks' ? { ...list, tasks } : list
+      )
+    },*/
+  [SET_TASKS_TO_LIST](state, payload) {
+    state.lists = state.lists.map(list =>
+      list.name === payload.listName ? { ...list, tasks: payload.tasks } : list
+    )
+  },
+  [SET_LISTS](state, lists) {
+    state.lists = lists
+  },
   [FETCH_TASKS](state, { userTasks, allTasks }) {
     const sortableTasks = userTasks
       .map(({ task_id }) => allTasks.find(task => task_id === task.id))
@@ -44,6 +63,23 @@ export const mutations = {
   [ADD_NEW_LIST](state, newNameList) {
     state.lists = [...state.lists, { name: newNameList, tasks: [] }]
   },
+  /*[ADD_TASK](
+      state: IListsState,
+      { task, listName }: { task: ITask; listName: string }
+    ) {
+      //@Mikhail what naming conventions are you following? For object properties I would like to match the DB
+      state.allTasks = [...state.allTasks, task]
+      state.lists.map(list => {
+        if (list.name === listName) {
+          const listTasks = list.tasks
+  
+          listTasks.splice(task.sort_order, 0, task)
+          return { ...list, tasks: listTasks }
+        } else {
+          return list
+        }
+      })
+    },*/
   [ADD_NEW_TASK](state, { listName, taskName, index }) {
     const getRandomArbitrary = (min, max) =>
       Math.ceil(Math.random() * (max - min) + min)
@@ -53,7 +89,7 @@ export const mutations = {
         const listTasks = list.tasks
         listTasks.splice(index, 0, {
           task_id: taskId,
-          id: getRandomArbitrary(1000, 999999)
+          id: taskId
         })
         return { ...list, tasks: listTasks }
       } else {

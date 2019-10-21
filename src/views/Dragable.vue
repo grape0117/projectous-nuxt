@@ -31,7 +31,10 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { ITask, IList } from '@/store/modules/lists/types'
+import { IList } from '@/store/modules/lists/types'
+import { ITask } from '@/store/modules/tasks/types'
+import ContentEditable from './content-editable.vue'
+
 // @ts-ignore
 import VueDraggable from '@/../node_modules/vuedraggable'
 import TaskItem from '@/components/draggable/TaskItem.vue'
@@ -137,7 +140,7 @@ export default class Dragable extends Vue {
 }
 
 .tasks-list__item > p {
-  margin: 0px;
+  margin: 0;
   word-break: break-all;
 }
 

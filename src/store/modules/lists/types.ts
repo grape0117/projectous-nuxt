@@ -4,18 +4,10 @@ export interface IListsState {
 
 export interface IList {
   name: string
-  tasks: ITask[]
-}
-
-export interface ITask {
-  due_date?: string
-  id?: number
-  uuid?: string | null
-  sort_order?: string | null
-  title?: string
-  task_id?: number
+  tasks: IUserTask[]
 }
 
 export interface IUserTask {
+  id: number
   task_id: number
 }
