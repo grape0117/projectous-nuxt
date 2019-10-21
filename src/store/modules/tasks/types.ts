@@ -18,7 +18,7 @@ export interface IModuleState {
 }
 
 export interface ITask {
-  id: string
+  id: number
   uuid: string | null
   sort_order: number
   title: string

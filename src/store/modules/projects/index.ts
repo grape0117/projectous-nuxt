@@ -1,12 +1,9 @@
-import Vue from 'vue'
+import { Module } from 'vuex'
 import { IRootState } from '@/store/types'
-import { IModuleState } from './types'
-import { ITask } from '../tasks/types'
-import { IProject } from '../projects/types'
-import { Module, GetterTree, ActionTree } from 'vuex'
-import { mutations } from './mutations'
 import { actions } from './actions'
-import { Getter } from 'vuex-class'
+import { getters } from './getters'
+import { mutations } from './mutations'
+import { IModuleState } from "./types";
 
 const state = {
   projects: [],

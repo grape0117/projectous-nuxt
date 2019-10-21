@@ -1,23 +1,31 @@
-// @ts-ignore
 import { MutationTree } from 'vuex'
-import { IListsState, IList } from './types'
 import { ITask } from '../tasks/types'
+import { IListsState, IList, IUserTask } from './types'
 import {
   FETCH_TASKS,
   SET_TASKS_TO_LIST,
   SET_LISTS,
   ADD_NEW_LIST,
-  SET_ALL_TASKS,
   ADD_NEW_TASK,
   ADD_TASK
 } from './mutations-types'
 
+const dayOfWeek: any = {
+  0: 'Monday',
+  1: 'Tuesday',
+  2: 'Wednesday',
+  3: 'Thursday',
+  4: 'Friday',
+  5: 'Saturday',
+  6: 'Sundays'
+}
+
 export const mutations: MutationTree<IListsState> = {
-  [FETCH_TASKS](state: IListsState, tasks: ITask[]) {
+  /*[FETCH_TASKS](state: IListsState, tasks: ITask[]) {
     state.lists = state.lists.map(list =>
       list.name === 'tasks' ? { ...list, tasks } : list
     )
-  },
+  },*/
   [SET_TASKS_TO_LIST](state: IListsState, payload: any) {
     state.lists = state.lists.map(list =>
       list.name === payload.listName ? { ...list, tasks: payload.tasks } : list
@@ -26,13 +34,52 @@ export const mutations: MutationTree<IListsState> = {
   [SET_LISTS](state: IListsState, lists: any) {
     state.lists = lists
   },
+  [FETCH_TASKS](state: IListsState, { userTasks, allTasks }: any) {
+    const sortableTasks = userTasks
+      .map(({ task_id }: IUserTask) =>
+        allTasks.find((task: ITask) => task_id === task.id)
+      )
+      .filter(({ due_date }: ITask) => due_date)
+      .sort(
+        (a: ITask, b: ITask) =>
+          // @ts-ignore
+          new Date(a.due_date) - new Date(b.due_date)
+      )
+
+    const sortableTasksByDays = sortableTasks.reduce(
+      (acc: any, item: ITask) => {
+        const dateTime = new Date(item.due_date as string).setHours(0, 0, 0, 0)
+
+        if (
+          acc.some(
+            (obj: any) => new Date(obj.date).setHours(0, 0, 0, 0) === dateTime
+          )
+        ) {
+          return acc.map((obj: any) =>
+            new Date(obj.date).setHours(0, 0, 0, 0) === dateTime
+              ? { ...obj, tasks: [...obj.tasks, item] }
+              : obj
+          )
+        } else {
+          return [...acc, { date: dateTime, tasks: [item] }]
+        }
+      },
+      []
+    )
+
+    state.lists = sortableTasksByDays.map((item: any) =>
+      // @ts-ignore
+      ({
+        name: dayOfWeek[new Date(item.date).getDay()],
+        tasks: item.tasks,
+        dateTime: item.date
+      })
+    )
+  },
   [ADD_NEW_LIST](state: IListsState, newNameList: string) {
     state.lists = [...state.lists, { name: newNameList, tasks: [] }]
   },
-  [SET_ALL_TASKS](state: IListsState, tasks: ITask[]) {
-    state.allTasks = tasks
-  },
-  [ADD_TASK](
+  /*[ADD_TASK](
     state: IListsState,
     { task, listName }: { task: ITask; listName: string }
   ) {
@@ -48,23 +95,17 @@ export const mutations: MutationTree<IListsState> = {
         return list
       }
     })
-  },
+  },*/
   [ADD_NEW_TASK](state: IListsState, { listName, taskName, index }: any) {
     const getRandomArbitrary = (min: number, max: number): number =>
       Math.ceil(Math.random() * (max - min) + min)
     const taskId = getRandomArbitrary(1000, 999999)
-
-    // @ts-ignore
-    state.allTasks = [...state.allTasks, { id: taskId, title: taskName }]
-
     state.lists.map(list => {
       if (list.name === listName) {
         const listTasks = list.tasks
-
-        // @ts-ignore
         listTasks.splice(index, 0, {
           task_id: taskId,
-          id: getRandomArbitrary(1000, 999999)
+          id: taskId
         })
         return { ...list, tasks: listTasks }
       } else {

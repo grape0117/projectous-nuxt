@@ -3,7 +3,7 @@ import { IRootState } from '@/store/types'
 import { IModuleState, IProject } from './types'
 import { IListsState } from '@/store/modules/lists/types'
 
-const getters: GetterTree<IModuleState, IRootState> = {
+export const getters: GetterTree<IModuleState, IRootState> = {
   getById: (state: IModuleState, getters: any) => (id: number) => {
     let project
     if ((project = state.projects[state.lookup[id]])) {
