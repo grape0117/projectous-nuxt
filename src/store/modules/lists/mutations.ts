@@ -1,4 +1,3 @@
-// @ts-ignore
 import { MutationTree } from 'vuex'
 import { IListsState, ITask, IUserTask } from './types'
 import {
@@ -9,7 +8,7 @@ import {
   ADD_NEW_TASK
 } from './mutations-types'
 
-const dayOfWeek = {
+const dayOfWeek: any = {
   0: 'Monday',
   1: 'Tuesday',
   2: 'Wednesday',
@@ -20,12 +19,12 @@ const dayOfWeek = {
 }
 
 export const mutations: MutationTree<IListsState> = {
-  [FETCH_TASKS](state: IListsState, payload: any) {
-    const sortableTasks = payload.userTasks
-      .map((userTask: IUserTask) =>
-        payload.allTasks.find((task: ITask) => userTask.task_id === task.id)
+  [FETCH_TASKS](state: IListsState, { userTasks, allTasks }: any) {
+    const sortableTasks = userTasks
+      .map(({ task_id }: IUserTask) =>
+        allTasks.find((task: ITask) => task_id === task.id)
       )
-      .filter((task: ITask) => task.due_date)
+      .filter(({ due_date }: ITask) => due_date)
       .sort(
         (a: ITask, b: ITask) =>
           // @ts-ignore
@@ -34,7 +33,7 @@ export const mutations: MutationTree<IListsState> = {
 
     const sortableTasksByDays = sortableTasks.reduce(
       (acc: any, item: ITask) => {
-        const dateTime = new Date(item.due_date).setHours(0, 0, 0, 0)
+        const dateTime = new Date(item.due_date as string).setHours(0, 0, 0, 0)
 
         if (
           acc.some(
@@ -78,15 +77,9 @@ export const mutations: MutationTree<IListsState> = {
     const getRandomArbitrary = (min: number, max: number): number =>
       Math.ceil(Math.random() * (max - min) + min)
     const taskId = getRandomArbitrary(1000, 999999)
-
-    // @ts-ignore
-    state.allTasks = [...state.allTasks, { id: taskId, title: taskName }]
-
     state.lists.map(list => {
       if (list.name === listName) {
         const listTasks = list.tasks
-
-        // @ts-ignore
         listTasks.splice(index, 0, {
           task_id: taskId,
           id: getRandomArbitrary(1000, 999999)
