@@ -6,6 +6,7 @@ import { mutations } from './mutations'
 import { IListsState } from './types'
 
 const state = {
+  allTasks: [],
   lists: [
     {
       name: 'tasks',
