@@ -1,11 +1,5 @@
 <template>
-  <VueDraggable
-    class="lists"
-    v-model="allLists"
-    group="lists"
-    @start="drag = true"
-    @end="drag = false"
-  >
+  <div class="lists">
     <div v-for="(list, index) in allLists" :key="index" class="tasks-list-main">
       <div class="list-title-block">
         <h3>{{ list.name.substring(0, 3).toUpperCase() }}</h3>
@@ -15,9 +9,7 @@
         :value="list"
         v-model="list.tasks"
         group="tasks"
-        @input="updateList(list)"
-        @start="drag = true"
-        @end="drag = false"
+        @change="extractTask"
       >
         <div
           v-for="(task, index) in list.tasks"
@@ -33,7 +25,7 @@
       <input type="text" v-model="nameNewList" />
       <button @click="addNewListHandler">Add</button>
     </div>
-  </VueDraggable>
+  </div>
 </template>
 
 <script lang="ts">
@@ -56,8 +48,7 @@ const Lists = namespace('lists')
 })
 export default class Dragable extends Vue {
   @Lists.Action private fetchTasks!: any
-  @Lists.Mutation('lists/SET_TASKS_TO_LIST') private setTaskToList!: any
-  @Lists.Mutation('lists/SET_LISTS') private setLists!: any
+  @Lists.Action private updateTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
   @Lists.State(
@@ -71,10 +62,6 @@ export default class Dragable extends Vue {
   private additionalTasks!: ITask
 
   private nameNewList: string = ''
-
-  set allLists(value: any) {
-    this.setLists(value)
-  }
 
   get allLists() {
     return this.lists
@@ -99,6 +86,15 @@ export default class Dragable extends Vue {
     // }, 5000)
   }
 
+  private extractTask(events: any): void {
+    if (events.removed) return
+    const { added, moved } = events
+    const event = added || moved
+    const task: ITask = event.element
+    task.sort_order = event.newIndex
+    this.updateTask(task)
+  }
+
   private addNewListHandler() {
     if (!this.nameNewList) return
     if (this.allLists.some((list: IList) => list.name === this.nameNewList)) {
@@ -106,10 +102,6 @@ export default class Dragable extends Vue {
     }
     this.addNewList(this.nameNewList)
     this.nameNewList = ''
-  }
-
-  private updateList({ name, tasks, dateTime }: any) {
-    this.setTaskToList({ listName: name, tasks, dateTime })
   }
 }
 </script>

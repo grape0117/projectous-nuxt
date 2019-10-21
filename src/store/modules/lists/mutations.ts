@@ -61,15 +61,6 @@ export const mutations: MutationTree<IListsState> = {
       })
     )
   },
-  [SET_TASKS_TO_LIST](state: IListsState, payload: any) {
-    console.log('SEND TO REQUEST CHANGE ORDER')
-    console.log(payload)
-
-    state.lists = state.lists.filter((list: any) => list.tasks.length !== 0)
-  },
-  [SET_LISTS](state: IListsState, lists: any) {
-    state.lists = lists
-  },
   [ADD_NEW_LIST](state: IListsState, newNameList: string) {
     state.lists = [...state.lists, { name: newNameList, tasks: [] }]
   },
