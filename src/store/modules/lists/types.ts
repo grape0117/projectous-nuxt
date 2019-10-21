@@ -1,16 +1,22 @@
 export interface IListsState {
-  lists: IList[],
+  lists: IList[]
   allTasks: ITask[]
 }
 
 export interface IList {
-  name: string,
+  name: string
   tasks: ITask[]
 }
 
 export interface ITask {
-  id: string
-  uuid: string | null
-  sort_order: string | null
-  title: string
+  due_date?: string
+  id?: number
+  uuid?: string | null
+  sort_order?: string | null
+  title?: string
+  task_id?: number
+}
+
+export interface IUserTask {
+  task_id: number
 }
