@@ -1,12 +1,11 @@
 // @ts-ignore
 import { MutationTree } from 'vuex'
-import { IListsState, ITask, IList, IUserTask } from './types'
+import { IListsState, ITask, IUserTask } from './types'
 import {
   FETCH_TASKS,
   SET_TASKS_TO_LIST,
   SET_LISTS,
   ADD_NEW_LIST,
-  SET_ALL_TASKS,
   ADD_NEW_TASK
 } from './mutations-types'
 
