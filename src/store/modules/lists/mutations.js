@@ -81,6 +81,7 @@ export const mutations = {
       })
     },*/
   [ADD_NEW_TASK](state, { listName, taskName, index }) {
+    //@Mikhail: can't we put this somewhere outside of mutations?
     const getRandomArbitrary = (min, max) =>
       Math.ceil(Math.random() * (max - min) + min)
     const taskId = getRandomArbitrary(1000, 999999)

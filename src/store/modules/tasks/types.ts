@@ -18,8 +18,7 @@ export interface IModuleState {
 }
 
 export interface ITask {
-  id: number
-  uuid: string | null
+  id: string
   sort_order: number
   title: string
   company_id: string | null
@@ -37,10 +36,7 @@ export interface ITask {
   created_by_company_user_id: number | null
   due_date: string | null
   estimate: number | null
-  for_today: number
-  next_work_day: Date | null
   original_due_date: Date | null
-  workflowy_id: string | null
   completed_at: string | null
   created_at: string | null
   updated_at: string | null

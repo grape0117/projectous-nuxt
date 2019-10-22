@@ -1,6 +1,7 @@
 import { MutationTree } from 'vuex'
 import { ITask } from '../tasks/types'
-import { IListsState, IList, IUserTask } from './types'
+import { IListsState, IList } from './types'
+import { ITaskUser } from '../task_users/types'
 import {
   FETCH_TASKS,
   SET_TASKS_TO_LIST,
@@ -36,7 +37,7 @@ export const mutations: MutationTree<IListsState> = {
   },
   [FETCH_TASKS](state: IListsState, { userTasks, allTasks }: any) {
     const sortableTasks = userTasks
-      .map(({ task_id }: IUserTask) =>
+      .map(({ task_id }: ITaskUser) =>
         allTasks.find((task: ITask) => task_id === task.id)
       )
       .filter(({ due_date }: ITask) => due_date)
@@ -97,6 +98,7 @@ export const mutations: MutationTree<IListsState> = {
     })
   },*/
   [ADD_NEW_TASK](state: IListsState, { listName, taskName, index }: any) {
+    //@Mikhail: can't we put this somewhere outside of mutations?
     const getRandomArbitrary = (min: number, max: number): number =>
       Math.ceil(Math.random() * (max - min) + min)
     const taskId = getRandomArbitrary(1000, 999999)
