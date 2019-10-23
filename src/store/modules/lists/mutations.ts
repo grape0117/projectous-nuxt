@@ -1,7 +1,7 @@
 import { MutationTree } from 'vuex'
 import { IListsState, ITask, IUserTask } from './types'
 import { FETCH_TASKS, ADD_NEW_LIST, ADD_NEW_TASK } from './mutations-types'
-import { Normilizer } from '@/utils/Normilizer'
+import { Normalizer } from '@/utils/Normalizer'
 import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
 
 const dayOfWeek: any = {
@@ -16,16 +16,17 @@ const dayOfWeek: any = {
 
 export const mutations: MutationTree<IListsState> = {
   [FETCH_TASKS](state: IListsState, { userTasks, allTasks }: any) {
-    const normalizedTasks = new Normilizer({
+    const normalizedTasks = new Normalizer({
       tasks: allTasks
     }).flatNormalizationById('tasks')
-    const sortedTasks = userTasks.map(
-      ({ task_id }: IUserTask) => normalizedTasks[task_id]
-    )
-    const unmarkedTasks = sortedTasks.filter(
+    const filteredTasks = userTasks
+      .map(({ task_id }: IUserTask) => normalizedTasks[task_id])
+      .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+    console.log(filteredTasks)
+    const unmarkedTasks = filteredTasks.filter(
       ({ next_work_day }: ITask) => !next_work_day
     )
-    const markedTasks = sortedTasks.filter(
+    const markedTasks = filteredTasks.filter(
       ({ next_work_day }: ITask) => next_work_day
     )
     const lists = []

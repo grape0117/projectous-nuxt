@@ -1,6 +1,6 @@
 import { normalize, schema } from 'normalizr'
 
-export class Normilizer {
+export class Normalizer {
   private data: any
   constructor(data: any) {
     this.data = data
