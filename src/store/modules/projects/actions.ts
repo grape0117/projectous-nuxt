@@ -30,10 +30,10 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }: { attribute: string; value: any; project_id: number }
   ) {
     // @ts-ignore
-    /*const response = await this._vm
+    const response = await this._vm
       .$http()
       .put('/projects/' + project_id + 'updateAttribute', { attribute, value })
-    commit('updateAttribute', { project_id, attribute, value }) //@Mikhail should I get values from response?*/
+    commit('updateAttribute', { project_id, attribute, value }) //@Mikhail should I get values from response?
   },
   async delete() {}
 }

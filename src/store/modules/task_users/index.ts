@@ -7,7 +7,7 @@ import { IModuleState } from './types'
 
 const state = {
   task_users: [],
-  lookup: []
+  lookup: {}
 }
 export const task_users: Module<IModuleState, IRootState> = {
   namespaced: true,

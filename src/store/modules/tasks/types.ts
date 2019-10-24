@@ -25,7 +25,7 @@ export interface ITask {
   project_id: string | null
   detail: string
   note: string | null
-  status: string // enum('reviewed','turned-in','completed','closed','open') NOT NULL DEFAULT 'open',
+  status: string | null // enum('reviewed','turned-in','completed','closed','open') NOT NULL DEFAULT 'open',
   priority: string //` enum('today','this week','when possible','active','hold') NOT NULL DEFAULT 'active',
   priority_set_at: string | null
   order: string | null

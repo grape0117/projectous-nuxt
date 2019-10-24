@@ -5,11 +5,36 @@ import { IRootState } from '@/store/types'
 import { ADD_TASK, FETCH_TASKS } from './mutations-types'
 
 export const actions: ActionTree<IListsState, IRootState> = {
-  async fetchTasks({ commit }): Promise<ITask[]> {
+  async fetchTasks({ commit }) {
     // @ts-ignore
-    const { user_tasks, tasks } = await this._vm.$http().fetch('/test-tasks')
-    commit(FETCH_TASKS, { userTasks: user_tasks, allTasks: tasks })
-    return user_tasks
+    const {
+      task_users,
+      tasks,
+      company_users,
+      projects,
+      project_users
+    } = await this._vm.$http().fetch('/test-tasks')
+    commit(FETCH_TASKS, { userTasks: task_users, allTasks: tasks })
+    commit(
+      'ADD_MANY',
+      { module: 'user_tasks', entities: task_users },
+      { root: true }
+    )
+    commit(
+      'ADD_MANY',
+      { module: 'projects', entities: projects },
+      { root: true }
+    )
+    commit(
+      'ADD_MANY',
+      { module: 'project_users', entities: project_users },
+      { root: true }
+    )
+    commit(
+      'ADD_MANY',
+      { module: 'company_users', entities: company_users },
+      { root: true }
+    )
   },
   /*  async addNewTask(
     { commit }: any,

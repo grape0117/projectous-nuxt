@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Prop, Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { IList } from '@/store/modules/lists/types'
 import { ITask } from '@/store/modules/tasks/types'
@@ -49,6 +49,7 @@ const Lists = namespace('lists')
   }
 })
 export default class Draggable extends Vue {
+  @Prop() selected_user: any
   @Lists.Action private fetchTasks!: any
   @Lists.Action private updateTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any

@@ -1,56 +1,65 @@
 import { MutationTree } from 'vuex'
 import { IModuleState, IProject } from '@/store/modules/projects/types'
 import Vue from 'vue'
+import {
+  ADD_PROJECTS,
+  UPSERT_PROJECT,
+  DELETE_PROJECT,
+  UPDATE_PROJECT,
+  UPDATE_PROJECT_ATTRIBUTE,
+  ADD_PROJECT
+} from '@/store/modules/projects/mutations-types'
 
 export const mutations: MutationTree<IModuleState> = {
-  load(state: IModuleState, projects: IProject[]) {
-    projects.forEach((value, key) => {
-      if (!state.lookup[projects[key].id]) {
-        state.projects.push(value)
-      } else {
-        state.projects[state.lookup[projects[key].id]] = value
-      }
-    })
-
-    state.lookup = []
-    state.projects.forEach((project, key) => {
-      state.lookup[project.id] = key
-    })
+  [ADD_PROJECTS](state: IModuleState, projects: any[]) {
+    //@ts-ignore
+    this.commit(
+      'ADD_MANY',
+      { module: 'projects', entities: projects },
+      { root: true }
+    )
   },
-  create(state: IModuleState, project: IProject) {
-    state.projects.push(project)
-
-    //@Mikhail is there a faster way to find the index? Can I search from the bottom of the array first?
-    state.projects.forEach((project, key) => {
-      state.lookup[project.id] = key
-    })
+  [ADD_PROJECT](state: IModuleState, project: any) {
+    //@ts-ignore
+    this.commit(
+      'ADD_ONE',
+      { module: 'projects', entity: project },
+      { root: true }
+    )
   },
-  upsert(state: IModuleState, project: IProject) {
-    let property
-    let key
-    key = state.lookup[project.id]
-    if (key) {
-      for (property in project) {
-        if (project.hasOwnProperty(property)) {
-          // @ts-ignore
-          state.projects[key][property] = project[property]
-        }
-      }
-    } else {
-      // @ts-ignore
-      this.commit('projects/create', project)
-    }
+  [UPSERT_PROJECT](state: IModuleState, project: any) {
+    //@ts-ignore
+    this.commit(
+      'UPSERT',
+      { module: 'projects', entity: project },
+      { root: true }
+    )
   },
-  updateAttribute(
+  [UPDATE_PROJECT](state: IModuleState, project: any) {
+    //@ts-ignore
+    this.commit(
+      'UPDATE',
+      { module: 'projects', entity: project },
+      { root: true }
+    )
+  },
+  [UPDATE_PROJECT_ATTRIBUTE](
     state: IModuleState,
-    { project_id: number, attribute: string, value }
+    { project_id, attribute, value }
   ) {
-    // @ts-ignore
-    state.projects[state.lookup[project.id]][attribute] = value
+    //@ts-ignore
+    this.commit(
+      'UPDATE_ATTRIBUTE',
+      { module: 'projects', id: project_id, attribute, value },
+      { root: true }
+    )
   },
-  delete(state: IModuleState, project: IProject) {
-    Vue.delete(state.projects, state.lookup[project.id])
-    Vue.delete(state.lookup, project.id)
-    //TODO: what to do with project_tasks and project_users
+  [DELETE_PROJECT](state: IModuleState, project) {
+    //@ts-ignore
+    this.commit(
+      'DELETE',
+      { module: 'projects', entity: project },
+      { root: true }
+    )
   }
 }
