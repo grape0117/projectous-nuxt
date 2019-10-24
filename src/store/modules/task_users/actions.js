@@ -22,14 +22,12 @@ const UUID = () => {
 }
 export const actions = {
   async createUserTask({ dispatch, commit }, { list, sort_order }) {
-    const task = {
+    //@Mikhail: how do I both use TS with optional properties but also use TS to help avoid errors? Just use ignore with a note?
+    const newTask = {
       id: UUID(),
       title: 'title'
     }
-    const new_task = dispatch('task/CREATE', {
-      uuid: task_uuid,
-      title: 'title'
-    })
+    const new_task = dispatch('task/CREATE', newTask)
     const new_task_user = dispatch('task_user/CREATE', {
       task: new_task,
       list,

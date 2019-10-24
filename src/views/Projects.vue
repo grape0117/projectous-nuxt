@@ -11,13 +11,12 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import Dragable from './Dragable'
+//import Dragable from 'Dragable'
 @Component({
-  components: { Dragable }
+  //components: { Dragable }
 })
 export default class Projects extends Vue {
-  selected_user: null
-
-  private mounted(): {}
+  //selected_user: null
+  //private mounted(): {}
 }
 </script>

@@ -2,18 +2,17 @@
   <div class="lists">
     <div v-for="(list, index) in allLists" :key="index" class="tasks-list-main">
       <div class="list-title-block">
-        <h3>{{ list.name.substring(0, 3).toUpperCase() }}</h3>
+        <h3>{{ list.name }}</h3>
       </div>
       <VueDraggable
         class="tasks-list"
-        :value="list"
         v-model="list.tasks"
         group="tasks"
-        @change="extractTask"
+        @change="extractTask($event, list.name)"
       >
         <div
           v-for="(task, index) in list.tasks"
-          :key="task.id"
+          :key="task.name"
           class="tasks-list__item"
         >
           <TaskItem :task="task" />
@@ -49,7 +48,7 @@ const Lists = namespace('lists')
     AddNewTaskForm
   }
 })
-export default class Dragable extends Vue {
+export default class Draggable extends Vue {
   @Lists.Action private fetchTasks!: any
   @Lists.Action private updateTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
@@ -89,13 +88,13 @@ export default class Dragable extends Vue {
     // }, 5000)
   }
 
-  private extractTask(events: any): void {
-    if (events.removed) return
-    const { added, moved } = events
-    const event = added || moved
-    const task: ITask = event.element
-    task.sort_order = event.newIndex
-    this.updateTask(task)
+  private extractTask(event: any): void {
+    const { added, moved, removed } = event
+    if (!removed) {
+      const { element, newIndex } = added || moved
+      console.log(newIndex)
+      this.updateTask(element)
+    }
   }
 
   private addNewListHandler() {

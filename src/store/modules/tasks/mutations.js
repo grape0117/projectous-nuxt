@@ -28,6 +28,7 @@ export const mutations = {
     if (key) {
       for (property in task) {
         if (task.hasOwnProperty(property)) {
+          //@ts-ignore
           state.tasks[key][property] = task[property]
         }
       }
@@ -39,7 +40,8 @@ export const mutations = {
     }
   },
   updateAttribute(state, { task_id, attribute, value }) {
-    state.tasks[state.lookup[task.id]][attribute] = value
+    //@ts-ignore
+    state.tasks[state.lookup[task_id]][attribute] = value
   },
   delete(state, task) {
     Vue.delete(state.tasks, state.lookup[task.id])

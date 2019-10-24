@@ -34,6 +34,7 @@ export const mutations: MutationTree<IModuleState> = {
     if (key) {
       for (property in task) {
         if (task.hasOwnProperty(property)) {
+          //@ts-ignore
           state.tasks[key][property] = task[property]
         }
       }
@@ -45,7 +46,8 @@ export const mutations: MutationTree<IModuleState> = {
     }
   },
   updateAttribute(state: IModuleState, { task_id, attribute, value }: any) {
-    state.tasks[state.lookup[task.id]][attribute] = value
+    //@ts-ignore
+    state.tasks[state.lookup[task_id]][attribute] = value
   },
   delete(state: IModuleState, task) {
     Vue.delete(state.tasks, state.lookup[task.id])

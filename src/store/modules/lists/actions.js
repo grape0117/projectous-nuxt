@@ -18,9 +18,9 @@ export const actions = {
       commit(SAVE_TASK_BY_UUID)
       return task
       },*/
-  async updateTask({ commit, state }, task) {
-    console.log('SEND TO REQUEST CHANGE ORDER')
+  async updateTask({ commit }, task) {
     console.log(task)
+    console.log('SEND TO REQUEST CHANGE ORDER')
   }
 }
 //# sourceMappingURL=actions.js.map

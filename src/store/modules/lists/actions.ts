@@ -23,8 +23,8 @@ export const actions: ActionTree<IListsState, IRootState> = {
     commit(SAVE_TASK_BY_UUID)
     return task
     },*/
-  async updateTask({ commit, state }, task): Promise<any> {
-    console.log('SEND TO REQUEST CHANGE ORDER')
+  async updateTask({ commit }, task): Promise<any> {
     console.log(task)
+    console.log('SEND TO REQUEST CHANGE ORDER')
   }
 }
