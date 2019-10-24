@@ -1,17 +1,9 @@
 import { MutationTree } from 'vuex'
-import { IModuleState, IProject } from '@/store/modules/projects/types'
+import { IRootState } from './types'
 import Vue from 'vue'
-import {
-  ADD_PROJECTS,
-  UPSERT_PROJECT,
-  DELETE_PROJECT,
-  UPDATE_PROJECT,
-  UPDATE_PROJECT_ATTRIBUTE,
-  ADD_PROJECT
-} from '@/store/modules/projects/mutations-types'
 
-export const mutations: MutationTree<IModuleState> = {
-  ['ADD_MANY'](state: IModuleState, { module, entities }: any) {
+export const mutations: MutationTree<IRootState> = {
+  ['ADD_MANY'](state: IRootState, { module, entities }: any) {
     //@ts-ignore
     entities.forEach((value, key) => {
       //@ts-ignore
@@ -31,17 +23,17 @@ export const mutations: MutationTree<IModuleState> = {
       state[module].lookup[item.id] = key
     })
   },
-  ['ADD_ONE'](state: IModuleState, entity: IProject) {
+  ['ADD_ONE'](state: IRootState, { module, entity }) {
     //@ts-ignore
-    state[rows].push(entity)
+    state[module][module].push(entity)
 
     //@Mikhail is there a faster way to find the index? Can I search from the bottom of the array first?
     //@ts-ignore
-    state[rows].forEach((item, key) => {
-      state.lookup[item.id] = key
+    state[module][module].forEach((item, key) => {
+      state[module].lookup[item.id] = key
     })
   },
-  ['UPSERT'](state: IModuleState, { module, entity }: any) {
+  ['UPSERT'](state: IRootState, { module, entity }: any) {
     let property
     let key
     // @ts-ignore
@@ -59,13 +51,13 @@ export const mutations: MutationTree<IModuleState> = {
     }
   },
   ['UPDATE_ATTRIBUTE'](
-    state: IModuleState,
+    state: IRootState,
     { module, id: number, attribute: string, value }
   ) {
     // @ts-ignore
     state[module][state[module].lookup[id]][attribute] = value
   },
-  ['DELETE'](state: IModuleState, { module, entity }) {
+  ['DELETE'](state: IRootState, { module, entity }) {
     // @ts-ignore
     Vue.delete(state[module], state[module].lookup[entity.id])
     // @ts-ignore

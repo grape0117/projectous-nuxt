@@ -12,10 +12,10 @@ import {
 
 export const mutations: MutationTree<IModuleState> = {
   [ADD_PROJECTS](state: IModuleState, projects: any[]) {
-    //@ts-ignore
     this.commit(
       'ADD_MANY',
       { module: 'projects', entities: projects },
+      //@ts-ignore
       { root: true }
     )
   },
@@ -24,6 +24,7 @@ export const mutations: MutationTree<IModuleState> = {
     this.commit(
       'ADD_ONE',
       { module: 'projects', entity: project },
+      //@ts-ignore
       { root: true }
     )
   },
@@ -32,6 +33,7 @@ export const mutations: MutationTree<IModuleState> = {
     this.commit(
       'UPSERT',
       { module: 'projects', entity: project },
+      //@ts-ignore
       { root: true }
     )
   },
@@ -40,6 +42,7 @@ export const mutations: MutationTree<IModuleState> = {
     this.commit(
       'UPDATE',
       { module: 'projects', entity: project },
+      //@ts-ignore
       { root: true }
     )
   },
@@ -51,6 +54,7 @@ export const mutations: MutationTree<IModuleState> = {
     this.commit(
       'UPDATE_ATTRIBUTE',
       { module: 'projects', id: project_id, attribute, value },
+      //@ts-ignore
       { root: true }
     )
   },
@@ -59,6 +63,7 @@ export const mutations: MutationTree<IModuleState> = {
     this.commit(
       'DELETE',
       { module: 'projects', entity: project },
+      //@ts-ignore
       { root: true }
     )
   }

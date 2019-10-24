@@ -6,15 +6,15 @@ import { ADD_TASK, FETCH_TASKS } from './mutations-types'
 
 export const actions: ActionTree<IListsState, IRootState> = {
   async fetchTasks({ commit }) {
-    // @ts-ignore
     const {
       task_users,
       tasks,
       company_users,
       projects,
       project_users
+      // @ts-ignore
     } = await this._vm.$http().fetch('/test-tasks')
-    commit(FETCH_TASKS, { userTasks: task_users, allTasks: tasks })
+    commit(FETCH_TASKS, { task_users: task_users, allTasks: tasks })
     commit(
       'ADD_MANY',
       { module: 'user_tasks', entities: task_users },

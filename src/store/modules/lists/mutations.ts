@@ -35,11 +35,11 @@ export const mutations: MutationTree<IListsState> = {
   [SET_LISTS](state: IListsState, lists: any) {
     state.lists = lists
   },*/
-  [FETCH_TASKS](state: IListsState, { userTasks, allTasks }: any) {
+  [FETCH_TASKS](state: IListsState, { task_users, allTasks }: any) {
     const normalizedTasks = new Normalizer({
       tasks: allTasks
     }).flatNormalizationById('tasks')
-    const filteredTasks = userTasks
+    const filteredTasks = task_users
       .map(({ task_id }: ITaskUser) => normalizedTasks[task_id])
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
     console.log(filteredTasks)
