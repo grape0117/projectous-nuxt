@@ -14,7 +14,6 @@ export const actions: ActionTree<IListsState, IRootState> = {
       project_users
       // @ts-ignore
     } = await this._vm.$http().fetch('/test-tasks')
-    console.log('===', task_users)
     commit(
       'ADD_MANY',
       { module: 'task_users', entities: task_users },
@@ -57,13 +56,11 @@ export const actions: ActionTree<IListsState, IRootState> = {
 
     commit('UPDATE', { module: 'task_users', entity: element }, { root: true })
     //@ts-ignore
-    await this._vm
-      .$http()
-      .put('/task_users/move-to-list', element.id, {
-        task: element,
-        sort_order: newIndex,
-        list: list
-      })
+    await this._vm.$http().put('/task_users/move-to-list', element.id, {
+      task: element,
+      sort_order: newIndex,
+      list: list
+    })
     console.log(element)
     console.log('SEND TO REQUEST CHANGE ORDER')
   }

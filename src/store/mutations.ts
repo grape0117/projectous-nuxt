@@ -4,6 +4,7 @@ import Vue from 'vue'
 
 export const mutations: MutationTree<IRootState> = {
   ADD_MANY(state: IRootState, { module, entities }: any) {
+    if (!state[module]) return
     //@ts-ignore
     entities.forEach((value, key) => {
       //@ts-ignore
@@ -24,6 +25,7 @@ export const mutations: MutationTree<IRootState> = {
     })
   },
   ['ADD_ONE'](state: IRootState, { module, entity }) {
+    if (!state[module]) return
     //@ts-ignore
     state[module][module].push(entity)
 
@@ -34,6 +36,7 @@ export const mutations: MutationTree<IRootState> = {
     })
   },
   ['UPSERT'](state: IRootState, { module, entity }: any) {
+    if (!state[module]) return
     let property
     let key
     // @ts-ignore
@@ -52,6 +55,7 @@ export const mutations: MutationTree<IRootState> = {
     }
   },
   ['UPDATE'](state: IRootState, { module, entity }) {
+    if (!state[module]) return
     let key = state[module].lookup[entity.id]
     if (key) {
       for (let property in entity) {
@@ -67,6 +71,7 @@ export const mutations: MutationTree<IRootState> = {
     state: IRootState,
     { module, id: number, attribute: string, value }
   ) {
+    if (!state[module]) return
     // @ts-ignore
     state[module][state[module].lookup[id]][attribute] = value
   },

@@ -89,11 +89,10 @@ export default class Draggable extends Vue {
     // }, 5000)
   }
 
-  private extractTask(event: any, list): void {
+  private extractTask(event: any, list: string): void {
     const { added, moved, removed } = event
     if (!removed) {
       const { element, newIndex } = added || moved
-      console.log(newIndex)
       this.moveTask({ element, newIndex, list })
     }
   }

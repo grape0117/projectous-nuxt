@@ -19,7 +19,8 @@ export default class Projects extends Vue {
   private selected_user: null = null
   //private mounted(): {}
   get company_users() {
-    return this.$store.state.company_users.company_users
+    return []
+    // return this.$store.state.company_users.company_users
   }
 }
 </script>

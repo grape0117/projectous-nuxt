@@ -1,4 +1,4 @@
-import { ICompanyUser } from '@/store/modules/company_users/types'
+import { ICompanyUser } from '@/store/modules/companyUsers/types'
 
 export interface IModuleState {
   projects: IProject[]

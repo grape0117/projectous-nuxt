@@ -36,19 +36,13 @@ export const mutations: MutationTree<IListsState> = {
   [SET_LISTS](state: IListsState, lists: any) {
     state.lists = lists
   },*/
-  [FETCH_TASKS](
-    state: IListsState,
-    rootState: IRootState,
-    { task_users, allTasks }: any
-  ) {
-    console.log('task_users', task_users)
+  [FETCH_TASKS](state: IListsState, { task_users, allTasks }: any) {
     const normalizedTasks = new Normalizer({
       tasks: allTasks
     }).flatNormalizationById('tasks')
     const filteredTasks = task_users
       .map(({ task_id }: ITaskUser) => normalizedTasks[task_id])
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
-    console.log(filteredTasks)
     const unmarkedTasks = filteredTasks.filter(
       ({ next_work_day }: ITaskUser) => !next_work_day
     )
@@ -107,7 +101,7 @@ export const mutations: MutationTree<IListsState> = {
     state.lists = lists
   },
   [ADD_NEW_LIST](state: IListsState, newNameList: string) {
-    state.lists = [...state.lists, { name: newNameList, tasks: [] }]
+    state.lists = [...state.lists, { name: newNameList, tasks: [], id: '1234' }] // Todo: generate id
   },
   /*[ADD_TASK](
     state: IListsState,
