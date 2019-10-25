@@ -3,11 +3,15 @@ import { IHttp } from './types'
 
 export class FetchHttp extends BaseHttp implements IHttp {
   public async fetch(url: string): Promise<any> {
-    const response = await fetch(`${this.baseUrl}${url}`)
+    const response = await fetch(`${this.baseUrl}${url}`, {
+      headers: this.headers
+    })
     return await response.json()
   }
   public async get(url: string, id: number | string) {
-    const response = await fetch(`${this.baseUrl}${url}/${id}`)
+    const response = await fetch(`${this.baseUrl}${url}/${id}`, {
+      headers: this.headers
+    })
     return await response.json()
   }
   public async post(url: string, data: any) {
@@ -15,6 +19,7 @@ export class FetchHttp extends BaseHttp implements IHttp {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
+        ...this.headers,
         'Content-Type': 'application/json'
       }
     })
@@ -25,6 +30,7 @@ export class FetchHttp extends BaseHttp implements IHttp {
       method: 'PUT',
       body: JSON.stringify(data),
       headers: {
+        ...this.headers,
         'Content-Type': 'application/json'
       }
     })
@@ -32,7 +38,8 @@ export class FetchHttp extends BaseHttp implements IHttp {
   }
   public async delete(url: string, id: number | string) {
     const response = await fetch(`${this.baseUrl}${url}/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: this.headers
     })
     return await response.json()
   }

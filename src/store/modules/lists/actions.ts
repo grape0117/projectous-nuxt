@@ -14,23 +14,24 @@ export const actions: ActionTree<IListsState, IRootState> = {
       project_users
       // @ts-ignore
     } = await this._vm.$http().fetch('/test-tasks')
-    console.log(task_users)
-    commit(FETCH_TASKS, { task_users: task_users, allTasks: tasks })
+    console.log('===', task_users)
     commit(
       'ADD_MANY',
-      { module: 'user_tasks', entities: task_users },
+      { module: 'task_users', entities: task_users },
       { root: true }
     )
+    commit('ADD_MANY', { module: 'tasks', entities: tasks }, { root: true })
     commit(
       'ADD_MANY',
       { module: 'projects', entities: projects },
       { root: true }
     )
-    commit(
-      'ADD_MANY',
-      { module: 'project_users', entities: project_users },
-      { root: true }
-    )
+    commit(FETCH_TASKS, { task_users, allTasks: tasks })
+    /*commit(
+        'ADD_MANY',
+        { module: 'project_users', entities: project_users },
+        { root: true }
+      )*/
     commit(
       'ADD_MANY',
       { module: 'company_users', entities: company_users },
@@ -49,8 +50,21 @@ export const actions: ActionTree<IListsState, IRootState> = {
     commit(SAVE_TASK_BY_UUID)
     return task
     },*/
-  async updateTask({ commit }, task): Promise<any> {
-    console.log(task)
+  async moveTask({ commit }, { element, newIndex, list }): Promise<any> {
+    element.sort_order = newIndex
+    element.next_work_day = list
+    console.log(element, newIndex, list)
+
+    commit('UPDATE', { module: 'task_users', entity: element }, { root: true })
+    //@ts-ignore
+    await this._vm
+      .$http()
+      .put('/task_users/move-to-list', element.id, {
+        task: element,
+        sort_order: newIndex,
+        list: list
+      })
+    console.log(element)
     console.log('SEND TO REQUEST CHANGE ORDER')
   }
 }

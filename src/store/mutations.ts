@@ -3,7 +3,7 @@ import { IRootState } from './types'
 import Vue from 'vue'
 
 export const mutations: MutationTree<IRootState> = {
-  ['ADD_MANY'](state: IRootState, { module, entities }: any) {
+  ADD_MANY(state: IRootState, { module, entities }: any) {
     //@ts-ignore
     entities.forEach((value, key) => {
       //@ts-ignore
@@ -39,6 +39,7 @@ export const mutations: MutationTree<IRootState> = {
     // @ts-ignore
     key = state[module].lookup[entity.id]
     if (key) {
+      //TODO: call 'UPDATE' here? How to share key?
       for (property in entity) {
         if (entity.hasOwnProperty(property)) {
           // @ts-ignore
@@ -48,6 +49,18 @@ export const mutations: MutationTree<IRootState> = {
     } else {
       // @ts-ignore
       this.commit('ADD_ONE', { entity: entity, module: module })
+    }
+  },
+  ['UPDATE'](state: IRootState, { module, entity }) {
+    let key = state[module].lookup[entity.id]
+    if (key) {
+      for (let property in entity) {
+        //@Mikhail am I creating a variable each loop? Should I declare it before? Does it matter?
+        if (entity.hasOwnProperty(property)) {
+          // @ts-ignore
+          state[module][key][property] = project[property]
+        }
+      }
     }
   },
   ['UPDATE_ATTRIBUTE'](

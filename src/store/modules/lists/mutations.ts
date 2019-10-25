@@ -10,6 +10,7 @@ import {
 } from './mutations-types'
 import { Normalizer } from '@/utils/Normalizer'
 import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
+import { IRootState } from '@/store/types'
 
 const dayOfWeek: any = {
   0: 'Monday',
@@ -35,11 +36,15 @@ export const mutations: MutationTree<IListsState> = {
   [SET_LISTS](state: IListsState, lists: any) {
     state.lists = lists
   },*/
-  [FETCH_TASKS](state: IListsState, { task_users, allTasks }: any) {
+  [FETCH_TASKS](
+    state: IListsState,
+    rootState: IRootState,
+    { task_users, allTasks }: any
+  ) {
+    console.log('task_users', task_users)
     const normalizedTasks = new Normalizer({
       tasks: allTasks
     }).flatNormalizationById('tasks')
-    console.log('here2')
     const filteredTasks = task_users
       .map(({ task_id }: ITaskUser) => normalizedTasks[task_id])
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
@@ -53,7 +58,18 @@ export const mutations: MutationTree<IListsState> = {
     const lists = []
     const today = resetTime(new Date())
     // Note: Create list for past tasks
+
+    /**
+     * Sort by sort_order
+     *
+     *
+     * Sort by date
+     * Sort by sort_order
+     *
+     */
+
     lists.push({
+      id: 'Past',
       name: 'Outdated tasks',
       tasks: markedTasks.filter(
         ({ next_work_day }: any) =>
@@ -62,7 +78,8 @@ export const mutations: MutationTree<IListsState> = {
     })
     // Note: create list for today
     lists.push({
-      name: getUserFriendlyDate(today),
+      id: today.toString(), //uuid //2019-10-10
+      name: getUserFriendlyDate(today), //2019-10-10 //Oct 10
       tasks: markedTasks.filter(
         ({ next_work_day }: any) =>
           resetTime(next_work_day).toString() === today.toString()
@@ -73,6 +90,7 @@ export const mutations: MutationTree<IListsState> = {
       const date = resetTime(new Date())
       date.setDate(resetTime(new Date()).getDate() + day)
       lists.push({
+        id: date.toString(),
         name: getUserFriendlyDate(date),
         tasks: markedTasks.filter(
           ({ next_work_day }: any) =>
@@ -82,6 +100,7 @@ export const mutations: MutationTree<IListsState> = {
     }
     // Note: create list for tasks with no data
     lists.push({
+      id: '',
       name: 'Unmarked',
       tasks: unmarkedTasks
     })

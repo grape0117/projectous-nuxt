@@ -8,7 +8,7 @@
         class="tasks-list"
         v-model="list.tasks"
         group="tasks"
-        @change="extractTask($event, list.name)"
+        @change="extractTask($event, list.id)"
       >
         <div
           v-for="(task, index) in list.tasks"
@@ -51,7 +51,7 @@ const Lists = namespace('lists')
 export default class Draggable extends Vue {
   @Prop() selected_user: any
   @Lists.Action private fetchTasks!: any
-  @Lists.Action private updateTask!: any
+  @Lists.Action private moveTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
   @Lists.State(
@@ -89,12 +89,12 @@ export default class Draggable extends Vue {
     // }, 5000)
   }
 
-  private extractTask(event: any): void {
+  private extractTask(event: any, list): void {
     const { added, moved, removed } = event
     if (!removed) {
       const { element, newIndex } = added || moved
       console.log(newIndex)
-      this.updateTask(element)
+      this.moveTask({ element, newIndex, list })
     }
   }
 

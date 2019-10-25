@@ -5,7 +5,7 @@
         company_user.name
       }}</option>
     </select>
-    <Dragable v-bind:selected_user="selected_user"></Dragable>
+    <Draggable v-bind:selected_user="selected_user"></Draggable>
   </div>
 </template>
 <script lang="ts">
@@ -16,7 +16,10 @@ import Draggable from './Draggable.vue'
   components: { Draggable }
 })
 export default class Projects extends Vue {
-  //selected_user: null
+  private selected_user: null = null
   //private mounted(): {}
+  get company_users() {
+    return this.$store.state.company_users.company_users
+  }
 }
 </script>
