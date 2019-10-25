@@ -14,6 +14,7 @@ export const actions: ActionTree<IListsState, IRootState> = {
       project_users
       // @ts-ignore
     } = await this._vm.$http().fetch('/test-tasks')
+    console.log(task_users)
     commit(FETCH_TASKS, { task_users: task_users, allTasks: tasks })
     commit(
       'ADD_MANY',
