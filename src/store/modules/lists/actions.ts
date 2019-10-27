@@ -1,8 +1,7 @@
 import { ActionTree } from 'vuex'
 import { IListsState } from '../lists/types'
-import { ITask } from '../tasks/types'
 import { IRootState } from '@/store/types'
-import { ADD_TASK, FETCH_TASKS } from './mutations-types'
+import { FETCH_TASKS } from './mutations-types'
 
 export const actions: ActionTree<IListsState, IRootState> = {
   async fetchTasks({ commit }) {
@@ -14,17 +13,17 @@ export const actions: ActionTree<IListsState, IRootState> = {
       project_users
       // @ts-ignore
     } = await this._vm.$http().fetch('/test-tasks')
-    commit(
-      'ADD_MANY',
-      { module: 'task_users', entities: task_users },
-      { root: true }
-    )
-    commit('ADD_MANY', { module: 'tasks', entities: tasks }, { root: true })
-    commit(
-      'ADD_MANY',
-      { module: 'projects', entities: projects },
-      { root: true }
-    )
+    // commit(
+    //   'ADD_MANY',
+    //   { module: 'task_users', entities: task_users },
+    //   { root: true }
+    // )
+    // commit('ADD_MANY', { module: 'tasks', entities: tasks }, { root: true })
+    // commit(
+    //   'ADD_MANY',
+    //   { module: 'projects', entities: projects },
+    //   { root: true }
+    // )
     commit(FETCH_TASKS, { task_users, allTasks: tasks })
     /*commit(
         'ADD_MANY',
@@ -33,7 +32,7 @@ export const actions: ActionTree<IListsState, IRootState> = {
       )*/
     commit(
       'ADD_MANY',
-      { module: 'company_users', entities: company_users },
+      { module: 'companyUsers', entities: company_users },
       { root: true }
     )
   },

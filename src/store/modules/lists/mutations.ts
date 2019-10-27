@@ -1,26 +1,9 @@
 import { MutationTree } from 'vuex'
-import { ITask } from '../tasks/types'
-import { IListsState, IList } from './types'
+import { IListsState } from './types'
 import { ITaskUser } from '../task_users/types'
-import {
-  FETCH_TASKS,
-  ADD_NEW_LIST,
-  ADD_NEW_TASK,
-  ADD_TASK
-} from './mutations-types'
+import { FETCH_TASKS, ADD_NEW_LIST, ADD_NEW_TASK } from './mutations-types'
 import { Normalizer } from '@/utils/Normalizer'
 import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
-import { IRootState } from '@/store/types'
-
-const dayOfWeek: any = {
-  0: 'Monday',
-  1: 'Tuesday',
-  2: 'Wednesday',
-  3: 'Thursday',
-  4: 'Friday',
-  5: 'Saturday',
-  6: 'Sundays'
-}
 
 export const mutations: MutationTree<IListsState> = {
   /*[FETCH_TASKS](state: IListsState, tasks: ITask[]) {
@@ -72,8 +55,8 @@ export const mutations: MutationTree<IListsState> = {
     })
     // Note: create list for today
     lists.push({
-      id: today.toString(), //uuid //2019-10-10
-      name: getUserFriendlyDate(today), //2019-10-10 //Oct 10
+      id: today.toString(), // uuid //2019-10-10
+      name: getUserFriendlyDate(today), // 2019-10-10 //Oct 10
       tasks: markedTasks.filter(
         ({ next_work_day }: any) =>
           resetTime(next_work_day).toString() === today.toString()
@@ -120,15 +103,15 @@ export const mutations: MutationTree<IListsState> = {
       }
     })
   },*/
-  [ADD_NEW_TASK](state: IListsState, { listName, taskName, index }: any) {
-    //@Mikhail: can't we put this somewhere outside of mutations?
+  [ADD_NEW_TASK](state: IListsState, { listName, index }: any) {
+    // @Mikhail: can't we put this somewhere outside of mutations?
     const getRandomArbitrary = (min: number, max: number): number =>
       Math.ceil(Math.random() * (max - min) + min)
     const taskId = getRandomArbitrary(1000, 999999)
     state.lists.map(list => {
       if (list.name === listName) {
         const listTasks = list.tasks
-        //@ts-ignore
+        // @ts-ignore
         listTasks.splice(index, 0, {
           task_id: taskId,
           id: taskId

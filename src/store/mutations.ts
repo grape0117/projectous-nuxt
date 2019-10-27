@@ -24,7 +24,7 @@ export const mutations: MutationTree<IRootState> = {
       state[module].lookup[item.id] = key
     })
   },
-  ['ADD_ONE'](state: IRootState, { module, entity }) {
+  ADD_ONE(state: IRootState, { module, entity }) {
     if (!state[module]) return
     //@ts-ignore
     state[module][module].push(entity)
@@ -35,7 +35,7 @@ export const mutations: MutationTree<IRootState> = {
       state[module].lookup[item.id] = key
     })
   },
-  ['UPSERT'](state: IRootState, { module, entity }: any) {
+  UPSERT(state: IRootState, { module, entity }: any) {
     if (!state[module]) return
     let property
     let key
@@ -54,7 +54,7 @@ export const mutations: MutationTree<IRootState> = {
       this.commit('ADD_ONE', { entity: entity, module: module })
     }
   },
-  ['UPDATE'](state: IRootState, { module, entity }) {
+  UPDATE(state: IRootState, { module, entity }) {
     if (!state[module]) return
     let key = state[module].lookup[entity.id]
     if (key) {
@@ -67,7 +67,7 @@ export const mutations: MutationTree<IRootState> = {
       }
     }
   },
-  ['UPDATE_ATTRIBUTE'](
+  UPDATE_ATTRIBUTE(
     state: IRootState,
     { module, id: number, attribute: string, value }
   ) {
@@ -75,7 +75,7 @@ export const mutations: MutationTree<IRootState> = {
     // @ts-ignore
     state[module][state[module].lookup[id]][attribute] = value
   },
-  ['DELETE'](state: IRootState, { module, entity }) {
+  DELETE(state: IRootState, { module, entity }) {
     // @ts-ignore
     Vue.delete(state[module], state[module].lookup[entity.id])
     // @ts-ignore

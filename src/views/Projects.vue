@@ -1,26 +1,31 @@
 <template>
   <div>
-    <select v-model="selected_user">
-      <option v-for="company_user in company_users" :id="company_user.id">{{
-        company_user.name
-      }}</option>
+    <select v-model="selectedUser">
+      <option v-for="{ id, name } in companyUsers" :id="id">
+        {{ name }}
+      </option>
     </select>
-    <Draggable v-bind:selected_user="selected_user"></Draggable>
+    <Draggable :selectedUser="selectedUser" />
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import { namespace } from 'vuex-class'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import Draggable from './Draggable.vue'
 @Component({
   components: { Draggable }
 })
 export default class Projects extends Vue {
-  private selected_user: null = null
-  //private mounted(): {}
-  get company_users() {
-    return []
-    // return this.$store.state.company_users.company_users
+  private selectedUser: any = null
+  get companyUsers() {
+    return this.$store.state.companyUsers.companyUsers
+  }
+  @Watch('companyUsers', { immediate: true })
+  private onCompanyUsersChanged(users: any) {
+    if (users.length) {
+      console.log(users, 'changed')
+      // Note: select first user by default
+      this.selectedUser = users[0].name
+    }
   }
 }
 </script>
