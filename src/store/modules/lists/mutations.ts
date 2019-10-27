@@ -4,16 +4,6 @@ import { FETCH_TASKS, ADD_NEW_LIST, ADD_NEW_TASK } from './mutations-types'
 import { Normalizer } from '@/utils/Normalizer'
 import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
 
-const dayOfWeek: any = {
-  0: 'Monday',
-  1: 'Tuesday',
-  2: 'Wednesday',
-  3: 'Thursday',
-  4: 'Friday',
-  5: 'Saturday',
-  6: 'Sundays'
-}
-
 export const mutations: MutationTree<IListsState> = {
   [FETCH_TASKS](state: IListsState, { userTasks, allTasks }: any) {
     const normalizedTasks = new Normalizer({
@@ -22,7 +12,6 @@ export const mutations: MutationTree<IListsState> = {
     const filteredTasks = userTasks
       .map(({ task_id }: IUserTask) => normalizedTasks[task_id])
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
-    console.log(filteredTasks)
     const unmarkedTasks = filteredTasks.filter(
       ({ next_work_day }: ITask) => !next_work_day
     )
@@ -34,10 +23,14 @@ export const mutations: MutationTree<IListsState> = {
     // Note: Create list for past tasks
     lists.push({
       name: 'Outdated tasks',
-      tasks: markedTasks.filter(
-        ({ next_work_day }: any) =>
-          resetTime(next_work_day).getDate() < today.getDate()
-      )
+      tasks: markedTasks
+        .filter(
+          ({ next_work_day }: any) =>
+            resetTime(next_work_day).getDate() < today.getDate()
+        )
+        .sort(({ next_work_day: a }: any, { next_work_day: b }: any) => {
+          return resetTime(a as Date).getTime() - resetTime(b as Date).getTime()
+        })
     })
     // Note: create list for today
     lists.push({
