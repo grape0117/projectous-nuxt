@@ -3,10 +3,10 @@ import { IRootState } from '@/store/types'
 import { ICompanyUser, IModuleState } from './types'
 
 const state = {
-  companyUsers: [],
+  company_users: [],
   lookup: {}
 }
-export const companyUsers: Module<IModuleState, IRootState> = {
+export const company_users: Module<IModuleState, IRootState> = {
   namespaced: true,
   state
 }
