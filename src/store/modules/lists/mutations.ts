@@ -48,10 +48,14 @@ export const mutations: MutationTree<IListsState> = {
     lists.push({
       id: 'Past',
       name: 'Outdated tasks',
-      tasks: markedTasks.filter(
-        ({ next_work_day }: any) =>
-          resetTime(next_work_day).getDate() < today.getDate()
-      )
+      tasks: markedTasks
+        .filter(
+          ({ next_work_day }: any) =>
+            resetTime(next_work_day).getDate() < today.getDate()
+        )
+        .sort(({ next_work_day: a }: any, { next_work_day: b }: any) => {
+          return resetTime(a as Date).getTime() - resetTime(b as Date).getTime()
+        })
     })
     // Note: create list for today
     lists.push({
