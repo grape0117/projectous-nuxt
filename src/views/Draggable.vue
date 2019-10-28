@@ -52,7 +52,7 @@ const Lists = namespace('lists')
   }
 })
 export default class Draggable extends Vue {
-  @Prop({ required: false }) selectedUser: any
+  @Prop({ required: false }) public selectedUser: any
   @Lists.Action private fetchTasks!: any
   @Lists.Action private moveTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
