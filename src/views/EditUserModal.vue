@@ -1,5 +1,5 @@
 <template>
-  <div id="edit-user-modal" class="modal fade" role="dialog">
+  <b-modal id="edit-user-modal" class="modal fade" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -186,7 +186,7 @@
       <!-- /.modal-content -->
     </div>
     <!-- /.modal-dialog -->
-  </div>
+  </b-modal>
   <!-- /.modal -->
 </template>
 
@@ -195,49 +195,26 @@ export default {
   name: 'edit-user-modal',
   computed: {
     isAdmin: function() {
-      return true
       return this.$store.getters['settings/isAdmin']
     },
     user: function() {
       return this.$store.getters['settings/getCurrentEditCompanyUser']
     },
-    has_no_timers: function() {
-      return true
-      return this.$store.getters['settings/getRemovableStatusOfCurrentEditUser']
-    }
   },
   methods: {
     makeInactive: function() {
-      var self = this
-      var data = {
-        user_id: this.user.user_id,
-        company_id: this.user.company_id
-      }
-      self.$store.dispatch('company_users/makeInactive', self.user.id)
-      ajax('make-user-inactive', data, function(response) {
-        $('#edit-user-modal').modal('toggle')
-        //if(response)
-      })
+      this.$bvModal.hide('edit-user-modal')
+      self.$store.dispatch('company_users/update_attribute', {id: this.user.id, attribute: 'status', value: 'inactive')
     },
     removeUser: function() {
-      var self = this
-      var data = {
-        user_id: this.user.user_id,
-        company_id: this.user.company_id
-      }
-      self.$store.dispatch('company_users/removeUser', self.user.id)
-      ajax('remove-user', data, function(response) {
-        $('#edit-user-modal').modal('toggle')
-        //if(response)
-      })
+        alert('remove') //TODO: only remove people that don't have data...?
+        return
+        this.$bvModal.hide('edit-user-modal')
+        self.$store.dispatch('company_users/delete', self.user.id)
     },
     saveUser: function() {
-      var self = this
-      var data = { user: this.user }
-      if (response) self.$store.dispatch('company_users/saveUser', self.user)
-      ajax('user/save', data, function(response) {
-        $('#edit-user-modal').modal('toggle')
-      })
+      this.$bvModal.hide('edit-user-modal')
+      self.$store.dispatch('company_users/save', this.user)
     }
   }
 }

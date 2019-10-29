@@ -6,10 +6,13 @@
         <router-view />
       </div>
     </div>
+    <edit-user-modal></edit-user-modal>
   </div>
 </template>
 <script>
+import EditUserModal from './views/EditUserModal'
 export default {
+  components: { EditUserModal },
   computed: {
     current_edit_project: () => this.$store.state.settings.current_edit_project,
     current_edit_company_user: () =>
@@ -23,8 +26,50 @@ export default {
   },
   watch: {
     current_edit_company_user() {
-      if (current_edit_company_user.id) {
+      if (this.current_edit_company_user.id) {
       }
+    }
+  },
+  mounted() {
+    this.init()
+  },
+  methods: {
+    async init() {
+      this.$bvModal.show('edit-user-modal')
+      const {
+        task_users,
+        tasks,
+        company_users,
+        projects,
+        project_users
+        // @ts-ignore
+      } = await this.$http().fetch('/test-tasks')
+      this.$store.commit(
+        'ADD_MANY',
+        { module: 'task_users', entities: task_users },
+        { root: true }
+      )
+      this.$store.commit(
+        'ADD_MANY',
+        { module: 'tasks', entities: tasks },
+        { root: true }
+      )
+      this.$store.commit(
+        'ADD_MANY',
+        { module: 'projects', entities: projects },
+        { root: true }
+      )
+      this.$store.commit(
+        'ADD_MANY',
+        { module: 'project_users', entities: project_users },
+        { root: true }
+      )
+      this.$store.commit(
+        'ADD_MANY',
+        { module: 'company_users', entities: company_users },
+        { root: true }
+      )
+      //TODO: companies
     }
   }
 }
