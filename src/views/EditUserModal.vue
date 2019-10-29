@@ -199,18 +199,22 @@ export default {
     },
     user: function() {
       return this.$store.getters['settings/getCurrentEditCompanyUser']
-    },
+    }
   },
   methods: {
     makeInactive: function() {
       this.$bvModal.hide('edit-user-modal')
-      self.$store.dispatch('company_users/update_attribute', {id: this.user.id, attribute: 'status', value: 'inactive')
+      self.$store.dispatch('company_users/update_attribute', {
+        id: this.user.id,
+        attribute: 'status',
+        value: 'inactive'
+      })
     },
     removeUser: function() {
-        alert('remove') //TODO: only remove people that don't have data...?
-        return
-        this.$bvModal.hide('edit-user-modal')
-        self.$store.dispatch('company_users/delete', self.user.id)
+      alert('remove') //TODO: only remove people that don't have data...?
+      return
+      this.$bvModal.hide('edit-user-modal')
+      self.$store.dispatch('company_users/delete', self.user.id)
     },
     saveUser: function() {
       this.$bvModal.hide('edit-user-modal')

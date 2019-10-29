@@ -1,8 +1,8 @@
 <template>
   <div>
-    <select v-model="selectedUser">
-      <option v-for="{ id, name } in company_users" :id="id">
-        {{ name }}
+    <select v-model="user">
+      <option v-for="user in companyUsers" :value="user" :id="user.id">
+        {{ user.name }}
       </option>
     </select>
     <Draggable :selectedUser="selectedUser" />
@@ -16,17 +16,20 @@ import Draggable from './Draggable.vue'
 })
 export default class Projects extends Vue {
   private selectedUser: any = null
-  get company_users() {
-    let users = this.$store.state.company_users.company_users
-    console.log(users)
-    return users
+  get user() {
+    return this.selectedUser
   }
-  @Watch('company_users', { immediate: true })
-  private onCompanyUsersChanged(company_users: any) {
-    if (company_users.length) {
-      console.log(company_users, 'changed')
+  set user(user) {
+    this.selectedUser = user
+  }
+  get companyUsers() {
+    return this.$store.state.companyUsers.companyUsers
+  }
+  @Watch('companyUsers', { immediate: true })
+  private onCompanyUsersChanged(users: any) {
+    if (users.length) {
       // Note: select first user by default
-      this.selectedUser = company_users[0].id
+      this.selectedUser = users[0]
     }
   }
 }

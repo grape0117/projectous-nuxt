@@ -1,8 +1,7 @@
 import { ActionTree } from 'vuex'
 import { IModuleState } from './types'
-import { ITask } from '../tasks/types'
 import { IRootState } from '@/store/types'
-import { ICompanyUser } from '@/store/modules/company_users/types'
+import { ICompanyUser } from '@/store/modules/companyUsers/types.ts'
 
 const company_user_id: number = 1
 
@@ -60,6 +59,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     if (context.state.check_action_stack) {
       let next_action = context.state.action_stack.pop()
       console.log('next_action', next_action)
+      // @ts-ignore
       this._vm.$bvModal.show(next_action + '-modal').modal()
     }
     console.log('setting check to true')
@@ -69,6 +69,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     //We want to manually open modal
     context.commit('setCheckActionStack', false)
     console.log('closing ' + modal)
+    // @ts-ignore
     $('#' + modal + '-modal').modal('hide')
 
     if (push) {
@@ -78,19 +79,20 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     if (pop) {
       var next_action = context.state.action_stack.pop() //TODO: does this work properly?
       console.log(next_action)
-      if (modal == 'client' && next_action == 'project') {
+      if (modal === 'client' && next_action === 'project') {
         console.log('client', object)
         context.commit('settings/setCurrentEditProjectCompanyClient', object, {
           root: true
         })
       }
+      // @ts-ignore
       this._vm.$bvModal.show(next_action + '-modal').modal()
     }
   },
   checkForRunningTimers(context) {
-    let running_timer = context.rootState.timers.timers.find(function(timer) {
+    let running_timer = context.rootState.timers.timers.find((timer: any) => {
       //console.log(timer.status);
-      return timer.status == 'running'
+      return timer.status === 'running'
     })
 
     //console.log(running_timer);
@@ -103,6 +105,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     context.commit('setCurrentEditPayment', payment)
   },
   editProject(context, project) {
+    // @ts-ignore
     this._vm.$bvmodal.show('project-modal')
   },
   loadCurrentCompanyUser(context, { user_id, company_id }) {
@@ -113,10 +116,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     context.commit('setCurrentCompanyUser', company_user)
   },
   setCurrentCompany(context, company_id) {
+    // @ts-ignore
     const company = this._vm
       .$http()
       .put('/set-current-company/' + company_id, {}, function() {
-        context.rootState.companies.companies.find(company => {
+        context.rootState.companies.companies.find((company: any) => {
           if (company_id == company.id) {
             context.commit('setCurrentCompany', company)
             context.dispatch('getData')

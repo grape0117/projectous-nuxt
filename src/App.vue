@@ -6,7 +6,7 @@
         <router-view />
       </div>
     </div>
-    <edit-user-modal></edit-user-modal>
+    <edit-user-modal />
   </div>
 </template>
 <script>
@@ -14,15 +14,15 @@ import EditUserModal from './views/EditUserModal'
 export default {
   components: { EditUserModal },
   computed: {
-    current_edit_project: () => this.$store.state.settings.current_edit_project,
-    current_edit_company_user: () =>
-      this.$store.state.settings.current_edit_company_user,
-    current_edit_company_client: () =>
-      this.$store.state.settings.current_edit_company_client,
-    current_edit_task: () => this.$store.state.settings.current_edit_task,
-    current_edit_timer: () => this.$store.state.settings.current_edit_timer,
-    current_edit_task_type: () =>
-      this.$store.state.settings.current_edit_task_type
+    // current_edit_project: () => this.$store.state.settings.current_edit_project,
+    // current_edit_company_user: () =>
+    //   this.$store.state.settings.current_edit_company_user,
+    // current_edit_company_client: () =>
+    //   this.$store.state.settings.current_edit_company_client,
+    // current_edit_task: () => this.$store.state.settings.current_edit_task,
+    // current_edit_timer: () => this.$store.state.settings.current_edit_timer,
+    // current_edit_task_type: () =>
+    //   this.$store.state.settings.current_edit_task_type
   },
   watch: {
     current_edit_company_user() {

@@ -24,7 +24,10 @@ export const mutations: MutationTree<IListsState> = {
       tasks: allTasks
     }).flatNormalizationById('tasks')
     const filteredTasks = task_users
-      .map(({ task_id }: ITaskUser) => normalizedTasks[task_id])
+      .map(({ task_id, company_user_id }: ITaskUser) => ({
+        ...normalizedTasks[task_id],
+        company_user_id
+      }))
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
     const unmarkedTasks = filteredTasks.filter(
       ({ next_work_day }: ITaskUser) => !next_work_day

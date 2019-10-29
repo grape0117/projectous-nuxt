@@ -1,6 +1,10 @@
 <template>
   <div class="lists">
-    <div v-for="(list, index) in allLists" :key="index" class="tasks-list-main">
+    <div
+      v-for="(list, index) in filteredLists"
+      :key="index"
+      class="tasks-list-main"
+    >
       <div class="list-title-block">
         <h3>{{ list.name }}</h3>
       </div>
@@ -32,7 +36,6 @@ import { Prop, Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { IList } from '@/store/modules/lists/types'
 import { ITask } from '@/store/modules/tasks/types'
-import ContentEditable from './content-editable.vue'
 
 // @ts-ignore
 import VueDraggable from '@/../node_modules/vuedraggable'
@@ -49,25 +52,18 @@ const Lists = namespace('lists')
   }
 })
 export default class Draggable extends Vue {
-  @Prop() selectedUser: any
+  @Prop({ required: false }) selectedUser: any
   @Lists.Action private fetchTasks!: any
   @Lists.Action private moveTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
-  @Lists.State(
-    state => state.lists.find((list: IList) => list.name === 'tasks').tasks
-  )
-  private tasks!: ITask
-  @Lists.State(
-    state =>
-      state.lists.find((list: IList) => list.name === 'additionalTasks').tasks
-  )
-  private additionalTasks!: ITask
+  @Lists.Getter filterListsByUserId!: any
 
   private nameNewList: string = ''
 
-  get allLists() {
-    return this.lists
+  get filteredLists() {
+    if (!this.selectedUser) return []
+    return this.filterListsByUserId(this.selectedUser.id)
   }
 
   private async created() {
@@ -99,7 +95,9 @@ export default class Draggable extends Vue {
 
   private addNewListHandler() {
     if (!this.nameNewList) return
-    if (this.allLists.some((list: IList) => list.name === this.nameNewList)) {
+    if (
+      this.filteredLists.some((list: IList) => list.name === this.nameNewList)
+    ) {
       return
     }
     this.addNewList(this.nameNewList)

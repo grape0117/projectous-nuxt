@@ -32,7 +32,7 @@ export const actions: ActionTree<IListsState, IRootState> = {
       )*/
     commit(
       'ADD_MANY',
-      { module: 'company_users', entities: company_users },
+      { module: 'companyUsers', entities: company_users },
       { root: true }
     )
   },
