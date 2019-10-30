@@ -57,7 +57,7 @@ export default class Draggable extends Vue {
   @Lists.Action private moveTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
-  @Lists.Getter filterListsByUserId!: any
+  @Lists.Getter private filterListsByUserId!: any
 
   private nameNewList: string = ''
 

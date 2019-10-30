@@ -110,20 +110,20 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   loadCurrentCompanyUser(context, { user_id, company_id }) {
     let company_user = context.rootState.company_users.company_users.find(
-      (company_user: ICompanyUser) =>
-        company_user.company_id == company_id && company_user.user_id == user_id
+      ({ company_id: companyId, user_id: userId }: ICompanyUser) =>
+        companyId == company_id && userId == user_id
     )
     context.commit('setCurrentCompanyUser', company_user)
   },
-  setCurrentCompany(context, company_id) {
+  setCurrentCompany({ commit, dispatch, rootState }, company_id) {
     // @ts-ignore
     const company = this._vm
       .$http()
       .put('/set-current-company/' + company_id, {}, function() {
-        context.rootState.companies.companies.find((company: any) => {
-          if (company_id == company.id) {
-            context.commit('setCurrentCompany', company)
-            context.dispatch('getData')
+        rootState.companies.companies.find((c: any) => {
+          if (company_id == c.id) {
+            commit('setCurrentCompany', company)
+            dispatch('getData')
             return true
           }
         })

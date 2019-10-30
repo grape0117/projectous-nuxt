@@ -25,9 +25,9 @@ export default {
       if (matches) {
         console.log(matches)
         console.log(this.projects)
-        let project = this.projects.find(function(project) {
-          console.log(project)
-          return project.acronym + ':' == matches[0]
+        let project = this.projects.find(proj => {
+          console.log(proj)
+          return proj.acronym + ':' === matches[0]
         })
         new_title = new_title.replace(
           regex,

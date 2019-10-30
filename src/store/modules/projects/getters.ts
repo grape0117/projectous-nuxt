@@ -4,16 +4,18 @@ import { IModuleState, IProject } from './types'
 import { IListsState } from '@/store/modules/lists/types'
 
 export const getters: GetterTree<IModuleState, IRootState> = {
-  getById: (state: IModuleState, getters: any) => (id: number) => {
+  getById: (state: IModuleState) => (id: number) => {
     let project
+    // tslint:disable-next-line:no-conditional-assignment
     if ((project = state.projects[state.lookup[id]])) {
       return project
     } else if (id) {
-      return state.projects.find(project => project.id === id)
+      return state.projects.find(({ id: projectId }) => projectId === id)
     }
   },
   userprojects: (
     state: IModuleState,
+    // tslint:disable-next-line:no-shadowed-variable
     getters: any,
     rootState: IRootState,
     rootGetters: any
@@ -49,6 +51,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   },
   projectProjectName: (
     state: IModuleState,
+    // tslint:disable-next-line:no-shadowed-variable
     getters: any,
     rootState: IRootState,
     rootGetters: any
@@ -61,6 +64,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   },
   projectClientName: (
     state: IModuleState,
+    // tslint:disable-next-line:no-shadowed-variable
     getters: any,
     rootState: IRootState,
     rootGetters: any

@@ -23,11 +23,16 @@ export default class Projects extends Vue {
   private selectedCompanyUser: any = null
 
   get company_users() {
-    return this.$store.state.company_users.company_users.sort(function(a, b) {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
-      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
-      return 0
-    })
+    return this.$store.state.company_users.company_users.sort(
+      (
+        { name: nameA }: { name: string },
+        { name: nameB }: { name: string }
+      ) => {
+        if (nameA.toLowerCase() > nameB.toLowerCase()) return 1
+        if (nameA.toLowerCase() < nameB.toLowerCase()) return -1
+        return 0
+      }
+    )
   }
 
   @Watch('company_users', { immediate: true })

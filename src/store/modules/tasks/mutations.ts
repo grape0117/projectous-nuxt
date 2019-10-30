@@ -22,8 +22,8 @@ export const mutations: MutationTree<IModuleState> = {
   },
   create: function(state, task) {
     state.tasks.push(task)
-    state.tasks.forEach((task, key) => {
-      state.lookup[task.id] = key
+    state.tasks.forEach((t, key) => {
+      state.lookup[t.id] = key
     })
   },
   upsert(state, task: ITask) {

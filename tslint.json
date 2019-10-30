@@ -24,6 +24,7 @@
     "object-literal-shorthand": false,
     "triple-equals": false,
     "max-line-length": false,
-    "prefer-const": false
+    "prefer-const": false,
+    "no-bitwise": false
   }
 }
