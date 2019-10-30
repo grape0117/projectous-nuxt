@@ -237,7 +237,7 @@ export default {
     }
   },
   mounted: function() {
-    var self = this
+    let self = this
     $('#project-modal').on('hidden.bs.modal', function() {
       self.$store.dispatch('settings/closedModal')
     })

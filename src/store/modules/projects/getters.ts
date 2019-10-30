@@ -19,12 +19,12 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     rootGetters: any
   ) => (user_id: number) => {
     if (!user_id) {
-      return getters['all_projects']
+      return getters.all_projects
     }
 
     let userProjects: number[]
 
-    return getters['all_projects'].filter((project: IProject) => {
+    return getters.all_projects.filter((project: IProject) => {
       let userMatch = false
       if (project.id) {
         if (userProjects.indexOf(project.id) !== -1) {
@@ -53,7 +53,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     rootState: IRootState,
     rootGetters: any
   ) => (project_id: number) => {
-    let project = getters['getprojectById'](project_id)
+    let project = getters.getprojectById(project_id)
     if (project) {
       return project.name
     }
@@ -65,7 +65,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     rootState: IRootState,
     rootGetters: any
   ) => (project_id: number) => {
-    let project = getters['getprojectById'](project_id)
+    let project = getters.getprojectById(project_id)
     if (!project) {
       return ''
     } else if (project.client_id) {

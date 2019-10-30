@@ -81,7 +81,7 @@ export default {
   name: 'invite-user-modal',
   methods: {
     inviteUser: function() {
-      var self = this
+      let self = this
       ajax('invite', $('#invite-user-form').serialize(), function(response) {
         $('#inviteName').val('')
         $('#inviteEmail').val('')

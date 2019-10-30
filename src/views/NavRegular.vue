@@ -100,7 +100,7 @@ export default {
   },
   methods: {
     home: function() {
-      var self = this
+      let self = this
       alert('go home')
       return
       //console.log(this.current_company.modules);

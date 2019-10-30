@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     async init() {
-      this.$bvModal.show('edit-user-modal')
+      //this.$bvModal.show('edit-user-modal')
       const {
         task_users,
         tasks,

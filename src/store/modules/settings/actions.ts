@@ -77,7 +77,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }
 
     if (pop) {
-      var next_action = context.state.action_stack.pop() //TODO: does this work properly?
+      let next_action = context.state.action_stack.pop() //TODO: does this work properly?
       console.log(next_action)
       if (modal === 'client' && next_action === 'project') {
         console.log('client', object)

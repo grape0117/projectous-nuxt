@@ -1,6 +1,6 @@
 <template>
   <div>
-    <select v-model="company_user">
+    <select v-model="selectedCompanyUser">
       <option
         v-for="company_user in company_users"
         :value="company_user"
@@ -21,20 +21,20 @@ import Draggable from './Draggable.vue'
 })
 export default class Projects extends Vue {
   private selectedCompanyUser: any = null
-  get company_user() {
-    return this.selectedCompanyUser
+
+  get company_users() {
+    return this.$store.state.company_users.company_users.sort(function(a, b) {
+      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+      return 0
+    })
   }
-  set user(user) {
-    this.selectedCompanyUser = user
-  }
-  get companyUsers() {
-    return this.$store.state.company_users.company_users
-  }
+
   @Watch('company_users', { immediate: true })
-  private onCompanyUsersChanged(users: any) {
-    if (users.length) {
+  private onCompanyUsersChanged(company_users: any) {
+    if (company_users.length && this.selectedCompanyUser === null) {
       // Note: select first user by default
-      this.selectedCompanyUser = users[0]
+      this.selectedCompanyUser = this.$store.state.settings.current_company_user
     }
   }
 }

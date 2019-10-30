@@ -304,7 +304,7 @@ export default {
     }
   },
   mounted: function() {
-    var self = this
+    let self = this
     $('#expense-modal').on('hidden.bs.modal', function() {
       self.$store.dispatch('settings/closedModal')
     })
@@ -397,7 +397,7 @@ export default {
       this.$store.commit('settings/setCheckActionStack', true)
     },
     expenseClient: function() {
-      var expenseProject = this.expenseProject()
+      let expenseProject = this.expenseProject()
       return this.$store.getters['company_clients/getCompanyClientByClientId'](
         expenseProject.client_id
       )
@@ -425,13 +425,13 @@ export default {
       return true
     },
     saveExpense: function(callback) {
-      var self = this
+      let self = this
       //console.log($('#expense-modal-project-id').val());
 
       //TODO: change Save button to Saving...
       //TODO: save time? or process on php side?
       labeledConsole('duration: ', this.expense.duration)
-      var save = true
+      let save = true
       if (!self.checkInputValue($('#expense-modal-project-id'))) {
         save = false
         $('#expense-modal-project-id')
@@ -442,14 +442,14 @@ export default {
       if (!save) {
         //return;
       }
-      var formData = $('#editExpenseForm').serialize()
+      let formData = $('#editExpenseForm').serialize()
       console.log(formData)
-      var project = self.$store.getters['projects/getProjectById'](
+      let project = self.$store.getters['projects/getProjectById'](
         $('#editExpenseForm select[name=project_id]').val()
       )
       if (project) {
         //TODO: checktypeof projectKey == 'number') {
-        var company_client = self.$store.getters[
+        let company_client = self.$store.getters[
           'company_clients/getCompanyClientByClientId'
         ](project.client_id)
         formData = formData + '&company_client_id=' + company_client.id
@@ -467,12 +467,12 @@ export default {
         self.expense.duration
 
       if ($('#expenseUserDate').val()) {
-        var hours = Math.floor(self.startSeconds / 3600)
-        var minutes = (
+        let hours = Math.floor(self.startSeconds / 3600)
+        let minutes = (
           '00' + Math.floor((self.startSeconds % 3600) / 60)
         ).slice(-2)
-        var seconds = ('00' + (self.startSeconds % 60)).slice(-2)
-        var report_at =
+        let seconds = ('00' + (self.startSeconds % 60)).slice(-2)
+        let report_at =
           $('#expenseUserDate').val() +
           ' ' +
           hours +
@@ -492,7 +492,7 @@ export default {
       this.$store.dispatch('expenses/saveExpense', formData) //TODO: .then()
     },
     client_name: function(client_id) {
-      var company_client = this.$store.getters[
+      let company_client = this.$store.getters[
         'company_clients/getCompanyClientByClientId'
       ](client_id)
       return company_client ? company_client.name : ''

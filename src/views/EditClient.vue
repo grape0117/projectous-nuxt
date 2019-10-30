@@ -246,7 +246,7 @@ export default {
     }
   },
   mounted: function() {
-    var self = this
+    let self = this
     $('#client-modal').on('hidden.bs.modal', function() {
       self.$store.dispatch('settings/closedModal')
     })
@@ -258,8 +258,8 @@ export default {
       }
     },
     userSelected: function(user_type, user_id) {
-      var self = this
-      var userSelected = false
+      let self = this
+      let userSelected = false
       if (!self.client.users) {
         return false
       }
@@ -275,8 +275,8 @@ export default {
       return userSelected
     },
     userChecked: function(user_id) {
-      var self = this
-      var userChecked = false
+      let self = this
+      let userChecked = false
       if (!self.client.users) {
         return false
       }
@@ -290,8 +290,8 @@ export default {
       return userChecked
     },
     userRate: function(user_id) {
-      var self = this
-      var userRate = ''
+      let self = this
+      let userRate = ''
       if (!self.client.users) {
         return
       }
@@ -307,7 +307,7 @@ export default {
     },
     saveClient: function() {
       //TODO: change Save button to Saving...
-      var formData = $('#editClientForm').serialize()
+      let formData = $('#editClientForm').serialize()
       this.$store.dispatch('company_clients/saveClient', formData)
     }
   }

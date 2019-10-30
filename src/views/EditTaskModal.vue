@@ -189,7 +189,7 @@ export default {
     }
   },
   mounted: function() {
-    var self = this
+    let self = this
     $('#task-modal').on('hidden.bs.modal', function() {
       self.$store.dispatch('settings/closedModal')
     })
@@ -208,7 +208,7 @@ export default {
       return this.$store.getters['company_users/getActiveUsers']
     },
     clientName: function(client_id) {
-      var company_client = this.$store.getters[
+      let company_client = this.$store.getters[
         'company_clients/getCompanyClientByClientId'
       ](client_id)
       return company_client ? company_client.name : ''
@@ -224,8 +224,8 @@ export default {
       return dateTimeToInput(this.task.due_date)
     },
     userSelected: function(user_type, user_id) {
-      var self = this
-      var userSelected = false
+      let self = this
+      let userSelected = false
       if (!self.task.users) {
         return false
       }
@@ -241,8 +241,8 @@ export default {
       return userSelected
     },
     userChecked: function(user_id) {
-      var self = this
-      var userChecked = false
+      let self = this
+      let userChecked = false
       if (!self.task.users) {
         return false
       }
@@ -256,8 +256,8 @@ export default {
       return userChecked
     },
     userRate: function(user_id) {
-      var self = this
-      var userRate = ''
+      let self = this
+      let userRate = ''
       if (!self.task.users) {
         return
       }
@@ -278,7 +278,7 @@ export default {
       )
     },
     client_name: function(client_id) {
-      var company_client = this.$store.getters[
+      let company_client = this.$store.getters[
         'company_clients/getCompanyClientByClientId'
       ](client_id)
       return company_client ? company_client.name : ''

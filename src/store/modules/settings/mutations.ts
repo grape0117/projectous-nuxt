@@ -4,10 +4,10 @@ import Vue from 'vue'
 
 export const mutations: MutationTree<IModuleState> = {
   setCurrentEditTimerProject(state, project) {
-    state.current_edit_timer['project_id'] = project.id
+    state.current_edit_timer.project_id = project.id
   },
   setCurrentEditProjectCompanyClient(state, client) {
-    state.current_edit_project['client_id'] = client.client_id
+    state.current_edit_project.client_id = client.client_id
   },
   setCurrentCompanyId(state, company_id) {
     state.current_company_id = company_id
@@ -48,9 +48,7 @@ export const mutations: MutationTree<IModuleState> = {
       alert('check values in modal')
     }
     Object.keys(timer).map(function(timerKey, index) {
-      state.current_edit_timer['timerKey'] = timer[timerKey]
-        ? timer[timerKey]
-        : ''
+      state.current_edit_timer.timerKey = timer[timerKey] ? timer[timerKey] : ''
     })
   },
   setCurrentEditTimerHistory: function(state, history) {
