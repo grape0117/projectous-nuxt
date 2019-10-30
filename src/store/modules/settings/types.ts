@@ -1,5 +1,5 @@
 import { IProject } from '@/store/modules/projects/types'
-import { ICompanyUser } from '@/store/modules/companyUsers/types'
+import { ICompanyUser } from '@/store/modules/company_users/types'
 import { ITask } from '@/store/modules/tasks/types'
 
 export interface IModuleState {

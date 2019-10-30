@@ -1,5 +1,5 @@
 export interface IModuleState {
-  companyUsers: ICompanyUser[]
+  company_users: ICompanyUser[]
   lookup: {}
 }
 

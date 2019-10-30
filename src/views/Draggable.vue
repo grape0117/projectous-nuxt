@@ -52,7 +52,7 @@ const Lists = namespace('lists')
   }
 })
 export default class Draggable extends Vue {
-  @Prop({ required: false }) public selectedUser: any
+  @Prop({ required: false }) public selectedCompanyUser: any
   @Lists.Action private fetchTasks!: any
   @Lists.Action private moveTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
@@ -62,8 +62,8 @@ export default class Draggable extends Vue {
   private nameNewList: string = ''
 
   get filteredLists() {
-    if (!this.selectedUser) return []
-    return this.filterListsByUserId(this.selectedUser.id)
+    if (!this.selectedCompanyUser) return []
+    return this.filterListsByUserId(this.selectedCompanyUser.id)
   }
 
   private async created() {
