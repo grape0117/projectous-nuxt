@@ -10,8 +10,8 @@ export const actions: ActionTree<IListsState, IRootState> = {
     commit(FETCH_TASKS, { userTasks: user_tasks, allTasks: tasks })
     return user_tasks
   },
-  async updateTask({ commit, state }, task): Promise<any> {
-    console.log('SEND TO REQUEST CHANGE ORDER')
+  async updateTask({ commit }, task): Promise<any> {
     console.log(task)
+    console.log('SEND TO REQUEST CHANGE ORDER')
   }
 }
