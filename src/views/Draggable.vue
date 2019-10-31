@@ -1,10 +1,6 @@
 <template>
   <div class="lists">
-    <div
-      v-for="(list, index) in filteredLists"
-      :key="index"
-      class="tasks-list-main"
-    >
+    <div v-for="(list, index) in lists" :key="index" class="tasks-list-main">
       <div class="list-title-block">
         <h3>{{ list.name }}</h3>
       </div>
@@ -15,12 +11,17 @@
         @change="extractTask($event, list.id)"
       >
         <div
-          v-for="(task, index) in list.tasks"
+          v-for="(task, index) in expandedList === list.name
+            ? list.tasks
+            : list.tasks.slice(0, shorthandedListItems)"
           :key="task.name"
           class="tasks-list__item"
         >
           <TaskItem :task="task" />
           <AddNewTaskForm :listTitle="list.name" :indexTask="index + 1" />
+        </div>
+        <div class="lists__toggle" @click="setExpandedList(list.name)">
+          ...
         </div>
       </VueDraggable>
     </div>
@@ -57,14 +58,10 @@ export default class Draggable extends Vue {
   @Lists.Action private moveTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
-  @Lists.Getter private filterListsByUserId!: any
 
   private nameNewList: string = ''
-
-  get filteredLists() {
-    if (!this.selectedCompanyUser) return []
-    return this.filterListsByUserId(this.selectedCompanyUser.id)
-  }
+  private expandedList: string = ''
+  private shorthandedListItems: number = 3
 
   private async created() {
     await this.fetchTasks()
@@ -89,16 +86,20 @@ export default class Draggable extends Vue {
     const { added, moved, removed } = event
     if (!removed) {
       const { element, newIndex } = added || moved
-      this.moveTask({ element, newIndex, list })
+      this.updateTask(element)
     }
+  }
+
+  private setExpandedList(listName: string) {
+    this.expandedList = this.expandedList ? '' : listName
   }
 
   private addNewListHandler() {
     if (!this.nameNewList) return
-    if (
-      this.filteredLists.some((list: IList) => list.name === this.nameNewList)
-    )
-      this.addNewList(this.nameNewList)
+    if (this.lists.some((list: IList) => list.name === this.nameNewList)) {
+      return
+    }
+    this.addNewList(this.nameNewList)
     this.nameNewList = ''
   }
 }
@@ -109,6 +110,12 @@ export default class Draggable extends Vue {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.lists__toggle {
+  border: solid 1px black;
+  text-align: center;
+  cursor: pointer;
 }
 
 .tasks-list {
