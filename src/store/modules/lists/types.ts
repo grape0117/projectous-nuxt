@@ -14,6 +14,7 @@ export interface ITask {
   sort_order?: string | null
   title?: string
   task_id?: number
+  next_work_day?: string
 }
 
 export interface IUserTask {
