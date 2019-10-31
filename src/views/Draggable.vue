@@ -20,7 +20,7 @@
           <TaskItem :task="task" />
           <AddNewTaskForm :listTitle="list.name" :indexTask="index + 1" />
         </div>
-        <div class="lists__expanded-toggle" @click="setExpandedList(list.name)">
+        <div class="lists__toggle" @click="setExpandedList(list.name)">
           ...
         </div>
       </VueDraggable>
@@ -108,7 +108,7 @@ export default class Draggable extends Vue {
   align-items: flex-start;
 }
 
-.lists__expanded-toggle {
+.lists__toggle {
   border: solid 1px black;
   text-align: center;
   cursor: pointer;
