@@ -6,14 +6,13 @@ import { mutations } from './mutations'
 import { IModuleState } from './types'
 
 const state = {
-  projects: [],
+  task_users: [],
   lookup: {}
 }
-
-export const projects: Module<IModuleState, IRootState> = {
+export const task_users: Module<IModuleState, IRootState> = {
   namespaced: true,
   state,
-  mutations,
   actions,
-  getters
+  getters,
+  mutations
 }

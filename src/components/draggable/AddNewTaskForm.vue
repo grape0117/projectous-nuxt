@@ -1,15 +1,15 @@
 <template>
-    <div class="form-add-task" @mouseleave="resetHandler">
-        <input
-          v-if="isCreating"
-          v-model="nameOfNewTask"
-          ref="newTask"
-          type="text"
-          @keydown.enter="addNewTaskHandler"
-          @keydown.esc="resetHandler"
-        />
-        <span v-else @click="isCreating = true">+</span>
-    </div>
+  <div class="form-add-task" @mouseleave="resetHandler">
+    <input
+      v-if="isCreating"
+      v-model="nameOfNewTask"
+      ref="newTask"
+      type="text"
+      @keydown.enter="addNewTaskHandler"
+      @keydown.esc="resetHandler"
+    />
+    <span v-else @click="isCreating = true">+</span>
+  </div>
 </template>
 
 <script lang="ts">
@@ -42,7 +42,11 @@ export default class TaskItem extends Vue {
 
   private addNewTaskHandler() {
     if (!this.nameOfNewTask) return
-    this.addNewTask({ listName: this.listTitle, index: this.indexTask, taskName: this.nameOfNewTask })
+    this.addNewTask({
+      listName: this.listTitle,
+      index: this.indexTask,
+      taskName: this.nameOfNewTask
+    })
     this.resetHandler()
   }
 }
@@ -62,7 +66,7 @@ export default class TaskItem extends Vue {
 }
 
 .form-add-task > span {
-  display: none
+  display: none;
 }
 
 .form-add-task:hover > span {

@@ -1,8 +1,12 @@
 import { IHttp } from '@/http/types'
 
 export class BaseHttp implements IHttp {
-  protected baseUrl: string = 'https://release.projectous.com/'
+  protected baseUrl: string = 'https://api.projectous.com/api'
+  protected headers: any = {
+    Authorization: 'Bearer ' + '123456789012345678901234567890qwertyuiop'
+  }
   public async fetch(url: string): Promise<any> {
+    alert('basefetch')
     this.throwError()
   }
   public async get(url: string, id: number | string): Promise<any> {

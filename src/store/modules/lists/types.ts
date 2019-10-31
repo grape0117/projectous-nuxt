@@ -1,22 +1,11 @@
+import { ITaskUser } from '../task_users/types'
+
 export interface IListsState {
   lists: IList[]
 }
 
 export interface IList {
+  id: string // TODO: id: string -- we want to be able to pass the list identifier to the backend without translation
   name: string
-  tasks: ITask[]
-}
-
-export interface ITask {
-  due_date?: string
-  id?: number
-  uuid?: string | null
-  sort_order?: string | null
-  title?: string
-  task_id?: number
-  next_work_day?: string
-}
-
-export interface IUserTask {
-  task_id: number
+  tasks: ITaskUser[]
 }
