@@ -36,7 +36,6 @@
 import { Prop, Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { IList } from '@/store/modules/lists/types'
-import { ITask } from '@/store/modules/tasks/types'
 
 // @ts-ignore
 import VueDraggable from '@/../node_modules/vuedraggable'
@@ -86,7 +85,8 @@ export default class Draggable extends Vue {
     const { added, moved, removed } = event
     if (!removed) {
       const { element, newIndex } = added || moved
-      this.updateTask(element)
+      // Todo: add updateTask method
+      // this.updateTask(element)
     }
   }
 
