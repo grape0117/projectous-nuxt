@@ -1,6 +1,10 @@
 <template>
   <div class="lists">
-    <div v-for="(list, index) in lists" :key="index" class="tasks-list-main">
+    <div
+      v-for="(list, index) in filteredLists"
+      :key="index"
+      class="tasks-list-main"
+    >
       <div class="list-title-block">
         <h3>{{ list.name }}</h3>
       </div>
@@ -62,6 +66,18 @@ export default class Draggable extends Vue {
   private expandedList: string = ''
   private shorthandedListItems: number = 3
 
+  private get filteredLists() {
+    if (!this.selectedCompanyUser || !this.selectedCompanyUser.id)
+      return this.lists
+    return this.lists.map(({ id, name, tasks }) => ({
+      id,
+      name,
+      tasks: tasks.filter(
+        ({ company_user_id }) => company_user_id === this.selectedCompanyUser.id
+      )
+    }))
+  }
+
   private async created() {
     await this.fetchTasks()
     // setInterval(() => {
@@ -83,6 +99,7 @@ export default class Draggable extends Vue {
 
   private extractTask(event: any, list: string): void {
     const { added, moved, removed } = event
+    console.log(event)
     if (!removed) {
       const { element, newIndex } = added || moved
       // Todo: add updateTask method
