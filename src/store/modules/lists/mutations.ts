@@ -1,9 +1,15 @@
 import { MutationTree } from 'vuex'
 import { IListsState } from './types'
 import { ITaskUser } from '../task_users/types'
-import { FETCH_TASKS, ADD_NEW_LIST, ADD_NEW_TASK } from './mutations-types'
+import {
+  FETCH_TASKS,
+  ADD_NEW_LIST,
+  ADD_NEW_TASK,
+  UPDATE_LIST
+} from './mutations-types'
 import { Normalizer } from '@/utils/Normalizer'
 import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
+import { cloneDeep } from 'lodash'
 
 export const mutations: MutationTree<IListsState> = {
   /*[FETCH_TASKS](state: IListsState, tasks: ITask[]) {
@@ -92,6 +98,24 @@ export const mutations: MutationTree<IListsState> = {
   },
   [ADD_NEW_LIST](state: IListsState, newNameList: string) {
     state.lists = [...state.lists, { name: newNameList, tasks: [], id: '1234' }] // Todo: generate id
+  },
+  [UPDATE_LIST](state: IListsState, { event, listName }) {
+    const { added, moved, removed } = event
+    const index = state.lists.findIndex(({ name }) => name === listName)
+    const list = cloneDeep(state.lists[index])
+    if (added) {
+      const { element, newIndex } = added
+      list.tasks.splice(newIndex, 0, element)
+      state.lists[index] = list
+    } else if (moved) {
+      const { element, newIndex } = added
+      list.tasks.splice(newIndex, 1, element)
+      state.lists[index] = list
+    } else if (removed) {
+      const { newIndex } = removed
+      list.tasks.splice(newIndex, 1)
+      state.lists[index] = list
+    }
   },
   /*[ADD_TASK](
     state: IListsState,

@@ -10,9 +10,9 @@
       </div>
       <VueDraggable
         class="tasks-list"
-        v-model="list.tasks"
+        :value="list.tasks"
         group="tasks"
-        @change="extractTask($event, list.id)"
+        @change="extractTask($event, list.name)"
       >
         <div
           v-for="(task, index) in expandedList === list.name
@@ -58,6 +58,7 @@ const Lists = namespace('lists')
 export default class Draggable extends Vue {
   @Prop({ required: false }) public selectedCompanyUser: any
   @Lists.Action private fetchTasks!: any
+  @Lists.Action private updateList!: any
   @Lists.Action private moveTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
@@ -97,14 +98,14 @@ export default class Draggable extends Vue {
     // }, 5000)
   }
 
-  private extractTask(event: any, list: string): void {
-    const { added, moved, removed } = event
-    console.log(event)
-    if (!removed) {
-      const { element, newIndex } = added || moved
-      // Todo: add updateTask method
-      // this.updateTask(element)
-    }
+  private extractTask(event: any, listName: string): void {
+    this.updateList({ event, listName })
+    // const { added, moved, removed } = event
+    // if (!removed) {
+    // const { element, newIndex } = added || moved
+    // Todo: add updateTask method
+    // this.updateTask(element)
+    // }
   }
 
   private setExpandedList(listName: string) {
