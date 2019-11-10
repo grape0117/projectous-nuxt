@@ -22,9 +22,9 @@
           <TaskItem :task="task" @editTask="" />
           <AddNewTaskForm :listTitle="list.name" :indexTask="i + 1" />
         </div>
-        <div class="lists__toggle" @click="setExpandedList(list.name)">
-          ...
-        </div>
+        <button class="lists__toggle" @click="setExpandedList(list.name)">
+          {{ expandedList === list.name ? '▲' : '▼' }}
+        </button>
       </VueDraggable>
     </div>
     <div class="form-add-new-list">
@@ -122,12 +122,22 @@ export default class Draggable extends Vue {
 }
 
 .lists__toggle {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
   border: solid 1px black;
-  text-align: center;
+  line-height: normal;
   cursor: pointer;
 }
 
 .tasks-list {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 200px;
