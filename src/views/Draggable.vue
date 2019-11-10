@@ -1,28 +1,26 @@
 <template>
   <div class="lists">
-    <div
-      v-for="(list, index) in filteredLists"
-      :key="index"
-      class="tasks-list-main"
-    >
+    <div v-for="(list, index) in lists" :key="index" class="tasks-list-main">
       <div class="list-title-block">
         <h3>{{ list.name }}</h3>
       </div>
       <VueDraggable
+        v-model="tasks[index]"
         class="tasks-list"
-        :value="list.tasks"
         group="tasks"
-        @change="extractTask($event, list.name)"
+        @change="extractTask($event, index)"
       >
         <div
-          v-for="(task, index) in expandedList === list.name
-            ? list.tasks
-            : list.tasks.slice(0, shorthandedListItems)"
+          v-for="(task, i) in expandedList === list.name
+            ? tasks[index]
+            : tasks[index]
+            ? tasks[index].slice(0, shorthandedListItems)
+            : []"
           :key="task.name"
           class="tasks-list__item"
         >
           <TaskItem :task="task" @editTask="" />
-          <AddNewTaskForm :listTitle="list.name" :indexTask="index + 1" />
+          <AddNewTaskForm :listTitle="list.name" :indexTask="i + 1" />
         </div>
         <div class="lists__toggle" @click="setExpandedList(list.name)">
           ...
@@ -37,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator'
+import { Prop, Component, Vue, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { IList } from '@/store/modules/lists/types'
 
@@ -47,6 +45,7 @@ import TaskItem from '@/components/draggable/TaskItem.vue'
 import AddNewTaskForm from '@/components/draggable/AddNewTaskForm.vue'
 
 const Lists = namespace('lists')
+const TaskUsers = namespace('task_users')
 
 @Component({
   components: {
@@ -58,26 +57,16 @@ const Lists = namespace('lists')
 export default class Draggable extends Vue {
   @Prop({ required: false }) public selectedCompanyUser: any
   @Lists.Action private fetchTasks!: any
-  @Lists.Action private updateList!: any
-  @Lists.Action private moveTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
+  @TaskUsers.State(state => state['tasks_by_user']) private tasks!: IList[]
+  @TaskUsers.Action private createTaskUsersList!: any
+  @TaskUsers.Mutation('task_users/UPDATE_TASK_USER_BY_LIST')
+  private updateTasksUserList!: any
 
   private nameNewList: string = ''
   private expandedList: string = ''
   private shorthandedListItems: number = 3
-
-  private get filteredLists() {
-    if (!this.selectedCompanyUser || !this.selectedCompanyUser.id)
-      return this.lists
-    return this.lists.map(({ id, name, tasks }) => ({
-      id,
-      name,
-      tasks: tasks.filter(
-        ({ company_user_id }) => company_user_id === this.selectedCompanyUser.id
-      )
-    }))
-  }
 
   private async created() {
     await this.fetchTasks()
@@ -98,14 +87,16 @@ export default class Draggable extends Vue {
     // }, 5000)
   }
 
-  private extractTask(event: any, listName: string): void {
-    this.updateList({ event, listName })
-    // const { added, moved, removed } = event
-    // if (!removed) {
-    // const { element, newIndex } = added || moved
+  @Watch('selectedCompanyUser')
+  private onSelectedUserChanged(value: any) {
+    if (value) {
+      this.createTaskUsersList(value.id)
+    }
+  }
+
+  private extractTask(event: any, listIndex: number): void {
     // Todo: add updateTask method
-    // this.updateTask(element)
-    // }
+    // this.updateTasksUserList({ event, listIndex })
   }
 
   private setExpandedList(listName: string) {

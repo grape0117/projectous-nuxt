@@ -1,15 +1,7 @@
 import { MutationTree } from 'vuex'
 import { IListsState } from './types'
-import { ITaskUser } from '../task_users/types'
-import {
-  FETCH_TASKS,
-  ADD_NEW_LIST,
-  ADD_NEW_TASK,
-  UPDATE_LIST
-} from './mutations-types'
-import { Normalizer } from '@/utils/Normalizer'
+import { FETCH_TASKS, ADD_NEW_LIST, ADD_NEW_TASK } from './mutations-types'
 import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
-import { cloneDeep } from 'lodash'
 
 export const mutations: MutationTree<IListsState> = {
   /*[FETCH_TASKS](state: IListsState, tasks: ITask[]) {
@@ -26,21 +18,6 @@ export const mutations: MutationTree<IListsState> = {
     state.lists = lists
   },*/
   [FETCH_TASKS](state: IListsState, { task_users, allTasks }: any) {
-    const normalizedTasks = new Normalizer({
-      tasks: allTasks
-    }).flatNormalizationById('tasks')
-    const filteredTasks = task_users
-      .map(({ task_id, company_user_id }: ITaskUser) => ({
-        ...normalizedTasks[task_id],
-        company_user_id
-      }))
-      .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
-    const unmarkedTasks = filteredTasks.filter(
-      ({ next_work_day }: ITaskUser) => !next_work_day
-    )
-    const markedTasks = filteredTasks.filter(
-      ({ next_work_day }: ITaskUser) => next_work_day
-    )
     const lists = []
     const today = resetTime(new Date())
     // Note: Create list for past tasks
@@ -56,24 +33,12 @@ export const mutations: MutationTree<IListsState> = {
 
     lists.push({
       id: 'Past',
-      name: 'Outdated tasks',
-      tasks: markedTasks
-        .filter(
-          ({ next_work_day }: any) =>
-            resetTime(next_work_day).getDate() < today.getDate()
-        )
-        .sort(({ next_work_day: a }: any, { next_work_day: b }: any) => {
-          return resetTime(a as Date).getTime() - resetTime(b as Date).getTime()
-        })
+      name: 'Outdated tasks'
     })
     // Note: create list for today
     lists.push({
       id: today.toString(), // uuid //2019-10-10
-      name: getUserFriendlyDate(today), // 2019-10-10 //Oct 10
-      tasks: markedTasks.filter(
-        ({ next_work_day }: any) =>
-          resetTime(next_work_day).toString() === today.toString()
-      )
+      name: getUserFriendlyDate(today) // 2019-10-10 //Oct 10
     })
     // Note: create lists for next 7 days from today
     for (let day = 1; day < 7; day++) {
@@ -81,41 +46,18 @@ export const mutations: MutationTree<IListsState> = {
       date.setDate(resetTime(new Date()).getDate() + day)
       lists.push({
         id: date.toString(),
-        name: getUserFriendlyDate(date),
-        tasks: markedTasks.filter(
-          ({ next_work_day }: any) =>
-            resetTime(next_work_day).toString() === date.toString()
-        )
+        name: getUserFriendlyDate(date)
       })
     }
     // Note: create list for tasks with no data
     lists.push({
-      id: '',
-      name: 'Unmarked',
-      tasks: unmarkedTasks
+      id: 'Unmarked',
+      name: 'Unmarked'
     })
     state.lists = lists
   },
   [ADD_NEW_LIST](state: IListsState, newNameList: string) {
-    state.lists = [...state.lists, { name: newNameList, tasks: [], id: '1234' }] // Todo: generate id
-  },
-  [UPDATE_LIST](state: IListsState, { event, listName }) {
-    const { added, moved, removed } = event
-    const index = state.lists.findIndex(({ name }) => name === listName)
-    const list = cloneDeep(state.lists[index])
-    if (added) {
-      const { element, newIndex } = added
-      list.tasks.splice(newIndex, 0, element)
-      state.lists[index] = list
-    } else if (moved) {
-      const { element, newIndex } = added
-      list.tasks.splice(newIndex, 1, element)
-      state.lists[index] = list
-    } else if (removed) {
-      const { newIndex } = removed
-      list.tasks.splice(newIndex, 1)
-      state.lists[index] = list
-    }
+    state.lists = [...state.lists, { name: newNameList, id: '1234' }] // Todo: generate id
   },
   /*[ADD_TASK](
     state: IListsState,
@@ -139,18 +81,18 @@ export const mutations: MutationTree<IListsState> = {
     const getRandomArbitrary = (min: number, max: number): number =>
       Math.ceil(Math.random() * (max - min) + min)
     const taskId = getRandomArbitrary(1000, 999999)
-    state.lists.map(list => {
-      if (list.name === listName) {
-        const listTasks = list.tasks
-        // @ts-ignore
-        listTasks.splice(index, 0, {
-          task_id: taskId,
-          id: taskId
-        })
-        return { ...list, tasks: listTasks }
-      } else {
-        return list
-      }
-    })
+    // state.lists.map(list => {
+    //   if (list.name === listName) {
+    //     const listTasks = list.tasks
+    //     // @ts-ignore
+    //     listTasks.splice(index, 0, {
+    //       task_id: taskId,
+    //       id: taskId
+    //     })
+    //     return { ...list, tasks: listTasks }
+    //   } else {
+    //     return list
+    //   }
+    // })
   }
 }
