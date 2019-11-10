@@ -1,7 +1,7 @@
 import { ActionTree } from 'vuex'
 import { IListsState } from '../lists/types'
 import { IRootState } from '@/store/types'
-import { FETCH_TASKS, UPDATE_LIST, UPDATE_TASK } from './mutations-types'
+import { FETCH_TASKS, UPDATE_LIST } from './mutations-types'
 
 export const actions: ActionTree<IListsState, IRootState> = {
   async fetchTasks({ commit }) {

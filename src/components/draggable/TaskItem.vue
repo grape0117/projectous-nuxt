@@ -3,7 +3,8 @@
     <span v-if="!editable" @click="editable = true">{{ task.title }}</span>
     <input
       v-else
-      v-model="task.title"
+      :value="task.title"
+      @input="onChange"
       @blur="editable = false"
       @keyup.enter="update"
     />
@@ -21,16 +22,21 @@ const Task = namespace('tasks')
 export default class TaskItem extends Vue {
   @Prop({ required: true }) private task!: ITask
   private editable: boolean = false
-  private original: string = this.task.title
+  private newTitle: string = ''
   @Task.Action private updateTask!: any
 
-  private editTask() {
-    this.editable = false
+  private onChange(e) {
+    this.newTitle = e.target.value
   }
 
   private update() {
     this.editable = false
-    this.updateTask(this.task)
+
+    // make update only if the title has changed
+    if (this.newTitle !== this.task.title) {
+      this.task.title = this.newTitle
+      this.updateTask(this.task)
+    }
   }
 }
 </script>

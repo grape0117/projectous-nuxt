@@ -58,9 +58,7 @@ export const mutations: MutationTree<IModuleState> = {
 
   [UPDATE_TASK](state, task) {
     const { id } = task
-    const { tasks } = state
-
-    const idx = tasks.findIndex(e => e.id === id)
-    state.tasks[idx] = task
+    const idx = state.tasks.findIndex(e => e.id === id)
+    state.tasks.splice(idx, 1, task)
   }
 }
