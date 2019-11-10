@@ -8,7 +8,9 @@
       @keydown.enter="addNewTaskHandler"
       @keydown.esc="resetHandler"
     />
-    <span v-else @click="isCreating = true">+</span>
+    <span v-else class="form-add-task__creating" @click="isCreating = true"
+      >+</span
+    >
   </div>
 </template>
 
@@ -54,23 +56,21 @@ export default class AddNewTaskForm extends Vue {
 
 <style>
 .form-add-task {
-  height: 5px;
-  border: 1px solid black;
+  width: 100%;
+  line-height: normal;
 }
 
-.form-add-task:hover {
-  height: 20px;
+.form-add-task__creating {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 17px;
+  height: 17px;
+  margin-left: auto;
+  border: 1px solid black;
 }
 
-.form-add-task > span {
-  display: none;
-}
-
-.form-add-task:hover > span {
-  display: inline;
+.form-add-task__creating:hover {
   cursor: pointer;
 }
 </style>

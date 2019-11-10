@@ -20,7 +20,11 @@
           class="tasks-list__item"
         >
           <TaskItem :task="task" @editTask="" />
-          <AddNewTaskForm :listTitle="list.name" :indexTask="i + 1" />
+          <AddNewTaskForm
+            class="tasks-list__add"
+            :listTitle="list.name"
+            :indexTask="i + 1"
+          />
         </div>
         <button class="lists__toggle" @click="setExpandedList(list.name)">
           {{ expandedList === list.name ? '▲' : '▼' }}
@@ -147,7 +151,14 @@ export default class Draggable extends Vue {
 }
 
 .tasks-list__item {
+  position: relative;
   border: 1px solid black;
+}
+
+.tasks-list__add {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
 }
 
 .list-title-block {
