@@ -64,10 +64,11 @@ export default class AddNewTaskForm extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
   margin-left: auto;
   border: 1px solid black;
+  background-color: white;
 }
 
 .form-add-task__creating:hover {
