@@ -1,6 +1,8 @@
 <template>
-  <div>
-    <p v-if="!editable" @click="editable = true">{{ task.title }}</p>
+  <div class="task-item">
+    <p class="task-item__text" v-if="!editable" @click="editable = true">
+      {{ task.title }}
+    </p>
     <input v-else :value="task.title" @keyup.enter="editTask" />
   </div>
 </template>
@@ -20,3 +22,10 @@ export default class TaskItem extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.task-item__text {
+  margin: 0;
+  line-height: normal;
+}
+</style>

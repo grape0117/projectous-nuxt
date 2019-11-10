@@ -10,22 +10,24 @@
         group="tasks"
         @change="extractTask($event, index)"
       >
-        <div
-          v-for="(task, i) in expandedList === list.name
-            ? tasks[index]
-            : tasks[index]
-            ? tasks[index].slice(0, shorthandedListItems)
-            : []"
-          :key="task.name"
-          class="tasks-list__item"
-        >
-          <TaskItem :task="task" @editTask="" />
-          <AddNewTaskForm
-            class="tasks-list__add"
-            :listTitle="list.name"
-            :indexTask="i + 1"
-          />
-        </div>
+        <ul class="tasks-list__list">
+          <li
+            v-for="(task, i) in expandedList === list.name
+              ? tasks[index]
+              : tasks[index]
+              ? tasks[index].slice(0, shorthandedListItems)
+              : []"
+            :key="task.name"
+            class="tasks-list__item"
+          >
+            <TaskItem :task="task" @editTask="" />
+            <AddNewTaskForm
+              class="tasks-list__add"
+              :listTitle="list.name"
+              :indexTask="i + 1"
+            />
+          </li>
+        </ul>
         <button class="lists__toggle" @click="setExpandedList(list.name)">
           {{ expandedList === list.name ? '▲' : '▼' }}
         </button>
@@ -150,15 +152,24 @@ export default class Draggable extends Vue {
   border: 1px solid gray;
 }
 
+.tasks-list__list {
+  margin: 0;
+  padding-left: 18px;
+}
+
 .tasks-list__item {
   position: relative;
-  border: 1px solid black;
+}
+
+.tasks-list__item + .tasks-list__item {
+  margin-top: 4px;
 }
 
 .tasks-list__add {
   position: absolute;
   right: 2px;
   bottom: 2px;
+  z-index: 500;
 }
 
 .list-title-block {
