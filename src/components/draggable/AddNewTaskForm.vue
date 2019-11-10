@@ -19,7 +19,7 @@ import { namespace } from 'vuex-class'
 const Lists = namespace('lists')
 
 @Component
-export default class TaskItem extends Vue {
+export default class AddNewTaskForm extends Vue {
   @Prop({ required: true }) protected listTitle!: string
   @Prop({ required: true }) protected indexTask!: number
   @Lists.Mutation('lists/ADD_NEW_TASK') private addNewTask!: any

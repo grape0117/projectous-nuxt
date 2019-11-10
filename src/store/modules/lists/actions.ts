@@ -39,6 +39,7 @@ export const actions: ActionTree<IListsState, IRootState> = {
   updateList({ commit }, { event, listName }) {
     commit(UPDATE_LIST, { event, listName })
   },
+  updateTask({ commit }, task) {},
   /*  async addNewTask(
     { commit }: any,
     { listName, taskName, index }: any

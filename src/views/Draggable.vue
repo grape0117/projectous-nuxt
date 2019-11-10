@@ -21,7 +21,7 @@
           :key="task.name"
           class="tasks-list__item"
         >
-          <TaskItem :task="task" />
+          <TaskItem :task="task" @editTask="" />
           <AddNewTaskForm :listTitle="list.name" :indexTask="index + 1" />
         </div>
         <div class="lists__toggle" @click="setExpandedList(list.name)">
