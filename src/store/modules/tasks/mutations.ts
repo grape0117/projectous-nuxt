@@ -2,6 +2,7 @@
 import { MutationTree } from 'vuex'
 import { IModuleState, ITask } from './types'
 import Vue from 'vue'
+import { UPDATE_TASK } from '@/store/modules/lists/mutations-types'
 
 export const mutations: MutationTree<IModuleState> = {
   load(state, tasks: ITask[]) {
@@ -53,5 +54,13 @@ export const mutations: MutationTree<IModuleState> = {
     Vue.delete(state.tasks, state.lookup[task.id])
     Vue.delete(state.lookup, task.id)
     //TODO: what to do with tasks_users?
+  },
+
+  [UPDATE_TASK](state, task) {
+    const { id } = task
+    const { tasks } = state
+
+    const idx = tasks.findIndex(e => e.id === id)
+    state.tasks[idx] = task
   }
 }

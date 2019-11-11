@@ -1,7 +1,13 @@
 import { MutationTree } from 'vuex'
 import { IListsState } from './types'
-import { FETCH_TASKS, ADD_NEW_LIST, ADD_NEW_TASK } from './mutations-types'
+import {
+  FETCH_TASKS,
+  ADD_NEW_LIST,
+  ADD_NEW_TASK,
+  UPDATE_TASK
+} from './mutations-types'
 import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
+import { ITask } from '@/store/modules/tasks/types'
 
 export const mutations: MutationTree<IListsState> = {
   /*[FETCH_TASKS](state: IListsState, tasks: ITask[]) {
