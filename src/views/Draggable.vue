@@ -4,33 +4,27 @@
       <div class="list-title-block">
         <h3>{{ list.name }}</h3>
       </div>
+      <div class="lists__toggle" @click="setExpandedList(list.name)">
+        &#9652;
+      </div>
       <VueDraggable
         v-model="tasks[index]"
         class="tasks-list"
         group="tasks"
         @change="extractTask($event, index)"
       >
-        <ul class="tasks-list__list">
-          <li
-            v-for="(task, i) in expandedList === list.name
-              ? tasks[index]
-              : tasks[index]
-              ? tasks[index].slice(0, shorthandedListItems)
-              : []"
-            :key="task.name"
-            class="tasks-list__item"
-          >
-            <TaskItem :task="task" @editTask="" />
-            <AddNewTaskForm
-              class="tasks-list__add"
-              :listTitle="list.name"
-              :indexTask="i + 1"
-            />
-          </li>
-        </ul>
-        <button class="lists__toggle" @click="setExpandedList(list.name)">
-          {{ expandedList === list.name ? '▲' : '▼' }}
-        </button>
+        <div
+          v-for="(task, i) in expandedList === list.name
+            ? tasks[index]
+            : tasks[index]
+            ? tasks[index].slice(0, shorthandedListItems)
+            : []"
+          :key="task.name"
+          class="tasks-list__item"
+        >
+          <TaskItem :task="task" @editTask="" />
+          <AddNewTaskForm :listTitle="list.name" :indexTask="i + 1" />
+        </div>
       </VueDraggable>
     </div>
     <div class="form-add-new-list">
@@ -128,17 +122,15 @@ export default class Draggable extends Vue {
 }
 
 .lists__toggle {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 20px;
   height: 20px;
-  box-sizing: border-box;
   border: solid 1px black;
-  line-height: normal;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
 
@@ -158,18 +150,7 @@ export default class Draggable extends Vue {
 }
 
 .tasks-list__item {
-  position: relative;
-}
-
-.tasks-list__item + .tasks-list__item {
-  margin-top: 4px;
-}
-
-.tasks-list__add {
-  position: absolute;
-  right: 2px;
-  bottom: 2px;
-  z-index: 500;
+  width: 100%;
 }
 
 .list-title-block {
@@ -188,6 +169,7 @@ export default class Draggable extends Vue {
 }
 
 .tasks-list-main {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: stretch;
