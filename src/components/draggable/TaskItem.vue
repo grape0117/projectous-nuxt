@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p v-if="!editable" @click="editable = true">{{ task.title }}</p>
+    <span v-if="!editable" @click="editable = true">{{ task.title }}</span>
     <input v-else :value="task.title" @keyup.enter="editTask" />
   </div>
 </template>

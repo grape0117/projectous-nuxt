@@ -4,6 +4,9 @@
       <div class="list-title-block">
         <h3>{{ list.name }}</h3>
       </div>
+      <div class="lists__toggle" @click="setExpandedList(list.name)">
+        &#9652;
+      </div>
       <VueDraggable
         v-model="tasks[index]"
         class="tasks-list"
@@ -21,9 +24,6 @@
         >
           <TaskItem :task="task" @editTask="" />
           <AddNewTaskForm :listTitle="list.name" :indexTask="i + 1" />
-        </div>
-        <div class="lists__toggle" @click="setExpandedList(list.name)">
-          ...
         </div>
       </VueDraggable>
     </div>
@@ -122,12 +122,20 @@ export default class Draggable extends Vue {
 }
 
 .lists__toggle {
+  width: 20px;
+  height: 20px;
   border: solid 1px black;
-  text-align: center;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
 
 .tasks-list {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 200px;
@@ -137,7 +145,7 @@ export default class Draggable extends Vue {
 }
 
 .tasks-list__item {
-  border: 1px solid black;
+  width: 100%;
 }
 
 .list-title-block {
@@ -156,6 +164,7 @@ export default class Draggable extends Vue {
 }
 
 .tasks-list-main {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: stretch;

@@ -54,23 +54,13 @@ export default class AddNewTaskForm extends Vue {
 
 <style>
 .form-add-task {
-  height: 5px;
+  width: 15px;
+  height: 15px;
   border: 1px solid black;
-}
-
-.form-add-task:hover {
-  height: 20px;
+  margin-left: auto;
   display: flex;
-  justify-content: center;
   align-items: center;
-}
-
-.form-add-task > span {
-  display: none;
-}
-
-.form-add-task:hover > span {
-  display: inline;
+  justify-content: center;
   cursor: pointer;
 }
 </style>
