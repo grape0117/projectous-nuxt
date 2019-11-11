@@ -17,7 +17,6 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 import { ITask } from '@/store/modules/tasks/types'
 import { namespace } from 'vuex-class'
 import { cloneDeep } from 'lodash'
-import { ITaskUser } from '@/store/modules/task_users/types'
 
 const Task = namespace('tasks')
 const TaskUsers = namespace('task_users')
@@ -29,9 +28,7 @@ export default class TaskItem extends Vue {
   @Prop({ required: true }) private taskIndex!: number
   @Task.Action private updateTask!: any
   @TaskUsers.Mutation('task_users/UPDATE_TASK_USER_BY_LIST')
-  updateUserTask!: any
-  @TaskUsers.State(state => state['tasks_by_user'])
-  private tasks!: ITaskUser[][]
+  private updateUserTask!: any
   private editable: boolean = false
   private newTitle: string = ''
 
