@@ -22,8 +22,17 @@
           :key="task.name"
           class="tasks-list__item"
         >
-          <TaskItem :task="task" :list-index="index" :task-index="i" />
-          <AddNewTaskForm :listTitle="list.name" :indexTask="i + 1" />
+          <TaskItem
+            :task="task"
+            :list-index="index"
+            :task-index="i"
+            @openNewTaskInput="isCreating = `${index}_${i}`"
+          />
+          <AddNewTaskForm
+            :listTitle="list.name"
+            :indexTask="i + 1"
+            :is-creating="isCreating === `${index}_${i}`"
+          />
         </div>
       </VueDraggable>
     </div>
@@ -38,7 +47,6 @@
 import { Prop, Component, Vue, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { IList } from '@/store/modules/lists/types'
-
 // @ts-ignore
 import VueDraggable from '@/../node_modules/vuedraggable'
 import TaskItem from '@/components/draggable/TaskItem.vue'
@@ -69,6 +77,7 @@ export default class Draggable extends Vue {
   private nameNewList: string = ''
   private expandedList: string = ''
   private shorthandedListItems: number = 3
+  private isCreating: string | null = null
 
   private async created() {
     await this.fetchTasks()

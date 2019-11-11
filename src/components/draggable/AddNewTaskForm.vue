@@ -5,8 +5,8 @@
       v-model="nameOfNewTask"
       ref="newTask"
       type="text"
-      @keydown.enter="addNewTaskHandler"
-      @keydown.esc="resetHandler"
+      @keyup.enter="addNewTaskHandler"
+      @keyup.esc="resetHandler"
     />
     <span v-else @click="isCreating = true">+</span>
   </div>
@@ -22,9 +22,9 @@ const Lists = namespace('lists')
 export default class AddNewTaskForm extends Vue {
   @Prop({ required: true }) protected listTitle!: string
   @Prop({ required: true }) protected indexTask!: number
+  @Prop({ required: true }) protected isCreating!: boolean
   @Lists.Mutation('lists/ADD_NEW_TASK') private addNewTask!: any
 
-  private isCreating: boolean = false
   private nameOfNewTask: string = ''
 
   @Watch('isCreating')

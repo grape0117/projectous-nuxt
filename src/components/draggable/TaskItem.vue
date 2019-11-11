@@ -1,12 +1,13 @@
 <template>
   <div>
-    <span v-if="!editable" @click="editable = true">{{ task.title }}</span>
+    <span v-if="!editable" @click="openInput">{{ task.title }}</span>
     <input
       v-else
+      ref="input"
       :value="task.title"
       @change="newTitle = $event.target.value"
-      @blur="editable = false"
-      @keyup.enter="update"
+      @blur="update"
+      @keyup.enter="openNewTaskForm"
     />
   </div>
 </template>
@@ -37,7 +38,7 @@ export default class TaskItem extends Vue {
   private update() {
     this.editable = false
     // make update only if the title has changed
-    if (this.task.title !== this.newTitle) {
+    if (this.newTitle && this.task.title !== this.newTitle) {
       const task: any = cloneDeep(this.task)
       task.title = this.newTitle
       this.updateTask(task)
@@ -47,6 +48,17 @@ export default class TaskItem extends Vue {
         taskIndex: this.taskIndex
       })
     }
+  }
+  private openInput() {
+    this.editable = true
+    this.$nextTick(() => {
+      // @ts-ignore
+      this.$refs.input.focus()
+    })
+  }
+  private openNewTaskForm() {
+    this.editable = false
+    this.$emit('openNewTaskInput')
   }
 }
 </script>
