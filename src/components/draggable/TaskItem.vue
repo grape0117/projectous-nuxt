@@ -4,7 +4,7 @@
     <input
       v-else
       :value="task.title"
-      @input="onChange"
+      @change="onChange"
       @blur="editable = false"
       @keyup.enter="update"
     />
@@ -22,10 +22,12 @@ const Task = namespace('tasks')
 export default class TaskItem extends Vue {
   @Prop({ required: true }) private task!: ITask
   private editable: boolean = false
+  private isChanged: boolean = false
   private newTitle: string = ''
   @Task.Action private updateTask!: any
 
   private onChange(e) {
+    this.isChanged = true
     this.newTitle = e.target.value
   }
 
@@ -33,9 +35,10 @@ export default class TaskItem extends Vue {
     this.editable = false
 
     // make update only if the title has changed
-    if (this.newTitle !== this.task.title) {
-      this.task.title = this.newTitle
-      this.updateTask(this.task)
+    if (this.isChanged) {
+      if (this.newTitle) {
+        this.updateTask({ ...this.task, title: this.newTitle })
+      }
     }
   }
 }
