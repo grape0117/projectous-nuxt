@@ -4,10 +4,12 @@ import {
   CREATE_TASK_USER,
   UPDATE_TASK_USER,
   DELETE_TASK_USER,
-  CREATE_TASK_USER_BY_LIST
+  CREATE_TASK_USER_BY_LIST,
+  UPDATE_TASK_USER_BY_LIST
 } from './mutations-types'
 import { Normalizer } from '@/utils/Normalizer'
 import { resetTime } from '@/utils/dateFunctions'
+import { cloneDeep } from 'lodash'
 
 export const mutations: MutationTree<IModuleState> = {
   [CREATE_TASK_USER](state: IModuleState, task_user: ITaskUser) {
@@ -75,5 +77,13 @@ export const mutations: MutationTree<IModuleState> = {
       }
       state.tasks_by_user.push(day_tasks)
     })
+  },
+  [UPDATE_TASK_USER_BY_LIST](
+    state: IModuleState,
+    { task, listIndex, taskIndex }
+  ) {
+    const tasks = cloneDeep(state.tasks_by_user)
+    tasks[listIndex][taskIndex] = task
+    state.tasks_by_user = tasks
   }
 }

@@ -22,7 +22,7 @@
           :key="task.name"
           class="tasks-list__item"
         >
-          <TaskItem :task="task" @editTask="" />
+          <TaskItem :task="task" :list-index="index" :task-index="i" />
           <AddNewTaskForm :listTitle="list.name" :indexTask="i + 1" />
         </div>
       </VueDraggable>
@@ -43,6 +43,7 @@ import { IList } from '@/store/modules/lists/types'
 import VueDraggable from '@/../node_modules/vuedraggable'
 import TaskItem from '@/components/draggable/TaskItem.vue'
 import AddNewTaskForm from '@/components/draggable/AddNewTaskForm.vue'
+import { ITaskUser } from '@/store/modules/task_users/types'
 
 const Lists = namespace('lists')
 const TaskUsers = namespace('task_users')
@@ -59,7 +60,8 @@ export default class Draggable extends Vue {
   @Lists.Action private fetchTasks!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
-  @TaskUsers.State(state => state['tasks_by_user']) private tasks!: IList[]
+  @TaskUsers.State(state => state['tasks_by_user'])
+  private tasks!: ITaskUser[][]
   @TaskUsers.Action private createTaskUsersList!: any
   @TaskUsers.Mutation('task_users/UPDATE_TASK_USER_BY_LIST')
   private updateTasksUserList!: any
