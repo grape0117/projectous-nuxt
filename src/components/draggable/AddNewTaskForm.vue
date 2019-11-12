@@ -8,22 +8,31 @@
       @keyup.enter="addNewTaskHandler"
       @keyup.esc="resetHandler"
     />
-    <span v-else @click="isCreating = true">+</span>
+    <span
+      v-else
+      @click="$emit('setIsCreating', `${listIndex}_${taskIndex - 1}`)"
+      >+</span
+    >
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
+import { ITask } from '@/store/modules/tasks/types'
 
-const Lists = namespace('lists')
+const Tasks = namespace('tasks')
+const TaskUsers = namespace('task_users')
 
 @Component
 export default class AddNewTaskForm extends Vue {
-  @Prop({ required: true }) protected listTitle!: string
-  @Prop({ required: true }) protected indexTask!: number
+  @Prop({ required: true }) protected listIndex!: string
+  @Prop({ required: true }) protected taskIndex!: number
+  @Prop({ required: true }) protected userId!: number | null
   @Prop({ required: true }) protected isCreating!: boolean
-  @Lists.Mutation('lists/ADD_NEW_TASK') private addNewTask!: any
+  @Tasks.Action private addNewTask!: any
+  @TaskUsers.Mutation('task_users/ADD_TASK_USER_TO_LIST')
+  private addUserTask!: any
 
   private nameOfNewTask: string = ''
 
@@ -36,16 +45,24 @@ export default class AddNewTaskForm extends Vue {
   }
 
   private resetHandler() {
-    this.isCreating = false
+    this.$emit('setIsCreating', null)
     this.nameOfNewTask = ''
   }
 
   private addNewTaskHandler() {
     if (!this.nameOfNewTask) return
-    this.addNewTask({
-      listName: this.listTitle,
-      index: this.indexTask,
-      taskName: this.nameOfNewTask
+    const getRandomArbitrary = (min: number, max: number): number =>
+      Math.ceil(Math.random() * (max - min) + min)
+    const id = getRandomArbitrary(1000, 999999).toString()
+    const task: ITask = {
+      id,
+      title: this.nameOfNewTask,
+      company_user_id: this.userId
+    }
+    this.addUserTask({
+      listIndex: this.listIndex,
+      taskIndex: this.taskIndex,
+      task
     })
     this.resetHandler()
   }

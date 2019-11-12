@@ -29,9 +29,11 @@
             @openNewTaskInput="isCreating = `${index}_${i}`"
           />
           <AddNewTaskForm
-            :listTitle="list.name"
-            :indexTask="i + 1"
+            :list-index="index"
+            :task-index="i + 1"
+            :user-id="selectedCompanyUser ? selectedCompanyUser.id : null"
             :is-creating="isCreating === `${index}_${i}`"
+            @setIsCreating="isCreating = $event"
           />
         </div>
       </VueDraggable>

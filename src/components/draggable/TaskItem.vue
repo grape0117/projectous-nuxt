@@ -18,7 +18,6 @@ import { ITask } from '@/store/modules/tasks/types'
 import { namespace } from 'vuex-class'
 import { cloneDeep } from 'lodash'
 
-const Task = namespace('tasks')
 const TaskUsers = namespace('task_users')
 
 @Component
@@ -26,7 +25,6 @@ export default class TaskItem extends Vue {
   @Prop({ required: true }) private task!: ITask
   @Prop({ required: true }) private listIndex!: number
   @Prop({ required: true }) private taskIndex!: number
-  @Task.Action private updateTask!: any
   @TaskUsers.Mutation('task_users/UPDATE_TASK_USER_BY_LIST')
   private updateUserTask!: any
   private editable: boolean = false
@@ -38,7 +36,6 @@ export default class TaskItem extends Vue {
     if (this.newTitle && this.task.title !== this.newTitle) {
       const task: any = cloneDeep(this.task)
       task.title = this.newTitle
-      this.updateTask(task)
       this.updateUserTask({
         task,
         listIndex: this.listIndex,

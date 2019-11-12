@@ -1,6 +1,3 @@
-export const FETCH_TASKS = 'lists/FETCH_TASKS'
+export const CREATE_LISTS = 'lists/CREATE_LISTS'
 export const ADD_NEW_LIST = 'lists/ADD_NEW_LIST'
 export const UPDATE_LIST = 'lists/UPDATE_LIST'
-export const ADD_NEW_TASK = 'lists/ADD_NEW_TASK'
-export const UPDATE_TASK = 'lists/UPDATE_TASK'
-export const ADD_TASK = 'lists/ADD_TASK'

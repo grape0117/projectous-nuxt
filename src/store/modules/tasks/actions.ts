@@ -3,17 +3,13 @@ import { ActionTree } from 'vuex'
 import { IModuleState } from './types'
 import { ITask } from '../tasks/types'
 import { IRootState } from '@/store/types'
-import { FETCH_TASKS, UPDATE_TASK } from '../lists/mutations-types'
+import { CREATE_LISTS } from '../lists/mutations-types'
 
 export const actions: ActionTree<IModuleState, IRootState> = {
-  async fetchTasks({ commit }: { commit: any }): Promise<ITask[]> {
-    const response = await fetch('https://release.projectous.com/test-tasks')
-    const { tasks } = await response.json()
-    commit(FETCH_TASKS, tasks)
-    return tasks
-  },
-
-  updateTask({ commit }, task) {
-    commit(UPDATE_TASK, task)
-  }
+  // async fetchTasks({ commit }: { commit: any }): Promise<ITask[]> {
+  //   const response = await fetch('https://release.projectous.com/test-tasks')
+  //   const { tasks } = await response.json()
+  //   commit(CREATE_LISTS)
+  //   return tasks
+  // }
 }

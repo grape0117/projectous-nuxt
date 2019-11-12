@@ -1,13 +1,7 @@
 import { MutationTree } from 'vuex'
 import { IListsState } from './types'
-import {
-  FETCH_TASKS,
-  ADD_NEW_LIST,
-  ADD_NEW_TASK,
-  UPDATE_TASK
-} from './mutations-types'
+import { CREATE_LISTS, ADD_NEW_LIST } from './mutations-types'
 import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
-import { ITask } from '@/store/modules/tasks/types'
 
 export const mutations: MutationTree<IListsState> = {
   /*[FETCH_TASKS](state: IListsState, tasks: ITask[]) {
@@ -23,7 +17,7 @@ export const mutations: MutationTree<IListsState> = {
   [SET_LISTS](state: IListsState, lists: any) {
     state.lists = lists
   },*/
-  [FETCH_TASKS](state: IListsState, { task_users, allTasks }: any) {
+  [CREATE_LISTS](state: IListsState, { task_users, allTasks }: any) {
     const lists = []
     const today = resetTime(new Date())
     // Note: Create list for past tasks
@@ -64,7 +58,7 @@ export const mutations: MutationTree<IListsState> = {
   },
   [ADD_NEW_LIST](state: IListsState, newNameList: string) {
     state.lists = [...state.lists, { name: newNameList, id: '1234' }] // Todo: generate id
-  },
+  }
   /*[ADD_TASK](
     state: IListsState,
     { task, listName }: { task: ITask; listName: string }
@@ -82,23 +76,4 @@ export const mutations: MutationTree<IListsState> = {
       }
     })
   },*/
-  [ADD_NEW_TASK](state: IListsState, { listName, index }: any) {
-    // @Mikhail: can't we put this somewhere outside of mutations?
-    const getRandomArbitrary = (min: number, max: number): number =>
-      Math.ceil(Math.random() * (max - min) + min)
-    const taskId = getRandomArbitrary(1000, 999999)
-    // state.lists.map(list => {
-    //   if (list.name === listName) {
-    //     const listTasks = list.tasks
-    //     // @ts-ignore
-    //     listTasks.splice(index, 0, {
-    //       task_id: taskId,
-    //       id: taskId
-    //     })
-    //     return { ...list, tasks: listTasks }
-    //   } else {
-    //     return list
-    //   }
-    // })
-  }
 }

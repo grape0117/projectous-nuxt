@@ -1,7 +1,7 @@
 import { ActionTree } from 'vuex'
 import { IListsState } from '../lists/types'
 import { IRootState } from '@/store/types'
-import { FETCH_TASKS, UPDATE_LIST } from './mutations-types'
+import { CREATE_LISTS, UPDATE_LIST } from './mutations-types'
 
 export const actions: ActionTree<IListsState, IRootState> = {
   async fetchTasks({ commit }) {
@@ -24,7 +24,7 @@ export const actions: ActionTree<IListsState, IRootState> = {
     //   { module: 'projects', entities: projects },
     //   { root: true }
     // )
-    commit(FETCH_TASKS, { task_users, allTasks: tasks })
+    commit(CREATE_LISTS, { task_users, allTasks: tasks })
     /*commit(
         'ADD_MANY',
         { module: 'project_users', entities: project_users },

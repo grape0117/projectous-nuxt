@@ -18,28 +18,28 @@ export interface IModuleState {
 }
 
 export interface ITask {
-  id: string
-  sort_order: number
-  title: string
-  company_id: string | null
-  project_id: string | null
-  detail: string
-  note: string | null
-  status: string | null // enum('reviewed','turned-in','completed','closed','open') NOT NULL DEFAULT 'open',
-  priority: string //` enum('today','this week','when possible','active','hold') NOT NULL DEFAULT 'active',
-  priority_set_at: string | null
-  order: string | null
-  previous_task_id: number | null
-  next_task_id: number | null
-  parent_task_id: number | null
-  child_task_id: number | null
-  created_by_company_user_id: number | null
-  due_date: string | null
-  estimate: number | null
-  original_due_date: Date | null
-  completed_at: string | null
-  created_at: string | null
-  updated_at: string | null
-  deleted_at: string | null
-  company_user_id: number | null
+  id?: string
+  sort_order?: number
+  title?: string
+  company_id?: string | null
+  project_id?: string | null
+  detail?: string
+  note?: string | null
+  status?: string | null // enum('reviewed','turned-in','completed','closed','open') NOT NULL DEFAULT 'open',
+  priority?: string //` enum('today','this week','when possible','active','hold') NOT NULL DEFAULT 'active',
+  priority_set_at?: string | null
+  order?: string | null
+  previous_task_id?: number | null
+  next_task_id?: number | null
+  parent_task_id?: number | null
+  child_task_id?: number | null
+  created_by_company_user_id?: number | null
+  due_date?: string | null
+  estimate?: number | null
+  original_due_date?: Date | null
+  completed_at?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+  deleted_at?: string | null
+  company_user_id?: number | null
 }

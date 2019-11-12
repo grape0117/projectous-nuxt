@@ -5,7 +5,8 @@ import {
   UPDATE_TASK_USER,
   DELETE_TASK_USER,
   CREATE_TASK_USER_BY_LIST,
-  UPDATE_TASK_USER_BY_LIST
+  UPDATE_TASK_USER_BY_LIST,
+  ADD_TASK_USER_TO_LIST
 } from './mutations-types'
 import { Normalizer } from '@/utils/Normalizer'
 import { resetTime } from '@/utils/dateFunctions'
@@ -84,6 +85,11 @@ export const mutations: MutationTree<IModuleState> = {
   ) {
     const tasks = cloneDeep(state.tasks_by_user)
     tasks[listIndex][taskIndex] = task
+    state.tasks_by_user = tasks
+  },
+  [ADD_TASK_USER_TO_LIST](state: IModuleState, { task, listIndex, taskIndex }) {
+    const tasks = cloneDeep(state.tasks_by_user)
+    tasks[listIndex].splice(taskIndex, 0, task)
     state.tasks_by_user = tasks
   }
 }
