@@ -5,8 +5,8 @@
       v-model="nameOfNewTask"
       ref="newTask"
       type="text"
-      @keydown.enter="addNewTaskHandler"
-      @keydown.esc="resetHandler"
+      @keyup.enter="addNewTaskHandler"
+      @keyup.esc="resetHandler"
     />
     <span v-else @click="isCreating = true">+</span>
   </div>
@@ -19,12 +19,12 @@ import { namespace } from 'vuex-class'
 const Lists = namespace('lists')
 
 @Component
-export default class TaskItem extends Vue {
+export default class AddNewTaskForm extends Vue {
   @Prop({ required: true }) protected listTitle!: string
   @Prop({ required: true }) protected indexTask!: number
+  @Prop({ required: true }) protected isCreating!: boolean
   @Lists.Mutation('lists/ADD_NEW_TASK') private addNewTask!: any
 
-  private isCreating: boolean = false
   private nameOfNewTask: string = ''
 
   @Watch('isCreating')
@@ -54,23 +54,13 @@ export default class TaskItem extends Vue {
 
 <style>
 .form-add-task {
-  height: 5px;
+  width: 15px;
+  height: 15px;
   border: 1px solid black;
-}
-
-.form-add-task:hover {
-  height: 20px;
+  margin-left: auto;
   display: flex;
-  justify-content: center;
   align-items: center;
-}
-
-.form-add-task > span {
-  display: none;
-}
-
-.form-add-task:hover > span {
-  display: inline;
+  justify-content: center;
   cursor: pointer;
 }
 </style>

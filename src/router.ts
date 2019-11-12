@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Draggable.vue'
 import Projects from './views/Projects.vue'
 import CompanyUsers from './views/CompanyUsers.vue'
 
@@ -11,7 +10,7 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Home
+      redirect: '/projects'
     },
     {
       path: '/projects',

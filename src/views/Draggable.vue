@@ -4,24 +4,35 @@
       <div class="list-title-block">
         <h3>{{ list.name }}</h3>
       </div>
+      <div class="lists__toggle" @click="setExpandedList(list.name)">
+        &#9652;
+      </div>
       <VueDraggable
+        v-model="tasks[index]"
         class="tasks-list"
-        v-model="list.tasks"
         group="tasks"
-        @change="extractTask($event, list.id)"
+        @change="extractTask($event, index)"
       >
         <div
-          v-for="(task, index) in expandedList === list.name
-            ? list.tasks
-            : list.tasks.slice(0, shorthandedListItems)"
+          v-for="(task, i) in expandedList === list.name
+            ? tasks[index]
+            : tasks[index]
+            ? tasks[index].slice(0, shorthandedListItems)
+            : []"
           :key="task.name"
           class="tasks-list__item"
         >
-          <TaskItem :task="task" />
-          <AddNewTaskForm :listTitle="list.name" :indexTask="index + 1" />
-        </div>
-        <div class="lists__toggle" @click="setExpandedList(list.name)">
-          ...
+          <TaskItem
+            :task="task"
+            :list-index="index"
+            :task-index="i"
+            @openNewTaskInput="isCreating = `${index}_${i}`"
+          />
+          <AddNewTaskForm
+            :listTitle="list.name"
+            :indexTask="i + 1"
+            :is-creating="isCreating === `${index}_${i}`"
+          />
         </div>
       </VueDraggable>
     </div>
@@ -33,16 +44,17 @@
 </template>
 
 <script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator'
+import { Prop, Component, Vue, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { IList } from '@/store/modules/lists/types'
-
 // @ts-ignore
 import VueDraggable from '@/../node_modules/vuedraggable'
 import TaskItem from '@/components/draggable/TaskItem.vue'
 import AddNewTaskForm from '@/components/draggable/AddNewTaskForm.vue'
+import { ITaskUser } from '@/store/modules/task_users/types'
 
 const Lists = namespace('lists')
+const TaskUsers = namespace('task_users')
 
 @Component({
   components: {
@@ -54,13 +66,18 @@ const Lists = namespace('lists')
 export default class Draggable extends Vue {
   @Prop({ required: false }) public selectedCompanyUser: any
   @Lists.Action private fetchTasks!: any
-  @Lists.Action private moveTask!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
+  @TaskUsers.State(state => state['tasks_by_user'])
+  private tasks!: ITaskUser[][]
+  @TaskUsers.Action private createTaskUsersList!: any
+  @TaskUsers.Mutation('task_users/UPDATE_TASK_USER_BY_LIST')
+  private updateTasksUserList!: any
 
   private nameNewList: string = ''
   private expandedList: string = ''
   private shorthandedListItems: number = 3
+  private isCreating: string | null = null
 
   private async created() {
     await this.fetchTasks()
@@ -81,13 +98,16 @@ export default class Draggable extends Vue {
     // }, 5000)
   }
 
-  private extractTask(event: any, list: string): void {
-    const { added, moved, removed } = event
-    if (!removed) {
-      const { element, newIndex } = added || moved
-      // Todo: add updateTask method
-      // this.updateTask(element)
+  @Watch('selectedCompanyUser')
+  private onSelectedUserChanged(value: any) {
+    if (value) {
+      this.createTaskUsersList(value.id)
     }
+  }
+
+  private extractTask(event: any, listIndex: number): void {
+    // Todo: add updateTask method
+    // this.updateTasksUserList({ event, listIndex })
   }
 
   private setExpandedList(listName: string) {
@@ -113,12 +133,20 @@ export default class Draggable extends Vue {
 }
 
 .lists__toggle {
+  width: 20px;
+  height: 20px;
   border: solid 1px black;
-  text-align: center;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
 
 .tasks-list {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 200px;
@@ -128,7 +156,7 @@ export default class Draggable extends Vue {
 }
 
 .tasks-list__item {
-  border: 1px solid black;
+  width: 100%;
 }
 
 .list-title-block {
@@ -147,6 +175,7 @@ export default class Draggable extends Vue {
 }
 
 .tasks-list-main {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: stretch;
