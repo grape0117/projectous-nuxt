@@ -4,7 +4,11 @@
       <div class="list-title-block">
         <h3>{{ list.name }}</h3>
       </div>
-      <div class="lists__toggle" @click.prevent="setExpandedList(list.name)">
+      <div
+        v-if="tasks[index] && tasks[index].length > shorthandedListItems"
+        class="lists__toggle"
+        @click.prevent="setExpandedList(list.name)"
+      >
         &#9652;
       </div>
       <VueDraggable
