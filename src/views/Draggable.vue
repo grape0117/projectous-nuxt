@@ -173,6 +173,16 @@ export default class Draggable extends Vue {
 
 .tasks-list__item {
   width: 100%;
+  position: relative;
+  font-size: 0.9rem;
+}
+
+.tasks-list__item::before {
+  content: '●';
+  position: absolute;
+  left: -0.9rem;
+  top: 0.3rem;
+  font-size: 0.5rem;
 }
 
 .list-title-block {
