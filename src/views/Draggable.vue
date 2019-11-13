@@ -4,7 +4,11 @@
       <div class="list-title-block">
         <h3>{{ list.name }}</h3>
       </div>
-      <div class="lists__toggle" @click.prevent="setExpandedList(list.name)">
+      <div
+        v-if="tasks[index] && tasks[index].length > shorthandedListItems"
+        class="lists__toggle"
+        @click.prevent="setExpandedList(list.name)"
+      >
         &#9652;
       </div>
       <VueDraggable
@@ -34,6 +38,7 @@
             :user-id="selectedCompanyUser ? selectedCompanyUser.id : null"
             :is-creating="isCreating === `${index}_${i}`"
             @setIsCreating="isCreating = $event"
+            class="tasks-list__add"
           />
         </div>
       </VueDraggable>
@@ -198,6 +203,14 @@ export default class Draggable extends Vue {
 .tasks-list__item > p {
   margin: 0;
   word-break: break-all;
+}
+
+.tasks-list__add {
+  opacity: 0;
+}
+
+.tasks-list__item:hover .tasks-list__add {
+  opacity: 1;
 }
 
 .tasks-list-main {
