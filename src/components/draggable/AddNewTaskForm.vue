@@ -10,7 +10,9 @@
     />
     <span
       v-else
-      @click="$emit('setIsCreating', `${listIndex}_${taskIndex - 1}`)"
+      @click="
+        $emit('setIsCreating', `${listIndex}_${taskIndex ? taskIndex - 1 : 0}`)
+      "
       >+</span
     >
   </div>
@@ -45,8 +47,10 @@ export default class AddNewTaskForm extends Vue {
   }
 
   private resetHandler() {
-    this.$emit('setIsCreating', null)
-    this.nameOfNewTask = ''
+    if (this.isCreating) {
+      this.$emit('setIsCreating', null)
+      this.nameOfNewTask = ''
+    }
   }
 
   private addNewTaskHandler() {
