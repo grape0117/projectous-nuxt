@@ -36,15 +36,15 @@
             @setIsCreating="isCreating = $event"
           />
         </div>
-        <AddNewTaskForm
-          v-if="tasks[index] && !tasks[index].length"
-          :list-index="index"
-          :task-index="0"
-          :user-id="selectedCompanyUser ? selectedCompanyUser.id : null"
-          :is-creating="isCreating === `${index}_${0}`"
-          @setIsCreating="isCreating = $event"
-        />
       </VueDraggable>
+      <AddNewTaskForm
+        v-if="tasks[index] && !tasks[index].length"
+        :list-index="index"
+        :task-index="0"
+        :user-id="selectedCompanyUser ? selectedCompanyUser.id : null"
+        :is-creating="isCreating === `${index}_${0}`"
+        @setIsCreating="isCreating = $event"
+      />
     </div>
     <div class="form-add-new-list">
       <input type="text" v-model="nameNewList" />
@@ -173,6 +173,16 @@ export default class Draggable extends Vue {
 
 .tasks-list__item {
   width: 100%;
+  position: relative;
+  font-size: 0.9rem;
+}
+
+.tasks-list__item::before {
+  content: '●';
+  position: absolute;
+  left: -0.9rem;
+  top: 0.3rem;
+  font-size: 0.5rem;
 }
 
 .list-title-block {
