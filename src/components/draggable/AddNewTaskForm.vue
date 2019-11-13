@@ -1,16 +1,18 @@
 <template>
-  <div class="form-add-task" @mouseleave="resetHandler">
+  <div class="form-add-task" @mouseleave="resetSelected">
     <input
       v-if="isCreating"
       v-model="nameOfNewTask"
       ref="newTask"
       type="text"
       @keyup.enter="addNewTaskHandler"
-      @keyup.esc="resetHandler"
+      @keyup.esc="resetSelected"
     />
     <span
       v-else
-      @click="$emit('setIsCreating', `${listIndex}_${taskIndex - 1}`)"
+      @click="
+        $emit('setIsCreating', `${listIndex}_${taskIndex ? taskIndex - 1 : 0}`)
+      "
       >+</span
     >
   </div>
@@ -44,9 +46,11 @@ export default class AddNewTaskForm extends Vue {
     }
   }
 
-  private resetHandler() {
-    this.$emit('setIsCreating', null)
-    this.nameOfNewTask = ''
+  private resetSelected() {
+    if (this.isCreating) {
+      this.$emit('setIsCreating', null)
+      this.nameOfNewTask = ''
+    }
   }
 
   private addNewTaskHandler() {
@@ -64,7 +68,7 @@ export default class AddNewTaskForm extends Vue {
       taskIndex: this.taskIndex,
       task
     })
-    this.resetHandler()
+    this.resetSelected()
   }
 }
 </script>

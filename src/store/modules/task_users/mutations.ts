@@ -43,9 +43,10 @@ export const mutations: MutationTree<IModuleState> = {
       'tasks'
     )
     const filteredTasks = task_users
-      .map(({ task_id, company_user_id }: ITaskUser) => ({
+      .map(({ task_id, company_user_id, next_work_day }: ITaskUser) => ({
         ...normalizedTasks[task_id],
-        company_user_id
+        company_user_id,
+        next_work_day
       }))
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
       .filter(({ company_user_id }: any) => company_user_id === userId)
