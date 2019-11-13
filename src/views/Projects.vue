@@ -42,5 +42,20 @@ export default class Projects extends Vue {
       this.selectedCompanyUser = this.$store.state.settings.current_company_user
     }
   }
+
+  @Watch('selectedCompanyUser', { immediate: true, deep: true })
+  private onSelectedUserChange(user: any) {
+    if (user) {
+      if (user.hasOwnProperty('id')) {
+        this.$router.replace({
+          path: `${this.$route.fullPath}`,
+          query: {
+            ...this.$route.query,
+            user: user.id
+          }
+        })
+      }
+    }
+  }
 }
 </script>
