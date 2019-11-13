@@ -7,9 +7,11 @@ export const mutations: MutationTree<IModuleState> = {
   load(state, tasks: ITask[]) {
     //add or update tasks
     tasks.forEach((value, key) => {
+      // @ts-ignore
       if (!state.lookup[tasks[key].id]) {
         state.tasks.push(value)
       } else {
+        // @ts-ignore
         state.tasks[state.lookup[tasks[key].id]] = value
       }
     })
@@ -17,12 +19,14 @@ export const mutations: MutationTree<IModuleState> = {
     //reset lookup
     state.lookup = []
     state.tasks.forEach((task, key) => {
+      // @ts-ignore
       state.lookup[task.id] = key
     })
   },
   create: function(state, task) {
     state.tasks.push(task)
     state.tasks.forEach((t, key) => {
+      // @ts-ignore
       state.lookup[t.id] = key
     })
   },
@@ -30,6 +34,7 @@ export const mutations: MutationTree<IModuleState> = {
     let property: string | number
     let key: number
 
+    // @ts-ignore
     key = state.lookup[task.id]
     if (key) {
       for (property in task) {
@@ -40,6 +45,7 @@ export const mutations: MutationTree<IModuleState> = {
       }
     } else {
       state.tasks.push(task)
+      // @ts-ignore
       state.lookup[task.id] = state.tasks.findIndex(row => {
         return row.id == task.id
       })
