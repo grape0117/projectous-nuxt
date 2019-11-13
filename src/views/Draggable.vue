@@ -36,15 +36,15 @@
             @setIsCreating="isCreating = $event"
           />
         </div>
-        <AddNewTaskForm
-          v-if="tasks[index] && !tasks[index].length"
-          :list-index="index"
-          :task-index="0"
-          :user-id="selectedCompanyUser ? selectedCompanyUser.id : null"
-          :is-creating="isCreating === `${index}_${0}`"
-          @setIsCreating="isCreating = $event"
-        />
       </VueDraggable>
+      <AddNewTaskForm
+        v-if="tasks[index] && !tasks[index].length"
+        :list-index="index"
+        :task-index="0"
+        :user-id="selectedCompanyUser ? selectedCompanyUser.id : null"
+        :is-creating="isCreating === `${index}_${0}`"
+        @setIsCreating="isCreating = $event"
+      />
     </div>
     <div class="form-add-new-list">
       <input type="text" v-model="nameNewList" />
