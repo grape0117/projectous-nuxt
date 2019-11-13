@@ -41,12 +41,13 @@ export default class Projects extends Vue {
       // Note: select first user by default
       this.selectedCompanyUser = this.$store.state.settings.current_company_user
     }
+    this.updateSelectedUser()
   }
 
   @Watch('selectedCompanyUser', { immediate: true, deep: true })
   private onSelectedUserChange(user: any) {
     if (user) {
-      if (user.hasOwnProperty('id')) {
+      if (`${user.id}` !== this.$route.query.user) {
         this.$router.replace({
           path: `${this.$route.fullPath}`,
           query: {
@@ -55,6 +56,21 @@ export default class Projects extends Vue {
           }
         })
       }
+    }
+  }
+
+  @Watch('$route.query.user', { immediate: true })
+  private onUserQueryChange(user: any) {
+    this.updateSelectedUser()
+  }
+
+  private updateSelectedUser() {
+    const queryUserID = this.$route.query.user
+    const matchingUser = this.company_users.find(
+      (item: any) => `${item.id}` === queryUserID
+    )
+    if (matchingUser) {
+      this.selectedCompanyUser = matchingUser
     }
   }
 }
