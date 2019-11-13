@@ -45,22 +45,20 @@ export default class Projects extends Vue {
   }
 
   @Watch('selectedCompanyUser', { immediate: true, deep: true })
-  private onSelectedUserChange(user: any) {
-    if (user) {
-      if (`${user.id}` !== this.$route.query.user) {
-        this.$router.replace({
-          path: `${this.$route.fullPath}`,
-          query: {
-            ...this.$route.query,
-            user: user.id
-          }
-        })
-      }
+  private onSelectedUserChanged(user: any) {
+    if (user && `${user.id}` !== this.$route.query.user) {
+      this.$router.replace({
+        path: `${this.$route.fullPath}`,
+        query: {
+          ...this.$route.query,
+          user: user.id
+        }
+      })
     }
   }
 
   @Watch('$route.query.user', { immediate: true })
-  private onUserQueryChange(user: any) {
+  private onUserQueryChanged() {
     this.updateSelectedUser()
   }
 

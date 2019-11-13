@@ -1,6 +1,8 @@
 <template>
   <div>
-    <span v-if="!editable" @click="openInput">{{ task.title }}</span>
+    <span v-if="!editable" @click="openInput">{{
+      task.title || 'No Title'
+    }}</span>
     <input
       v-else
       ref="input"
