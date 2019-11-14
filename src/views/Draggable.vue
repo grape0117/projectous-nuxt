@@ -4,7 +4,11 @@
       <div class="list-title-block">
         <h3>{{ list.name }}</h3>
       </div>
-      <div class="lists__toggle" @click="setExpandedList(list.name)">
+      <div
+        v-if="tasks[index] && tasks[index].length > shorthandedListItems"
+        class="lists__toggle"
+        @click.prevent="setExpandedList(list.name)"
+      >
         &#9652;
       </div>
       <VueDraggable
@@ -34,9 +38,18 @@
             :user-id="selectedCompanyUser ? selectedCompanyUser.id : null"
             :is-creating="isCreating === `${index}_${i}`"
             @setIsCreating="isCreating = $event"
+            class="tasks-list__add"
           />
         </div>
       </VueDraggable>
+      <AddNewTaskForm
+        v-if="tasks[index] && !tasks[index].length"
+        :list-index="index"
+        :task-index="0"
+        :user-id="selectedCompanyUser ? selectedCompanyUser.id : null"
+        :is-creating="isCreating === `${index}_${0}`"
+        @setIsCreating="isCreating = $event"
+      />
     </div>
     <div class="form-add-new-list">
       <input type="text" v-model="nameNewList" />
@@ -145,6 +158,7 @@ export default class Draggable extends Vue {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  z-index: 10;
 }
 
 .tasks-list {
@@ -157,8 +171,23 @@ export default class Draggable extends Vue {
   border: 1px solid gray;
 }
 
+.tasks-list__list {
+  margin: 0;
+  padding-left: 18px;
+}
+
 .tasks-list__item {
   width: 100%;
+  position: relative;
+  font-size: 0.9rem;
+}
+
+.tasks-list__item::before {
+  content: '●';
+  position: absolute;
+  left: -0.9rem;
+  top: 0.3rem;
+  font-size: 0.5rem;
 }
 
 .list-title-block {
@@ -174,6 +203,14 @@ export default class Draggable extends Vue {
 .tasks-list__item > p {
   margin: 0;
   word-break: break-all;
+}
+
+.tasks-list__add {
+  opacity: 0;
+}
+
+.tasks-list__item:hover .tasks-list__add {
+  opacity: 1;
 }
 
 .tasks-list-main {

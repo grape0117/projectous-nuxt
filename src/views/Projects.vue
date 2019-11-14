@@ -41,6 +41,35 @@ export default class Projects extends Vue {
       // Note: select first user by default
       this.selectedCompanyUser = this.$store.state.settings.current_company_user
     }
+    this.updateSelectedUser()
+  }
+
+  @Watch('selectedCompanyUser', { immediate: true, deep: true })
+  private onSelectedUserChanged(user: any) {
+    if (user && `${user.id}` !== this.$route.query.user) {
+      this.$router.replace({
+        path: `${this.$route.fullPath}`,
+        query: {
+          ...this.$route.query,
+          user: user.id
+        }
+      })
+    }
+  }
+
+  @Watch('$route.query.user', { immediate: true })
+  private onUserQueryChanged() {
+    this.updateSelectedUser()
+  }
+
+  private updateSelectedUser() {
+    const queryUserID = this.$route.query.user
+    const matchingUser = this.company_users.find(
+      (item: any) => `${item.id}` === queryUserID
+    )
+    if (matchingUser) {
+      this.selectedCompanyUser = matchingUser
+    }
   }
 }
 </script>
