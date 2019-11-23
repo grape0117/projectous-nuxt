@@ -1,14 +1,14 @@
 <template>
   <div>
-    <span v-if="!editable" @click="openInput">{{
+    <span v-if="!editable" class="task-item__title" @click="openInput">{{
       task.title || 'No Title'
     }}</span>
     <input
       v-else
       ref="input"
       :value="task.title"
+      class="task-item__input"
       @change="newTitle = $event.target.value"
-      @blur="update"
       @keyup.enter="openNewTaskForm"
     />
   </div>
@@ -58,3 +58,19 @@ export default class TaskItem extends Vue {
   }
 }
 </script>
+
+<style>
+.task-item__title {
+  font-weight: normal;
+  font-size: 14px;
+}
+.task-item__input {
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: normal;
+  color: inherit;
+  padding: 0;
+}
+</style>
