@@ -8,9 +8,8 @@ import {
   UPDATE_TASK_USER_BY_LIST,
   ADD_TASK_USER_TO_LIST
 } from './mutations-types'
-import { Normalizer } from '@/utils/Normalizer'
-import { resetTime } from '@/utils/dateFunctions'
 import { cloneDeep } from 'lodash'
+import { sortTaskUsersByDay } from '@/utils/util-functions'
 
 export const mutations: MutationTree<IModuleState> = {
   [CREATE_TASK_USER](state: IModuleState, task_user: ITaskUser) {
@@ -39,46 +38,9 @@ export const mutations: MutationTree<IModuleState> = {
   [CREATE_TASK_USER_BY_LIST](state: IModuleState, { lists, tasks, userId }) {
     state.tasks_by_user = []
     const task_users: any = state['task_users']
-    const normalizedTasks = new Normalizer({ tasks }).flatNormalizationById(
-      'tasks'
+    sortTaskUsersByDay(task_users, tasks, lists, userId).forEach((day: any) =>
+      state.tasks_by_user.push(day)
     )
-    const filteredTasks = task_users
-      .map(({ task_id, company_user_id, next_work_day }: ITaskUser) => ({
-        ...normalizedTasks[task_id],
-        company_user_id,
-        next_work_day
-      }))
-      .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
-      .filter(({ company_user_id }: any) => company_user_id === userId)
-    const unmarkedTasks = filteredTasks.filter(
-      ({ next_work_day }: ITaskUser) => !next_work_day
-    )
-    const markedTasks = filteredTasks.filter(
-      ({ next_work_day }: ITaskUser) => next_work_day
-    )
-    lists.forEach(({ id }: any) => {
-      const today = resetTime(new Date())
-      let day_tasks
-      if (id === 'Past') {
-        day_tasks = markedTasks
-          .filter(
-            ({ next_work_day }: any) =>
-              resetTime(next_work_day).getDate() < today.getDate()
-          )
-          .sort(({ next_work_day: a }: any, { next_work_day: b }: any) => {
-            return (
-              resetTime(a as Date).getTime() - resetTime(b as Date).getTime()
-            )
-          })
-      } else if (id === 'Unmarked') {
-        day_tasks = unmarkedTasks
-      } else {
-        day_tasks = markedTasks.filter(
-          ({ next_work_day }: any) => resetTime(next_work_day).toString() === id
-        )
-      }
-      state.tasks_by_user.push(day_tasks)
-    })
   },
   [UPDATE_TASK_USER_BY_LIST](
     state: IModuleState,
