@@ -17,14 +17,14 @@
           <span class="icon-bar"></span>
         </button>
         <div class="navbar-brand" @click="home()">Projectous</div>
-        <button
-          data-toggle="collapse"
-          data-target="#notification"
-          style="position: absolute; left: 100px; top: 1px; color: blue;"
-        >
-          <i class="glyphicon glyphicon-ok"></i
-          ><span class="badge badge-light">4</span>
-        </button>
+        <!--        <button-->
+        <!--          data-toggle="collapse"-->
+        <!--          data-target="#notification"-->
+        <!--          style="position: absolute; left: 100px; top: 1px; color: blue;"-->
+        <!--        >-->
+        <!--          <i class="glyphicon glyphicon-ok"></i-->
+        <!--          ><span class="badge badge-light">4</span>-->
+        <!--        </button>-->
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
@@ -32,7 +32,7 @@
                                     <option value="-">*** No Project ***</option>
                                     @foreach($projects as $project)
                     <option value="{{ $project->id }}"
-                         
+
                                                 >{{ $project->name }}</option>
                                     @endforeach
                         </select></a></li>-->
@@ -101,24 +101,24 @@ export default {
   methods: {
     home: function() {
       let self = this
-      alert('go home')
-      return
+      // alert('go home')
+      // return
       //console.log(this.current_company.modules);
-      this.$nextTick(function() {
-        self.$store.state.settings.current_company.modules.forEach(function(
-          module,
-          key
-        ) {
-          if (
-            module.pivot.is_home > 0 &&
-            module.pivot.company_user_role ==
-              self.$store.state.settings.current_company_user.user_role
-          ) {
-            self.$router.push(module.path)
-            return
-          }
-        })
-      })
+      // this.$nextTick(function() {
+      //   self.$store.state.settings.current_company.modules.forEach(function(
+      //     module,
+      //     key
+      //   ) {
+      //     if (
+      //       module.pivot.is_home > 0 &&
+      //       module.pivot.company_user_role ==
+      //         self.$store.state.settings.current_company_user.user_role
+      //     ) {
+      //       self.$router.push(module.path)
+      //       return
+      //     }
+      //   })
+      // })
     },
     getData: function() {
       store.dispatch('settings/getData')
