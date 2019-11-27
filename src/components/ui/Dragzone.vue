@@ -1,5 +1,5 @@
 <template>
-  <div class="dragzone" @dragover.prevent @dragover="listUpdate">
+  <div class="dragzone" @dragover.prevent>
     <div
       v-for="(item, index) in options"
       :key="item.id"
@@ -7,7 +7,7 @@
       draggable="true"
       @dragstart="dragstart(item)"
       @dragend="dragend"
-      @dragover="moveOrder(index)"
+      @dragover="moveItem(index)"
     >
       {{ item.title }}
     </div>
@@ -32,20 +32,11 @@ export default class Dragzone extends Vue {
   public dragend() {
     localStorage.removeItem('task')
   }
-  public moveOrder(index: number) {
+  public moveItem(index: number) {
     try {
       const item = JSON.parse(localStorage.getItem('task') as string)
-      // item.sortOrder = index + 1
-      this.$emit('changeSortOrder', item, index)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-  public listUpdate() {
-    try {
-      const item = JSON.parse(localStorage.getItem('task') as string)
-      item.listId = this.id
-      this.$emit('updateTask', item)
+      item.listId = Number(this.id)
+      this.$emit('updateTask', item, index)
     } catch (e) {
       console.log(e)
     }
