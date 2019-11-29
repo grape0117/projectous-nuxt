@@ -6,11 +6,12 @@
       :id="id"
       :options="groupedData[id]"
       @update="update"
+      @save="$emit('save', $event)"
     />
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { groupBy, cloneDeep } from 'lodash'
 import move from 'array-move'
 
@@ -22,9 +23,6 @@ export default class Draggable extends Vue {
   get groupedData() {
     return groupBy(this.clonedData, 'listId')
   }
-  public created() {
-    this.clonedData = cloneDeep(this.data)
-  }
   public update(item: any, position: number) {
     const index = this.clonedData.findIndex(({ id }: any) => item.id === id)
     const firstElementInList = this.clonedData.findIndex(
@@ -33,6 +31,10 @@ export default class Draggable extends Vue {
     const elementNewPosition = firstElementInList + position
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)
+  }
+  @Watch('data', { immediate: true })
+  public onDataChanged(value: any) {
+    this.clonedData = cloneDeep(value)
   }
 }
 </script>

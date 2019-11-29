@@ -3,6 +3,7 @@
     <div
       v-for="(item, index) in options"
       :key="item.id"
+      class="dragzone__item"
       :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
       draggable="true"
       @dragstart="dragstart(item)"
@@ -30,13 +31,20 @@ export default class Dragzone extends Vue {
     this.draggedItemId = item
   }
   private dragend() {
-    localStorage.removeItem('item')
+    try {
+      const item = JSON.parse(localStorage.getItem('item') as string)
+      this.$emit('save', item)
+      localStorage.removeItem('item')
+    } catch (e) {
+      console.log(e)
+    }
   }
   private moveItem(index: number) {
     try {
       const item = JSON.parse(localStorage.getItem('item') as string)
-      item.listId = Number(this.id)
+      item.listId = this.id.toString()
       this.$emit('update', item, index)
+      localStorage.setItem('item', JSON.stringify(item))
     } catch (e) {
       console.log(e)
     }
@@ -45,7 +53,7 @@ export default class Dragzone extends Vue {
     if (!this.options.length) {
       try {
         const item = JSON.parse(localStorage.getItem('item') as string)
-        item.listId = Number(this.id)
+        item.listId = this.id.toString()
         this.$emit('update', item, 0)
       } catch (e) {
         console.log(e)
@@ -58,8 +66,13 @@ export default class Dragzone extends Vue {
 <style>
 .dragzone {
   width: 300px;
-  height: 200px;
+  min-height: 40px;
+  padding: 0.5rem;
+  height: auto;
   border: 1px solid black;
+}
+.dragzone__item {
+  cursor: pointer;
 }
 .dragzone__item--dragged {
   color: rgba(0, 0, 0, 0.3);

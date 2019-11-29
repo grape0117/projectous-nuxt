@@ -1,51 +1,50 @@
-import { Normalizer } from '@/utils/Normalizer'
-import { ITaskUser } from '@/store/modules/task_users/types'
-import { resetTime } from '@/utils/dateFunctions'
+import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
+import { IList } from '@/store/modules/lists/types'
+import store from '@/store'
 
-export function sortTaskUsersByDay(
-  taskUsers: any,
-  tasks: any,
-  lists: any,
-  userId: any
-) {
-  const normalizedTasks = new Normalizer({ tasks }).flatNormalizationById(
-    'tasks'
-  )
-  const filteredTasks = taskUsers
-    .map(({ task_id, company_user_id, next_work_day }: ITaskUser) => ({
-      ...normalizedTasks[task_id],
+export function sortUserTasksByDay(tasks: any, lists: any) {
+  const { tasks: allTasks, lookup } = store.state.tasks
+  const today = resetTime(new Date())
+  return tasks
+    .map(({ id, task_id, company_user_id, next_work_day }: any) => ({
+      id,
+      title: allTasks[lookup[task_id]].title,
       company_user_id,
-      next_work_day
+      next_work_day,
+      listId: !next_work_day
+        ? 'Unmarked'
+        : resetTime(next_work_day).getDate() < today.getDate()
+        ? 'Past'
+        : lists.find(
+            // tslint:disable-next-line:no-shadowed-variable
+            ({ id }: any) => resetTime(next_work_day).toString() === id
+          )
     }))
     .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
-    .filter(({ company_user_id }: any) => company_user_id === userId)
-  const unmarkedTasks = filteredTasks.filter(
-    ({ next_work_day }: ITaskUser) => !next_work_day
-  )
-  const markedTasks = filteredTasks.filter(
-    ({ next_work_day }: ITaskUser) => next_work_day
-  )
-  const days: any = []
-  lists.forEach(({ id }: any) => {
-    const today = resetTime(new Date())
-    let day_tasks
-    if (id === 'Past') {
-      day_tasks = markedTasks
-        .filter(
-          ({ next_work_day }: any) =>
-            resetTime(next_work_day).getDate() < today.getDate()
-        )
-        .sort(({ next_work_day: a }: any, { next_work_day: b }: any) => {
-          return resetTime(a as Date).getTime() - resetTime(b as Date).getTime()
-        })
-    } else if (id === 'Unmarked') {
-      day_tasks = unmarkedTasks
-    } else {
-      day_tasks = markedTasks.filter(
-        ({ next_work_day }: any) => resetTime(next_work_day).toString() === id
-      )
-    }
-    days.push(day_tasks)
+}
+
+export function createListsByDays(): IList[] {
+  const lists: IList[] = []
+  const today = resetTime(new Date())
+  lists.push({
+    id: 'Past',
+    title: 'Outdated tasks'
   })
-  return days
+  lists.push({
+    id: today.toString(),
+    title: getUserFriendlyDate(today)
+  })
+  for (let day = 1; day < 7; day++) {
+    const date = resetTime(new Date())
+    date.setDate(resetTime(new Date()).getDate() + day)
+    lists.push({
+      id: date.toString(),
+      title: getUserFriendlyDate(date)
+    })
+  }
+  lists.push({
+    id: 'Unmarked',
+    title: 'Unmarked'
+  })
+  return lists
 }

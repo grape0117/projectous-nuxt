@@ -11,6 +11,7 @@
 </template>
 <script>
 import EditUserModal from './views/EditUserModal'
+
 export default {
   components: { EditUserModal },
   computed: {
@@ -69,6 +70,7 @@ export default {
         { module: 'company_users', entities: company_users },
         { root: true }
       )
+      this.$store.commit('lists/lists/CREATE_LISTS', 'user_tasks_list')
       //TODO: companies
     }
   }

@@ -1,13 +1,6 @@
 import { ActionTree } from 'vuex'
 import { IModuleState } from './types'
-import { ITask } from '../tasks/types'
 import { IRootState } from '@/store/types'
-import {
-  CREATE_TASK_USER,
-  UPDATE_TASK_USER,
-  DELETE_TASK_USER,
-  CREATE_TASK_USER_BY_LIST
-} from './mutations-types'
 
 const company_user_id: number = 1
 
@@ -56,10 +49,5 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
     commit('tasks/UPDATE', task)
     commit('task_users/UPDATE', task_user)
-  },
-  createTaskUsersList({ commit, rootState }, userId) {
-    const tasks: any = rootState['tasks']['tasks']
-    const lists: any = rootState['lists']['lists']
-    commit(CREATE_TASK_USER_BY_LIST, { lists, tasks, userId })
   }
 }
