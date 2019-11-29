@@ -1,5 +1,5 @@
 <template>
-  <div class="dragzone" @dragover.prevent>
+  <div class="dragzone" @dragover.prevent @dragenter="test">
     <div
       v-for="(item, index) in options"
       :key="item.id"
@@ -21,24 +21,35 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public id!: number
   @Prop({ required: true, default: () => [] }) public options!: any
   get draggedItemId() {
-    return localStorage.getItem('task') || null
+    return localStorage.getItem('item') || null
   }
   set draggedItemId(item: any) {
-    localStorage.setItem('task', JSON.stringify(item))
+    localStorage.setItem('item', JSON.stringify(item))
   }
-  public dragstart(item: any) {
+  private dragstart(item: any) {
     this.draggedItemId = item
   }
-  public dragend() {
-    localStorage.removeItem('task')
+  private dragend() {
+    localStorage.removeItem('item')
   }
-  public moveItem(index: number) {
+  private moveItem(index: number) {
     try {
-      const item = JSON.parse(localStorage.getItem('task') as string)
+      const item = JSON.parse(localStorage.getItem('item') as string)
       item.listId = Number(this.id)
-      this.$emit('updateTask', item, index)
+      this.$emit('update', item, index)
     } catch (e) {
       console.log(e)
+    }
+  }
+  private test() {
+    if (!this.options.length) {
+      try {
+        const item = JSON.parse(localStorage.getItem('item') as string)
+        item.listId = Number(this.id)
+        this.$emit('update', item, 0)
+      } catch (e) {
+        console.log(e)
+      }
     }
   }
 }
@@ -47,7 +58,7 @@ export default class Dragzone extends Vue {
 <style>
 .dragzone {
   width: 300px;
-  height: 400px;
+  height: 200px;
   border: 1px solid black;
 }
 .dragzone__item--dragged {

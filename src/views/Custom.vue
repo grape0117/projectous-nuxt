@@ -10,20 +10,12 @@
       </option>
     </select>
     <hr />
-    <pj-dragzone
-      v-for="key in Object.keys(lists)"
-      :key="key"
-      :id="key"
-      :options="lists[key]"
-      @updateTask="updateTask"
-    />
+    <pj-draggable :data="tasks" :lists="lists" />
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { groupBy } from 'lodash'
-import move from 'array-move'
 
 const CompanyUsers = namespace('company_users')
 
@@ -42,6 +34,13 @@ export default class Custom extends Vue {
     { id: 8, title: 'My task 8', listId: 3 },
     { id: 9, title: 'My task 9', listId: 3 }
   ]
+  private lists: any = [
+    { id: 1, title: 'First List' },
+    { id: 2, title: 'Second List' },
+    { id: 3, title: 'Third List' },
+    { id: 4, title: 'Forth List' },
+    { id: 5, title: 'Fifth List' }
+  ]
   get sortedCompanyUsers() {
     return this.companyUsers.sort(
       (
@@ -53,23 +52,6 @@ export default class Custom extends Vue {
         return 0
       }
     )
-  }
-  get lists() {
-    return groupBy(this.tasks, 'listId')
-  }
-  public updateTask(task: any, position: number) {
-    const index = this.tasks.findIndex(({ id }: any) => task.id === id)
-    const firstElementInList = this.tasks.findIndex(
-      ({ listId }: any) => listId === task.listId
-    )
-    const elementNewPosition = firstElementInList + position
-    console.log(index, position)
-    this.tasks[index] = task
-    this.tasks = move(this.tasks, index, elementNewPosition)
-    // if (index > -1) {
-    //   this.tasks = this.tasks
-    //     .map((item: any) => item.id === task.id ? task : item)
-    // }
   }
 }
 </script>
