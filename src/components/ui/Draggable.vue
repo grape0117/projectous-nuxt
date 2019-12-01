@@ -6,7 +6,8 @@
       :id="id"
       :options="groupedData[id]"
       @update="update"
-      @save="$emit('update', $event)"
+      @updateTitle="$emit('update', $event)"
+      @save="$emit('updateTaskUser', $event)"
     />
   </div>
 </template>

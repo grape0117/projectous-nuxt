@@ -10,7 +10,12 @@
       </option>
     </select>
     <hr />
-    <pj-draggable :data="sortedUserTasks" :lists="lists" @update="updateTask" />
+    <pj-draggable
+      :data="sortedUserTasks"
+      :lists="lists"
+      @update="updateTask"
+      @updateTaskUser="updateTaskUser"
+    />
   </div>
 </template>
 <script lang="ts">
@@ -21,6 +26,7 @@ import { sortUserTasksByDay } from '@/utils/util-functions'
 
 const CompanyUsers = namespace('company_users')
 const TaskUsers = namespace('task_users')
+const Tasks = namespace('tasks')
 const Lists = namespace('lists')
 
 @Component
@@ -45,11 +51,12 @@ export default class Custom extends Vue {
     )
   }
   @TaskUsers.Getter public getByCompanyUserId!: any
+  @Tasks.Action public updateTask!: any
   @Lists.State(state => state.user_tasks_list) public lists!: IList
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
   private selectedCompanyUser: any = null
-  public updateTask(task: any) {
-    console.log(task)
+  public updateTaskUser() {
+    console.log('f: updateTaskUser')
   }
 }
 </script>

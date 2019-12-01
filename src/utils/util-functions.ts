@@ -8,6 +8,7 @@ export function sortUserTasksByDay(tasks: any, lists: any) {
   return tasks
     .map(({ id, task_id, company_user_id, next_work_day }: any) => ({
       id,
+      task_id,
       title: allTasks[lookup[task_id]].title,
       company_user_id,
       next_work_day,

@@ -1,5 +1,5 @@
 import { ActionTree } from 'vuex'
-import { IModuleState } from './types'
+import { IModuleState, ITaskUser } from './types'
 import { IRootState } from '@/store/types'
 
 const company_user_id: number = 1

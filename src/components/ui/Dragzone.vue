@@ -11,17 +11,26 @@
       @dragover="moveItem(index)"
     >
       <div class="dragzone__item-dragbox" />
-      <div v-html="item.title" contenteditable="true" @input="updateTitle" />
+      <div
+        v-html="item.title"
+        contenteditable="true"
+        @blur="updateTitle($event, item)"
+      />
     </div>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
+import { cloneDeep } from 'lodash'
+import { namespace } from 'vuex-class'
+
+const Tasks = namespace('tasks')
 
 @Component
 export default class Dragzone extends Vue {
   @Prop({ required: true }) public id!: number
   @Prop({ required: true, default: () => [] }) public options!: any
+  @Tasks.Getter public getById!: any
   get draggedItemId() {
     return localStorage.getItem('item') || null
   }
@@ -61,8 +70,10 @@ export default class Dragzone extends Vue {
       }
     }
   }
-  private updateTitle({ target: { innerHTML: name } }: any) {
-    // console.log(name)
+  private updateTitle({ target: { innerHTML: name } }: any, item: any) {
+    const updatedItem = cloneDeep(this.getById(item.task_id))
+    updatedItem.title = name
+    this.$emit('updateTitle', updatedItem)
   }
 }
 </script>
