@@ -43,8 +43,8 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public id!: number
   @Prop({ required: true, default: () => [] }) public options!: any
   @Tasks.Getter public getById!: any
-  expandedList: boolean = true
-  numberOfExpandedItems: number = 3
+  private expandedList: boolean = true
+  private numberOfExpandedItems: number = 3
   get draggedItemId() {
     return localStorage.getItem('item') || null
   }
