@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import '@/plugins/http'
+import '@/plugins/ui'
 import BootstrapVue from 'bootstrap-vue'
 Vue.use(BootstrapVue)
 import NavBar from './views/NavBar.vue'
