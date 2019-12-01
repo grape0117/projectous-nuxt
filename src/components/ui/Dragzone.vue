@@ -29,6 +29,12 @@
         />
       </div>
     </div>
+    <div
+      v-if="expandedList && options.length > numberOfExpandedItems"
+      class="pl-2"
+    >
+      ...
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -135,5 +141,8 @@ export default class Dragzone extends Vue {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+*:focus {
+  outline: none;
 }
 </style>

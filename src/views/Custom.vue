@@ -10,14 +10,13 @@
       </option>
     </select>
     <hr />
-    <pj-draggable :data="sortedUserTasks" :lists="lists" @update="updateItem" />
+    <pj-draggable :data="userTasks" :lists="lists" @update="updateItem" />
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { IList } from '@/store/modules/lists/types'
-import { sortUserTasksByDay } from '@/utils/util-functions'
 import { cloneDeep } from 'lodash'
 import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
 
@@ -28,8 +27,8 @@ const Lists = namespace('lists')
 
 @Component
 export default class Custom extends Vue {
-  @TaskUsers.Getter private getByCompanyUserId!: any
   @TaskUsers.Getter('getById') private getTaskUserById!: any
+  @TaskUsers.Getter private sortedByDays!: any
   @TaskUsers.Action private updateTaskUser!: any
   @Tasks.Action private updateTask!: any
   @Tasks.Getter('getById') private getTaskById!: any
@@ -37,10 +36,7 @@ export default class Custom extends Vue {
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
   get userTasks() {
     if (!this.selectedCompanyUser) return []
-    return this.getByCompanyUserId(this.selectedCompanyUser.id)
-  }
-  get sortedUserTasks() {
-    return sortUserTasksByDay(this.userTasks, this.lists)
+    return this.sortedByDays(this.selectedCompanyUser.id)
   }
   get sortedCompanyUsers() {
     return this.companyUsers.sort(
@@ -66,8 +62,10 @@ export default class Custom extends Vue {
     } else if (!!Date.parse(item.listId)) {
       newNextWorkDay = formatDateToYYYY_MM_DD(item.listId)
     }
-    userTask.next_work_day = newNextWorkDay
-    await this.updateTaskUser(userTask)
+    if (userTask.next_work_day !== newNextWorkDay) {
+      userTask.next_work_day = newNextWorkDay
+      await this.updateTaskUser(userTask)
+    }
     // Todo: update task
     const task = cloneDeep(this.getTaskById(item.task_id))
     if (task.title !== item.title) {

@@ -1,8 +1,7 @@
 import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
 import { IList } from '@/store/modules/lists/types'
-import store from '@/store'
 
-function getListId(next_work_day: Date | string | null, lists: any) {
+export function getListId(next_work_day: Date | string | null, lists: any) {
   if (!next_work_day) return 'Unmarked'
   const today = resetTime(new Date())
   if (resetTime(next_work_day as Date).getTime() < today.getTime())
@@ -13,25 +12,6 @@ function getListId(next_work_day: Date | string | null, lists: any) {
     )
     return list ? list.id : 'Unmarked'
   }
-}
-
-export function sortUserTasksByDay(tasks: any, lists: any) {
-  const { tasks: allTasks, lookup } = store.state.tasks
-  const today = resetTime(new Date())
-  return tasks
-    .map(({ id, task_id, company_user_id, next_work_day }: any) => ({
-      id,
-      task_id,
-      title: allTasks[lookup[task_id]].title,
-      company_user_id,
-      next_work_day,
-      listId: !next_work_day
-        ? 'Unmarked'
-        : resetTime(next_work_day).getTime() < today.getTime()
-        ? 'Past'
-        : getListId(next_work_day, lists)
-    }))
-    .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
 }
 
 export function createListsByDays(): IList[] {
