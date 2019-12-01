@@ -1,5 +1,5 @@
 <template>
-  <div class="dragzone" @dragover.prevent @dragenter="test">
+  <div class="dragzone" @dragover.prevent @dragenter="moveToNewList">
     <div
       v-for="(item, index) in options"
       :key="item.id"
@@ -10,7 +10,8 @@
       @dragend="dragend"
       @dragover="moveItem(index)"
     >
-      {{ item.title }}
+      <div class="dragzone__item-dragbox" />
+      <div v-html="item.title" contenteditable="true" @input="updateTitle" />
     </div>
   </div>
 </template>
@@ -49,7 +50,7 @@ export default class Dragzone extends Vue {
       console.log(e)
     }
   }
-  private test() {
+  private moveToNewList() {
     if (!this.options.length) {
       try {
         const item = JSON.parse(localStorage.getItem('item') as string)
@@ -59,6 +60,9 @@ export default class Dragzone extends Vue {
         console.log(e)
       }
     }
+  }
+  private updateTitle({ target: { innerHTML: name } }: any) {
+    // console.log(name)
   }
 }
 </script>
@@ -72,9 +76,19 @@ export default class Dragzone extends Vue {
   border: 1px solid black;
 }
 .dragzone__item {
+  display: flex;
+  align-items: center;
   cursor: pointer;
 }
 .dragzone__item--dragged {
   color: rgba(0, 0, 0, 0.3);
+}
+.dragzone__item-dragbox {
+  width: 10px;
+  height: 10px;
+  margin-right: 0.5rem;
+  border-radius: 100%;
+  flex: none;
+  background-color: black;
 }
 </style>

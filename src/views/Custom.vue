@@ -10,7 +10,7 @@
       </option>
     </select>
     <hr />
-    <pj-draggable :data="sortedUserTasks" :lists="lists" @save="saveTask" />
+    <pj-draggable :data="sortedUserTasks" :lists="lists" @update="updateTask" />
   </div>
 </template>
 <script lang="ts">
@@ -48,7 +48,7 @@ export default class Custom extends Vue {
   @Lists.State(state => state.user_tasks_list) public lists!: IList
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
   private selectedCompanyUser: any = null
-  public saveTask(task: any) {
+  public updateTask(task: any) {
     console.log(task)
   }
 }

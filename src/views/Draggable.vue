@@ -131,7 +131,7 @@ export default class Draggable extends Vue {
 
   private addNewListHandler() {
     if (!this.nameNewList) return
-    if (this.lists.some((list: IList) => list.name === this.nameNewList)) {
+    if (this.lists.some((list: IList) => list.title === this.nameNewList)) {
       return
     }
     this.addNewList(this.nameNewList)
