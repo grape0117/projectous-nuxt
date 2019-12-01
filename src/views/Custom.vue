@@ -56,7 +56,6 @@ export default class Custom extends Vue {
   }
   private selectedCompanyUser: any = null
   public async updateItem(item: any) {
-    // Todo: update user task
     const userTask = cloneDeep(this.getTaskUserById(item.id))
     let newNextWorkDay = null
     if (item.listId === 'Past') {
@@ -70,6 +69,11 @@ export default class Custom extends Vue {
     userTask.next_work_day = newNextWorkDay
     await this.updateTaskUser(userTask)
     // Todo: update task
+    const task = cloneDeep(this.getTaskById(item.task_id))
+    if (task.title !== item.title) {
+      task.title = item.title
+      await this.updateTask(task)
+    }
   }
 }
 </script>

@@ -33,7 +33,6 @@ export const mutations: MutationTree<IModuleState> = {
   upsert(state, task: ITask) {
     let property: string | number
     let key: number
-
     // @ts-ignore
     key = state.lookup[task.id]
     if (key) {
