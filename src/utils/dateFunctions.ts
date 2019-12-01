@@ -22,3 +22,11 @@ export const getUserFriendlyDate = (datetime: Date) => {
     return `${weekDay}, ${date} ${month}`
   }
 }
+
+export const formatDateToYYYY_MM_DD = (datetime: Date) => {
+  const date = new Date(datetime)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDay() + 1
+  return `${year}-${month}-${day < 10 ? `0${day}` : day}`
+}

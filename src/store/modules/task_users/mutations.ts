@@ -16,7 +16,7 @@ export const mutations: MutationTree<IModuleState> = {
     }
   },
   [UPDATE_TASK_USER](state: IModuleState, task_user: ITaskUser) {
-    state.task_users[state.lookup[task_user.uuid]] = task_user
+    state.task_users[state.lookup[task_user.id]] = task_user
   },
   [DELETE_TASK_USER](state: IModuleState, task_user: ITaskUser) {
     //@Mikhail not sure if I should use deleted_at. I'm wondering if it's faster and better to not change the keys

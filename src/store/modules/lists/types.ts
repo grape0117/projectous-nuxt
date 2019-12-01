@@ -7,4 +7,5 @@ export interface IListsState {
 export interface IList {
   id: number | string
   title: string
+  group: string
 }

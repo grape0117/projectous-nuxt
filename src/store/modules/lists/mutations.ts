@@ -11,7 +11,7 @@ export const mutations: MutationTree<IListsState> = {
   [ADD_NEW_LIST](state: IListsState, newNameList: string) {
     state.user_tasks_list = [
       ...state.user_tasks_list,
-      { title: newNameList, id: '1234' }
+      { title: newNameList, id: '1234', group: 'Custom' }
     ] // Todo: generate id
   }
 }
