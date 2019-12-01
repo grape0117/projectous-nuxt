@@ -1,18 +1,26 @@
 <template>
   <div>
-    <pj-dragzone
-      v-for="{ id } in lists"
-      :key="id"
-      :id="id"
-      :options="groupedData[id]"
-      @update="update"
-      @save="$emit('update', $event)"
-    />
+    <div v-for="group in listGroups" :key="group" class="list">
+      <div class="list__group-title">{{ group }}</div>
+      <div
+        v-for="{ id, title } in lists.filter(list => list.group === group)"
+        :key="id"
+        class="list__group"
+      >
+        <div class="list__group-subtitle">{{ title }}</div>
+        <pj-dragzone
+          :id="id"
+          :options="groupedData[id]"
+          @update="update"
+          @save="$emit('update', $event)"
+        />
+      </div>
+    </div>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import { groupBy, cloneDeep } from 'lodash'
+import { groupBy, cloneDeep, uniq } from 'lodash'
 import move from 'array-move'
 
 @Component
@@ -22,6 +30,9 @@ export default class Draggable extends Vue {
   private clonedData: any = []
   get groupedData() {
     return groupBy(this.clonedData, 'listId')
+  }
+  get listGroups() {
+    return uniq(this.lists.map(({ group }: any) => group))
   }
   @Watch('data', { immediate: true })
   public onDataChanged(value: any) {
@@ -39,3 +50,14 @@ export default class Draggable extends Vue {
   }
 }
 </script>
+<style>
+.list__group {
+  padding-left: 1.5rem;
+}
+.list__group-title {
+  font-weight: bold;
+}
+.list__group-subtitle {
+  font-size: 0.8rem;
+}
+</style>

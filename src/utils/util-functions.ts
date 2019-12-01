@@ -19,23 +19,27 @@ export function createListsByDays(): IList[] {
   const today = resetTime(new Date())
   lists.push({
     id: 'Past',
-    title: 'Outdated tasks'
+    title: 'Outdated tasks',
+    group: 'Past Tasks'
   })
   lists.push({
     id: today.toString(),
-    title: getUserFriendlyDate(today)
+    title: getUserFriendlyDate(today),
+    group: 'Current Tasks'
   })
   for (let day = 1; day < 7; day++) {
     const date = resetTime(new Date())
     date.setDate(resetTime(new Date()).getDate() + day)
     lists.push({
       id: date.toString(),
-      title: getUserFriendlyDate(date)
+      title: getUserFriendlyDate(date),
+      group: 'Current Tasks'
     })
   }
   lists.push({
     id: 'Unmarked',
-    title: 'Unmarked'
+    title: 'Unmarked',
+    group: 'Unsorted'
   })
   return lists
 }
