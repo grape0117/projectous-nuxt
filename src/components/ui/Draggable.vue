@@ -32,6 +32,8 @@ export default class Draggable extends Vue {
     const firstElementInList = this.clonedData.findIndex(
       ({ listId }: any) => listId === item.listId
     )
+    if (index === firstElementInList + position) return
+    console.log(index, firstElementInList)
     const elementNewPosition = firstElementInList + position
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)

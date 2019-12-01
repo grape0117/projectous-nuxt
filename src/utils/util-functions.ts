@@ -5,23 +5,27 @@ import store from '@/store'
 export function sortUserTasksByDay(tasks: any, lists: any) {
   const { tasks: allTasks, lookup } = store.state.tasks
   const today = resetTime(new Date())
-  return tasks
-    .map(({ id, task_id, company_user_id, next_work_day }: any) => ({
-      id,
-      task_id,
-      title: allTasks[lookup[task_id]].title,
-      company_user_id,
-      next_work_day,
-      listId: !next_work_day
-        ? 'Unmarked'
-        : resetTime(next_work_day).getDate() < today.getDate()
-        ? 'Past'
-        : lists.find(
-            // tslint:disable-next-line:no-shadowed-variable
-            ({ id }: any) => resetTime(next_work_day).toString() === id
-          )
-    }))
-    .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+  return (
+    tasks
+      // .filter(({ next_work_day }: any) => next_work_day)
+      .map(({ id, task_id, company_user_id, next_work_day }: any) => ({
+        id,
+        task_id,
+        title: allTasks[lookup[task_id]].title,
+        company_user_id,
+        next_work_day,
+        listId: !next_work_day
+          ? 'Unmarked'
+          : resetTime(next_work_day).getTime() < today.getTime()
+          ? 'Past'
+          : lists.find(
+              // tslint:disable-next-line:no-shadowed-variable
+              ({ id }: any) => resetTime(next_work_day).toString() === id
+              // ({ id }: any) => console.log(resetTime(next_work_day).getTime())
+            )
+      }))
+      .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+  )
 }
 
 export function createListsByDays(): IList[] {

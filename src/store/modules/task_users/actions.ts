@@ -1,6 +1,7 @@
 import { ActionTree } from 'vuex'
 import { IModuleState, ITaskUser } from './types'
 import { IRootState } from '@/store/types'
+import { UPDATE_TASK_USER } from '@/store/modules/task_users/mutations-types'
 
 const company_user_id: number = 1
 
@@ -49,5 +50,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
     commit('tasks/UPDATE', task)
     commit('task_users/UPDATE', task_user)
+  },
+  async updateTaskUser({ commit }: any, taskUser: ITaskUser) {
+    //Todo: send request to the server to update task user
+    commit(UPDATE_TASK_USER, taskUser)
   }
 }

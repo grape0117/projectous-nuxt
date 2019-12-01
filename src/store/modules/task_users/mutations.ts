@@ -16,11 +16,6 @@ export const mutations: MutationTree<IModuleState> = {
     }
   },
   [UPDATE_TASK_USER](state: IModuleState, task_user: ITaskUser) {
-    // state.task_users[state.lookup[task_user.uuid]] = task_user
-    console.log('mutation: UPDATE_TASK_USER')
-    console.log(state.lookup[task_user.id])
-    console.log(state.task_users[state.lookup[task_user.id]])
-    // console.log(state.task_users[state.lookup[task_user.id]])
     state.task_users[state.lookup[task_user.id]] = task_user
   },
   [DELETE_TASK_USER](state: IModuleState, task_user: ITaskUser) {
