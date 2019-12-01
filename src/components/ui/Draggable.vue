@@ -6,8 +6,7 @@
       :id="id"
       :options="groupedData[id]"
       @update="update"
-      @updateTitle="$emit('update', $event)"
-      @save="$emit('updateTaskUser', $event)"
+      @save="$emit('update', $event)"
     />
   </div>
 </template>
@@ -24,6 +23,10 @@ export default class Draggable extends Vue {
   get groupedData() {
     return groupBy(this.clonedData, 'listId')
   }
+  @Watch('data', { immediate: true })
+  public onDataChanged(value: any) {
+    this.clonedData = cloneDeep(value)
+  }
   public update(item: any, position: number) {
     const index = this.clonedData.findIndex(({ id }: any) => item.id === id)
     const firstElementInList = this.clonedData.findIndex(
@@ -32,10 +35,6 @@ export default class Draggable extends Vue {
     const elementNewPosition = firstElementInList + position
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)
-  }
-  @Watch('data', { immediate: true })
-  public onDataChanged(value: any) {
-    this.clonedData = cloneDeep(value)
   }
 }
 </script>

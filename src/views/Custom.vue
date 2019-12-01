@@ -13,8 +13,7 @@
     <pj-draggable
       :data="sortedUserTasks"
       :lists="lists"
-      @update="updateTask"
-      @updateTaskUser="updateTaskUser"
+      @update="updateTaskUser"
     />
   </div>
 </template>
@@ -31,6 +30,10 @@ const Lists = namespace('lists')
 
 @Component
 export default class Custom extends Vue {
+  @TaskUsers.Getter public getByCompanyUserId!: any
+  @Tasks.Action public updateTask!: any
+  @Lists.State(state => state.user_tasks_list) public lists!: IList
+  @CompanyUsers.State(state => state.company_users) private companyUsers!: any
   get userTasks() {
     if (!this.selectedCompanyUser) return []
     return this.getByCompanyUserId(this.selectedCompanyUser.id)
@@ -50,13 +53,10 @@ export default class Custom extends Vue {
       }
     )
   }
-  @TaskUsers.Getter public getByCompanyUserId!: any
-  @Tasks.Action public updateTask!: any
-  @Lists.State(state => state.user_tasks_list) public lists!: IList
-  @CompanyUsers.State(state => state.company_users) private companyUsers!: any
   private selectedCompanyUser: any = null
-  public updateTaskUser() {
-    console.log('f: updateTaskUser')
+  public updateTaskUser(userTask: any) {
+    // Todo: update user task
+    // Todo: update task
   }
 }
 </script>

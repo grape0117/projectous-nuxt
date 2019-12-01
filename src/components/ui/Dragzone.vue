@@ -71,9 +71,9 @@ export default class Dragzone extends Vue {
     }
   }
   private updateTitle({ target: { innerHTML: name } }: any, item: any) {
-    const updatedItem = cloneDeep(this.getById(item.task_id))
+    const updatedItem = cloneDeep(item)
     updatedItem.title = name
-    this.$emit('updateTitle', updatedItem)
+    this.$emit('save', updatedItem)
   }
 }
 </script>
