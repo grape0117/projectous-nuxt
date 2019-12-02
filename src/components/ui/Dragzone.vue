@@ -18,7 +18,7 @@
         draggable="true"
         @dragstart="dragstart(item)"
         @dragend="dragend"
-        @dragover="moveItem(index)"
+        @dragover="moveItem(index, item.id)"
       >
         <div class="dragzone__item-dragbox" />
         <div
@@ -69,11 +69,11 @@ export default class Dragzone extends Vue {
       console.log(e)
     }
   }
-  private moveItem(index: number) {
+  private moveItem(index: number, id: number) {
     try {
       const item = JSON.parse(localStorage.getItem('item') as string)
       item.listId = this.id.toString()
-      this.$emit('update', item, index)
+      this.$emit('update', item, index, id)
       localStorage.setItem('item', JSON.stringify(item))
     } catch (e) {
       console.log(e)
@@ -114,6 +114,7 @@ export default class Dragzone extends Vue {
 .dragzone__item {
   display: flex;
   align-items: center;
+  padding: 2px 0;
   cursor: pointer;
 }
 .dragzone__item-icon {

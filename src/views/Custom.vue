@@ -66,7 +66,7 @@ export default class Custom extends Vue {
       userTask.next_work_day = newNextWorkDay
       await this.updateTaskUser(userTask)
     }
-    // Todo: update task
+    // Todo: @stephane it needs to add property list_id to user_task
     const task = cloneDeep(this.getTaskById(item.task_id))
     if (task.title !== item.title) {
       task.title = item.title

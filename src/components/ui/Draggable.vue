@@ -38,13 +38,11 @@ export default class Draggable extends Vue {
   public onDataChanged(value: any) {
     this.clonedData = cloneDeep(value)
   }
-  public update(item: any, position: number) {
+  public update(item: any, position: number, idNewPosition: number) {
     const index = this.clonedData.findIndex(({ id }: any) => item.id === id)
-    const firstElementInList = this.clonedData.findIndex(
-      ({ listId }: any) => listId === item.listId
+    const elementNewPosition = this.clonedData.findIndex(
+      ({ id }: any) => id === idNewPosition
     )
-    if (index === firstElementInList + position) return
-    const elementNewPosition = firstElementInList + position
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)
   }
