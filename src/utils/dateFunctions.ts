@@ -3,6 +3,7 @@ export const resetTime = (date: Date) => {
   day.setHours(0)
   day.setMinutes(0)
   day.setSeconds(0)
+  day.setMilliseconds(0)
   return day
 }
 
@@ -27,6 +28,6 @@ export const formatDateToYYYY_MM_DD = (datetime: Date) => {
   const date = new Date(datetime)
   const year = date.getFullYear()
   const month = date.getMonth() + 1
-  const day = date.getDay() + 1
+  const day = date.getDate()
   return `${year}-${month}-${day < 10 ? `0${day}` : day}`
 }
