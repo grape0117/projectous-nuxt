@@ -5,6 +5,7 @@
         v-for="companyUser in sortedCompanyUsers"
         :value="companyUser"
         :id="companyUser.id"
+        :key="companyUser.id"
       >
         {{ companyUser.name }}
       </option>
@@ -14,7 +15,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { IList } from '@/store/modules/lists/types'
 import { cloneDeep } from 'lodash'
@@ -39,6 +40,7 @@ export default class Custom extends Vue {
     return this.sortedByDays(this.selectedCompanyUser.id)
   }
   get sortedCompanyUsers() {
+    this.setUserByRouteQuery()
     return this.companyUsers.sort(
       (
         { name: nameA }: { name: string },
@@ -51,6 +53,18 @@ export default class Custom extends Vue {
     )
   }
   private selectedCompanyUser: any = null
+  public setUserByRouteQuery() {
+    if (!this.$router.currentRoute.query.user || this.companyUsers.length == 0)
+      return
+    setTimeout(() => {
+      this.sortedCompanyUsers.findIndex((user: any) => {
+        if (user.name == this.$router.currentRoute.query.user)
+          this.selectedCompanyUser = user
+      })
+      if (!this.selectedCompanyUser)
+        this.$router.push({ query: {} }).catch(e => {})
+    }, 30)
+  }
   public async updateItem(item: any) {
     const userTask = cloneDeep(this.getTaskUserById(item.id))
     let newNextWorkDay = null
@@ -66,11 +80,17 @@ export default class Custom extends Vue {
       userTask.next_work_day = newNextWorkDay
       await this.updateTaskUser(userTask)
     }
-    // Todo: update task
+    // Todo: @stephane it needs to add property list_id to user_task
     const task = cloneDeep(this.getTaskById(item.task_id))
     if (task.title !== item.title) {
       task.title = item.title
       await this.updateTask(task)
+    }
+  }
+  @Watch('selectedCompanyUser')
+  private changeRouteQueryParams(value: any) {
+    if (value) {
+      this.$router.push({ query: { user: value.name } }).catch(e => {})
     }
   }
 }
