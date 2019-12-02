@@ -43,3 +43,13 @@ export function createListsByDays(): IList[] {
   })
   return lists
 }
+
+export function createUserLists(lists: any) {
+  return lists.map(({ id, label: title }: any) => {
+    return {
+      id,
+      title,
+      group: 'User Lists'
+    }
+  })
+}
