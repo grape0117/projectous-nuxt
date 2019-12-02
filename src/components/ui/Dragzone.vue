@@ -23,9 +23,12 @@
         <div class="dragzone__item-dragbox" />
         <div
           class="dragzone__item-text"
+          ref="content"
           v-html="item.title"
           contenteditable="true"
           @blur="updateTitle($event, item)"
+          @keydown.enter.prevent
+          @keydown.enter="createNewTask(item.id)"
         />
       </div>
     </div>
@@ -94,6 +97,9 @@ export default class Dragzone extends Vue {
     const updatedItem = cloneDeep(item)
     updatedItem.title = name
     this.$emit('save', updatedItem)
+  }
+  private createNewTask(id: number) {
+    this.$emit('create', id)
   }
 }
 </script>

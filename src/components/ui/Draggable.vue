@@ -11,6 +11,7 @@
         <pj-dragzone
           :id="id"
           :options="groupedData[id]"
+          @create="create($event, id)"
           @update="update"
           @save="$emit('update', $event)"
         />
@@ -37,6 +38,9 @@ export default class Draggable extends Vue {
   @Watch('data', { immediate: true })
   public onDataChanged(value: any) {
     this.clonedData = cloneDeep(value)
+  }
+  public create(id: number, listId: number | string) {
+    this.$emit('create', id, listId)
   }
   public update(item: any, position: number, idNewPosition: number) {
     const index = this.clonedData.findIndex(({ id }: any) => item.id === id)

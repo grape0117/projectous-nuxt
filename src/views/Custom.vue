@@ -10,7 +10,12 @@
       </option>
     </select>
     <hr />
-    <pj-draggable :data="userTasks" :lists="lists" @update="updateItem" />
+    <pj-draggable
+      :data="userTasks"
+      :lists="lists"
+      @create="createItem"
+      @update="updateItem"
+    />
   </div>
 </template>
 <script lang="ts">
@@ -51,6 +56,10 @@ export default class Custom extends Vue {
     )
   }
   private selectedCompanyUser: any = null
+  public createItem(previousItemId: number, listId: string | number) {
+    console.log(previousItemId, listId)
+    // Todo: create task and task_user
+  }
   public async updateItem(item: any) {
     const userTask = cloneDeep(this.getTaskUserById(item.id))
     let newNextWorkDay = null
