@@ -1,12 +1,11 @@
 import { MutationTree } from 'vuex'
-import { IListsState } from './types'
+import { IListsState, IList } from './types'
 import { CREATE_LISTS, ADD_NEW_LIST } from './mutations-types'
-import { createListsByDays } from '@/utils/util-functions'
 
 export const mutations: MutationTree<IListsState> = {
-  [CREATE_LISTS](state: IListsState, listName: string) {
+  [CREATE_LISTS](state: IListsState, { listName, lists }) {
     // @ts-ignore
-    state[listName] = createListsByDays()
+    state[listName] = lists
   },
   [ADD_NEW_LIST](state: IListsState, newNameList: string) {
     state.user_tasks_list = [
