@@ -91,7 +91,7 @@ export default class Custom extends Vue {
     }
   }
   @Watch('sortedCompanyUsers')
-  onSortedCompanyUsersChanged(users: any) {
+  private onSortedCompanyUsersChanged(users: any) {
     const query = this.$route.query.user
     if (query) {
       const user = users.find(({ id }: any) => id === +query)
