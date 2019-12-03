@@ -5,6 +5,7 @@
         v-for="companyUser in sortedCompanyUsers"
         :value="companyUser"
         :id="companyUser.id"
+        :key="companyUser.id"
       >
         {{ companyUser.name }}
       </option>
@@ -19,7 +20,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { IList } from '@/store/modules/lists/types'
 import { cloneDeep } from 'lodash'
@@ -81,6 +82,20 @@ export default class Custom extends Vue {
     if (task.title !== title) {
       task.title = title
       await this.updateTask(task)
+    }
+  }
+  @Watch('selectedCompanyUser')
+  private changeRouteQueryParams(value: any) {
+    if (value) {
+      this.$router.push({ query: { user: value.id } }).catch(e => {})
+    }
+  }
+  @Watch('sortedCompanyUsers')
+  onSortedCompanyUsersChanged(users: any) {
+    const query = this.$route.query.user
+    if (query) {
+      const user = users.find(({ id }: any) => id === +query)
+      if (user && !this.selectedCompanyUser) this.selectedCompanyUser = user
     }
   }
 }
