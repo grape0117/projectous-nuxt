@@ -40,6 +40,7 @@ export default class Custom extends Vue {
     return this.sortedByDays(this.selectedCompanyUser.id)
   }
   get sortedCompanyUsers() {
+    this.setUserByRouteQuery()
     return this.companyUsers.sort(
       (
         { name: nameA }: { name: string },
