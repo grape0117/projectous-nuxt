@@ -52,7 +52,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('task_users/UPDATE', task_user)
   },
   async updateTaskUser({ commit }: any, taskUser: ITaskUser) {
-    //Todo: send request to the server to update task user
+    //Todo: @stephane send request to the server to update task user
     commit(UPDATE_TASK_USER, taskUser)
   }
 }
