@@ -19,18 +19,29 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     const today = resetTime(new Date())
     return state.task_users
       .filter(({ company_user_id }) => company_user_id === companyUserId)
-      .map(({ id, task_id, company_user_id, next_work_day }: any) => ({
-        id,
-        task_id,
-        title: allTasks[lookup[task_id]].title,
-        company_user_id,
-        next_work_day,
-        listId: !next_work_day
-          ? 'Unmarked'
-          : resetTime(next_work_day).getTime() < today.getTime()
-          ? 'Past'
-          : getListId(next_work_day, lists)
-      }))
+      .map(
+        ({
+          id,
+          task_id,
+          sort_order,
+          user_task_list_id,
+          company_user_id,
+          next_work_day
+        }: any) => ({
+          id,
+          task_id,
+          title: allTasks[lookup[task_id]].title,
+          company_user_id,
+          sort_order,
+          user_task_list_id,
+          next_work_day,
+          listId: !next_work_day
+            ? 'Unmarked'
+            : resetTime(next_work_day).getTime() < today.getTime()
+            ? 'Past'
+            : getListId(next_work_day, lists, user_task_list_id)
+        })
+      )
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
   }
 }

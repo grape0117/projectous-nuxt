@@ -11,7 +11,7 @@
     </select>
     <hr />
     <pj-draggable
-      :data="userTasks"
+      :data="tasksUsers"
       :lists="lists"
       @create="createItem"
       @update="updateItem"
@@ -39,7 +39,7 @@ export default class Custom extends Vue {
   @Tasks.Getter('getById') private getTaskById!: any
   @Lists.State(state => state.user_tasks_list) private lists!: IList
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
-  get userTasks() {
+  get tasksUsers() {
     if (!this.selectedCompanyUser) return []
     return this.sortedByDays(this.selectedCompanyUser.id)
   }
@@ -60,25 +60,26 @@ export default class Custom extends Vue {
     console.log(previousItemId, listId)
     // Todo: create task and task_user
   }
-  public async updateItem(item: any) {
-    const userTask = cloneDeep(this.getTaskUserById(item.id))
+  public async updateItem({ id, task_id, title, listId, sort_order }: any) {
+    const taskUser = cloneDeep(this.getTaskUserById(id))
     let newNextWorkDay = null
-    if (item.listId === 'Past') {
+    if (listId === 'Past') {
       const date = new Date()
       newNextWorkDay = formatDateToYYYY_MM_DD(
         new Date(date.setMonth(date.getMonth() - 1))
       )
-    } else if (!!Date.parse(item.listId)) {
-      newNextWorkDay = formatDateToYYYY_MM_DD(item.listId)
+    } else if (!!Date.parse(listId) && isNaN(listId)) {
+      newNextWorkDay = formatDateToYYYY_MM_DD(listId)
+    } else if (Number.isInteger(Number(listId))) {
+      // Note: assume that all lists with integer id are created by user and update user_task_list_id
+      taskUser.user_task_list_id = listId
     }
-    if (userTask.next_work_day !== newNextWorkDay) {
-      userTask.next_work_day = newNextWorkDay
-      await this.updateTaskUser(userTask)
-    }
-    // Todo: @stephane it needs to add property list_id to user_task
-    const task = cloneDeep(this.getTaskById(item.task_id))
-    if (task.title !== item.title) {
-      task.title = item.title
+    taskUser.next_work_day = newNextWorkDay
+    taskUser.sort_order = sort_order
+    await this.updateTaskUser(taskUser)
+    const task = cloneDeep(this.getTaskById(task_id))
+    if (task.title !== title) {
+      task.title = title
       await this.updateTask(task)
     }
   }

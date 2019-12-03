@@ -1,7 +1,12 @@
 import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
 import { IList } from '@/store/modules/lists/types'
 
-export function getListId(next_work_day: Date | string | null, lists: any) {
+export function getListId(
+  next_work_day: Date | string | null,
+  lists: any,
+  listId: any = null
+) {
+  if (listId) return listId
   if (!next_work_day) return 'Unmarked'
   const today = resetTime(new Date())
   if (resetTime(next_work_day as Date).getTime() < today.getTime())
