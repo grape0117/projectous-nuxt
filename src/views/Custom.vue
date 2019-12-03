@@ -40,7 +40,6 @@ export default class Custom extends Vue {
     return this.sortedByDays(this.selectedCompanyUser.id)
   }
   get sortedCompanyUsers() {
-    this.setUserByRouteQuery()
     return this.companyUsers.sort(
       (
         { name: nameA }: { name: string },
@@ -53,16 +52,6 @@ export default class Custom extends Vue {
     )
   }
   private selectedCompanyUser: any = null
-  public setUserByRouteQuery() {
-    if (!this.$router.currentRoute.query.user || this.companyUsers.length == 0)
-      return
-    this.sortedCompanyUsers.forEach((user: any) => {
-      if (user.id == this.$router.currentRoute.query.user)
-        this.selectedCompanyUser = user
-    })
-    if (!this.selectedCompanyUser)
-      this.$router.push({ query: {} }).catch(e => {})
-  }
   public async updateItem(item: any) {
     const userTask = cloneDeep(this.getTaskUserById(item.id))
     let newNextWorkDay = null
@@ -92,8 +81,12 @@ export default class Custom extends Vue {
     }
   }
   @Watch('sortedCompanyUsers')
-  private func(val: any) {
-    this.setUserByRouteQuery()
+  onSortedCompanyUsersChanged(users: any) {
+    const query = this.$route.query.user
+    if (query) {
+      const user = users.find(({ id }: any) => id === +query)
+      if (user && !this.selectedCompanyUser) this.selectedCompanyUser = user
+    }
   }
 }
 </script>
