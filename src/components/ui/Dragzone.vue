@@ -75,7 +75,7 @@ export default class Dragzone extends Vue {
   private moveItem(index: number, id: number) {
     try {
       const item = JSON.parse(localStorage.getItem('item') as string)
-      item.listId = this.id.toString()
+      item.listId = this.id
       item.sort_order = index
       this.$emit('update', item, index, id)
       localStorage.setItem('item', JSON.stringify(item))
@@ -87,7 +87,7 @@ export default class Dragzone extends Vue {
     if (!this.options.length) {
       try {
         const item = JSON.parse(localStorage.getItem('item') as string)
-        item.listId = this.id.toString()
+        item.listId = this.id
         item.sort_order = 0
         this.$emit('update', item, 0)
       } catch (e) {
