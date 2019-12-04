@@ -14,7 +14,7 @@
           : options"
         :key="item.id"
         class="dragzone__item"
-        :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
+        :class="{ 'dragzone__item--dragged': item.id === draggedId }"
         draggable="true"
         @dragstart="dragstart(item)"
         @dragend="dragend"
@@ -54,20 +54,18 @@ export default class Dragzone extends Vue {
   @Tasks.Getter public getById!: any
   private expandedList: boolean = true
   private numberOfExpandedItems: number = 3
-  get draggedItemId() {
-    return localStorage.getItem('item') || null
-  }
-  set draggedItemId(item: any) {
-    localStorage.setItem('item', JSON.stringify(item))
-  }
+  private draggedId!: number | null
+
   private dragstart(item: any) {
-    this.draggedItemId = item
+    localStorage.setItem('item', JSON.stringify(item))
+    this.draggedId = item.id
   }
   private dragend() {
     try {
       const item = JSON.parse(localStorage.getItem('item') as string)
       this.$emit('save', item)
       localStorage.removeItem('item')
+      this.draggedId = null
     } catch (e) {
       console.log(e)
     }
@@ -136,7 +134,8 @@ export default class Dragzone extends Vue {
   cursor: pointer;
 }
 .dragzone__item--dragged {
-  color: rgba(0, 0, 0, 0.3);
+  /* color: rgba(0, 0, 0, 0); */
+  color: red;
 }
 .dragzone__item-dragbox {
   width: 10px;
