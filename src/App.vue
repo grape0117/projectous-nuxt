@@ -75,8 +75,12 @@ export default {
       const daysLists = createListsByDays()
       const userLists = createUserLists(user_task_lists)
       this.$store.commit('lists/lists/CREATE_LISTS', {
-        listName: 'user_tasks_list',
-        lists: [...daysLists, ...userLists]
+        listName: 'generalLists',
+        lists: daysLists
+      })
+      this.$store.commit('lists/lists/CREATE_LISTS', {
+        listName: 'userLists',
+        lists: userLists
       })
       //TODO: companies
     }

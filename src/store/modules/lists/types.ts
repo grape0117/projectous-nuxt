@@ -1,11 +1,13 @@
 import { ITaskUser } from '../task_users/types'
 
 export interface IListsState {
-  user_tasks_list: IList[]
+  generalLists: IList[]
+  userLists: IList[]
 }
 
 export interface IList {
   id: number | string
+  userId?: number
   title: string
   group: string
 }
