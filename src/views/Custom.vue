@@ -2,10 +2,10 @@
   <div>
     <select v-model="selectedCompanyUser">
       <option
-        v-for="companyUser in sortedCompanyUsers"
+        v-for="(companyUser, i) in sortedCompanyUsers"
         :value="companyUser"
         :id="companyUser.id"
-        :key="companyUser.id"
+        :key="`${companyUser.id}-${i}`"
       >
         {{ companyUser.name }}
       </option>
@@ -38,8 +38,13 @@ export default class Custom extends Vue {
   @TaskUsers.Action private updateTaskUser!: any
   @Tasks.Action private updateTask!: any
   @Tasks.Getter('getById') private getTaskById!: any
-  @Lists.State(state => state.user_tasks_list) private lists!: IList
+  @Lists.Getter private getUserLists!: any
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
+  get lists() {
+    return !this.selectedCompanyUser
+      ? []
+      : this.getUserLists(this.selectedCompanyUser.id)
+  }
   get tasksUsers() {
     if (!this.selectedCompanyUser) return []
     return this.sortedByDays(this.selectedCompanyUser.id)

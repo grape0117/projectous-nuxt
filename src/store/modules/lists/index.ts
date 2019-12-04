@@ -6,7 +6,8 @@ import { mutations } from './mutations'
 import { IListsState } from './types'
 
 const state = {
-  user_tasks_list: []
+  generalLists: [],
+  userLists: []
 }
 export const lists: Module<IListsState, IRootState> = {
   namespaced: true,
