@@ -16,7 +16,7 @@
         class="dragzone__item"
         :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
         draggable="true"
-        @dragstart="dragstart($event, item)"
+        @dragstart="dragstart(item)"
         @dragend="dragend"
         @dragover="moveItem(index, item.id)"
       >
@@ -56,7 +56,7 @@ export default class Dragzone extends Vue {
   private expandedList: boolean = true
   private numberOfExpandedItems: number = 3
 
-  private dragstart(event: any, item: any) {
+  private dragstart(item: any) {
     localStorage.setItem('item', JSON.stringify(item))
     this.$emit('setDraggedItemId', item.id)
   }
