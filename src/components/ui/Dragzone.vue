@@ -52,6 +52,7 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public id!: number
   @Prop({ required: true }) public draggedItemId!: number | null
   @Prop({ required: true, default: () => [] }) public options!: any
+  @Prop({ required: true }) public isListDragged!: boolean
   @Tasks.Getter public getById!: any
   private expandedList: boolean = true
   private numberOfExpandedItems: number = 3
@@ -71,6 +72,8 @@ export default class Dragzone extends Vue {
     }
   }
   private moveItem(index: number, id: number) {
+    if (this.isListDragged) return
+
     try {
       const item = JSON.parse(localStorage.getItem('item') as string)
       item.listId = this.id
@@ -82,6 +85,8 @@ export default class Dragzone extends Vue {
     }
   }
   private moveToNewList() {
+    if (this.isListDragged) return
+
     if (!this.options.length) {
       try {
         const item = JSON.parse(localStorage.getItem('item') as string)
