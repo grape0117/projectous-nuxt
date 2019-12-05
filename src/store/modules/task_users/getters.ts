@@ -35,7 +35,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
           sort_order,
           user_task_list_id,
           next_work_day,
-          listId: !next_work_day
+          listId: user_task_list_id
+            ? user_task_list_id
+            : !next_work_day
             ? 'Unmarked'
             : resetTime(next_work_day).getTime() < today.getTime()
             ? 'Past'

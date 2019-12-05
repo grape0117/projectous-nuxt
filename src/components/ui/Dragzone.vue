@@ -53,6 +53,7 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public draggedItemId!: number | null
   @Prop({ required: true, default: () => [] }) public options!: any
   @Prop({ required: true }) public isListDragged!: boolean
+  @Prop({ required: true }) public group!: string
   @Tasks.Getter public getById!: any
   private expandedList: boolean = true
   private numberOfExpandedItems: number = 3
@@ -77,6 +78,7 @@ export default class Dragzone extends Vue {
     try {
       const item = JSON.parse(localStorage.getItem('item') as string)
       item.listId = this.id
+      item.user_task_list_id = this.group === 'User Lists' ? this.id : null
       item.sort_order = index
       this.$emit('update', item, index, id)
       localStorage.setItem('item', JSON.stringify(item))
@@ -91,6 +93,7 @@ export default class Dragzone extends Vue {
       try {
         const item = JSON.parse(localStorage.getItem('item') as string)
         item.listId = this.id
+        item.user_task_list_id = this.group === 'User Lists' ? this.id : null
         item.sort_order = 0
         this.$emit('update', item, 0)
       } catch (e) {
