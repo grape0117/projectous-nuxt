@@ -15,7 +15,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   },
   sortedByDays: (state: IModuleState, _, rootState) => (companyUserId: any) => {
     const { tasks: allTasks, lookup } = rootState.tasks
-    const lists = rootState.lists.user_tasks_list
+    const lists = rootState.lists.generalLists
     const today = resetTime(new Date())
     return state.task_users
       .filter(({ company_user_id }) => company_user_id === companyUserId)
