@@ -10,8 +10,8 @@
     <div class="dragzone__content">
       <div
         v-for="(item, index) in expandedList
-          ? options.slice(0, numberOfExpandedItems)
-          : options"
+          ? items.slice(0, numberOfExpandedItems)
+          : items"
         :key="item.id"
         class="dragzone__item"
         :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
@@ -26,9 +26,8 @@
           ref="content"
           v-html="item.title"
           contenteditable="true"
-          @blur="updateTitle($event, item)"
-          @keydown.enter.prevent
-          @keydown.enter="createNewTask(item.id)"
+          @blur="updateTitle($event, item, index)"
+          @keydown.enter.prevent="addNewTask($event, item, index)"
         />
       </div>
     </div>
@@ -41,7 +40,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
 
@@ -55,8 +54,16 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public isListDragged!: boolean
   @Prop({ required: true }) public group!: string
   @Tasks.Getter public getById!: any
+
   private expandedList: boolean = true
   private numberOfExpandedItems: number = 3
+  private items: any = this.options
+  private newItem: any = null
+
+  @Watch('options')
+  private onOptionsChange(value: any) {
+    this.items = value
+  }
 
   private dragstart(item: any) {
     localStorage.setItem('item', JSON.stringify(item))
@@ -101,13 +108,41 @@ export default class Dragzone extends Vue {
       }
     }
   }
-  private updateTitle({ target: { innerHTML: name } }: any, item: any) {
+  private updateTitle(
+    { target: { innerHTML: name } }: any,
+    item: any,
+    index: number
+  ) {
+    if (item.id === -1 && item.title === '') {
+      this.items.splice(index, 1)
+    }
+
+    if (name === item.title) return
+
     const updatedItem = cloneDeep(item)
     updatedItem.title = name
-    this.$emit('save', updatedItem)
+
+    if (updatedItem.id !== -1) {
+      this.$emit('save', updatedItem)
+    } else {
+      this.$emit('create', updatedItem)
+    }
   }
-  private createNewTask(id: number) {
-    this.$emit('create', id)
+  private async addNewTask(e: any, item: any, index: number) {
+    this.updateTitle(e, item, index)
+
+    this.newItem = cloneDeep(item)
+    this.newItem.id = -1
+    this.newItem.task_id = -1
+    this.newItem.title = ''
+
+    this.items.splice(1, 0, this.newItem)
+
+    await this.$nextTick()
+    if (this.$el.querySelectorAll('.dragzone__item-text')[index + 1]) {
+      // @ts-ignore
+      this.$el.querySelectorAll('.dragzone__item-text')[index + 1].focus()
+    }
   }
 }
 </script>
@@ -156,6 +191,8 @@ export default class Dragzone extends Vue {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  flex-grow: 1;
+  min-height: 1.5em;
 }
 *:focus {
   outline: none;

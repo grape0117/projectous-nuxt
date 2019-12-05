@@ -36,10 +36,13 @@ export default class Custom extends Vue {
   @TaskUsers.Getter('getById') private getTaskUserById!: any
   @TaskUsers.Getter private sortedByDays!: any
   @TaskUsers.Action private updateTaskUser!: any
+  @TaskUsers.Action private createUserTask!: any
   @Tasks.Action private updateTask!: any
+  @Tasks.Action private createTask!: any
   @Tasks.Getter('getById') private getTaskById!: any
   @Lists.Getter private getUserLists!: any
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
+
   get lists() {
     return !this.selectedCompanyUser
       ? []
@@ -61,11 +64,18 @@ export default class Custom extends Vue {
       }
     )
   }
+
   private selectedCompanyUser: any = null
-  public createItem(previousItemId: number, listId: string | number) {
-    console.log(previousItemId, listId)
-    // Todo: create task and task_user
+
+  public async createItem(item: any) {
+    const newTaskID = await this.createTask({ title: item.title })
+
+    const newUserTask = cloneDeep(item)
+    delete newUserTask.title
+    newUserTask.task_id = newTaskID
+    this.createUserTask(newUserTask)
   }
+
   public async updateItem({ id, task_id, title, listId, sort_order }: any) {
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let newNextWorkDay = null

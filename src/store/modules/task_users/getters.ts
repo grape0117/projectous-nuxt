@@ -45,5 +45,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
         })
       )
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+  },
+
+  getNextId: (state: IModuleState) => () => {
+    return state.lookup.length
   }
 }

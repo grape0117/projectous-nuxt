@@ -22,7 +22,7 @@
           :isListDragged="isListDragged"
           :draggedItemId="draggedItemId"
           :group="group"
-          @create="create($event, id)"
+          @create="$emit('create', $event)"
           @update="update"
           @save="$emit('update', $event)"
           @setDraggedItemId="draggedItemId = $event"
@@ -40,8 +40,9 @@ import move from 'array-move'
 export default class Draggable extends Vue {
   @Prop({ required: true }) public data!: any
   @Prop({ required: true }) public lists!: any
+
+  private clonedData: any = cloneDeep(this.data)
   private listGroups: any = []
-  private clonedData: any = []
   private draggedItemId: number | null = null
   private isListDragged: boolean = false
   private draggedListIndex: number = NaN
@@ -69,9 +70,6 @@ export default class Draggable extends Vue {
       })
   }
 
-  public create(id: number, listId: number | string) {
-    this.$emit('create', id, listId)
-  }
   public update(item: any, position: number, idNewPosition: number) {
     const index = this.clonedData.findIndex(({ id }: any) => item.id === id)
     const elementNewPosition = this.clonedData.findIndex(
