@@ -26,6 +26,7 @@
           @update="update"
           @save="$emit('update', $event)"
           @setDraggedItemId="draggedItemId = $event"
+          @addNewTask="addNewItem"
         />
       </div>
     </div>
@@ -35,6 +36,7 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { groupBy, cloneDeep, uniq } from 'lodash'
 import move from 'array-move'
+import { generateUniqId } from '@/utils/util-functions'
 
 @Component
 export default class Draggable extends Vue {
@@ -77,6 +79,9 @@ export default class Draggable extends Vue {
     )
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)
+  }
+  public addNewItem(item: any) {
+    this.clonedData.splice(1, 0, item)
   }
 
   private dragStart(index: number) {

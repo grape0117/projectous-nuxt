@@ -59,3 +59,7 @@ export function createUserLists(lists: any) {
     }
   })
 }
+
+export function generateUniqId(length: number) {
+  return Math.floor(Math.random() * length)
+}

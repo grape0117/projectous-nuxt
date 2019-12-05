@@ -10,8 +10,8 @@
     <div class="dragzone__content">
       <div
         v-for="(item, index) in expandedList
-          ? items.slice(0, numberOfExpandedItems)
-          : items"
+          ? options.slice(0, numberOfExpandedItems)
+          : options"
         :key="item.id"
         class="dragzone__item"
         :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
@@ -26,6 +26,7 @@
           ref="content"
           v-html="item.title"
           contenteditable="true"
+          :data-id="item.id"
           @blur="updateTitle($event, item, index)"
           @keydown.enter.prevent="addNewTask($event, item, index)"
         />
@@ -43,6 +44,7 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
+import { generateUniqId } from '@/utils/util-functions'
 
 const Tasks = namespace('tasks')
 
@@ -57,13 +59,7 @@ export default class Dragzone extends Vue {
 
   private expandedList: boolean = true
   private numberOfExpandedItems: number = 3
-  private items: any = this.options
   private newItem: any = null
-
-  @Watch('options')
-  private onOptionsChange(value: any) {
-    this.items = value
-  }
 
   private dragstart(item: any) {
     localStorage.setItem('item', JSON.stringify(item))
@@ -113,35 +109,46 @@ export default class Dragzone extends Vue {
     item: any,
     index: number
   ) {
-    if (item.id === -1 && item.title === '') {
-      this.items.splice(index, 1)
-    }
-
-    if (name === item.title) return
+    if (name === item.title || item.newAdded) return
 
     const updatedItem = cloneDeep(item)
     updatedItem.title = name
 
-    if (updatedItem.id !== -1) {
+    if (!updatedItem.newAdded) {
       this.$emit('save', updatedItem)
     } else {
+      delete updatedItem.newAdded
       this.$emit('create', updatedItem)
     }
   }
+
   private async addNewTask(e: any, item: any, index: number) {
-    this.updateTitle(e, item, index)
-
-    this.newItem = cloneDeep(item)
-    this.newItem.id = -1
-    this.newItem.task_id = -1
-    this.newItem.title = ''
-
-    this.items.splice(1, 0, this.newItem)
+    if (item.newAdded) {
+      const updatedItem = cloneDeep(item)
+      updatedItem.title = e.target.innerHTML
+      delete updatedItem.newAdded
+      this.$emit('create', updatedItem)
+    }
 
     await this.$nextTick()
-    if (this.$el.querySelectorAll('.dragzone__item-text')[index + 1]) {
+    await this.$nextTick()
+    await this.$nextTick()
+
+    const newItem = cloneDeep(item)
+    newItem.id = generateUniqId(100000)
+    newItem.task_id = -1
+    newItem.title = ''
+    newItem.newAdded = true
+
+    this.$emit('addNewTask', newItem)
+
+    await this.$nextTick()
+    const newEl =
+      this.$el.querySelector(`.dragzone__item-text[data-id="${newItem.id}"]`) ||
+      this.$el.querySelectorAll('.dragzone__item-text')[this.options.length]
+    if (newEl) {
       // @ts-ignore
-      this.$el.querySelectorAll('.dragzone__item-text')[index + 1].focus()
+      newEl.focus()
     }
   }
 }
