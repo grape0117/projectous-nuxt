@@ -21,6 +21,7 @@
           :options="groupedData[id]"
           :isListDragged="isListDragged"
           :draggedItemId="draggedItemId"
+          :group="group"
           @create="create($event, id)"
           @update="update"
           @save="$emit('update', $event)"
