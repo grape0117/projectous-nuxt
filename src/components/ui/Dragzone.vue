@@ -50,24 +50,22 @@ const Tasks = namespace('tasks')
 @Component
 export default class Dragzone extends Vue {
   @Prop({ required: true }) public id!: number
+  @Prop({ required: true }) public draggedItemId!: number | null
   @Prop({ required: true, default: () => [] }) public options!: any
   @Tasks.Getter public getById!: any
   private expandedList: boolean = true
   private numberOfExpandedItems: number = 3
-  get draggedItemId() {
-    return localStorage.getItem('item') || null
-  }
-  set draggedItemId(item: any) {
-    localStorage.setItem('item', JSON.stringify(item))
-  }
+
   private dragstart(item: any) {
-    this.draggedItemId = item
+    localStorage.setItem('item', JSON.stringify(item))
+    this.$emit('setDraggedItemId', item.id)
   }
   private dragend() {
     try {
       const item = JSON.parse(localStorage.getItem('item') as string)
       this.$emit('save', item)
       localStorage.removeItem('item')
+      this.$emit('setDraggedItemId', null)
     } catch (e) {
       console.log(e)
     }
