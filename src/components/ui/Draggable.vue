@@ -11,9 +11,11 @@
         <pj-dragzone
           :id="id"
           :options="groupedData[id]"
+          :draggedItemId="draggedItemId"
           @create="create($event, id)"
           @update="update"
           @save="$emit('update', $event)"
+          @setDraggedItemId="draggedItemId = $event"
         />
       </div>
     </div>
@@ -29,6 +31,7 @@ export default class Draggable extends Vue {
   @Prop({ required: true }) public data!: any
   @Prop({ required: true }) public lists!: any
   private clonedData: any = []
+  private draggedItemId: number | null = null
   get groupedData() {
     return groupBy(this.clonedData, 'listId')
   }
