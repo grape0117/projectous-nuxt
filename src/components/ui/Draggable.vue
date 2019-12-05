@@ -1,9 +1,17 @@
 <template>
   <div>
-    <div v-for="group in listGroups" :key="group" class="list">
-      <div class="list__group-title">{{ group }}</div>
+    <div
+      v-for="(group, index) in listGroups"
+      :key="index"
+      class="list"
+      :draggable="group.isDraggable"
+      @dragstart.self="dragStart(index)"
+      @dragend.self="dragEnd"
+      @dragenter="moveList(index, group.isDraggable)"
+    >
+      <div class="list__group-title">{{ group.name }}</div>
       <div
-        v-for="{ id, title } in lists.filter(list => list.group === group)"
+        v-for="{ id, title } in lists.filter(list => list.group === group.name)"
         :key="id"
         class="list__group"
       >
@@ -11,6 +19,7 @@
         <pj-dragzone
           :id="id"
           :options="groupedData[id]"
+          :isListDragged="isListDragged"
           :draggedItemId="draggedItemId"
           @create="create($event, id)"
           @update="update"
@@ -30,18 +39,35 @@ import move from 'array-move'
 export default class Draggable extends Vue {
   @Prop({ required: true }) public data!: any
   @Prop({ required: true }) public lists!: any
+  private listGroups: any = []
   private clonedData: any = []
   private draggedItemId: number | null = null
+  private isListDragged: boolean = false
+  private draggedListIndex: number = NaN
+  private targetListIndex: number = NaN
+
   get groupedData() {
     return groupBy(this.clonedData, 'listId')
   }
-  get listGroups() {
-    return uniq(this.lists.map(({ group }: any) => group))
-  }
+
   @Watch('data', { immediate: true })
   public onDataChanged(value: any) {
     this.clonedData = cloneDeep(value)
   }
+  @Watch('lists', { immediate: true })
+  public onListsChanged(value: any) {
+    const notDraggable = ['Past Tasks', 'Current Tasks']
+    // TODO: lists should have isDraggable field
+    this.listGroups = uniq(value.map(({ group }: any) => group))
+      // TODO: to del, only for tests
+      .map((list: any) => {
+        return {
+          name: list,
+          isDraggable: notDraggable.indexOf(list) === -1
+        }
+      })
+  }
+
   public create(id: number, listId: number | string) {
     this.$emit('create', id, listId)
   }
@@ -53,9 +79,45 @@ export default class Draggable extends Vue {
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)
   }
+
+  private dragStart(index: number) {
+    this.isListDragged = true
+    this.draggedListIndex = index
+  }
+  private dragEnd() {
+    if (this.targetListIndex === this.draggedListIndex) return
+
+    const listGroupsCopy = [...this.listGroups]
+    const targetEl = listGroupsCopy[this.targetListIndex]
+    const draggedEl = listGroupsCopy[this.draggedListIndex]
+    listGroupsCopy.splice(this.targetListIndex, 1, draggedEl)
+    listGroupsCopy.splice(this.draggedListIndex, 1, targetEl)
+    this.draggedListIndex = this.targetListIndex
+    this.listGroups = listGroupsCopy
+
+    this.isListDragged = false
+    this.draggedListIndex = NaN
+  }
+  private moveList(targetElIndex: number, isDraggable: boolean) {
+    if (!isDraggable) return
+    this.targetListIndex = targetElIndex
+
+    // TODO: bug if change position here because of different height
+    // const listGroupsCopy = [...this.listGroups]
+    // const targetEl = listGroupsCopy[targetElIndex]
+    // const draggedEl = listGroupsCopy[this.draggedListIndex];
+    // listGroupsCopy.splice(targetElIndex, 1, draggedEl)
+    // listGroupsCopy.splice(this.draggedListIndex, 1, targetEl)
+    // this.draggedListIndex = targetElIndex
+    // this.listGroups = listGroupsCopy
+  }
 }
 </script>
+
 <style>
+.list {
+  cursor: pointer;
+}
 .list__group {
   padding-left: 1.5rem;
 }
