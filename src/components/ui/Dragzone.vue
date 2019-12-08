@@ -36,25 +36,28 @@
                 :data-id="item.id"
                 @blur="updateTitle($event, item, index)"
                 @keydown.enter.prevent="addNewTask($event, item, index)"
+                @click="editedItemId = item.id"
               />
               <div class="dragzone__item-subtext">Greenbite</div>
             </div>
-            <div class="dragzone__item-tracker-icon">
-              <span class="dragzone__item-tracker-icon-triangle" />
-              <span class="dragzone__item-tracker-icon-square" />
+            <div v-if="editedItemId === item.id" class="dragzone__item-tracker-icon" @click="setTimerId(item.id)">
+              <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-triangle" />
+              <span v-else class="dragzone__item-tracker-icon-square" />
             </div>
           </div>
-          <div class="dragzone__item-tracker">
+          <div v-if="editedItemId === item.id" class="dragzone__item-tracker">
             <div class="dragzone__item-tracker-number">08/01</div>
             <div
-              class="dragzone__item-tracker-name dragzone__item-tracker-name--active"
+              class="dragzone__item-tracker-name"
+              :class="{'dragzone__item-tracker-name--active': timerId === item.id}"
             >
               Richard
             </div>
             <span
-              class="dragzone__item-tracker-circle dragzone__item-tracker-circle--active"
+              class="dragzone__item-tracker-circle"
+              :class="{'dragzone__item-tracker-circle--active': timerId === item.id}"
             />
-            <div class="dragzone__item-tracker-time">00:00:03</div>
+            <div class="dragzone__item-tracker-time">00:00:00</div>
           </div>
         </div>
       </div>
@@ -87,6 +90,8 @@ export default class Dragzone extends Vue {
   private expandedList: boolean = true
   private numberOfExpandedItems: number = 3
   private newItem: any = null
+  private timerId: number | string | null = null
+  private editedItemId: number | string | null = null
 
   private dragstart(item: any) {
     localStorage.setItem('item', JSON.stringify(item))
@@ -136,6 +141,7 @@ export default class Dragzone extends Vue {
     item: any,
     index: number
   ) {
+    this.editedItemId = null
     if (name === item.title || item.newAdded) return
 
     const updatedItem = cloneDeep(item)
@@ -177,6 +183,9 @@ export default class Dragzone extends Vue {
       // @ts-ignore
       newEl.focus()
     }
+  }
+  private setTimerId(id: number | string) {
+    this.timerId = this.timerId === null ? id : null
   }
 }
 </script>
