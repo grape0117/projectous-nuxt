@@ -20,16 +20,46 @@
         @dragend="dragend"
         @dragover="moveItem(index, item.id)"
       >
-        <div class="dragzone__item-dragbox" />
-        <div
-          class="dragzone__item-text"
-          ref="content"
-          v-html="item.title"
-          contenteditable="true"
-          :data-id="item.id"
-          @blur="updateTitle($event, item, index)"
-          @keydown.enter.prevent="addNewTask($event, item, index)"
-        />
+        <div class="dragzone__item-dragbox dragzone__item-dragbox--active">
+          <span />
+          <span />
+          <span />
+        </div>
+        <div class="dragzone__item-block">
+          <div class="dragzone__item-block-content">
+            <div class="dragzone__item-block-content-text">
+              <div
+                class="dragzone__item-text"
+                ref="content"
+                v-html="item.title"
+                contenteditable="true"
+                :data-id="item.id"
+                @blur="updateTitle($event, item, index)"
+                @keydown.enter.prevent="addNewTask($event, item, index)"
+                @click="editedItemId = item.id"
+              />
+              <div class="dragzone__item-subtext">Greenbite</div>
+            </div>
+            <div v-if="editedItemId === item.id" class="dragzone__item-tracker-icon" @click="setTimerId(item.id)">
+              <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-triangle" />
+              <span v-else class="dragzone__item-tracker-icon-square" />
+            </div>
+          </div>
+          <div v-if="editedItemId === item.id" class="dragzone__item-tracker">
+            <div class="dragzone__item-tracker-number">08/01</div>
+            <div
+              class="dragzone__item-tracker-name"
+              :class="{'dragzone__item-tracker-name--active': timerId === item.id}"
+            >
+              Richard
+            </div>
+            <span
+              class="dragzone__item-tracker-circle"
+              :class="{'dragzone__item-tracker-circle--active': timerId === item.id}"
+            />
+            <div class="dragzone__item-tracker-time">00:00:00</div>
+          </div>
+        </div>
       </div>
     </div>
     <div
@@ -60,6 +90,8 @@ export default class Dragzone extends Vue {
   private expandedList: boolean = true
   private numberOfExpandedItems: number = 3
   private newItem: any = null
+  private timerId: number | string | null = null
+  private editedItemId: number | string | null = null
 
   private dragstart(item: any) {
     localStorage.setItem('item', JSON.stringify(item))
@@ -109,6 +141,7 @@ export default class Dragzone extends Vue {
     item: any,
     index: number
   ) {
+    this.editedItemId = null
     if (name === item.title || item.newAdded) return
 
     const updatedItem = cloneDeep(item)
@@ -151,16 +184,18 @@ export default class Dragzone extends Vue {
       newEl.focus()
     }
   }
+  private setTimerId(id: number | string) {
+    this.timerId = this.timerId === null ? id : null
+  }
 }
 </script>
 
 <style>
 .dragzone {
-  width: 300px;
+  width: calc(100% - 121px);
   min-height: 40px;
   padding: 0.5rem;
   height: auto;
-  border: 1px solid black;
 }
 .dragzone__content {
   max-height: 350px;
@@ -169,7 +204,7 @@ export default class Dragzone extends Vue {
 }
 .dragzone__item {
   display: flex;
-  align-items: center;
+  align-items: start;
   padding: 2px 0;
   cursor: pointer;
 }
@@ -186,20 +221,105 @@ export default class Dragzone extends Vue {
 .dragzone__item--dragged {
   color: rgba(0, 0, 0, 0.3);
 }
+.dragzone__item-block {
+  width: 100%;
+}
+.dragzone__item-block-content {
+  display: flex;
+  align-items: center;
+}
 .dragzone__item-dragbox {
-  width: 10px;
-  height: 10px;
-  margin-right: 0.5rem;
-  border-radius: 100%;
+  width: 12px;
+  height: 12px;
+  margin: 0.5rem;
   flex: none;
-  background-color: black;
+}
+.dragzone__item-dragbox span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #cccccf;
+  margin: 2px 0;
+}
+.dragzone__item-dragbox--active span {
+  background: #cef3f7;
 }
 .dragzone__item-text {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  flex-grow: 1;
-  min-height: 1.5em;
+  font-size: 1.2rem;
+  color: #595b60;
+}
+.dragzone__item-subtext {
+  width: 100%;
+  font-size: 1rem;
+  font-weight: lighter;
+  color: #949598;
+}
+.dragzone__item-tracker-icon {
+  width: 60px;
+  height: 60px;
+  margin-left: auto;
+  border-radius: 100%;
+  background: #c5c5c8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.dragzone__item-tracker-icon--active {
+  background: #5cd8e2;
+}
+.dragzone__item-tracker-icon-triangle {
+  width: 20px;
+  height: 0;
+  margin-left: 5px;
+  border-left: solid 20px #ffffff;
+  border-bottom: solid 12px transparent;
+  border-top: solid 12px transparent;
+}
+.dragzone__item-tracker-icon-square {
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 3px;
+}
+.dragzone__item-tracker-icon:hover span {
+  transform: scale(0.8);
+  transform-origin: 50% 50%;
+  transition: transform 200ms ease-out;
+}
+.dragzone__item-tracker {
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  margin-top: 0.5rem;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  color: #767676;
+}
+.dragzone__item-tracker-number {
+  padding: 0 4px;
+  margin-right: 0.5rem;
+  background: #ffffff;
+}
+.dragzone__item-tracker-name {
+  font-style: italic;
+}
+.dragzone__item-tracker-name--active {
+  color: #5cd8e2;
+}
+.dragzone__item-tracker-circle {
+  width: 14px;
+  height: 14px;
+  margin-left: 1rem;
+  border-radius: 100%;
+  background: #767676;
+}
+.dragzone__item-tracker-circle--active {
+  background: #50b379;
+}
+.dragzone__item-tracker-time {
+  margin-left: auto;
+  font-weight: bold;
 }
 *:focus {
   outline: none;
