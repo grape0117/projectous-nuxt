@@ -5,7 +5,7 @@
       :key="index"
       class="list"
       :draggable="group.isDraggable"
-      @dragstart.self="dragStart(index)"
+      @dragstart.self="dragStart($event, index)"
       @dragend.self="dragEnd"
       @dragenter="moveList(index, group.isDraggable)"
     >
@@ -84,7 +84,8 @@ export default class Draggable extends Vue {
     this.clonedData.splice(1, 0, item)
   }
 
-  private dragStart(index: number) {
+  private dragStart(e: any, index: number) {
+    e.dataTransfer.setData('application/node type', this)
     this.isListDragged = true
     this.draggedListIndex = index
   }

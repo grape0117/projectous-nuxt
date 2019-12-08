@@ -16,7 +16,7 @@
         class="dragzone__item"
         :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
         draggable="true"
-        @dragstart="dragstart(item)"
+        @dragstart="dragstart($event, item)"
         @dragend="dragend"
         @dragover="moveItem(index, item.id)"
       >
@@ -93,7 +93,8 @@ export default class Dragzone extends Vue {
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
 
-  private dragstart(item: any) {
+  private dragstart(e: any, item: any) {
+    e.dataTransfer.setData('application/node type', this)
     localStorage.setItem('item', JSON.stringify(item))
     this.$emit('setDraggedItemId', item.id)
   }
