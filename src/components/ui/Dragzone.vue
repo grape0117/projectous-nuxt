@@ -142,7 +142,8 @@ export default class Dragzone extends Vue {
     item: any,
     index: number
   ) {
-    this.editedItemId = null
+    // Todo: how to close tracker?
+    // this.editedItemId = null
     if (name === item.title || item.newAdded) return
 
     const updatedItem = cloneDeep(item)
