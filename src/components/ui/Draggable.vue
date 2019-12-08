@@ -120,15 +120,29 @@ export default class Draggable extends Vue {
 
 <style>
 .list {
+  width: 100%;
+  max-width: 600px;
   cursor: pointer;
 }
 .list__group {
-  padding-left: 1.5rem;
+  width: 100%;
+  display: flex;
+  border: 1px solid #f6f6f6;
 }
 .list__group-title {
+  font-size: 1.5rem;
   font-weight: bold;
+  color: #707070;
+  text-align: center;
 }
 .list__group-subtitle {
-  font-size: 0.8rem;
+  width: 120px;
+  padding: 0.5rem;
+  border-right: 1px solid #f6f6f6;
+  background: #f0fbfc;
+  flex: none;
+  text-transform: uppercase;
+  color: #85868a;
+  font-weight: bold;
 }
 </style>
