@@ -40,8 +40,15 @@
               />
               <div class="dragzone__item-subtext">Greenbite</div>
             </div>
-            <div v-if="editedItemId === item.id" class="dragzone__item-tracker-icon" @click="setTimerId(item.id)">
-              <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-triangle" />
+            <div
+              v-if="editedItemId === item.id"
+              class="dragzone__item-tracker-icon"
+              @click="setTimerId(item.id)"
+            >
+              <span
+                v-if="timerId === item.id"
+                class="dragzone__item-tracker-icon-triangle"
+              />
               <span v-else class="dragzone__item-tracker-icon-square" />
             </div>
           </div>
@@ -49,13 +56,17 @@
             <div class="dragzone__item-tracker-number">08/01</div>
             <div
               class="dragzone__item-tracker-name"
-              :class="{'dragzone__item-tracker-name--active': timerId === item.id}"
+              :class="{
+                'dragzone__item-tracker-name--active': timerId === item.id
+              }"
             >
               Richard
             </div>
             <span
               class="dragzone__item-tracker-circle"
-              :class="{'dragzone__item-tracker-circle--active': timerId === item.id}"
+              :class="{
+                'dragzone__item-tracker-circle--active': timerId === item.id
+              }"
             />
             <div class="dragzone__item-tracker-time">00:00:00</div>
           </div>
@@ -206,7 +217,7 @@ export default class Dragzone extends Vue {
 }
 .dragzone__item {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   padding: 2px 0;
   cursor: pointer;
 }
