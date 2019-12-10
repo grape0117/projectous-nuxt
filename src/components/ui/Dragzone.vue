@@ -224,7 +224,7 @@ export default class Dragzone extends Vue {
 }
 .dragzone__item {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   padding: 2px 0;
   cursor: pointer;
 }
