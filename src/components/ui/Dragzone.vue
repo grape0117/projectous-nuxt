@@ -35,13 +35,20 @@
                 contenteditable="true"
                 :data-id="item.id"
                 @blur="updateTitle($event, item, index)"
-                @keydown.enter.prevent="addNewTask($event, item, index)"
+                @keydown.enter.prevent="onEnter($event, item)"
                 @click="editedItemId = item.id"
               />
               <div class="dragzone__item-subtext">Greenbite</div>
             </div>
-            <div v-if="editedItemId === item.id" class="dragzone__item-tracker-icon" @click="setTimerId(item.id)">
-              <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-triangle" />
+            <div
+              v-if="editedItemId === item.id"
+              class="dragzone__item-tracker-icon"
+              @click="setTimerId(item.id)"
+            >
+              <span
+                v-if="timerId === item.id"
+                class="dragzone__item-tracker-icon-triangle"
+              />
               <span v-else class="dragzone__item-tracker-icon-square" />
             </div>
           </div>
@@ -49,13 +56,17 @@
             <div class="dragzone__item-tracker-number">08/01</div>
             <div
               class="dragzone__item-tracker-name"
-              :class="{'dragzone__item-tracker-name--active': timerId === item.id}"
+              :class="{
+                'dragzone__item-tracker-name--active': timerId === item.id
+              }"
             >
               Richard
             </div>
             <span
               class="dragzone__item-tracker-circle"
-              :class="{'dragzone__item-tracker-circle--active': timerId === item.id}"
+              :class="{
+                'dragzone__item-tracker-circle--active': timerId === item.id
+              }"
             />
             <div class="dragzone__item-tracker-time">00:00:00</div>
           </div>
@@ -144,7 +155,12 @@ export default class Dragzone extends Vue {
   ) {
     // Todo: how to close tracker?
     // this.editedItemId = null
-    if (name === item.title || item.newAdded) return
+
+    if (item.addItem) {
+      this.addNewTask(item)
+    }
+
+    if (name === item.title || !name) return
 
     const updatedItem = cloneDeep(item)
     updatedItem.title = name
@@ -153,17 +169,18 @@ export default class Dragzone extends Vue {
       this.$emit('save', updatedItem)
     } else {
       delete updatedItem.newAdded
+      delete item.newAdded
       this.$emit('create', updatedItem)
     }
   }
 
-  private async addNewTask(e: any, item: any, index: number) {
-    if (item.newAdded) {
-      const updatedItem = cloneDeep(item)
-      updatedItem.title = e.target.innerHTML
-      delete updatedItem.newAdded
-      this.$emit('create', updatedItem)
-    }
+  private onEnter({ target: el }: any, item: any) {
+    item.addItem = true
+    el.blur(item, 1)
+  }
+
+  private async addNewTask(item: any) {
+    delete item.addItem
 
     await this.$nextTick()
     await this.$nextTick()
@@ -174,6 +191,7 @@ export default class Dragzone extends Vue {
     newItem.task_id = -1
     newItem.title = ''
     newItem.newAdded = true
+    delete newItem.addItem
 
     this.$emit('addNewTask', newItem)
 
@@ -230,6 +248,10 @@ export default class Dragzone extends Vue {
   display: flex;
   align-items: center;
 }
+.dragzone__item-block-content-text {
+  flex-grow: 1;
+  margin-right: 20px;
+}
 .dragzone__item-dragbox {
   width: 12px;
   height: 12px;
@@ -247,6 +269,8 @@ export default class Dragzone extends Vue {
   background: #cef3f7;
 }
 .dragzone__item-text {
+  flex-grow: 1;
+  min-height: 1.459em;
   font-size: 1.2rem;
   color: #595b60;
 }
