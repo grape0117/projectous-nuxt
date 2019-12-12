@@ -17,7 +17,10 @@ export class AxiosHttp extends BaseHttp implements IHttp {
     alert('get')
     const { data } = await axios.get(`${this.baseUrl}${url}`, {
       params: { id },
-      headers: this.headers
+      headers: {
+        Authorization: 'bearer ' + '123456789012345678901234567890qwertyuiop',
+        'Content-Type': 'text/plain'
+      }
     })
     return data
   }
@@ -26,7 +29,10 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       `${this.baseUrl}${url}`,
       { data },
       {
-        headers: this.headers
+        headers: {
+          Authorization: 'bearer ' + '123456789012345678901234567890qwertyuiop',
+          'Content-Type': 'text/plain'
+        }
       }
     )
     return response
@@ -36,13 +42,19 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       `${this.baseUrl}${url}/${id}`,
       { data },
       {
-        headers: this.headers
+        headers: {
+          Authorization: 'bearer ' + '123456789012345678901234567890qwertyuiop',
+          'Content-Type': 'text/plain'
+        }
       }
     )
   }
   public async delete(url: string, id: number | string) {
     return await axios.delete(`${this.baseUrl}${url}/${id}`, {
-      headers: this.headers
+      headers: {
+        Authorization: 'bearer ' + '123456789012345678901234567890qwertyuiop',
+        'Content-Type': 'text/plain'
+      }
     })
   }
 }

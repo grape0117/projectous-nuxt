@@ -77,6 +77,7 @@ export default class Custom extends Vue {
   }
 
   public async updateItem({ id, task_id, title, listId, sort_order }: any) {
+    console.log(id, task_id, title, listId, sort_order)
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let newNextWorkDay = null
     if (listId === 'Past') {
@@ -84,11 +85,16 @@ export default class Custom extends Vue {
       newNextWorkDay = formatDateToYYYY_MM_DD(
         new Date(date.setMonth(date.getMonth() - 1))
       )
+
+      //If listId is a date, return that I think
     } else if (!!Date.parse(listId) && isNaN(listId)) {
       newNextWorkDay = formatDateToYYYY_MM_DD(listId)
+
+      //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {
-      // Note: assume that all lists with integer id are created by user and update user_task_list_id
+      //Only user-created lists have a listId set on task_user object
       taskUser.user_task_list_id = listId
+      //TODO: set next_word_day to null?
     }
     taskUser.next_work_day = newNextWorkDay
     taskUser.sort_order = sort_order

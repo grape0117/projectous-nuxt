@@ -25,6 +25,7 @@ export const mutations: MutationTree<IModuleState> = {
   },
   create: function(state, task) {
     state.tasks.push(task)
+    //TODO: we only need to find the key for the new task
     state.tasks.forEach((t, key) => {
       // @ts-ignore
       state.lookup[t.id] = key

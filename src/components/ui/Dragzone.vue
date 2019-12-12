@@ -148,20 +148,21 @@ export default class Dragzone extends Vue {
       }
     }
   }
+  /*
+  If you hit enter, that fires first, set item.addItem == true. I'm not sure why we don't just addNewTask inside onEnter?
+   */
   private updateTitle(
     { target: { innerHTML: name } }: any,
     item: any,
     index: number
   ) {
-    // Todo: how to close tracker?
-    // this.editedItemId = null
-
-    if (item.addItem) {
+    if (item.doAddItem) {
       this.addNewTask(item)
     }
 
-    if (name === item.title || !name) return
-
+    /*
+    This still doesn't make sense to me. Why not just save on the object? Why copy and then replace?
+     */
     const updatedItem = cloneDeep(item)
     updatedItem.title = name
 
@@ -174,14 +175,20 @@ export default class Dragzone extends Vue {
     }
   }
 
+  /*
+Why not create item inside this?
+ */
   private onEnter({ target: el }: any, item: any) {
-    item.addItem = true
+    item.doAddItem = true
     el.blur(item, 1)
   }
 
   private async addNewTask(item: any) {
-    delete item.addItem
+    delete item.doAddItem
 
+    /*
+      Why so many? Doesn't seem right.
+       */
     await this.$nextTick()
     await this.$nextTick()
     await this.$nextTick()
@@ -191,10 +198,13 @@ export default class Dragzone extends Vue {
     newItem.task_id = -1
     newItem.title = ''
     newItem.newAdded = true
-    delete newItem.addItem
+    delete newItem.doAddItem //I don't think this is needed. It's deleted above
 
-    this.$emit('addNewTask', newItem)
+    this.$emit('addNewTask', newItem) //I don't know why we are using item/task interchangeably. We should choose a single name for things and use that
 
+    /*
+      Why is there an || here? Is this for both lists and tasks?
+       */
     await this.$nextTick()
     const newEl =
       this.$el.querySelector(`.dragzone__item-text[data-id="${newItem.id}"]`) ||
@@ -204,6 +214,9 @@ export default class Dragzone extends Vue {
       newEl.focus()
     }
   }
+  /*
+  This is for toggling the Play/Stop icon
+   */
   private setTimerId(id: number | string) {
     this.timerId = this.timerId === null ? id : null
   }
@@ -253,6 +266,7 @@ export default class Dragzone extends Vue {
   margin-right: 20px;
 }
 .dragzone__item-dragbox {
+  cursor: move;
   width: 12px;
   height: 12px;
   margin: 0.5rem;
