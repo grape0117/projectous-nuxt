@@ -65,7 +65,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // @ts-ignore
     const newTaskUserResponse = await this._vm
       .$http()
-      .put('/tasks-users/', taskUser.id, taskUser)
+      .put('/task-users/', taskUser.id, {task_user: taskUser})
     commit(UPDATE_TASK_USER, newTaskUserResponse)
   }
 }

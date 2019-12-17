@@ -19,7 +19,6 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     //TODO: should we do this? task.id = uuid.v4();
     // @ts-ignore
     const newTaskResponse = await this._vm.$http().post('/tasks', { task })
-    console.log(newTaskResponse)
     commit('create', newTaskResponse.task)
     return newTaskResponse.task.id
   }
