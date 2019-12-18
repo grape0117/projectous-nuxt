@@ -13,23 +13,17 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       return state.projects.find(({ id: projectId }) => projectId === id)
     }
   },
-  userprojects: (
-    state: IModuleState,
-    // tslint:disable-next-line:no-shadowed-variable
-    getters: any,
-    rootState: IRootState,
-    rootGetters: any
-  ) => (user_id: number) => {
+  userprojects: (state: IModuleState) => (user_id: number) => {
     if (!user_id) {
-      return getters.all_projects
+      return state.projects
     }
 
-    let userProjects: number[]
+    let userProjects: number[] = []
 
-    return getters.all_projects.filter((project: IProject) => {
+    return state.projects.filter((project: IProject) => {
       let userMatch = false
       if (project.id) {
-        if (userProjects.indexOf(project.id) !== -1) {
+        if (userProjects.includes(project.id)) {
           return true
         }
         project.users.forEach(user => {
@@ -40,7 +34,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
           }
         })
       }
-      project.users.forEach((user, index) => {
+      project.users.forEach(user => {
         if (user.id == user_id) {
           userMatch = true
           return false
