@@ -11,25 +11,46 @@
       </option>
     </select>
     <hr />
-    <pj-draggable
-      :data="tasksUsers"
-      :lists="lists"
-      @create="createItem"
-      @update="updateItem"
-    />
+    <b-container fluid>
+      <b-row>
+        <b-col>
+          <pj-draggable
+            :data="tasksUsers"
+            :lists="lists"
+            @create="createItem"
+            @update="updateItem"
+          />
+        </b-col>
+        <b-col>
+          <div class="text-center">
+            Projects
+          </div>
+          <div v-for="(projects, clientId) in projectsByClientId">
+            {{ clientId }}
+            <ul>
+              <li v-for="project in projects">
+                {{ project.name }}
+              </li>
+            </ul>
+          </div>
+        </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { IList } from '@/store/modules/lists/types'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, groupBy } from 'lodash'
 import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
+import { IProject } from '@/store/modules/projects/types'
 
 const CompanyUsers = namespace('company_users')
 const TaskUsers = namespace('task_users')
 const Tasks = namespace('tasks')
 const Lists = namespace('lists')
+const Projects = namespace('projects')
 
 @Component
 export default class Custom extends Vue {
@@ -41,6 +62,7 @@ export default class Custom extends Vue {
   @Tasks.Action private createTask!: any
   @Tasks.Getter('getById') private getTaskById!: any
   @Lists.Getter private getUserLists!: any
+  @Projects.Getter('userprojects') private getUserProjects!: any
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
 
   get lists() {
@@ -63,6 +85,15 @@ export default class Custom extends Vue {
         return 0
       }
     )
+  }
+
+  get projectsByClientId() {
+    const projects: IProject[] = this.getUserProjects()
+
+    const listOfprojectsToDisplay = projects
+      .filter(pr => pr.status === 'open')
+      .sort((a, b) => a.client_id - b.client_id)
+    return groupBy(listOfprojectsToDisplay, 'client_id')
   }
 
   private selectedCompanyUser: any = null
