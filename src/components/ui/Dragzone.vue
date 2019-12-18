@@ -116,7 +116,10 @@ export default class Dragzone extends Vue {
 
   get selectedItemTaskId() {
     return this.editedItemId
-      ? this.options.find(option => option.id === this.editedItemId).task_id
+      ? this.options.find(
+          (option: { id: string | number | null }) =>
+            option.id === this.editedItemId
+        ).task_id
       : null
   }
 
