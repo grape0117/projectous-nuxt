@@ -89,11 +89,10 @@ export default class Custom extends Vue {
 
   get projectsByClientId() {
     const projects: IProject[] = this.getUserProjects()
-
-    const listOfprojectsToDisplay = projects
+    const listOfProjectsToDisplay = projects
       .filter(pr => pr.status === 'open')
       .sort((a, b) => a.client_id - b.client_id)
-    return groupBy(listOfprojectsToDisplay, 'client_id')
+    return groupBy(listOfProjectsToDisplay, 'client_id')
   }
 
   private selectedCompanyUser: any = null
