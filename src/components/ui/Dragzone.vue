@@ -238,7 +238,6 @@ Why not create item inside this?
    */
   private setTimerId(id: number | string) {
     this.timerId = this.timerId === null ? id : null
-    // toggle TaskDetails here
   }
 }
 </script>
