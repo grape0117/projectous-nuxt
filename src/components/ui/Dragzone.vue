@@ -79,6 +79,7 @@
     >
       ...
     </div>
+    <TaskDetails v-if="taskDetailsDisplayed" :taskId="selectedItemTaskId" />
   </div>
 </template>
 <script lang="ts">
@@ -86,10 +87,15 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
 import { generateUniqId } from '@/utils/util-functions'
+import TaskDetails from '@/components/draggable/TaskDetails.vue'
 
 const Tasks = namespace('tasks')
 
-@Component
+@Component({
+  components: {
+    TaskDetails
+  }
+})
 export default class Dragzone extends Vue {
   @Prop({ required: true }) public id!: number
   @Prop({ required: true }) public draggedItemId!: number | null
@@ -103,6 +109,16 @@ export default class Dragzone extends Vue {
   private newItem: any = null
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
+
+  get taskDetailsDisplayed() {
+    return this.editedItemId && !this.timerId
+  }
+
+  get selectedItemTaskId() {
+    return this.editedItemId
+      ? this.options.find(option => option.id === this.editedItemId).task_id
+      : null
+  }
 
   private dragstart(e: any, item: any) {
     e.dataTransfer.setData('application/node type', this)
@@ -219,6 +235,7 @@ Why not create item inside this?
    */
   private setTimerId(id: number | string) {
     this.timerId = this.timerId === null ? id : null
+    // toggle TaskDetails here
   }
 }
 </script>
