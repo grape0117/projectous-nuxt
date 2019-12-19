@@ -54,7 +54,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   //   commit('tasks/UPDATE', task)
   //   commit('task_users/UPDATE', task_user)
   // },
-  async createUserTask({ commit, getters }, taskUser: ITaskUser) {
+  async createTaskUser({ commit, getters }, taskUser: ITaskUser) {
     // Todo: send to server
     taskUser.id = getters.getNextId()
     commit(CREATE_TASK_USER, taskUser)

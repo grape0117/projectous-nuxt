@@ -1,7 +1,6 @@
 import { GetterTree } from 'vuex'
 import { IRootState } from '@/store/types'
 import { IModuleState, IProject } from './types'
-import { IListsState } from '@/store/modules/lists/types'
 
 export const getters: GetterTree<IModuleState, IRootState> = {
   getById: (state: IModuleState) => (id: number) => {
@@ -13,8 +12,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       return state.projects.find(({ id: projectId }) => projectId === id)
     }
   },
-  userprojects: (state: IModuleState) => (user_id: number) => {
-    if (!user_id) {
+  getUserProjects: (state: IModuleState) => (userId: number) => {
+    if (!userId) {
       return state.projects
     }
 
@@ -26,16 +25,16 @@ export const getters: GetterTree<IModuleState, IRootState> = {
         if (userProjects.includes(project.id)) {
           return true
         }
-        project.users.forEach(user => {
-          if (user.id == user_id) {
+        project.users.forEach(({ id }) => {
+          if (id == userId) {
             userProjects.push(project.id)
             userMatch = true
             return false
           }
         })
       }
-      project.users.forEach(user => {
-        if (user.id == user_id) {
+      project.users.forEach(({ id }) => {
+        if (id == userId) {
           userMatch = true
           return false
         }
@@ -46,9 +45,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   projectProjectName: (
     state: IModuleState,
     // tslint:disable-next-line:no-shadowed-variable
-    getters: any,
-    rootState: IRootState,
-    rootGetters: any
+    getters: any
   ) => (project_id: number) => {
     let project = getters.getprojectById(project_id)
     if (project) {

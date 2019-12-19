@@ -17,8 +17,8 @@
           <pj-draggable
             :data="tasksUsers"
             :lists="lists"
-            @create="createItem"
-            @update="updateItem"
+            @create="createTask"
+            @update="updateTask"
           />
         </b-col>
         <b-col>
@@ -26,10 +26,11 @@
             Projects
           </div>
           <div v-for="(projects, clientId) in projectsByClientId">
-            {{ clientId }}
+<!--            Todo: change client id to client name-->
+            Client id: {{ clientId }}
             <ul>
-              <li v-for="project in projects">
-                {{ project.name }}
+              <li v-for="{ name } in projects">
+                {{ name }}
               </li>
             </ul>
           </div>
@@ -41,7 +42,6 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { IList } from '@/store/modules/lists/types'
 import { cloneDeep, groupBy } from 'lodash'
 import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
 import { IProject } from '@/store/modules/projects/types'
@@ -56,13 +56,13 @@ const Projects = namespace('projects')
 export default class Custom extends Vue {
   @TaskUsers.Getter('getById') private getTaskUserById!: any
   @TaskUsers.Getter private sortedByDays!: any
-  @TaskUsers.Action private updateTaskUser!: any
-  @TaskUsers.Action private createUserTask!: any
-  @Tasks.Action private updateTask!: any
-  @Tasks.Action private createTask!: any
+  @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
+  @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
+  @Tasks.Action('updateTask') private updateTaskVuex!: any
+  @Tasks.Action('createTask') private createTaskVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
   @Lists.Getter private getUserLists!: any
-  @Projects.Getter('userprojects') private getUserProjects!: any
+  @Projects.Getter private getUserProjects!: any
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
 
   get lists() {
@@ -88,7 +88,7 @@ export default class Custom extends Vue {
   }
 
   get projectsByClientId() {
-    const projects: IProject[] = this.getUserProjects()
+    const projects: IProject[] = this.getUserProjects(null)
     const listOfProjectsToDisplay = projects
       .filter(pr => pr.status === 'open')
       .sort((a, b) => a.client_id - b.client_id)
@@ -97,17 +97,15 @@ export default class Custom extends Vue {
 
   private selectedCompanyUser: any = null
 
-  public async createItem(item: any) {
-    const newTaskID = await this.createTask({ title: item.title })
-
+  public async createTask(item: any) {
+    const newTaskID = await this.createTaskVuex({ title: item.title })
     const newUserTask = cloneDeep(item)
     delete newUserTask.title
     newUserTask.task_id = newTaskID
-    this.createUserTask(newUserTask)
+    this.createTaskUserVuex(newUserTask)
   }
 
-  public async updateItem({ id, task_id, title, listId, sort_order }: any) {
-    console.log(id, task_id, title, listId, sort_order)
+  public async updateTask({ id, task_id, title, listId, sort_order }: any) {
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let newNextWorkDay = null
     if (listId === 'Past') {
@@ -115,11 +113,9 @@ export default class Custom extends Vue {
       newNextWorkDay = formatDateToYYYY_MM_DD(
         new Date(date.setMonth(date.getMonth() - 1))
       )
-
       //If listId is a date, return that I think
     } else if (!!Date.parse(listId) && isNaN(listId)) {
       newNextWorkDay = formatDateToYYYY_MM_DD(listId)
-
       //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {
       //Only user-created lists have a listId set on task_user object
@@ -128,11 +124,11 @@ export default class Custom extends Vue {
     }
     taskUser.next_work_day = newNextWorkDay
     taskUser.sort_order = sort_order
-    await this.updateTaskUser(taskUser)
+    await this.updateTaskUserVuex(taskUser)
     const task = cloneDeep(this.getTaskById(task_id))
     if (task.title !== title) {
       task.title = title
-      await this.updateTask(task)
+      await this.updateTaskVuex(task)
     }
   }
   @Watch('selectedCompanyUser')
