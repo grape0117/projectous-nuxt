@@ -47,9 +47,9 @@
             >
               <span
                 v-if="timerId === item.id"
-                class="dragzone__item-tracker-icon-triangle"
+                class="dragzone__item-tracker-icon-square"
               />
-              <span v-else class="dragzone__item-tracker-icon-square" />
+              <span v-else class="dragzone__item-tracker-icon-triangle" />
             </div>
           </div>
           <div v-if="editedItemId === item.id" class="dragzone__item-tracker">
