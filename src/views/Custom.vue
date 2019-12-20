@@ -40,31 +40,13 @@
             </ul>
           </div>
         </b-col>
-        <b-col cols="2">
-          <div class="text-center">
-            Open
-          </div>
-          <ul>
-            <li v-for="task in selectedProjectTasksPerStatus.open">
-              {{ task.title }}
-            </li>
-          </ul>
-        </b-col>
-        <b-col cols="2">
-          <div class="text-center">
-            In Progress
-          </div>
-          <li v-for="task in selectedProjectTasksPerStatus['in progress']">
-            {{ task.title }}
-          </li>
-        </b-col>
-        <b-col cols="2">
-          <div class="text-center">
-            Closed
-          </div>
-          <li v-for="task in selectedProjectTasksPerStatus.closed">
-            {{ task.title }}
-          </li>
+        <b-col cols="6">
+          <pj-draggable
+            :data="selectedProjectTasksForStatusesColumns"
+            :lists="taskPerStatusLists"
+            @create="createTask"
+            @update="updateTask"
+          />
         </b-col>
       </b-row>
     </b-container>
@@ -78,12 +60,15 @@ import { cloneDeep, groupBy } from 'lodash'
 import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
 import { IProject } from '@/store/modules/projects/types'
 import TaskDetails from '@/components/draggable/TaskDetails.vue'
+import { ITask } from '@/store/modules/tasks/types'
 
 const CompanyUsers = namespace('company_users')
 const TaskUsers = namespace('task_users')
 const Tasks = namespace('tasks')
 const Lists = namespace('lists')
 const Projects = namespace('projects')
+
+const taskStatuses = ['open', 'in progress', 'closed']
 
 interface ITaskTimerToggle {
   taskId: number | string
@@ -142,21 +127,23 @@ export default class Custom extends Vue {
       .sort((a, b) => a.client_id - b.client_id)
     return groupBy(listOfProjectsToDisplay, 'client_id')
   }
-
   get taskDetailsDisplayed() {
     return this.editedTaskId && this.editedTaskTimerId
   }
-
-  get selectedProjectTasksPerStatus() {
+  get selectedProjectTasksForStatusesColumns() {
     const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
-    if (projectTasks.length) {
-      return groupBy(projectTasks, 'status')
-    }
-    return {
-      open: [],
-      'in progress': [],
-      closed: []
-    }
+    return projectTasks.map((task: ITask) => ({
+      ...task,
+      listId: task.status
+    }))
+  }
+
+  get taskPerStatusLists() {
+    return taskStatuses.map(status => ({
+      title: status,
+      id: status,
+      group: status
+    }))
   }
 
   private selectedCompanyUser: any = null
