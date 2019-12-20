@@ -44,6 +44,7 @@
           <pj-draggable
             :data="selectedProjectTasksForStatusesColumns"
             :lists="taskPerStatusLists"
+            :verticalAlignment="false"
             @create="createTask"
             @update="updateTask"
           />
@@ -205,3 +206,13 @@ export default class Custom extends Vue {
   }
 }
 </script>
+
+<style>
+.project-item__name {
+  cursor: pointer;
+}
+
+.project-item__name:hover {
+  color: blue;
+}
+</style>

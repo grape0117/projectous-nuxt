@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div
+    class="list__wrapper"
+    :class="{ 'horizontal-alignment': !verticalAlignment }"
+  >
     <div
       v-for="(group, index) in listGroups"
       :key="index"
@@ -15,7 +18,9 @@
         :key="id"
         class="list__group"
       >
-        <div class="list__group-subtitle">{{ title }}</div>
+        <div class="list__group-subtitle" v-if="verticalAlignment">
+          {{ title }}
+        </div>
         <pj-dragzone
           :id="id"
           :options="groupedData[id]"
@@ -43,6 +48,7 @@ import { generateUniqId } from '@/utils/util-functions'
 export default class Draggable extends Vue {
   @Prop({ required: true }) public data!: any
   @Prop({ required: true }) public lists!: any
+  @Prop({ required: false, default: true }) public verticalAlignment!: boolean
 
   private clonedData: any = cloneDeep(this.data)
   private listGroups: any = []
@@ -125,6 +131,13 @@ export default class Draggable extends Vue {
   width: 100%;
   max-width: 600px;
   cursor: pointer;
+  text-transform: capitalize;
+}
+.list__wrapper.horizontal-alignment {
+  display: flex;
+}
+.list__wrapper.horizontal-alignment .dragzone {
+  width: 100%;
 }
 .list__group {
   width: 100%;
