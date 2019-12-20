@@ -13,7 +13,7 @@
     <hr />
     <b-container fluid>
       <b-row>
-        <b-col>
+        <b-col cols="3">
           <pj-draggable
             :data="tasksUsers"
             :lists="lists"
@@ -22,7 +22,7 @@
             @taskTimerToggled="onTaskTimerToggled"
           />
         </b-col>
-        <b-col>
+        <b-col cols="3">
           <div class="text-center">
             Projects
           </div>
@@ -30,10 +30,28 @@
             <!--            Todo: change client id to client name-->
             Client id: {{ clientId }}
             <ul>
-              <li v-for="{ name } in projects">
+              <li
+                v-for="{ name } in projects"
+                @click="selectedProjectId = project.id"
+              >
                 {{ name }}
               </li>
             </ul>
+          </div>
+        </b-col>
+        <b-col cols="2">
+          <div class="text-center">
+            Open
+          </div>
+        </b-col>
+        <b-col cols="2">
+          <div class="text-center">
+            In Progress
+          </div>
+        </b-col>
+        <b-col cols="2">
+          <div class="text-center">
+            Closed
           </div>
         </b-col>
       </b-row>
@@ -76,6 +94,8 @@ export default class Custom extends Vue {
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
+
+  private selectedProjectId: string | number | null = null
 
   private editedTaskTimerId: number | string | null = null
   private editedTaskId: number | string | null = null
