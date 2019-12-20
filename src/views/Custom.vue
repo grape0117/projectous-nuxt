@@ -31,8 +31,9 @@
             Client id: {{ clientId }}
             <ul>
               <li
-                v-for="{ name } in projects"
-                @click="selectedProjectId = project.id"
+                v-for="{ name, id } in projects"
+                @click="selectedProjectId = id"
+                class="project-item__name"
               >
                 {{ name }}
               </li>
@@ -43,16 +44,27 @@
           <div class="text-center">
             Open
           </div>
+          <ul>
+            <li v-for="task in selectedProjectTasksPerStatus.open">
+              {{ task.title }}
+            </li>
+          </ul>
         </b-col>
         <b-col cols="2">
           <div class="text-center">
             In Progress
           </div>
+          <li v-for="task in selectedProjectTasksPerStatus['in progress']">
+            {{ task.title }}
+          </li>
         </b-col>
         <b-col cols="2">
           <div class="text-center">
             Closed
           </div>
+          <li v-for="task in selectedProjectTasksPerStatus.closed">
+            {{ task.title }}
+          </li>
         </b-col>
       </b-row>
     </b-container>
@@ -91,6 +103,7 @@ export default class Custom extends Vue {
   @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
+  @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
@@ -132,6 +145,18 @@ export default class Custom extends Vue {
 
   get taskDetailsDisplayed() {
     return this.editedTaskId && this.editedTaskTimerId
+  }
+
+  get selectedProjectTasksPerStatus() {
+    const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
+    if (projectTasks.length) {
+      return groupBy(projectTasks, 'status')
+    }
+    return {
+      open: [],
+      'in progress': [],
+      closed: []
+    }
   }
 
   private selectedCompanyUser: any = null
