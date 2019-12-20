@@ -111,7 +111,7 @@ export default class Dragzone extends Vue {
   private editedItemId: number | string | null = null
 
   get taskDetailsDisplayed() {
-    return this.editedItemId && !this.timerId
+    return this.editedItemId && this.timerId
   }
 
   get selectedItemTaskId() {
