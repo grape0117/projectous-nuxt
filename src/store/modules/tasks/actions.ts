@@ -7,12 +7,10 @@ import { uuid } from 'vue-uuid'
 
 export const actions: ActionTree<IModuleState, IRootState> = {
   async updateTask({ commit }: any, task: any) {
+    // @ts-ignore
+    await this._vm.$http().put('/tasks/', task.id, { task })
     // TODO @stephane send task to server
     commit('upsert', task)
-    // @ts-ignore
-    const newTaskResponse = await this._vm
-      .$http()
-      .put('/tasks/' + task.id, task)
   },
 
   async createTask({ commit, getters }: any, task: any) {

@@ -133,9 +133,11 @@ export default class Custom extends Vue {
   }
   get selectedProjectTasksForStatusesColumns() {
     const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
-    return projectTasks.map((task: ITask) => ({
-      ...task,
-      listId: task.status
+    return projectTasks.map(({ id, title, status }: ITask) => ({
+      id,
+      title,
+      status,
+      listId: status
     }))
   }
 
@@ -157,7 +159,14 @@ export default class Custom extends Vue {
     this.createTaskUserVuex(newUserTask)
   }
 
-  public async updateTask({ id, task_id, title, listId, sort_order }: any) {
+  public async updateTask(task: any) {
+    const taskCopy = cloneDeep(this.getTaskById(task.id))
+    taskCopy.status = task.listId
+    taskCopy.sort_order = task.sort_order
+    await this.updateTaskVuex(taskCopy)
+  }
+
+  public async updateUserTask({ id, task_id, title, listId, sort_order }: any) {
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let newNextWorkDay = null
     if (listId === 'Past') {
