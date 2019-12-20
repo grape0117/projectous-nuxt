@@ -218,8 +218,9 @@ Why not create item inside this?
   This is for toggling the Play/Stop icon
    */
   private onTaskTimerClick(taskId: number | string, itemId: number | string) {
-    this.timerId = this.timerId === null ? itemId : null
-    this.$emit('taskTimerToggled', { taskId, timerId: this.timerId })
+    const timerId = this.timerId === null ? itemId : null
+    this.timerId = timerId
+    this.$emit('taskTimerToggled', { taskId, timerId })
   }
 }
 </script>
