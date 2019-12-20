@@ -13,6 +13,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   },
 
   getByProjectId: (state: IModuleState) => (projectId: any) => {
-    return state.tasks.filter(task => task.project_id === projectId)
+    if (projectId) {
+      return state.tasks.filter(task => task.project_id === projectId)
+    }
+    return []
   }
 }
