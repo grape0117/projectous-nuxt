@@ -27,7 +27,7 @@
           @save="$emit('update', $event)"
           @setDraggedItemId="draggedItemId = $event"
           @addNewTask="addNewItem"
-          @taskTimerToggled="payload => $emit('taskTimerToggled', payload)"
+          @taskTimerToggled="$emit('taskTimerToggled', $event)"
         />
       </div>
     </div>
