@@ -85,7 +85,6 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
-import { generateUniqId } from '@/utils/util-functions'
 
 const Tasks = namespace('tasks')
 
@@ -96,6 +95,7 @@ export default class Dragzone extends Vue {
   @Prop({ required: true, default: () => [] }) public options!: any
   @Prop({ required: true }) public isListDragged!: boolean
   @Prop({ required: true }) public group!: string
+  @Prop({ required: true }) public tempItemId!: number | null
   @Tasks.Getter public getById!: any
 
   private expandedList: boolean = true
@@ -103,6 +103,21 @@ export default class Dragzone extends Vue {
   private newItem: any = null
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
+  private preventUpdate: boolean = false
+
+  @Watch('tempItemId')
+  private async onTempItemIdChanged(id: number | null) {
+    if (id !== null) {
+      await this.$nextTick()
+      const newEl =
+        this.$el.querySelector(`.dragzone__item-text[data-id="${id}"]`) ||
+        this.$el.querySelectorAll('.dragzone__item-text')[this.options.length]
+      if (newEl) {
+        // @ts-ignore
+        newEl.focus()
+      }
+    }
+  }
 
   private dragstart(e: any, item: any) {
     e.dataTransfer.setData('application/node type', this)
@@ -112,7 +127,7 @@ export default class Dragzone extends Vue {
   private dragend() {
     try {
       const item = JSON.parse(localStorage.getItem('item') as string)
-      this.$emit('save', item)
+      this.$emit('update', item)
       localStorage.removeItem('item')
       this.$emit('setDraggedItemId', null)
     } catch (e) {
@@ -127,7 +142,7 @@ export default class Dragzone extends Vue {
       item.listId = this.id
       item.user_task_list_id = this.group === 'User Lists' ? this.id : null
       item.sort_order = index
-      this.$emit('update', item, index, id)
+      this.$emit('updateSorting', item, index, id)
       localStorage.setItem('item', JSON.stringify(item))
     } catch (e) {
       console.log(e)
@@ -142,7 +157,7 @@ export default class Dragzone extends Vue {
         item.listId = this.id
         item.user_task_list_id = this.group === 'User Lists' ? this.id : null
         item.sort_order = 0
-        this.$emit('update', item, 0)
+        this.$emit('updateSorting', item, 0)
       } catch (e) {
         console.log(e)
       }
@@ -153,66 +168,59 @@ export default class Dragzone extends Vue {
    */
   private updateTitle(
     { target: { innerHTML: name } }: any,
-    item: any,
-    index: number
+    item: any
   ) {
-    if (item.doAddItem) {
-      this.addNewTask(item)
-    }
-
+    if (this.preventUpdate) return
     /*
     This still doesn't make sense to me. Why not just save on the object? Why copy and then replace?
      */
     const updatedItem = cloneDeep(item)
     updatedItem.title = name
-
-    if (!updatedItem.newAdded) {
-      this.$emit('save', updatedItem)
-    } else {
-      delete updatedItem.newAdded
-      delete item.newAdded
-      this.$emit('create', updatedItem)
-    }
+    this.$emit('update', updatedItem)
   }
 
   /*
 Why not create item inside this?
  */
-  private onEnter({ target: el }: any, item: any) {
-    item.doAddItem = true
-    el.blur(item, 1)
+  private async onEnter({ target: el }: any, item: any) {
+    // this.$emit('create', cloneDeep(item))
+    this.preventUpdate = true
+    this.$emit('addTempItem', item)
+
+    el.blur()
   }
 
   private async addNewTask(item: any) {
-    delete item.doAddItem
-
-    /*
-      Why so many? Doesn't seem right.
-       */
-    await this.$nextTick()
-    await this.$nextTick()
-    await this.$nextTick()
-
-    const newItem = cloneDeep(item)
-    newItem.id = generateUniqId(100000)
-    newItem.task_id = -1
-    newItem.title = ''
-    newItem.newAdded = true
-    delete newItem.doAddItem //I don't think this is needed. It's deleted above
-
-    this.$emit('addNewTask', newItem) //I don't know why we are using item/task interchangeably. We should choose a single name for things and use that
-
-    /*
-      Why is there an || here? Is this for both lists and tasks?
-       */
-    await this.$nextTick()
-    const newEl =
-      this.$el.querySelector(`.dragzone__item-text[data-id="${newItem.id}"]`) ||
-      this.$el.querySelectorAll('.dragzone__item-text')[this.options.length]
-    if (newEl) {
-      // @ts-ignore
-      newEl.focus()
-    }
+    console.log(item, 'add new')
+    // delete item.new
+    //
+    // /*
+    //   Why so many? Doesn't seem right.
+    //    */
+    // await this.$nextTick()
+    // await this.$nextTick()
+    // await this.$nextTick()
+    //
+    // const newItem = cloneDeep(item)
+    // newItem.id = generateUniqId(100000)
+    // newItem.task_id = -1
+    // newItem.title = ''
+    // newItem.newAdded = true
+    // delete newItem.new //I don't think this is needed. It's deleted above
+    //
+    // this.$emit('addNewTask', newItem) //I don't know why we are using item/task interchangeably. We should choose a single name for things and use that
+    //
+    // /*
+    //   Why is there an || here? Is this for both lists and tasks?
+    //    */
+    // await this.$nextTick()
+    // const newEl =
+    //   this.$el.querySelector(`.dragzone__item-text[data-id="${newItem.id}"]`) ||
+    //   this.$el.querySelectorAll('.dragzone__item-text')[this.options.length]
+    // if (newEl) {
+    //   // @ts-ignore
+    //   newEl.focus()
+    // }
   }
   /*
   This is for toggling the Play/Stop icon

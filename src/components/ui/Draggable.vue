@@ -27,12 +27,13 @@
           :isListDragged="isListDragged"
           :draggedItemId="draggedItemId"
           :group="group"
+          :tempItemId="tempItemId"
           @create="$emit('create', $event)"
-          @update="update"
-          @save="$emit('update', $event)"
-          @setDraggedItemId="draggedItemId = $event"
-          @addNewTask="addNewItem"
+          @update="$emit('update', $event)"
           @taskTimerToggled="$emit('taskTimerToggled', $event)"
+          @updateSorting="updateSorting"
+          @setDraggedItemId="draggedItemId = $event"
+          @addTempItem="addTempItem"
         />
       </div>
     </div>
@@ -50,6 +51,7 @@ export default class Draggable extends Vue {
   @Prop({ required: true }) public lists!: any
   @Prop({ required: false, default: true }) public verticalAlignment!: boolean
 
+  protected tempItemId: number | null = null
   private clonedData: any = cloneDeep(this.data)
   private listGroups: any = []
   private draggedItemId: number | null = null
@@ -79,7 +81,7 @@ export default class Draggable extends Vue {
       })
   }
 
-  public update(item: any, position: number, idNewPosition: number) {
+  public updateSorting(item: any, position: number, idNewPosition: number) {
     const index = this.clonedData.findIndex(({ id }: any) => item.id === id)
     const elementNewPosition = this.clonedData.findIndex(
       ({ id }: any) => id === idNewPosition
@@ -87,8 +89,14 @@ export default class Draggable extends Vue {
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)
   }
-  public addNewItem(item: any) {
-    this.clonedData.splice(1, 0, item)
+  public addTempItem({ listId }: any) {
+    const tempId = generateUniqId(10000)
+    this.clonedData.splice(1, 0, {
+      id: tempId,
+      title: '',
+      listId: listId
+    })
+    this.tempItemId = tempId
   }
 
   private dragStart(e: any, index: number) {
