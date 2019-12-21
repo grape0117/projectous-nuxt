@@ -19,6 +19,7 @@
             :lists="lists"
             @create="createTask"
             @update="updateTask"
+            @taskTimerToggled="onTaskTimerToggled"
           />
         </b-col>
         <b-col>
@@ -26,7 +27,7 @@
             Projects
           </div>
           <div v-for="(projects, clientId) in projectsByClientId">
-<!--            Todo: change client id to client name-->
+            <!--            Todo: change client id to client name-->
             Client id: {{ clientId }}
             <ul>
               <li v-for="{ name } in projects">
@@ -37,6 +38,7 @@
         </b-col>
       </b-row>
     </b-container>
+    <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
   </div>
 </template>
 <script lang="ts">
@@ -45,6 +47,7 @@ import { namespace } from 'vuex-class'
 import { cloneDeep, groupBy } from 'lodash'
 import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
 import { IProject } from '@/store/modules/projects/types'
+import TaskDetails from '@/components/draggable/TaskDetails.vue'
 
 const CompanyUsers = namespace('company_users')
 const TaskUsers = namespace('task_users')
@@ -52,7 +55,16 @@ const Tasks = namespace('tasks')
 const Lists = namespace('lists')
 const Projects = namespace('projects')
 
-@Component
+interface ITaskTimerToggle {
+  taskId: number | string
+  timerId: number | string | null
+}
+
+@Component({
+  components: {
+    TaskDetails
+  }
+})
 export default class Custom extends Vue {
   @TaskUsers.Getter('getById') private getTaskUserById!: any
   @TaskUsers.Getter private sortedByDays!: any
@@ -64,6 +76,9 @@ export default class Custom extends Vue {
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
+
+  private editedTaskTimerId: number | string | null = null
+  private editedTaskId: number | string | null = null
 
   get lists() {
     return !this.selectedCompanyUser
@@ -93,6 +108,10 @@ export default class Custom extends Vue {
       .filter(pr => pr.status === 'open')
       .sort((a, b) => a.client_id - b.client_id)
     return groupBy(listOfProjectsToDisplay, 'client_id')
+  }
+
+  get taskDetailsDisplayed() {
+    return this.editedTaskId && this.editedTaskTimerId
   }
 
   private selectedCompanyUser: any = null
@@ -131,6 +150,13 @@ export default class Custom extends Vue {
       await this.updateTaskVuex(task)
     }
   }
+
+  private onTaskTimerToggled(payload: ITaskTimerToggle) {
+    const { taskId, timerId } = payload
+    this.editedTaskId = taskId
+    this.editedTaskTimerId = timerId
+  }
+
   @Watch('selectedCompanyUser')
   private changeRouteQueryParams(value: any) {
     if (value) {

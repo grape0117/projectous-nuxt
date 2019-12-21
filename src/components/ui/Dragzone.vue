@@ -43,13 +43,13 @@
             <div
               v-if="editedItemId === item.id"
               class="dragzone__item-tracker-icon"
-              @click="setTimerId(item.id)"
+              @click="onTaskTimerClicked(item.task_id, item.id)"
             >
               <span
                 v-if="timerId === item.id"
-                class="dragzone__item-tracker-icon-triangle"
+                class="dragzone__item-tracker-icon-square"
               />
-              <span v-else class="dragzone__item-tracker-icon-square" />
+              <span v-else class="dragzone__item-tracker-icon-triangle" />
             </div>
           </div>
           <div v-if="editedItemId === item.id" class="dragzone__item-tracker">
@@ -217,8 +217,10 @@ Why not create item inside this?
   /*
   This is for toggling the Play/Stop icon
    */
-  private setTimerId(id: number | string) {
-    this.timerId = this.timerId === null ? id : null
+  private onTaskTimerClicked(taskId: number | string, itemId: number | string) {
+    const timerId = this.timerId === null ? itemId : null
+    this.timerId = timerId
+    this.$emit('taskTimerToggled', { taskId, timerId })
   }
 }
 </script>
