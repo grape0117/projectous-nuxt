@@ -18,7 +18,7 @@
             :data="tasksUsers"
             :lists="lists"
             @create="createTask"
-            @update="updateTask"
+            @update="updateTaskUser"
             @taskTimerToggled="onTaskTimerToggled"
           />
         </b-col>
@@ -40,7 +40,7 @@
             </ul>
           </div>
         </b-col>
-        <b-col cols="6">
+        <b-col v-if="selectedProjectId" cols="6">
           <pj-draggable
             :data="selectedProjectTasksForStatusesColumns"
             :lists="taskPerStatusLists"
@@ -59,8 +59,8 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { cloneDeep, groupBy } from 'lodash'
 import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
-import { IProject } from '@/store/modules/projects/types'
 import TaskDetails from '@/components/draggable/TaskDetails.vue'
+import { IProject } from '@/store/modules/projects/types'
 import { ITask } from '@/store/modules/tasks/types'
 
 const CompanyUsers = namespace('company_users')
@@ -95,7 +95,6 @@ export default class Custom extends Vue {
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
 
   private selectedProjectId: string | number | null = null
-
   private editedTaskTimerId: number | string | null = null
   private editedTaskId: number | string | null = null
 
@@ -152,11 +151,7 @@ export default class Custom extends Vue {
   private selectedCompanyUser: any = null
 
   public async createTask(item: any) {
-    const newTaskID = await this.createTaskVuex({ title: item.title })
-    const newUserTask = cloneDeep(item)
-    delete newUserTask.title
-    newUserTask.task_id = newTaskID
-    this.createTaskUserVuex(newUserTask)
+    await this.createTaskVuex({ title: item.title })
   }
 
   public async updateTask(task: any) {
@@ -166,7 +161,15 @@ export default class Custom extends Vue {
     await this.updateTaskVuex(taskCopy)
   }
 
-  public async updateUserTask({ id, task_id, title, listId, sort_order }: any) {
+  public async createTaskUser(item: any) {
+    const newTaskID = await this.createTaskVuex({ title: item.title })
+    const newUserTask = cloneDeep(item)
+    delete newUserTask.title
+    newUserTask.task_id = newTaskID
+    this.createTaskUserVuex(newUserTask)
+  }
+
+  public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let newNextWorkDay = null
     if (listId === 'Past') {

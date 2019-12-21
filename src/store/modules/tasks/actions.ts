@@ -16,8 +16,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   async createTask({ commit, getters }: any, task: any) {
     //TODO: should we do this? task.id = uuid.v4();
     // @ts-ignore
-    const newTaskResponse = await this._vm.$http().post('/tasks', { task })
-    commit('create', newTaskResponse.task)
-    return newTaskResponse.task.id
+    const { task: newTask } = await this._vm.$http().post('/tasks', { task })
+    commit('create', newTask)
+    return newTask
   }
 }

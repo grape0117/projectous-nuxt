@@ -55,17 +55,14 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   //   commit('task_users/UPDATE', task_user)
   // },
   async createTaskUser({ commit, getters }, taskUser: ITaskUser) {
-    // Todo: send to server
     taskUser.id = getters.getNextId()
     commit(CREATE_TASK_USER, taskUser)
   },
   async updateTaskUser({ commit }: any, taskUser: ITaskUser) {
-    //Todo: @stephane send request to the server to update task user
-    // @stephane - here is an example how to use http module
     // @ts-ignore
-    const newTaskUserResponse = await this._vm
+    const { task_user } = await this._vm
       .$http()
       .put('/task-users/', taskUser.id, {task_user: taskUser})
-    commit(UPDATE_TASK_USER, newTaskUserResponse)
+    commit(UPDATE_TASK_USER, task_user)
   }
 }
