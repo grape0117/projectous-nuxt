@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div
+    class="list__wrapper"
+    :class="{ 'horizontal-alignment': !verticalAlignment }"
+  >
     <div
       v-for="(group, index) in listGroups"
       :key="index"
@@ -15,19 +18,23 @@
         :key="id"
         class="list__group"
       >
-        <div class="list__group-subtitle">{{ title }}</div>
+        <div class="list__group-subtitle" v-if="verticalAlignment">
+          {{ title }}
+        </div>
         <pj-dragzone
           :id="id"
           :options="groupedData[id]"
           :isListDragged="isListDragged"
           :draggedItemId="draggedItemId"
           :group="group"
+          :tempItemId="tempItemId"
           @create="$emit('create', $event)"
-          @update="update"
-          @save="$emit('update', $event)"
-          @setDraggedItemId="draggedItemId = $event"
-          @addNewTask="addNewItem"
+          @update="$emit('update', $event)"
           @taskTimerToggled="$emit('taskTimerToggled', $event)"
+          @updateSorting="updateSorting"
+          @setDraggedItemId="draggedItemId = $event"
+          @addTempItem="addTempItem"
+          @deleteTempItem="deleteTempItem"
         />
       </div>
     </div>
@@ -43,7 +50,9 @@ import { generateUniqId } from '@/utils/util-functions'
 export default class Draggable extends Vue {
   @Prop({ required: true }) public data!: any
   @Prop({ required: true }) public lists!: any
+  @Prop({ required: false, default: true }) public verticalAlignment!: boolean
 
+  protected tempItemId: number | null = null
   private clonedData: any = cloneDeep(this.data)
   private listGroups: any = []
   private draggedItemId: number | null = null
@@ -73,7 +82,7 @@ export default class Draggable extends Vue {
       })
   }
 
-  public update(item: any, position: number, idNewPosition: number) {
+  public updateSorting(item: any, position: number, idNewPosition: number) {
     const index = this.clonedData.findIndex(({ id }: any) => item.id === id)
     const elementNewPosition = this.clonedData.findIndex(
       ({ id }: any) => id === idNewPosition
@@ -81,8 +90,19 @@ export default class Draggable extends Vue {
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)
   }
-  public addNewItem(item: any) {
-    this.clonedData.splice(1, 0, item)
+  public addTempItem({ listId }: any) {
+    const tempId = generateUniqId(10000)
+    this.clonedData.splice(1, 0, {
+      id: tempId,
+      title: '',
+      listId: listId
+    })
+    this.tempItemId = tempId
+  }
+
+  private deleteTempItem() {
+    this.clonedData = this.clonedData.filter(({ id }: any) => id !== this.tempItemId)
+    this.tempItemId = null
   }
 
   private dragStart(e: any, index: number) {
@@ -109,13 +129,6 @@ export default class Draggable extends Vue {
     this.targetListIndex = targetElIndex
 
     // TODO: bug if change position here because of different height
-    // const listGroupsCopy = [...this.listGroups]
-    // const targetEl = listGroupsCopy[targetElIndex]
-    // const draggedEl = listGroupsCopy[this.draggedListIndex];
-    // listGroupsCopy.splice(targetElIndex, 1, draggedEl)
-    // listGroupsCopy.splice(this.draggedListIndex, 1, targetEl)
-    // this.draggedListIndex = targetElIndex
-    // this.listGroups = listGroupsCopy
   }
 }
 </script>
@@ -125,6 +138,13 @@ export default class Draggable extends Vue {
   width: 100%;
   max-width: 600px;
   cursor: pointer;
+  text-transform: capitalize;
+}
+.list__wrapper.horizontal-alignment {
+  display: flex;
+}
+.list__wrapper.horizontal-alignment .dragzone {
+  width: 100%;
 }
 .list__group {
   width: 100%;

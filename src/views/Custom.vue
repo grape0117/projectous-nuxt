@@ -13,16 +13,16 @@
     <hr />
     <b-container fluid>
       <b-row>
-        <b-col>
+        <b-col cols="3">
           <pj-draggable
             :data="tasksUsers"
             :lists="lists"
-            @create="createTask"
-            @update="updateTask"
+            @create="createTaskUser"
+            @update="updateTaskUser"
             @taskTimerToggled="onTaskTimerToggled"
           />
         </b-col>
-        <b-col>
+        <b-col cols="3">
           <div class="text-center">
             Projects
           </div>
@@ -30,11 +30,24 @@
             <!--            Todo: change client id to client name-->
             Client id: {{ clientId }}
             <ul>
-              <li v-for="{ name } in projects">
+              <li
+                v-for="{ name, id } in projects"
+                @click="selectedProjectId = id"
+                class="project-item__name"
+              >
                 {{ name }}
               </li>
             </ul>
           </div>
+        </b-col>
+        <b-col v-if="selectedProjectId" cols="6">
+          <pj-draggable
+            :data="selectedProjectTasksForStatusesColumns"
+            :lists="taskPerStatusLists"
+            :verticalAlignment="false"
+            @create="createTask"
+            @update="updateTask"
+          />
         </b-col>
       </b-row>
     </b-container>
@@ -46,14 +59,17 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { cloneDeep, groupBy } from 'lodash'
 import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
-import { IProject } from '@/store/modules/projects/types'
 import TaskDetails from '@/components/draggable/TaskDetails.vue'
+import { IProject } from '@/store/modules/projects/types'
+import { ITask } from '@/store/modules/tasks/types'
 
 const CompanyUsers = namespace('company_users')
 const TaskUsers = namespace('task_users')
 const Tasks = namespace('tasks')
 const Lists = namespace('lists')
 const Projects = namespace('projects')
+
+const taskStatuses = ['open', 'in progress', 'closed']
 
 interface ITaskTimerToggle {
   taskId: number | string
@@ -73,10 +89,12 @@ export default class Custom extends Vue {
   @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
+  @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
 
+  private selectedProjectId: string | number | null = null
   private editedTaskTimerId: number | string | null = null
   private editedTaskId: number | string | null = null
 
@@ -109,22 +127,68 @@ export default class Custom extends Vue {
       .sort((a, b) => a.client_id - b.client_id)
     return groupBy(listOfProjectsToDisplay, 'client_id')
   }
-
   get taskDetailsDisplayed() {
     return this.editedTaskId && this.editedTaskTimerId
+  }
+  get selectedProjectTasksForStatusesColumns() {
+    const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
+    return projectTasks.map(({ id, title, status }: ITask) => ({
+      id,
+      title,
+      status,
+      listId: status
+    }))
+  }
+
+  get taskPerStatusLists() {
+    return taskStatuses.map(status => ({
+      title: status,
+      id: status,
+      group: status
+    }))
   }
 
   private selectedCompanyUser: any = null
 
-  public async createTask(item: any) {
-    const newTaskID = await this.createTaskVuex({ title: item.title })
-    const newUserTask = cloneDeep(item)
-    delete newUserTask.title
-    newUserTask.task_id = newTaskID
-    this.createTaskUserVuex(newUserTask)
+  public async createTask({ title }: any) {
+    await this.createTaskVuex({ title, project_id: this.selectedProjectId })
   }
 
-  public async updateTask({ id, task_id, title, listId, sort_order }: any) {
+  public async updateTask(task: any) {
+    const taskCopy = cloneDeep(this.getTaskById(task.id))
+    taskCopy.status = task.listId
+    taskCopy.sort_order = task.sort_order
+    await this.updateTaskVuex(taskCopy)
+  }
+
+  public async createTaskUser({ title, listId }: any) {
+    let next_work_day = null
+    let user_task_list_id = null
+    if (listId === 'Past') {
+      const date = new Date()
+      next_work_day = formatDateToYYYY_MM_DD(
+        new Date(date.setMonth(date.getMonth() - 1))
+      )
+      //If listId is a date, return that I think
+    } else if (!!Date.parse(listId) && isNaN(listId)) {
+      next_work_day = formatDateToYYYY_MM_DD(listId)
+      //If listId is a number, this is a user-created list
+    } else if (Number.isInteger(Number(listId))) {
+      //Only user-created lists have a listId set on task_user object
+      user_task_list_id = listId
+    }
+    const task = { title }
+    const { id } = await this.createTaskVuex(task)
+    const taskUser = {
+      task_id: id,
+      next_work_day,
+      company_user_id: this.selectedCompanyUser.id,
+      user_task_list_id
+    }
+    await this.createTaskUserVuex(taskUser)
+  }
+
+  public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let newNextWorkDay = null
     if (listId === 'Past') {
@@ -173,3 +237,13 @@ export default class Custom extends Vue {
   }
 }
 </script>
+
+<style>
+.project-item__name {
+  cursor: pointer;
+}
+
+.project-item__name:hover {
+  color: blue;
+}
+</style>

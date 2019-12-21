@@ -6,8 +6,6 @@ import {
   CREATE_TASK_USER
 } from '@/store/modules/task_users/mutations-types'
 
-const company_user_id: number = 1
-
 const UUID = () => {
   const date = new Date()
   return (
@@ -28,6 +26,21 @@ const UUID = () => {
     ' ' +
     Math.random()
   )
+}
+
+function creteDefaultTaskUser(): ITaskUser {
+  return {
+    company_user_id: null,
+    next_work_day: null,
+    role: '',
+    sort_order: 0,
+    task_id: 0,
+    task_uuid: null,
+    user_rate: '0.00',
+    user_task_list_id: null,
+    uuid: null,
+    work_day_position: null
+  }
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
@@ -54,18 +67,26 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   //   commit('tasks/UPDATE', task)
   //   commit('task_users/UPDATE', task_user)
   // },
-  async createTaskUser({ commit, getters }, taskUser: ITaskUser) {
-    // Todo: send to server
-    taskUser.id = getters.getNextId()
-    commit(CREATE_TASK_USER, taskUser)
+  async createTaskUser({ commit }, { task_id, next_work_day, company_user_id, user_task_list_id}: ITaskUser) {
+    const taskUser = {
+      ...creteDefaultTaskUser(),
+      task_id,
+      next_work_day,
+      company_user_id,
+      user_task_list_id
+    }
+    // @ts-ignore
+    const { task_user } = await this._vm
+      .$http()
+      .post('/task-users', { task_user: taskUser })
+    commit(CREATE_TASK_USER, task_user)
+    return task_user
   },
   async updateTaskUser({ commit }: any, taskUser: ITaskUser) {
-    //Todo: @stephane send request to the server to update task user
-    // @stephane - here is an example how to use http module
     // @ts-ignore
-    const newTaskUserResponse = await this._vm
+    const { task_user } = await this._vm
       .$http()
       .put('/task-users/', taskUser.id, {task_user: taskUser})
-    commit(UPDATE_TASK_USER, newTaskUserResponse)
+    commit(UPDATE_TASK_USER, task_user)
   }
 }

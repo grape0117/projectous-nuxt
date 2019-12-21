@@ -23,7 +23,7 @@ export interface ITask {
   title?: string
   company_id?: string | null
   project_id?: string | null
-  detail?: string
+  detail?: string | null
   note?: string | null
   status?: string | null // enum('reviewed','turned-in','completed','closed','open') NOT NULL DEFAULT 'open',
   priority?: string //` enum('today','this week','when possible','active','hold') NOT NULL DEFAULT 'active',
@@ -42,4 +42,12 @@ export interface ITask {
   updated_at?: string | null
   deleted_at?: string | null
   company_user_id?: number | null
+  files: string[]
+  for_today: number | null
+  messages: string[]
+  project_next_work_day: string | null
+  project_sort_order: number
+  users: number[]
+  uuid: string | null
+  workflowy_id: number | null
 }

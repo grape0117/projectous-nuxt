@@ -10,5 +10,12 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   // TODO: delete if task will be added through server
   getNextId: (state: IModuleState) => () => {
     return state.lookup.length
+  },
+
+  getByProjectId: (state: IModuleState) => (projectId: any) => {
+    if (projectId) {
+      return state.tasks.filter(task => task.project_id === projectId)
+    }
+    return []
   }
 }
