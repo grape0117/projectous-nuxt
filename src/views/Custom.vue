@@ -150,8 +150,8 @@ export default class Custom extends Vue {
 
   private selectedCompanyUser: any = null
 
-  public async createTask(item: any) {
-    await this.createTaskVuex({ title: item.title })
+  public async createTask({ title }: any) {
+    await this.createTaskVuex({ title, project_id: this.selectedProjectId })
   }
 
   public async updateTask(task: any) {
@@ -161,13 +161,31 @@ export default class Custom extends Vue {
     await this.updateTaskVuex(taskCopy)
   }
 
-  public async createTaskUser(item: any) {
-    console.log(item, 'custom')
-    // const newTaskID = await this.createTaskVuex({ title: item.title })
-    // const newUserTask = cloneDeep(item)
-    // delete newUserTask.title
-    // newUserTask.task_id = newTaskID
-    // this.createTaskUserVuex(newUserTask)
+  public async createTaskUser({ title, listId }: any) {
+    let next_work_day = null
+    let user_task_list_id = null
+    if (listId === 'Past') {
+      const date = new Date()
+      next_work_day = formatDateToYYYY_MM_DD(
+        new Date(date.setMonth(date.getMonth() - 1))
+      )
+      //If listId is a date, return that I think
+    } else if (!!Date.parse(listId) && isNaN(listId)) {
+      next_work_day = formatDateToYYYY_MM_DD(listId)
+      //If listId is a number, this is a user-created list
+    } else if (Number.isInteger(Number(listId))) {
+      //Only user-created lists have a listId set on task_user object
+      user_task_list_id = listId
+    }
+    const task = { title }
+    const { id } = await this.createTaskVuex(task)
+    const taskUser = {
+      task_id: id,
+      next_work_day,
+      company_user_id: this.selectedCompanyUser.id,
+      user_task_list_id
+    }
+    await this.createTaskUserVuex(taskUser)
   }
 
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
