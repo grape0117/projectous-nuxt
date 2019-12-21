@@ -17,7 +17,7 @@
           <pj-draggable
             :data="tasksUsers"
             :lists="lists"
-            @create="createTask"
+            @create="createTaskUser"
             @update="updateTaskUser"
             @taskTimerToggled="onTaskTimerToggled"
           />
@@ -162,11 +162,12 @@ export default class Custom extends Vue {
   }
 
   public async createTaskUser(item: any) {
-    const newTaskID = await this.createTaskVuex({ title: item.title })
-    const newUserTask = cloneDeep(item)
-    delete newUserTask.title
-    newUserTask.task_id = newTaskID
-    this.createTaskUserVuex(newUserTask)
+    console.log(item, 'custom')
+    // const newTaskID = await this.createTaskVuex({ title: item.title })
+    // const newUserTask = cloneDeep(item)
+    // delete newUserTask.title
+    // newUserTask.task_id = newTaskID
+    // this.createTaskUserVuex(newUserTask)
   }
 
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {

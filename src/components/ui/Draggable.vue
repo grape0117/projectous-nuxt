@@ -34,6 +34,7 @@
           @updateSorting="updateSorting"
           @setDraggedItemId="draggedItemId = $event"
           @addTempItem="addTempItem"
+          @deleteTempItem="deleteTempItem"
         />
       </div>
     </div>
@@ -99,6 +100,11 @@ export default class Draggable extends Vue {
     this.tempItemId = tempId
   }
 
+  private deleteTempItem() {
+    this.clonedData = this.clonedData.filter(({ id }: any) => id !== this.tempItemId)
+    this.tempItemId = null
+  }
+
   private dragStart(e: any, index: number) {
     e.dataTransfer.setData('application/node type', this)
     this.isListDragged = true
@@ -123,13 +129,6 @@ export default class Draggable extends Vue {
     this.targetListIndex = targetElIndex
 
     // TODO: bug if change position here because of different height
-    // const listGroupsCopy = [...this.listGroups]
-    // const targetEl = listGroupsCopy[targetElIndex]
-    // const draggedEl = listGroupsCopy[this.draggedListIndex];
-    // listGroupsCopy.splice(targetElIndex, 1, draggedEl)
-    // listGroupsCopy.splice(this.draggedListIndex, 1, targetEl)
-    // this.draggedListIndex = targetElIndex
-    // this.listGroups = listGroupsCopy
   }
 }
 </script>

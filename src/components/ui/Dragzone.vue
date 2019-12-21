@@ -30,13 +30,13 @@
             <div class="dragzone__item-block-content-text">
               <div
                 class="dragzone__item-text"
-                ref="content"
                 v-html="item.title"
                 contenteditable="true"
                 :data-id="item.id"
-                @blur="updateTitle($event, item, index)"
+                @blur="updateTitle($event, item)"
                 @keydown.enter.prevent="onEnter($event, item)"
                 @click="editedItemId = item.id"
+                @input="newNameTouched = true"
               />
               <div class="dragzone__item-subtext">Greenbite</div>
             </div>
@@ -104,6 +104,7 @@ export default class Dragzone extends Vue {
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
   private preventUpdate: boolean = false
+  private newNameTouched: boolean = false
 
   @Watch('tempItemId')
   private async onTempItemIdChanged(id: number | null) {
@@ -170,57 +171,31 @@ export default class Dragzone extends Vue {
     { target: { innerHTML: name } }: any,
     item: any
   ) {
-    if (this.preventUpdate) return
-    /*
-    This still doesn't make sense to me. Why not just save on the object? Why copy and then replace?
-     */
-    const updatedItem = cloneDeep(item)
-    updatedItem.title = name
-    this.$emit('update', updatedItem)
+    if (this.tempItemId || this.preventUpdate) {
+      if (this.newNameTouched) {
+        item.title = name
+        this.$emit('create', item)
+        this.$emit('deleteTempItem')
+        this.preventUpdate = false
+      }
+    } else {
+      const updatedItem = cloneDeep(item)
+      updatedItem.title = name
+      this.$emit('update', updatedItem)
+    }
   }
 
   /*
 Why not create item inside this?
  */
-  private async onEnter({ target: el }: any, item: any) {
-    // this.$emit('create', cloneDeep(item))
-    this.preventUpdate = true
-    this.$emit('addTempItem', item)
-
-    el.blur()
-  }
-
-  private async addNewTask(item: any) {
-    console.log(item, 'add new')
-    // delete item.new
-    //
-    // /*
-    //   Why so many? Doesn't seem right.
-    //    */
-    // await this.$nextTick()
-    // await this.$nextTick()
-    // await this.$nextTick()
-    //
-    // const newItem = cloneDeep(item)
-    // newItem.id = generateUniqId(100000)
-    // newItem.task_id = -1
-    // newItem.title = ''
-    // newItem.newAdded = true
-    // delete newItem.new //I don't think this is needed. It's deleted above
-    //
-    // this.$emit('addNewTask', newItem) //I don't know why we are using item/task interchangeably. We should choose a single name for things and use that
-    //
-    // /*
-    //   Why is there an || here? Is this for both lists and tasks?
-    //    */
-    // await this.$nextTick()
-    // const newEl =
-    //   this.$el.querySelector(`.dragzone__item-text[data-id="${newItem.id}"]`) ||
-    //   this.$el.querySelectorAll('.dragzone__item-text')[this.options.length]
-    // if (newEl) {
-    //   // @ts-ignore
-    //   newEl.focus()
-    // }
+  private async onEnter(event: any, item: any) {
+    if (!this.tempItemId) {
+      this.newNameTouched = false
+      const { target } = event
+      this.preventUpdate = true
+      this.$emit('addTempItem', item)
+      target.blur()
+    }
   }
   /*
   This is for toggling the Play/Stop icon
