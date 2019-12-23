@@ -76,6 +76,14 @@
           </div>
         </div>
       </div>
+
+      <div
+        v-if="options.length === 0"
+        class="dragzone__addTask"
+        @click="onClickAddButton"
+      >
+        +
+      </div>
     </div>
     <div
       v-if="expandedList && options.length > numberOfExpandedItems"
@@ -183,10 +191,20 @@ export default class Dragzone extends Vue {
         this.$emit('deleteTempItem')
         this.preventUpdate = false
       }
-    } else {
+    } else if (item.title !== name) {
       const updatedItem = cloneDeep(item)
       updatedItem.title = name
       this.$emit('update', updatedItem)
+    }
+  }
+
+  private async onClickAddButton() {
+    if (!this.tempItemId) {
+      this.newNameTouched = false
+      this.preventUpdate = true
+      this.$emit('addTempItem', {
+        listId: this.id
+      })
     }
   }
 
@@ -202,6 +220,7 @@ Why not create item inside this?
       target.blur()
     }
   }
+
   /*
   This is for toggling the Play/Stop icon
    */
