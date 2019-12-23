@@ -26,12 +26,12 @@
           <div class="text-center">
             Projects
           </div>
-          <div v-for="(projects, clientId) in projectsByClientId">
+          <div v-for="client in activeClients">
             <!--            Todo: change client id to client name-->
-            Client id: {{ clientId }}
+            {{ client.name }}
             <ul>
               <li
-                v-for="{ name, id } in projects"
+                v-for="{ name, id } in openClientProjects(client)"
                 @click="selectedProjectId = id"
                 class="project-item__name"
               >
@@ -63,13 +63,14 @@ import TaskDetails from '@/components/draggable/TaskDetails.vue'
 import { IProject } from '@/store/modules/projects/types'
 import { ITask } from '@/store/modules/tasks/types'
 
+const CompanyClients = namespace('company_clients')
 const CompanyUsers = namespace('company_users')
 const TaskUsers = namespace('task_users')
 const Tasks = namespace('tasks')
 const Lists = namespace('lists')
 const Projects = namespace('projects')
 
-const taskStatuses = ['open', 'in progress', 'closed']
+const taskStatuses = ['open', 'in progress', 'turned-in', 'completed', 'closed']
 
 interface ITaskTimerToggle {
   taskId: number | string
@@ -120,6 +121,18 @@ export default class Custom extends Vue {
     )
   }
 
+  get activeClients() {
+    return this.$store.state.company_clients.company_clients
+      .filter(client => {
+        return client.status === 'active'
+      })
+      .sort(function(a, b) {
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+        return 0
+      })
+  }
+
   get projectsByClientId() {
     const projects: IProject[] = this.getUserProjects(null)
     const listOfProjectsToDisplay = projects
@@ -150,6 +163,25 @@ export default class Custom extends Vue {
 
   private selectedCompanyUser: any = null
 
+  public openClientProjects(client: any) {
+    console.log(client)
+    return this.$store.state.projects.projects
+      .filter(project => {
+        if (project.status !== 'open') return false
+        return project.client_id === client.client_company_id
+      })
+      .sort(function(a, b) {
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+        return 0
+      })
+  }
+  public clientName(company_client_id: any) {
+    const company_client = this.$store.getters['company_clients/getById'](
+      company_client_id
+    )
+    return company_client ? company_client.name : ''
+  }
   public async createTask({ title }: any) {
     await this.createTaskVuex({ title, project_id: this.selectedProjectId })
   }
