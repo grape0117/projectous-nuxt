@@ -157,7 +157,8 @@ export default class Custom extends Vue {
     return taskStatuses.map(status => ({
       title: status,
       id: status,
-      group: status
+      group: status,
+      initiallyExpanded: true
     }))
   }
 
