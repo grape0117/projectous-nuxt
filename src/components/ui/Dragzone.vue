@@ -10,8 +10,8 @@
     <div class="dragzone__content">
       <div
         v-for="(item, index) in expandedList
-          ? options.slice(0, numberOfExpandedItems)
-          : options"
+          ? options
+          : options.slice(0, numberOfExpandedItems)"
         :key="item.id"
         class="dragzone__item"
         :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
