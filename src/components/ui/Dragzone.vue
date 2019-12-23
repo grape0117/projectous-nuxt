@@ -75,6 +75,12 @@
             <div class="dragzone__item-tracker-time">00:00:00</div>
           </div>
         </div>
+        <div
+          class="dragzone__addTask dragzone__addTask--item"
+          @click="onClickAddButton"
+        >
+          +
+        </div>
       </div>
 
       <div
@@ -250,6 +256,9 @@ Why not create item inside this?
   padding: 2px 0;
   cursor: pointer;
 }
+.dragzone__item:hover .dragzone__addTask--item {
+  display: block;
+}
 .dragzone__item-icon {
   width: 25px;
   height: 25px;
@@ -375,6 +384,11 @@ Why not create item inside this?
 .dragzone__item-tracker-time {
   margin-left: auto;
   font-weight: bold;
+}
+.dragzone__addTask {
+}
+.dragzone__addTask--item {
+  display: none;
 }
 *:focus {
   outline: none;
