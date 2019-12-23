@@ -16,7 +16,9 @@
         {{ group.name }}
       </div>
       <div
-        v-for="{ id, title } in lists.filter(list => list.group === group.name)"
+        v-for="{ id, title, initiallyExpanded } in lists.filter(
+          list => list.group === group.name
+        )"
         :key="id"
         class="list__group"
       >
@@ -38,6 +40,7 @@
           :draggedItemId="draggedItemId"
           :group="group"
           :tempItemId="tempItemId"
+          :initiallyExpanded="initiallyExpanded"
           @create="$emit('create', $event)"
           @update="$emit('update', $event)"
           @taskTimerToggled="$emit('taskTimerToggled', $event)"
