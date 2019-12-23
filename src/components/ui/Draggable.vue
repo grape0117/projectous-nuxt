@@ -14,7 +14,9 @@
     >
       <div class="list__group-title">{{ group.name }}</div>
       <div
-        v-for="{ id, title } in lists.filter(list => list.group === group.name)"
+        v-for="{ id, title, initiallyExpanded } in lists.filter(
+          list => list.group === group.name
+        )"
         :key="id"
         class="list__group"
       >
@@ -28,6 +30,7 @@
           :draggedItemId="draggedItemId"
           :group="group"
           :tempItemId="tempItemId"
+          :initiallyExpanded="initiallyExpanded"
           @create="$emit('create', $event)"
           @update="$emit('update', $event)"
           @taskTimerToggled="$emit('taskTimerToggled', $event)"
@@ -101,7 +104,9 @@ export default class Draggable extends Vue {
   }
 
   private deleteTempItem() {
-    this.clonedData = this.clonedData.filter(({ id }: any) => id !== this.tempItemId)
+    this.clonedData = this.clonedData.filter(
+      ({ id }: any) => id !== this.tempItemId
+    )
     this.tempItemId = null
   }
 

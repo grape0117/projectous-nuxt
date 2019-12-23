@@ -1,7 +1,7 @@
 <template>
   <div class="dragzone" @dragover.prevent @dragenter="moveToNewList">
     <div
-      v-if="options.length > numberOfExpandedItems"
+      v-if="isListExpandable"
       @click="expandedList = !expandedList"
       class="dragzone__item-icon"
     >
@@ -87,10 +87,7 @@
         +
       </div>
     </div>
-    <div
-      v-if="expandedList && options.length > numberOfExpandedItems"
-      class="pl-2"
-    >
+    <div v-if="!expandedList && isListExpandable" class="pl-2">
       ...
     </div>
   </div>
@@ -110,15 +107,20 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public isListDragged!: boolean
   @Prop({ required: true }) public group!: string
   @Prop({ required: true }) public tempItemId!: number | null
+  @Prop({ required: false, default: false }) public initiallyExpanded!: boolean
   @Tasks.Getter public getById!: any
 
-  private expandedList: boolean = true
+  private expandedList: boolean = this.initiallyExpanded
   private numberOfExpandedItems: number = 3
   private newItem: any = null
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
   private preventUpdate: boolean = false
   private newNameTouched: boolean = false
+
+  private get isListExpandable() {
+    return this.options.length > this.numberOfExpandedItems
+  }
 
   @Watch('tempItemId')
   private async onTempItemIdChanged(id: number | null) {
