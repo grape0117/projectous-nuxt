@@ -72,7 +72,7 @@
           </div>
         </div>
         <div
-          class="dragzone__addTask dragzone__addTask--item"
+          class="dragzone__add-task dragzone__add-task--item"
           @click="onClickAddButton"
         >
           +
@@ -81,7 +81,7 @@
 
       <div
         v-if="options.length === 0"
-        class="dragzone__addTask"
+        class="dragzone__add-task"
         @click="onClickAddButton"
       >
         +
@@ -248,7 +248,7 @@ Why not create item inside this?
   padding: 2px 0;
   cursor: pointer;
 }
-.dragzone__item:hover .dragzone__addTask--item {
+.dragzone__item:hover .dragzone__add-task--item {
   display: block;
 }
 .dragzone__item-icon {
@@ -371,9 +371,9 @@ Why not create item inside this?
   margin-left: auto;
   font-weight: bold;
 }
-.dragzone__addTask {
+.dragzone__add-task {
 }
-.dragzone__addTask--item {
+.dragzone__add-task--item {
   display: none;
 }
 *:focus {
