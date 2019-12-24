@@ -19,7 +19,7 @@
         class="list__group"
       >
         <div class="list__group-subtitle" v-if="verticalAlignment">
-          {{ title }}
+          <div>{{ title }}</div>
         </div>
         <pj-dragzone
           :id="id"
@@ -101,7 +101,9 @@ export default class Draggable extends Vue {
   }
 
   private deleteTempItem() {
-    this.clonedData = this.clonedData.filter(({ id }: any) => id !== this.tempItemId)
+    this.clonedData = this.clonedData.filter(
+      ({ id }: any) => id !== this.tempItemId
+    )
     this.tempItemId = null
   }
 
@@ -158,7 +160,7 @@ export default class Draggable extends Vue {
   text-align: center;
 }
 .list__group-subtitle {
-  width: 120px;
+  width: 40px;
   padding: 0.5rem;
   border-right: 1px solid #f6f6f6;
   background: #f0fbfc;
@@ -166,5 +168,9 @@ export default class Draggable extends Vue {
   text-transform: uppercase;
   color: #85868a;
   font-weight: bold;
+}
+.list__group-subtitle div {
+  writing-mode: vertical-rl;
+  text-align: center;
 }
 </style>

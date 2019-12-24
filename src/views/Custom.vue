@@ -164,7 +164,6 @@ export default class Custom extends Vue {
   private selectedCompanyUser: any = null
 
   public openClientProjects(client: any) {
-    console.log(client)
     return this.$store.state.projects.projects
       .filter(project => {
         if (project.status !== 'open') return false

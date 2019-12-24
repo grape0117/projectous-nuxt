@@ -32,6 +32,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
           task_id,
           title: allTasks[lookup[task_id]].title,
           company_user_id,
+          project_id:
+            allTasks[lookup[task_id]]
+              .project_id /*TODO Mikhail, this isn't flexible for project tasks?*/,
           sort_order,
           user_task_list_id,
           next_work_day,

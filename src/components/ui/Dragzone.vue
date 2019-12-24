@@ -20,14 +20,19 @@
         @dragend="dragend"
         @dragover="moveItem(index, item.id)"
       >
-        <div class="dragzone__item-dragbox dragzone__item-dragbox--active">
-          <span />
-          <span />
-          <span />
-        </div>
         <div class="dragzone__item-block">
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
+              <div class="dragzone__item-subtext">
+                {{ projectName(item.project_id) }}
+              </div>
+              <div
+                class="dragzone__item-dragbox dragzone__item-dragbox--active"
+              >
+                <span />
+                <span />
+                <span />
+              </div>
               <div
                 class="dragzone__item-text"
                 v-html="item.title"
@@ -38,7 +43,6 @@
                 @click="editedItemId = item.id"
                 @input="newNameTouched = true"
               />
-              <div class="dragzone__item-subtext">Greenbite</div>
             </div>
             <div
               v-if="editedItemId === item.id"
@@ -120,6 +124,11 @@ export default class Dragzone extends Vue {
     }
   }
 
+  private projectName(project_id: any) {
+    console.log('item', project_id)
+    const project = this.$store.getters['projects/getById'](project_id)
+    return project ? project.name : project_id
+  }
   private dragstart(e: any, item: any) {
     e.dataTransfer.setData('application/node type', this)
     localStorage.setItem('item', JSON.stringify(item))
@@ -167,10 +176,7 @@ export default class Dragzone extends Vue {
   /*
   If you hit enter, that fires first, set item.addItem == true. I'm not sure why we don't just addNewTask inside onEnter?
    */
-  private updateTitle(
-    { target: { innerHTML: name } }: any,
-    item: any
-  ) {
+  private updateTitle({ target: { innerHTML: name } }: any, item: any) {
     if (this.tempItemId || this.preventUpdate) {
       if (this.newNameTouched) {
         item.title = name
@@ -210,13 +216,13 @@ Why not create item inside this?
 
 <style>
 .dragzone {
-  width: calc(100% - 121px);
+  /*width: calc(100% - 121px);*/
   min-height: 40px;
   padding: 0.5rem;
   height: auto;
 }
 .dragzone__content {
-  max-height: 350px;
+  /*max-height: 350px;*/
   overflow-y: auto;
   padding: 0.5rem;
 }
@@ -251,10 +257,12 @@ Why not create item inside this?
   margin-right: 20px;
 }
 .dragzone__item-dragbox {
+  float: left;
   cursor: move;
   width: 12px;
   height: 12px;
   margin: 0.5rem;
+  margin-top: 0.2rem;
   flex: none;
 }
 .dragzone__item-dragbox span {
@@ -268,14 +276,18 @@ Why not create item inside this?
   background: #cef3f7;
 }
 .dragzone__item-text {
+  margin-left: 30px;
   flex-grow: 1;
   min-height: 1.459em;
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   color: #595b60;
 }
 .dragzone__item-subtext {
+  margin-left: 30px;
   width: 100%;
-  font-size: 1rem;
+  margin-bottom: -0.1rem;
+  line-height: 0.8rem;
+  font-size: 0.7rem;
   font-weight: lighter;
   color: #949598;
 }

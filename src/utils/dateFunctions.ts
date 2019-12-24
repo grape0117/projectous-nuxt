@@ -16,11 +16,11 @@ export const getUserFriendlyDate = (datetime: Date) => {
   else if (day.toString() === tomorrow.toString()) return 'Tomorrow'
   else {
     const weekDay = new Date(datetime).toLocaleString('en-us', {
-      weekday: 'long'
+      weekday: 'short'
     })
     const date = day.getDate()
     const month = new Date(datetime).toLocaleString('en-us', { month: 'short' })
-    return `${weekDay}, ${date} ${month}`
+    return `${weekDay}, ${date}`
   }
 }
 
