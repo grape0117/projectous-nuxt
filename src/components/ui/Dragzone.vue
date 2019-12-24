@@ -71,6 +71,20 @@
             <div class="dragzone__item-tracker-time">00:00:00</div>
           </div>
         </div>
+        <div
+          class="dragzone__add-task dragzone__add-task--item"
+          @click="onClickAddButton"
+        >
+          +
+        </div>
+      </div>
+
+      <div
+        v-if="options.length === 0"
+        class="dragzone__add-task"
+        @click="onClickAddButton"
+      >
+        +
       </div>
     </div>
     <div
@@ -167,21 +181,29 @@ export default class Dragzone extends Vue {
   /*
   If you hit enter, that fires first, set item.addItem == true. I'm not sure why we don't just addNewTask inside onEnter?
    */
-  private updateTitle(
-    { target: { innerHTML: name } }: any,
-    item: any
-  ) {
+  private updateTitle({ target: { innerHTML: name } }: any, item: any) {
     if (this.tempItemId || this.preventUpdate) {
       if (this.newNameTouched) {
         item.title = name
         this.$emit('create', item)
-        this.$emit('deleteTempItem')
-        this.preventUpdate = false
       }
-    } else {
+      this.$emit('deleteTempItem')
+      this.preventUpdate = false
+      this.editedItemId = null
+    } else if (item.title !== name) {
       const updatedItem = cloneDeep(item)
       updatedItem.title = name
       this.$emit('update', updatedItem)
+    }
+  }
+
+  private async onClickAddButton() {
+    if (!this.tempItemId) {
+      this.newNameTouched = false
+      this.preventUpdate = true
+      this.$emit('addTempItem', {
+        listId: this.id
+      })
     }
   }
 
@@ -197,6 +219,7 @@ Why not create item inside this?
       target.blur()
     }
   }
+
   /*
   This is for toggling the Play/Stop icon
    */
@@ -225,6 +248,9 @@ Why not create item inside this?
   align-items: flex-start;
   padding: 2px 0;
   cursor: pointer;
+}
+.dragzone__item:hover .dragzone__add-task--item {
+  display: block;
 }
 .dragzone__item-icon {
   width: 25px;
@@ -345,6 +371,11 @@ Why not create item inside this?
 .dragzone__item-tracker-time {
   margin-left: auto;
   font-weight: bold;
+}
+.dragzone__add-task {
+}
+.dragzone__add-task--item {
+  display: none;
 }
 *:focus {
   outline: none;
