@@ -194,9 +194,10 @@ export default class Dragzone extends Vue {
       if (this.newNameTouched) {
         item.title = name
         this.$emit('create', item)
-        this.$emit('deleteTempItem')
-        this.preventUpdate = false
       }
+      this.$emit('deleteTempItem')
+      this.preventUpdate = false
+      this.editedItemId = null
     } else if (item.title !== name) {
       const updatedItem = cloneDeep(item)
       updatedItem.title = name
