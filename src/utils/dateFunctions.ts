@@ -27,7 +27,7 @@ export const getUserFriendlyDate = (datetime: Date) => {
 export const formatDateToYYYY_MM_DD = (datetime: Date) => {
   const date = new Date(datetime)
   const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  return `${year}-${month}-${day < 10 ? `0${day}` : day}`
+  const month = ('00' + (date.getMonth() + 1)).slice(-2)
+  const day = ('00' + date.getDate()).slice(-2)
+  return `${year}-${month}-${day}`
 }
