@@ -1,7 +1,7 @@
 import { GetterTree } from 'vuex'
 import { IRootState } from '@/store/types'
 import { IModuleState } from './types'
-import { resetTime } from '@/utils/dateFunctions'
+import { setToMidnight, localDate } from '@/utils/dateFunctions'
 import { getListId } from '@/utils/util-functions'
 
 export const getters: GetterTree<IModuleState, IRootState> = {
@@ -16,7 +16,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   sortedByDays: (state: IModuleState, _, rootState) => (companyUserId: any) => {
     const { tasks: allTasks, lookup } = rootState.tasks
     const lists = rootState.lists.generalLists
-    const today = resetTime(new Date())
+    const today = setToMidnight(new Date())
     return state.task_users
       .filter(({ company_user_id }) => company_user_id === companyUserId)
       .map(
@@ -42,7 +42,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
             ? user_task_list_id
             : !next_work_day
             ? 'Unmarked'
-            : resetTime(next_work_day).getTime() < today.getTime()
+            : localDate(next_work_day) < today
             ? 'Past'
             : getListId(next_work_day, lists, user_task_list_id)
         })

@@ -222,7 +222,7 @@ Why not create item inside this?
 }
 .dragzone__content {
   /*max-height: 350px;*/
-  overflow-y: auto;
+  /*overflow-y: auto;*/
   padding: 0.5rem;
 }
 .dragzone__item {

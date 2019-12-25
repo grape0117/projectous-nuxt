@@ -196,12 +196,18 @@ export default class Custom extends Vue {
     let next_work_day = null
     let user_task_list_id = null
     if (listId === 'Past') {
+      /*
+        TODO: This isn't clean. It shouldn't just be a month back. Seems like we have options:
+        1) When the list loads, resave all to have a specific listId like -1
+        2) Figure out where in the list the new entry was added and use the same next_work_day (seems wrong though)
+         */
       const date = new Date()
       next_work_day = formatDateToYYYY_MM_DD(
         new Date(date.setMonth(date.getMonth() - 1))
       )
       //If listId is a date, return that I think
     } else if (!!Date.parse(listId) && isNaN(listId)) {
+      //TODO: check to see if we even need to convert it
       next_work_day = formatDateToYYYY_MM_DD(listId)
       //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {
@@ -221,24 +227,27 @@ export default class Custom extends Vue {
 
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
     const taskUser = cloneDeep(this.getTaskUserById(id))
-    let newNextWorkDay = null
+    let next_work_day = null
     if (listId === 'Past') {
+      //TODO: see note on create function
       const date = new Date()
-      newNextWorkDay = formatDateToYYYY_MM_DD(
+      next_work_day = formatDateToYYYY_MM_DD(
         new Date(date.setMonth(date.getMonth() - 1))
       )
       //If listId is a date, return that I think
     } else if (!!Date.parse(listId) && isNaN(listId)) {
-      newNextWorkDay = formatDateToYYYY_MM_DD(listId)
+      console.log('next_work_day?', listId)
+      next_work_day = formatDateToYYYY_MM_DD(listId)
       //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {
       //Only user-created lists have a listId set on task_user object
       taskUser.user_task_list_id = listId
       //TODO: set next_word_day to null?
     }
-    taskUser.next_work_day = newNextWorkDay
+    taskUser.next_work_day = next_work_day
     taskUser.sort_order = sort_order
     await this.updateTaskUserVuex(taskUser)
+    //TODO: why is updating a title mixed in with moving a task?
     const task = cloneDeep(this.getTaskById(task_id))
     if (task.title !== title) {
       task.title = title
