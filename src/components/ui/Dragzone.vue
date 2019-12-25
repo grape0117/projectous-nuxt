@@ -125,7 +125,6 @@ export default class Dragzone extends Vue {
   }
 
   private projectName(project_id: any) {
-    console.log('item', project_id)
     const project = this.$store.getters['projects/getById'](project_id)
     return project ? project.name : project_id
   }

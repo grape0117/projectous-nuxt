@@ -12,13 +12,23 @@
       @dragend.self="dragEnd"
       @dragenter="moveList(index, group.isDraggable)"
     >
-      <div class="list__group-title">{{ group.name }}</div>
+      <div v-if="!verticalAlignment" class="list__group-title">
+        {{ group.name }}
+      </div>
       <div
         v-for="{ id, title } in lists.filter(list => list.group === group.name)"
         :key="id"
         class="list__group"
       >
         <div class="list__group-subtitle" v-if="verticalAlignment">
+          <div
+            v-if="group.isDraggable"
+            class="dragzone__item-dragbox dragzone__item-dragbox--active"
+          >
+            <span />
+            <span />
+            <span />
+          </div>
           <div>{{ title }}</div>
         </div>
         <pj-dragzone
@@ -169,6 +179,11 @@ export default class Draggable extends Vue {
   color: #85868a;
   font-weight: bold;
 }
+
+.list__group-subtitle > div {
+  float: left;
+}
+
 .list__group-subtitle div {
   writing-mode: vertical-rl;
   text-align: center;
