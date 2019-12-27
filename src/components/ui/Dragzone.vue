@@ -196,10 +196,14 @@ export default class Dragzone extends Vue {
       if (this.newNameTouched) {
         item.title = name
         this.$emit('create', item)
+        this.$emit('deleteTempItem')
       }
-      this.$emit('deleteTempItem')
+      if (!name) {
+        this.$emit('deleteTempItem')
+      }
       this.preventUpdate = false
       this.editedItemId = null
+      this.newNameTouched = false
     } else if (item.title !== name) {
       const updatedItem = cloneDeep(item)
       updatedItem.title = name
@@ -223,9 +227,10 @@ Why not create item inside this?
   private async onEnter(event: any, item: any) {
     if (!this.tempItemId) {
       this.newNameTouched = false
-      const { target } = event
       this.preventUpdate = true
       this.$emit('addTempItem', item)
+    } else {
+      const { target } = event
       target.blur()
     }
   }
