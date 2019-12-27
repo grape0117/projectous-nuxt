@@ -1,7 +1,7 @@
 <template>
   <div class="dragzone" @dragover.prevent @dragenter="moveToNewList">
     <div
-      v-if="options.length > numberOfExpandedItems"
+      v-if="tasks.length > numberOfExpandedItems"
       @click="expandedList = !expandedList"
       class="dragzone__item-icon"
     >
@@ -10,8 +10,8 @@
     <div class="dragzone__content">
       <div
         v-for="(item, index) in expandedList
-          ? options.slice(0, numberOfExpandedItems)
-          : options"
+          ? tasks.slice(0, numberOfExpandedItems)
+          : tasks"
         :key="item.id"
         class="dragzone__item"
         :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
@@ -78,7 +78,7 @@
       </div>
     </div>
     <div
-      v-if="expandedList && options.length > numberOfExpandedItems"
+      v-if="expandedList && tasks.length > numberOfExpandedItems"
       class="pl-2"
     >
       ...
@@ -96,7 +96,7 @@ const Tasks = namespace('tasks')
 export default class Dragzone extends Vue {
   @Prop({ required: true }) public id!: number
   @Prop({ required: true }) public draggedItemId!: number | null
-  @Prop({ required: true, default: () => [] }) public options!: any
+  @Prop({ required: true, default: () => [] }) public tasks!: any
   @Prop({ required: true }) public isListDragged!: boolean
   @Prop({ required: true }) public group!: string
   @Prop({ required: true }) public tempItemId!: number | null
@@ -116,7 +116,7 @@ export default class Dragzone extends Vue {
       await this.$nextTick()
       const newEl =
         this.$el.querySelector(`.dragzone__item-text[data-id="${id}"]`) ||
-        this.$el.querySelectorAll('.dragzone__item-text')[this.options.length]
+        this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
       if (newEl) {
         // @ts-ignore
         newEl.focus()
@@ -160,7 +160,7 @@ export default class Dragzone extends Vue {
   private moveToNewList() {
     if (this.isListDragged) return
 
-    if (!this.options.length) {
+    if (!this.tasks.length) {
       try {
         const item = JSON.parse(localStorage.getItem('item') as string)
         item.listId = this.id
@@ -217,13 +217,13 @@ Why not create item inside this?
 .dragzone {
   /*width: calc(100% - 121px);*/
   min-height: 40px;
-  padding: 0.5rem;
+  /*padding: 0.5rem;*/
   height: auto;
 }
 .dragzone__content {
   /*max-height: 350px;*/
   /*overflow-y: auto;*/
-  padding: 0.5rem;
+  /*padding: 0.5rem;*/
 }
 .dragzone__item {
   display: flex;
@@ -272,7 +272,7 @@ Why not create item inside this?
   margin: 2px 0;
 }
 .dragzone__item-dragbox--active span {
-  background: #cef3f7;
+  background: lightgrey; /*#cef3f7;*/
 }
 .dragzone__item-text {
   margin-left: 30px;

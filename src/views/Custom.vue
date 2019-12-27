@@ -13,7 +13,7 @@
     <hr />
     <b-container fluid>
       <b-row>
-        <b-col cols="3">
+        <b-col cols="3" class="scroll-col">
           <pj-draggable
             :data="tasksUsers"
             :lists="lists"
@@ -22,7 +22,7 @@
             @taskTimerToggled="onTaskTimerToggled"
           />
         </b-col>
-        <b-col cols="3">
+        <b-col cols="3" class="scroll-col">
           <div class="text-center">
             Projects
           </div>
@@ -285,5 +285,10 @@ export default class Custom extends Vue {
 
 .project-item__name:hover {
   color: blue;
+}
+
+.scroll-col {
+  height: calc(100vh - 170px);
+  overflow-y: scroll;
 }
 </style>

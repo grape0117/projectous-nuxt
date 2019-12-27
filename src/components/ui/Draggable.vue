@@ -33,7 +33,7 @@
         </div>
         <pj-dragzone
           :id="id"
-          :options="groupedData[id]"
+          :tasks="groupedData[id]"
           :isListDragged="isListDragged"
           :draggedItemId="draggedItemId"
           :group="group"
