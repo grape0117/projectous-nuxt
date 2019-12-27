@@ -84,7 +84,7 @@
       </div>
 
       <div
-        v-if="options.length === 0"
+        v-if="tasks.length === 0"
         class="dragzone__add-task"
         @click="onClickAddButton"
       >
@@ -123,7 +123,7 @@ export default class Dragzone extends Vue {
   private newNameTouched: boolean = false
 
   private get isListExpandable() {
-    return this.options.length > this.numberOfExpandedItems
+    return this.tasks.length > this.numberOfExpandedItems
   }
 
   @Watch('tempItemId')
@@ -156,8 +156,8 @@ export default class Dragzone extends Vue {
       this.$emit('update', item)
       localStorage.removeItem('item')
       this.$emit('setDraggedItemId', null)
-      if (this.options.length)
-        this.$emit('updateOptions', JSON.stringify(this.options))
+      if (this.tasks.length)
+        this.$emit('updateOptions', JSON.stringify(this.tasks))
     } catch (e) {
       console.log(e)
     }
@@ -199,8 +199,8 @@ export default class Dragzone extends Vue {
       if (this.newNameTouched) {
         item.title = name
         this.$emit('create', item)
-        if (this.options.length)
-          this.$emit('updateOptions', JSON.stringify(this.options))
+        if (this.tasks.length)
+          this.$emit('updateOptions', JSON.stringify(this.tasks))
         this.$emit('deleteTempItem')
       }
       if (!name) {
