@@ -155,8 +155,8 @@ export default class Custom extends Vue {
 
   private selectedCompanyUser: any = null
 
-  public async createTask({ title }: any) {
-    await this.createTaskVuex({ title, project_id: this.selectedProjectId })
+  public async createTask({ title, sort_order }: any) {
+    await this.createTaskVuex({ title, project_id: this.selectedProjectId, project_sort_order: sort_order })
   }
 
   public async updateTask(task: any) {

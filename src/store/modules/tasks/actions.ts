@@ -37,11 +37,12 @@ function createDefaultTask(): ITask {
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
-  async createTask({ commit, getters }: any, { title, project_id }: any) {
+  async createTask({ commit, getters }: any, { title, project_id, project_sort_order }: any) {
     const task = {
       ...createDefaultTask(),
       title,
-      project_id
+      project_id,
+      project_sort_order
     }
     //TODO: should we do this? task.id = uuid.v4();
     // @ts-ignore
