@@ -39,7 +39,7 @@
                 contenteditable="true"
                 :data-id="item.id"
                 @blur="updateTitle($event, item)"
-                @keydown.enter.prevent="onEnter($event, item)"
+                @keydown.enter.prevent="onEnter($event, item, index)"
                 @click="editedItemId = item.id"
                 @input="newNameTouched = true"
               />
@@ -134,6 +134,7 @@ export default class Dragzone extends Vue {
         this.$el.querySelector(`.dragzone__item-text[data-id="${id}"]`) ||
         this.$el.querySelectorAll('.dragzone__item-text')[this.options.length]
       if (newEl) {
+        this.expandedList = true
         // @ts-ignore
         newEl.focus()
       }
@@ -155,6 +156,7 @@ export default class Dragzone extends Vue {
       this.$emit('update', item)
       localStorage.removeItem('item')
       this.$emit('setDraggedItemId', null)
+      if (this.options.length) this.$emit('updateOptions', JSON.stringify(this.options))
     } catch (e) {
       console.log(e)
     }
@@ -196,6 +198,7 @@ export default class Dragzone extends Vue {
       if (this.newNameTouched) {
         item.title = name
         this.$emit('create', item)
+        if (this.options.length) this.$emit('updateOptions', JSON.stringify(this.options))
         this.$emit('deleteTempItem')
       }
       if (!name) {
@@ -224,11 +227,11 @@ export default class Dragzone extends Vue {
   /*
 Why not create item inside this?
  */
-  private async onEnter(event: any, item: any) {
+  private async onEnter(event: any, item: any, index: number) {
     if (!this.tempItemId) {
       this.newNameTouched = false
       this.preventUpdate = true
-      this.$emit('addTempItem', item)
+      this.$emit('addTempItem', item, index)
     } else {
       const { target } = event
       target.blur()
