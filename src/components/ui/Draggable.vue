@@ -16,7 +16,9 @@
         {{ group.name }}
       </div>
       <div
-        v-for="{ id, title } in lists.filter(list => list.group === group.name)"
+        v-for="{ id, title, initiallyExpanded } in lists.filter(
+          list => list.group === group.name
+        )"
         :key="id"
         class="list__group"
       >
@@ -38,6 +40,7 @@
           :draggedItemId="draggedItemId"
           :group="group"
           :tempItemId="tempItemId"
+          :initiallyExpanded="initiallyExpanded"
           @create="$emit('create', $event)"
           @update="$emit('update', $event)"
           @taskTimerToggled="$emit('taskTimerToggled', $event)"
@@ -45,6 +48,7 @@
           @setDraggedItemId="draggedItemId = $event"
           @addTempItem="addTempItem"
           @deleteTempItem="deleteTempItem"
+          @updateOptions="$emit('updateOptions', $event)"
         />
       </div>
     </div>
@@ -100,12 +104,16 @@ export default class Draggable extends Vue {
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)
   }
-  public addTempItem({ listId }: any) {
+  public addTempItem({ listId, id = null }: any, index: number) {
     const tempId = generateUniqId(10000)
-    this.clonedData.splice(1, 0, {
+    const currentIndex = this.clonedData.findIndex(
+      ({ id: itemId }: any) => id === itemId
+    )
+    this.clonedData.splice(currentIndex > -1 ? currentIndex + 1 : 0, 0, {
       id: tempId,
       title: '',
-      listId: listId
+      listId: listId,
+      sort_order: !isNaN(index) ? index + 1 : 0
     })
     this.tempItemId = tempId
   }

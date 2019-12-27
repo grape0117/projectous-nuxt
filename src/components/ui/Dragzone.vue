@@ -1,7 +1,7 @@
 <template>
   <div class="dragzone" @dragover.prevent @dragenter="moveToNewList">
     <div
-      v-if="tasks.length > numberOfExpandedItems"
+      v-if="isListExpandable"
       @click="expandedList = !expandedList"
       class="dragzone__item-icon"
     >
@@ -10,8 +10,8 @@
     <div class="dragzone__content">
       <div
         v-for="(item, index) in expandedList
-          ? tasks.slice(0, numberOfExpandedItems)
-          : tasks"
+          ? tasks
+          : tasks.slice(0, numberOfExpandedItems)"
         :key="item.id"
         class="dragzone__item"
         :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
@@ -39,7 +39,7 @@
                 contenteditable="true"
                 :data-id="item.id"
                 @blur="updateTitle($event, item)"
-                @keydown.enter.prevent="onEnter($event, item)"
+                @keydown.enter.prevent="onEnter($event, item, index)"
                 @click="editedItemId = item.id"
                 @input="newNameTouched = true"
               />
@@ -75,12 +75,23 @@
             <div class="dragzone__item-tracker-time">00:00:00</div>
           </div>
         </div>
+        <div
+          class="dragzone__add-task dragzone__add-task--item"
+          @click="onClickAddButton"
+        >
+          +
+        </div>
+      </div>
+
+      <div
+        v-if="options.length === 0"
+        class="dragzone__add-task"
+        @click="onClickAddButton"
+      >
+        +
       </div>
     </div>
-    <div
-      v-if="expandedList && tasks.length > numberOfExpandedItems"
-      class="pl-2"
-    >
+    <div v-if="!expandedList && isListExpandable" class="pl-2">
       ...
     </div>
   </div>
@@ -100,15 +111,20 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public isListDragged!: boolean
   @Prop({ required: true }) public group!: string
   @Prop({ required: true }) public tempItemId!: number | null
+  @Prop({ required: false, default: false }) public initiallyExpanded!: boolean
   @Tasks.Getter public getById!: any
 
-  private expandedList: boolean = true
+  private expandedList: boolean = this.initiallyExpanded
   private numberOfExpandedItems: number = 3
   private newItem: any = null
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
   private preventUpdate: boolean = false
   private newNameTouched: boolean = false
+
+  private get isListExpandable() {
+    return this.options.length > this.numberOfExpandedItems
+  }
 
   @Watch('tempItemId')
   private async onTempItemIdChanged(id: number | null) {
@@ -118,6 +134,7 @@ export default class Dragzone extends Vue {
         this.$el.querySelector(`.dragzone__item-text[data-id="${id}"]`) ||
         this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
       if (newEl) {
+        this.expandedList = true
         // @ts-ignore
         newEl.focus()
       }
@@ -139,6 +156,8 @@ export default class Dragzone extends Vue {
       this.$emit('update', item)
       localStorage.removeItem('item')
       this.$emit('setDraggedItemId', null)
+      if (this.options.length)
+        this.$emit('updateOptions', JSON.stringify(this.options))
     } catch (e) {
       console.log(e)
     }
@@ -180,28 +199,47 @@ export default class Dragzone extends Vue {
       if (this.newNameTouched) {
         item.title = name
         this.$emit('create', item)
+        if (this.options.length)
+          this.$emit('updateOptions', JSON.stringify(this.options))
         this.$emit('deleteTempItem')
-        this.preventUpdate = false
       }
-    } else {
+      if (!name) {
+        this.$emit('deleteTempItem')
+      }
+      this.preventUpdate = false
+      this.editedItemId = null
+      this.newNameTouched = false
+    } else if (item.title !== name) {
       const updatedItem = cloneDeep(item)
       updatedItem.title = name
       this.$emit('update', updatedItem)
     }
   }
 
+  private async onClickAddButton() {
+    if (!this.tempItemId) {
+      this.newNameTouched = false
+      this.preventUpdate = true
+      this.$emit('addTempItem', {
+        listId: this.id
+      })
+    }
+  }
+
   /*
 Why not create item inside this?
  */
-  private async onEnter(event: any, item: any) {
+  private async onEnter(event: any, item: any, index: number) {
     if (!this.tempItemId) {
       this.newNameTouched = false
-      const { target } = event
       this.preventUpdate = true
-      this.$emit('addTempItem', item)
+      this.$emit('addTempItem', item, index)
+    } else {
+      const { target } = event
       target.blur()
     }
   }
+
   /*
   This is for toggling the Play/Stop icon
    */
@@ -230,6 +268,9 @@ Why not create item inside this?
   align-items: flex-start;
   padding: 2px 0;
   cursor: pointer;
+}
+.dragzone__item:hover .dragzone__add-task--item {
+  display: block;
 }
 .dragzone__item-icon {
   width: 25px;
@@ -356,6 +397,11 @@ Why not create item inside this?
 .dragzone__item-tracker-time {
   margin-left: auto;
   font-weight: bold;
+}
+.dragzone__add-task {
+}
+.dragzone__add-task--item {
+  display: none;
 }
 *:focus {
   outline: none;

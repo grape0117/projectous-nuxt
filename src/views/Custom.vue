@@ -20,6 +20,7 @@
             @create="createTaskUser"
             @update="updateTaskUser"
             @taskTimerToggled="onTaskTimerToggled"
+            @updateOptions="updateTaskUserSortOrder"
           />
         </b-col>
         <b-col cols="3" class="scroll-col">
@@ -47,6 +48,7 @@
             :verticalAlignment="false"
             @create="createTask"
             @update="updateTask"
+            @updateOptions="updateTaskSortOrder"
           />
         </b-col>
       </b-row>
@@ -87,8 +89,11 @@ export default class Custom extends Vue {
   @TaskUsers.Getter private sortedByDays!: any
   @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
   @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
+  @TaskUsers.Action('updateSortOrder')
+  private updateTaskUsersSortOrderVuex!: any
   @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
+  @Tasks.Action('updateSortOrder') private updateTaskSortOrderVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
   @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
   @Lists.Getter private getUserLists!: any
@@ -157,7 +162,8 @@ export default class Custom extends Vue {
     return taskStatuses.map(status => ({
       title: status,
       id: status,
-      group: status
+      group: status,
+      initiallyExpanded: true
     }))
   }
 
@@ -192,7 +198,7 @@ export default class Custom extends Vue {
     await this.updateTaskVuex(taskCopy)
   }
 
-  public async createTaskUser({ title, listId }: any) {
+  public async createTaskUser({ title, listId, sort_order }: any) {
     let next_work_day = null
     let user_task_list_id = null
     if (listId === 'Past') {
@@ -220,7 +226,8 @@ export default class Custom extends Vue {
       task_id: id,
       next_work_day,
       company_user_id: this.selectedCompanyUser.id,
-      user_task_list_id
+      user_task_list_id,
+      sort_order
     }
     await this.createTaskUserVuex(taskUser)
   }
@@ -259,6 +266,20 @@ export default class Custom extends Vue {
     const { taskId, timerId } = payload
     this.editedTaskId = taskId
     this.editedTaskTimerId = timerId
+  }
+
+  private updateTaskUserSortOrder(tasks: any): void {
+    const parsedTasks = JSON.parse(tasks)
+    this.updateTaskUsersSortOrderVuex(
+      parsedTasks.map(({ id }: { id: number }) => id)
+    )
+  }
+
+  private updateTaskSortOrder(tasks: any): void {
+    const parsedTasks = JSON.parse(tasks)
+    this.updateTaskSortOrderVuex(
+      parsedTasks.map(({ id }: { id: number }) => id)
+    )
   }
 
   @Watch('selectedCompanyUser')
