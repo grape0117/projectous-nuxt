@@ -67,13 +67,20 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   //   commit('tasks/UPDATE', task)
   //   commit('task_users/UPDATE', task_user)
   // },
-  async createTaskUser({ commit }, { task_id, next_work_day, company_user_id, user_task_list_id}: ITaskUser) {
+  async createTaskUser({ commit }, {
+    task_id,
+    next_work_day,
+    company_user_id,
+    user_task_list_id,
+    sort_order}: ITaskUser
+  ) {
     const taskUser = {
       ...creteDefaultTaskUser(),
       task_id,
       next_work_day,
       company_user_id,
-      user_task_list_id
+      user_task_list_id,
+      sort_order
     }
     // @ts-ignore
     const { task_user } = await this._vm
@@ -88,5 +95,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       .$http()
       .put('/task-users/', taskUser.id, {task_user: taskUser})
     commit(UPDATE_TASK_USER, task_user)
+  },
+  updateSortOrder({ commit }, ids) {
+    // Todo: @stephane - create endpoint to update sort_order for tasks
+    commit('updateTaskUsersSortOrder', ids)
   }
 }

@@ -38,6 +38,7 @@
           @setDraggedItemId="draggedItemId = $event"
           @addTempItem="addTempItem"
           @deleteTempItem="deleteTempItem"
+          @updateOptions="$emit('updateOptions', $event)"
         />
       </div>
     </div>
@@ -93,12 +94,14 @@ export default class Draggable extends Vue {
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)
   }
-  public addTempItem({ listId }: any) {
+  public addTempItem({ listId, id = null }: any, index: number) {
     const tempId = generateUniqId(10000)
-    this.clonedData.splice(1, 0, {
+    const currentIndex = this.clonedData.findIndex(({ id: itemId }: any) => id === itemId)
+    this.clonedData.splice(currentIndex > -1 ? currentIndex + 1 : 0, 0, {
       id: tempId,
       title: '',
-      listId: listId
+      listId: listId,
+      sort_order: !isNaN(index) ? index + 1 : 0
     })
     this.tempItemId = tempId
   }

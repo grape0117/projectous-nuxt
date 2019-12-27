@@ -59,5 +59,11 @@ export const mutations: MutationTree<IModuleState> = {
     Vue.delete(state.tasks, state.lookup[task.id])
     Vue.delete(state.lookup, task.id)
     //TODO: what to do with tasks_users?
+  },
+  updateTasksSortOrder(state: IModuleState, ids: number[]) {
+    ids.forEach((id, index) => {
+      const task = state.tasks[state.lookup[id]]
+      if (task) task.project_sort_order = index
+    })
   }
 }

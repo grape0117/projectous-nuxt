@@ -37,11 +37,12 @@ function createDefaultTask(): ITask {
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
-  async createTask({ commit, getters }: any, { title, project_id }: any) {
+  async createTask({ commit, getters }: any, { title, project_id, project_sort_order }: any) {
     const task = {
       ...createDefaultTask(),
       title,
-      project_id
+      project_id,
+      project_sort_order
     }
     //TODO: should we do this? task.id = uuid.v4();
     // @ts-ignore
@@ -54,5 +55,14 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     await this._vm.$http().put('/tasks/', task.id, { task })
     // TODO @stephane send task to server
     commit('upsert', task)
+  },
+  /**
+   * @param commit - vuex mutation
+   * @param { number[] } ids - list of tasks ids, where index is equal sort_order
+   * @description: update tasks sort order
+   */
+  updateSortOrder({ commit }, ids) {
+    // Todo: @stephane - create endpoint to update project_sort_order for tasks
+    commit('updateTasksSortOrder', ids)
   }
 }
