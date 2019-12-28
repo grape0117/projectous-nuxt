@@ -4,6 +4,7 @@ import { IRootState } from '@/store/types'
 
 export const mutations: MutationTree<IModuleState> = {
   ADD_MANY(state: IModuleState, { company_clients }: any) {
+    // @ts-ignore
     this.commit('ADD_MANY', {
       module: 'company_clients',
       entities: company_clients

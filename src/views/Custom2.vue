@@ -121,7 +121,7 @@ export default {
                 listId: status
             }))
         },
-        taskPerStatusLists: () =>{
+        taskPerStatusLists: () => {
             return taskStatuses.map(status => ({
                 title: status,
                 id: status,
@@ -130,25 +130,35 @@ export default {
         }
 
     },
-    watch: {
-        selectedCompanyUser: {
-            if (value) {
-                this.$router.push({ query: { user: value.id } }).catch(e => {})
-            }
-        }  ,
-        sortedCompanyUsers: {
-            const query = this.$route.query.user
-            if (query) {
-                const user = users.find(({ id }) => id === +query)
-                if (user && !this.selectedCompanyUser) this.selectedCompanyUser = user
-            }
+    /*
+      Todo: @stephane if I correct watchers should be functions
+      watch: {
+        selectedCompanyUser(value) {
+          if(value) {
+            this.$router.push({ query: { user: value.id } }).catch(e => {})
+          }
         }
-    },
+      }
+    */
+    // watch: {
+    //     selectedCompanyUser: {
+    //         if(value) {
+    //             this.$router.push({ query: { user: value.id } }).catch(e => {})
+    //         }
+    //     },
+    //     sortedCompanyUsers: {
+    //         const query = this.$route.query.user
+    //         if (query) {
+    //             const user = users.find(({ id }) => id === +query)
+    //             if (user && !this.selectedCompanyUser) this.selectedCompanyUser = user
+    //         }
+    //     }
+    // },
     methods: {
-        createTask: (title) => {
-            this.$store.dispatch('createTaskVuex',{ title, project_id: this.selectedProjectId })
+        createTask: title => {
+            this.$store.dispatch('createTaskVuex', { title, project_id: this.selectedProjectId })
         },
-        updateTask: (task) => {
+        updateTask: task => {
             const taskCopy = cloneDeep(this.getTaskById(task.id)) //TODO remove cloneDeep
             taskCopy.status = task.listId
             taskCopy.sort_order = task.sort_order
@@ -206,12 +216,12 @@ export default {
                 this.dispatch('updateTaskVuex', task)
             }
         },
-        onTaskTimerToggled: (payload) => {
+        onTaskTimerToggled: payload => {
             const { taskId, timerId } = payload
             this.editedTaskId = taskId
             this.editedTaskTimerId = timerId
         }
-    },
+    }
 }
 </script>
 <style>

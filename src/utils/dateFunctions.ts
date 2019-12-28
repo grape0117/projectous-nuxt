@@ -30,7 +30,7 @@ export const getUserTaskListFormattedDate = (date: Date) => {
   }
 }
 
-export const formatDateToYYYY_MM_DD = (datetime: string) => {
+export const formatDateToYYYY_MM_DD = (datetime: Date) => {
   const date = new Date(datetime)
   const year = date.getFullYear()
   const month = ('00' + (date.getMonth() + 1).toString()).slice(-2)

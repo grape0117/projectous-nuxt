@@ -128,10 +128,10 @@ export default class Custom extends Vue {
 
   get activeClients() {
     return this.$store.state.company_clients.company_clients
-      .filter(client => {
+      .filter((client: any) => {
         return client.status === 'active'
       })
-      .sort(function(a, b) {
+      .sort((a: any, b: any) => {
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
         if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
         return 0
@@ -171,11 +171,11 @@ export default class Custom extends Vue {
 
   public openClientProjects(client: any) {
     return this.$store.state.projects.projects
-      .filter(project => {
+      .filter((project: any) => {
         if (project.status !== 'open') return false
         return project.client_id === client.client_company_id
       })
-      .sort(function(a, b) {
+      .sort((a: any, b: any) => {
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
         if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
         return 0
