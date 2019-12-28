@@ -12,7 +12,9 @@
       @dragend.self="dragEnd"
       @dragenter="moveList(index, group.isDraggable)"
     >
-      <div class="list__group-title">{{ group.name }}</div>
+      <div v-if="!verticalAlignment" class="list__group-title">
+        {{ group.name }}
+      </div>
       <div
         v-for="{ id, title, initiallyExpanded } in lists.filter(
           list => list.group === group.name
@@ -21,11 +23,19 @@
         class="list__group"
       >
         <div class="list__group-subtitle" v-if="verticalAlignment">
-          {{ title }}
+          <div
+            v-if="group.isDraggable"
+            class="dragzone__item-dragbox dragzone__item-dragbox--active"
+          >
+            <span />
+            <span />
+            <span />
+          </div>
+          <div>{{ title }}</div>
         </div>
         <pj-dragzone
           :id="id"
-          :options="groupedData[id]"
+          :tasks="groupedData[id]"
           :isListDragged="isListDragged"
           :draggedItemId="draggedItemId"
           :group="group"
@@ -96,7 +106,9 @@ export default class Draggable extends Vue {
   }
   public addTempItem({ listId, id = null }: any, index: number) {
     const tempId = generateUniqId(10000)
-    const currentIndex = this.clonedData.findIndex(({ id: itemId }: any) => id === itemId)
+    const currentIndex = this.clonedData.findIndex(
+      ({ id: itemId }: any) => id === itemId
+    )
     this.clonedData.splice(currentIndex > -1 ? currentIndex + 1 : 0, 0, {
       id: tempId,
       title: '',
@@ -166,7 +178,7 @@ export default class Draggable extends Vue {
   text-align: center;
 }
 .list__group-subtitle {
-  width: 120px;
+  width: 40px;
   padding: 0.5rem;
   border-right: 1px solid #f6f6f6;
   background: #f0fbfc;
@@ -174,5 +186,14 @@ export default class Draggable extends Vue {
   text-transform: uppercase;
   color: #85868a;
   font-weight: bold;
+}
+
+.list__group-subtitle > div {
+  float: left;
+}
+
+.list__group-subtitle div {
+  writing-mode: vertical-rl;
+  text-align: center;
 }
 </style>

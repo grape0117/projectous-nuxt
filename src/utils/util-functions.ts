@@ -1,19 +1,23 @@
-import { getUserFriendlyDate, resetTime } from '@/utils/dateFunctions'
+import {
+  getUserTaskListFormattedDate,
+  setToMidnight,
+  localDate
+} from '@/utils/dateFunctions'
 import { IList } from '@/store/modules/lists/types'
 
 export function getListId(
-  next_work_day: Date | string | null,
+  next_work_day: string | null,
   lists: any,
   listId: any = null
 ) {
   if (listId) return listId
   if (!next_work_day) return 'Unmarked'
-  const today = resetTime(new Date())
-  if (resetTime(next_work_day as Date).getTime() < today.getTime())
-    return 'Past'
-  if (Date.parse(next_work_day as string)) {
+  const today = setToMidnight(new Date())
+  console.log('getListId', next_work_day)
+  if (localDate(next_work_day).getTime() < today.getTime()) return 'Past'
+  if (Date.parse(next_work_day)) {
     const list = lists.find(
-      ({ id }: any) => resetTime(next_work_day as Date).toString() === id
+      ({ id }: any) => localDate(next_work_day).toString() === id
     )
     return list ? list.id : 'Unmarked'
   }
@@ -21,7 +25,7 @@ export function getListId(
 
 export function createListsByDays(): IList[] {
   const lists: IList[] = []
-  const today = resetTime(new Date())
+  const today = setToMidnight(new Date())
   lists.push({
     id: 'Past',
     title: 'Outdated tasks',
@@ -29,15 +33,15 @@ export function createListsByDays(): IList[] {
   })
   lists.push({
     id: today.toString(),
-    title: getUserFriendlyDate(today),
+    title: getUserTaskListFormattedDate(today),
     group: 'Current Tasks'
   })
   for (let day = 1; day < 7; day++) {
-    const date = resetTime(new Date())
-    date.setDate(resetTime(new Date()).getDate() + day)
+    const date = setToMidnight(new Date())
+    date.setDate(setToMidnight(new Date()).getDate() + day)
     lists.push({
       id: date.toString(),
-      title: getUserFriendlyDate(date),
+      title: getUserTaskListFormattedDate(date),
       group: 'Current Tasks'
     })
   }

@@ -39,9 +39,10 @@ export default {
     async init() {
       //this.$bvModal.show('edit-user-modal')
       const {
+        company_clients,
+        company_users,
         task_users,
         tasks,
-        company_users,
         projects,
         project_users,
         user_task_lists
@@ -70,6 +71,12 @@ export default {
       this.$store.commit(
         'ADD_MANY',
         { module: 'company_users', entities: company_users },
+        { root: true }
+      )
+      console.log('company_clients')
+      this.$store.commit(
+        'ADD_MANY',
+        { module: 'company_clients', entities: company_clients },
         { root: true }
       )
       const daysLists = createListsByDays()

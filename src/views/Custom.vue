@@ -13,7 +13,7 @@
     <hr />
     <b-container fluid>
       <b-row>
-        <b-col cols="3">
+        <b-col cols="3" class="scroll-col">
           <pj-draggable
             :data="tasksUsers"
             :lists="lists"
@@ -23,16 +23,16 @@
             @updateOptions="updateTaskUserSortOrder"
           />
         </b-col>
-        <b-col cols="3">
+        <b-col cols="3" class="scroll-col">
           <div class="text-center">
             Projects
           </div>
-          <div v-for="(projects, clientId) in projectsByClientId">
+          <div v-for="client in activeClients">
             <!--            Todo: change client id to client name-->
-            Client id: {{ clientId }}
+            {{ client.name }}
             <ul>
               <li
-                v-for="{ name, id } in projects"
+                v-for="{ name, id } in openClientProjects(client)"
                 @click="selectedProjectId = id"
                 class="project-item__name"
               >
@@ -65,13 +65,14 @@ import TaskDetails from '@/components/draggable/TaskDetails.vue'
 import { IProject } from '@/store/modules/projects/types'
 import { ITask } from '@/store/modules/tasks/types'
 
+const CompanyClients = namespace('company_clients')
 const CompanyUsers = namespace('company_users')
 const TaskUsers = namespace('task_users')
 const Tasks = namespace('tasks')
 const Lists = namespace('lists')
 const Projects = namespace('projects')
 
-const taskStatuses = ['open', 'in progress', 'closed']
+const taskStatuses = ['open', 'in progress', 'turned-in', 'completed', 'closed']
 
 interface ITaskTimerToggle {
   taskId: number | string
@@ -88,7 +89,8 @@ export default class Custom extends Vue {
   @TaskUsers.Getter private sortedByDays!: any
   @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
   @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
-  @TaskUsers.Action('updateSortOrder') private updateTaskUsersSortOrderVuex!: any
+  @TaskUsers.Action('updateSortOrder')
+  private updateTaskUsersSortOrderVuex!: any
   @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
   @Tasks.Action('updateSortOrder') private updateTaskSortOrderVuex!: any
@@ -124,6 +126,18 @@ export default class Custom extends Vue {
     )
   }
 
+  get activeClients() {
+    return this.$store.state.company_clients.company_clients
+      .filter((client: any) => {
+        return client.status === 'active'
+      })
+      .sort((a: any, b: any) => {
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+        return 0
+      })
+  }
+
   get projectsByClientId() {
     const projects: IProject[] = this.getUserProjects(null)
     const listOfProjectsToDisplay = projects
@@ -155,8 +169,26 @@ export default class Custom extends Vue {
 
   private selectedCompanyUser: any = null
 
-  public async createTask({ title, sort_order }: any) {
-    await this.createTaskVuex({ title, project_id: this.selectedProjectId, project_sort_order: sort_order })
+  public openClientProjects(client: any) {
+    return this.$store.state.projects.projects
+      .filter((project: any) => {
+        if (project.status !== 'open') return false
+        return project.client_id === client.client_company_id
+      })
+      .sort((a: any, b: any) => {
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+        return 0
+      })
+  }
+  public clientName(company_client_id: any) {
+    const company_client = this.$store.getters['company_clients/getById'](
+      company_client_id
+    )
+    return company_client ? company_client.name : ''
+  }
+  public async createTask({ title }: any) {
+    await this.createTaskVuex({ title, project_id: this.selectedProjectId })
   }
 
   public async updateTask(task: any) {
@@ -170,12 +202,18 @@ export default class Custom extends Vue {
     let next_work_day = null
     let user_task_list_id = null
     if (listId === 'Past') {
+      /*
+        TODO: This isn't clean. It shouldn't just be a month back. Seems like we have options:
+        1) When the list loads, resave all to have a specific listId like -1
+        2) Figure out where in the list the new entry was added and use the same next_work_day (seems wrong though)
+         */
       const date = new Date()
       next_work_day = formatDateToYYYY_MM_DD(
         new Date(date.setMonth(date.getMonth() - 1))
       )
       //If listId is a date, return that I think
     } else if (!!Date.parse(listId) && isNaN(listId)) {
+      //TODO: check to see if we even need to convert it
       next_work_day = formatDateToYYYY_MM_DD(listId)
       //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {
@@ -196,24 +234,27 @@ export default class Custom extends Vue {
 
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
     const taskUser = cloneDeep(this.getTaskUserById(id))
-    let newNextWorkDay = null
+    let next_work_day = null
     if (listId === 'Past') {
+      //TODO: see note on create function
       const date = new Date()
-      newNextWorkDay = formatDateToYYYY_MM_DD(
+      next_work_day = formatDateToYYYY_MM_DD(
         new Date(date.setMonth(date.getMonth() - 1))
       )
       //If listId is a date, return that I think
     } else if (!!Date.parse(listId) && isNaN(listId)) {
-      newNextWorkDay = formatDateToYYYY_MM_DD(listId)
+      console.log('next_work_day?', listId)
+      next_work_day = formatDateToYYYY_MM_DD(listId)
       //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {
       //Only user-created lists have a listId set on task_user object
       taskUser.user_task_list_id = listId
       //TODO: set next_word_day to null?
     }
-    taskUser.next_work_day = newNextWorkDay
+    taskUser.next_work_day = next_work_day
     taskUser.sort_order = sort_order
     await this.updateTaskUserVuex(taskUser)
+    //TODO: why is updating a title mixed in with moving a task?
     const task = cloneDeep(this.getTaskById(task_id))
     if (task.title !== title) {
       task.title = title
@@ -229,12 +270,16 @@ export default class Custom extends Vue {
 
   private updateTaskUserSortOrder(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.updateTaskUsersSortOrderVuex(parsedTasks.map(({ id }: { id: number }) => id))
+    this.updateTaskUsersSortOrderVuex(
+      parsedTasks.map(({ id }: { id: number }) => id)
+    )
   }
 
   private updateTaskSortOrder(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.updateTaskSortOrderVuex(parsedTasks.map(({ id }: { id: number }) => id))
+    this.updateTaskSortOrderVuex(
+      parsedTasks.map(({ id }: { id: number }) => id)
+    )
   }
 
   @Watch('selectedCompanyUser')
@@ -261,5 +306,10 @@ export default class Custom extends Vue {
 
 .project-item__name:hover {
   color: blue;
+}
+
+.scroll-col {
+  height: calc(100vh - 170px);
+  overflow-y: scroll;
 }
 </style>

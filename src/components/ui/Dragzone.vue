@@ -10,8 +10,8 @@
     <div class="dragzone__content">
       <div
         v-for="(item, index) in expandedList
-          ? options
-          : options.slice(0, numberOfExpandedItems)"
+          ? tasks
+          : tasks.slice(0, numberOfExpandedItems)"
         :key="item.id"
         class="dragzone__item"
         :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
@@ -20,14 +20,19 @@
         @dragend="dragend"
         @dragover="moveItem(index, item.id)"
       >
-        <div class="dragzone__item-dragbox dragzone__item-dragbox--active">
-          <span />
-          <span />
-          <span />
-        </div>
         <div class="dragzone__item-block">
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
+              <div class="dragzone__item-subtext">
+                {{ projectName(item.project_id) }}
+              </div>
+              <div
+                class="dragzone__item-dragbox dragzone__item-dragbox--active"
+              >
+                <span />
+                <span />
+                <span />
+              </div>
               <div
                 class="dragzone__item-text"
                 v-html="item.title"
@@ -38,7 +43,6 @@
                 @click="editedItemId = item.id"
                 @input="newNameTouched = true"
               />
-              <div class="dragzone__item-subtext">Greenbite</div>
             </div>
             <div
               v-if="editedItemId === item.id"
@@ -80,7 +84,7 @@
       </div>
 
       <div
-        v-if="options.length === 0"
+        v-if="tasks.length === 0"
         class="dragzone__add-task"
         @click="onClickAddButton"
       >
@@ -103,7 +107,7 @@ const Tasks = namespace('tasks')
 export default class Dragzone extends Vue {
   @Prop({ required: true }) public id!: number
   @Prop({ required: true }) public draggedItemId!: number | null
-  @Prop({ required: true, default: () => [] }) public options!: any
+  @Prop({ required: true, default: () => [] }) public tasks!: any
   @Prop({ required: true }) public isListDragged!: boolean
   @Prop({ required: true }) public group!: string
   @Prop({ required: true }) public tempItemId!: number | null
@@ -119,7 +123,7 @@ export default class Dragzone extends Vue {
   private newNameTouched: boolean = false
 
   private get isListExpandable() {
-    return this.options.length > this.numberOfExpandedItems
+    return this.tasks.length > this.numberOfExpandedItems
   }
 
   @Watch('tempItemId')
@@ -128,7 +132,7 @@ export default class Dragzone extends Vue {
       await this.$nextTick()
       const newEl =
         this.$el.querySelector(`.dragzone__item-text[data-id="${id}"]`) ||
-        this.$el.querySelectorAll('.dragzone__item-text')[this.options.length]
+        this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
       if (newEl) {
         this.expandedList = true
         // @ts-ignore
@@ -137,6 +141,10 @@ export default class Dragzone extends Vue {
     }
   }
 
+  private projectName(project_id: any) {
+    const project = this.$store.getters['projects/getById'](project_id)
+    return project ? project.name : project_id
+  }
   private dragstart(e: any, item: any) {
     e.dataTransfer.setData('application/node type', this)
     localStorage.setItem('item', JSON.stringify(item))
@@ -148,7 +156,8 @@ export default class Dragzone extends Vue {
       this.$emit('update', item)
       localStorage.removeItem('item')
       this.$emit('setDraggedItemId', null)
-      if (this.options.length) this.$emit('updateOptions', JSON.stringify(this.options))
+      if (this.tasks.length)
+        this.$emit('updateOptions', JSON.stringify(this.tasks))
     } catch (e) {
       console.log(e)
     }
@@ -170,7 +179,7 @@ export default class Dragzone extends Vue {
   private moveToNewList() {
     if (this.isListDragged) return
 
-    if (!this.options.length) {
+    if (!this.tasks.length) {
       try {
         const item = JSON.parse(localStorage.getItem('item') as string)
         item.listId = this.id
@@ -190,7 +199,8 @@ export default class Dragzone extends Vue {
       if (this.newNameTouched) {
         item.title = name
         this.$emit('create', item)
-        if (this.options.length) this.$emit('updateOptions', JSON.stringify(this.options))
+        if (this.tasks.length)
+          this.$emit('updateOptions', JSON.stringify(this.tasks))
         this.$emit('deleteTempItem')
       }
       if (!name) {
@@ -243,15 +253,15 @@ Why not create item inside this?
 
 <style>
 .dragzone {
-  width: calc(100% - 121px);
+  /*width: calc(100% - 121px);*/
   min-height: 40px;
-  padding: 0.5rem;
+  /*padding: 0.5rem;*/
   height: auto;
 }
 .dragzone__content {
-  max-height: 350px;
-  overflow-y: auto;
-  padding: 0.5rem;
+  /*max-height: 350px;*/
+  /*overflow-y: auto;*/
+  /*padding: 0.5rem;*/
 }
 .dragzone__item {
   display: flex;
@@ -287,10 +297,12 @@ Why not create item inside this?
   margin-right: 20px;
 }
 .dragzone__item-dragbox {
+  float: left;
   cursor: move;
   width: 12px;
   height: 12px;
   margin: 0.5rem;
+  margin-top: 0.2rem;
   flex: none;
 }
 .dragzone__item-dragbox span {
@@ -301,17 +313,21 @@ Why not create item inside this?
   margin: 2px 0;
 }
 .dragzone__item-dragbox--active span {
-  background: #cef3f7;
+  background: lightgrey; /*#cef3f7;*/
 }
 .dragzone__item-text {
+  margin-left: 30px;
   flex-grow: 1;
   min-height: 1.459em;
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   color: #595b60;
 }
 .dragzone__item-subtext {
+  margin-left: 30px;
   width: 100%;
-  font-size: 1rem;
+  margin-bottom: -0.1rem;
+  line-height: 0.8rem;
+  font-size: 0.7rem;
   font-weight: lighter;
   color: #949598;
 }
