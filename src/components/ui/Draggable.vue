@@ -57,7 +57,6 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { groupBy, cloneDeep, uniq, invert } from 'lodash'
-import move from 'array-move'
 import { generateUniqId } from '@/utils/util-functions'
 
 @Component
@@ -104,7 +103,7 @@ export default class Draggable extends Vue {
     const index = Number(this.clonedDataIndexes[item.id])
     const elementNewPosition = Number(this.clonedDataIndexes[idNewPosition])
     this.clonedData[index] = item
-    this.clonedData = move(this.clonedData, index, elementNewPosition)
+    this.clonedData.splice(elementNewPosition, 0, this.clonedData.splice(index, 1)[0] )
   }
   public addTempItem({ listId, id = null }: any, index: number) {
     const tempId = generateUniqId(10000)
