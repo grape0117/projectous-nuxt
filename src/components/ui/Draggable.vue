@@ -56,7 +56,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import { groupBy, cloneDeep, uniq } from 'lodash'
+import { groupBy, cloneDeep, uniq, invert } from 'lodash'
 import move from 'array-move'
 import { generateUniqId } from '@/utils/util-functions'
 
@@ -78,6 +78,10 @@ export default class Draggable extends Vue {
     return groupBy(this.clonedData, 'listId')
   }
 
+  get clonedDataIndexes() {
+    return invert(this.clonedData.map(({ id }: any) => id))
+  }
+
   @Watch('data', { immediate: true })
   public onDataChanged(value: any) {
     this.clonedData = cloneDeep(value)
@@ -97,10 +101,8 @@ export default class Draggable extends Vue {
   }
 
   public updateSorting(item: any, position: number, idNewPosition: number) {
-    const index = this.clonedData.findIndex(({ id }: any) => item.id === id)
-    const elementNewPosition = this.clonedData.findIndex(
-      ({ id }: any) => id === idNewPosition
-    )
+    const index = Number(this.clonedDataIndexes[item.id])
+    const elementNewPosition = Number(this.clonedDataIndexes[idNewPosition])
     this.clonedData[index] = item
     this.clonedData = move(this.clonedData, index, elementNewPosition)
   }

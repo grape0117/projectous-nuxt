@@ -20,7 +20,7 @@
         @dragend="dragend"
       >
         <div class="dragzone__item-block">
-          <div style="width: 100%; height: 5px" @dragover="moveItem(index, item.id)" />
+          <div style="width: 100%; height: 2px" @dragover="moveItem(index, item.id)" />
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
               <div class="dragzone__item-subtext">
