@@ -398,7 +398,7 @@ export default {
     },
     expenseClient: function() {
       let expenseProject = this.expenseProject()
-      return this.$store.getters['company_clients/getCompanyClientByClientId'](
+      return this.$store.getters['company_clients/getByClientCompanyId'](
         expenseProject.client_id
       )
     },
@@ -450,7 +450,7 @@ export default {
       if (project) {
         //TODO: checktypeof projectKey == 'number') {
         let company_client = self.$store.getters[
-          'company_clients/getCompanyClientByClientId'
+          'company_clients/getByClientCompanyId'
         ](project.client_id)
         formData = formData + '&company_client_id=' + company_client.id
       } else {
@@ -493,7 +493,7 @@ export default {
     },
     client_name: function(client_id) {
       let company_client = this.$store.getters[
-        'company_clients/getCompanyClientByClientId'
+        'company_clients/getByClientCompanyId'
       ](client_id)
       return company_client ? company_client.name : ''
     }
