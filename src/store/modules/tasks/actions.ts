@@ -27,7 +27,7 @@ function createDefaultTask(): ITask {
     priority_set_at: null,
     project_id: null,
     project_next_work_day: null,
-    project_sort_order: 0,
+    sort_order: 0,
     status: 'open',
     title: '',
     users: [],
@@ -63,5 +63,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   updateSortOrder({ commit }, ids) {
     // Todo: @stephane - create endpoint to update project_sort_order for tasks
     commit('updateTasksSortOrder', ids)
+    // @ts-ignore
+    this._vm.$http.post('/tasks/sort_order', { ids: ids })
   }
 }

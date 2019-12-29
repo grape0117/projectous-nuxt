@@ -102,5 +102,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   updateSortOrder({ commit }, ids) {
     // Todo: @stephane - create endpoint to update sort_order for tasks
     commit('updateTaskUsersSortOrder', ids)
+    // @ts-ignore
+    this._vm //@Mikhail this isn't working with put. It's not getting called at all unless I use post and not because of the id parameter (which I still don't like)
+      .$http()
+      .post('/task-users/sort_order', { ids: ids })
   }
 }

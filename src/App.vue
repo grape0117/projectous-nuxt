@@ -6,6 +6,7 @@
         <router-view />
       </div>
     </div>
+    <task-modal />
     <edit-user-modal />
   </div>
 </template>

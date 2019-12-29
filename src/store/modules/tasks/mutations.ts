@@ -63,7 +63,7 @@ export const mutations: MutationTree<IModuleState> = {
   updateTasksSortOrder(state: IModuleState, ids: number[]) {
     ids.forEach((id, index) => {
       const task = state.tasks[state.lookup[id]]
-      if (task) task.project_sort_order = index
+      if (task) task.sort_order = index //Project?
     })
   }
 }

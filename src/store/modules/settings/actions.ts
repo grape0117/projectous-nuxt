@@ -2,6 +2,7 @@ import { ActionTree } from 'vuex'
 import { IModuleState } from './types'
 import { IRootState } from '@/store/types'
 import { ICompanyUser } from '@/store/modules/company_users/types.ts'
+import $ from 'jquery'
 
 const company_user_id: number = 1
 
@@ -51,7 +52,10 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('tasks/UPDATE', task)
     commit('task_users/UPDATE', task_user)
   },
-  openModal() {},
+  openModal(context, { modal }) {
+    this.$bvModal.show(modal + '-modal')
+    //$('#'+modal+'-modal').modal({});
+  },
   closedModal(context) {
     console.log('closedModal')
     console.log('check_action_stack', context.state.check_action_stack)

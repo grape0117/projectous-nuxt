@@ -20,7 +20,10 @@
         @dragend="dragend"
       >
         <div class="dragzone__item-block">
-          <div style="width: 100%; height: 5px" @dragover="moveItem(index, item.id)" />
+          <div
+            style="width: 100%; height: 5px"
+            @dragover="moveItem(index, item.id)"
+          />
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
               <div class="dragzone__item-subtext">
@@ -28,6 +31,7 @@
               </div>
               <div
                 class="dragzone__item-dragbox dragzone__item-dragbox--active"
+                @click="editTask(item.task_id)"
               >
                 <span />
                 <span />
@@ -141,6 +145,16 @@ export default class Dragzone extends Vue {
     }
   }
 
+  private editTask(task_id: any) {
+    console.log(task_id)
+    this.$store.state.settings.current_edit_task = this.$store.getters[
+      'tasks/getById'
+    ](task_id)
+    console.log(this.$store.getters['tasks/getById'](task_id))
+    console.log(this.$store.state.settings.current_edit_task)
+    this.$bvModal.show('task-modal')
+    //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
+  }
   private projectName(project_id: any) {
     const project = this.$store.getters['projects/getById'](project_id)
     return project ? project.name : project_id
