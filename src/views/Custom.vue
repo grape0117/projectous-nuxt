@@ -35,7 +35,7 @@
                 v-for="{ name, id } in openClientProjects(client)"
               >
                 <div class="project-item__name" @click="setProjectId(id)">{{ name }}</div>
-                <div @click="pinProject(id)" class="project-item__status">
+                <div @click="setPinnedProject(id)" class="project-item__status">
                   <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)">
                   <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else>
                 </div>
@@ -101,7 +101,7 @@ export default class Custom extends Vue {
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
   @Projects.Mutation('projects/SET_SELECTED_PROJECT') setProjectId!: any
-  @Projects.Mutation('projects/PIN_PROJECT') pinProject!: any
+  @Projects.Action pinProject!: any
   @Projects.State(state => state.selectedProjectId) selectedProjectId!: string | number | null
   @Projects.State(state => state.pinnedProjects) pinnedProjects!: number[]
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
@@ -173,6 +173,10 @@ export default class Custom extends Vue {
   }
 
   private selectedCompanyUser: any = null
+
+  public setPinnedProject(id: number) {
+    this.pinProject({ id, userId: this.selectedCompanyUser.id })
+  }
 
   public openClientProjects(client: any) {
     return this.$store.state.projects.projects

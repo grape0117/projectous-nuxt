@@ -8,6 +8,10 @@ export const mutations: MutationTree<IListsState> = {
     state[listName] = lists
   },
   [ADD_NEW_LIST](state: IListsState, newList: IList) {
-    state.userLists = [...state.userLists, newList] // Todo: generate id
+    if (!!state.userLists.find(({ title }) => title === newList.title)) {
+      state.userLists = state.userLists.filter(({ title }) => title !== newList.title)
+    } else {
+      state.userLists = [...state.userLists, newList]
+    }
   }
 }

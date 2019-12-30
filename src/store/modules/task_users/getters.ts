@@ -17,7 +17,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     const { tasks: allTasks, lookup } = rootState.tasks
     const lists = rootState.lists.generalLists
     const today = setToMidnight(new Date())
-    const pinnedProjects = rootState.projects.pinnedProjects
+    const { pinnedProjects, lookup: projectsLookup, projects } = rootState.projects
     return state.task_users
       .filter(({ company_user_id }) => company_user_id === companyUserId)
       .map(
@@ -28,31 +28,32 @@ export const getters: GetterTree<IModuleState, IRootState> = {
           user_task_list_id,
           company_user_id,
           next_work_day
-        }: any) => ({
-          id,
-          task_id,
-          title: allTasks[lookup[task_id]].title,
-          company_user_id,
-          project_id:
-            allTasks[lookup[task_id]]
-              .project_id /*TODO Mikhail, this isn't flexible for project tasks?*/,
-          sort_order,
-          user_task_list_id,
-          next_work_day,
-          listId: user_task_list_id
-            ? user_task_list_id
-            : !next_work_day
-            ? 'Unmarked'
-            : localDate(next_work_day) < today
-            ? 'Past'
-            : getListId(next_work_day, lists, user_task_list_id)
-        })
+        }: any) => {
+          const project_id = allTasks[lookup[task_id]].project_id
+          const project = projects[projectsLookup[allTasks[lookup[task_id]].project_id]]
+          const project_name = project ? project.name : 'Unknown project'
+          const isPinned = !!pinnedProjects.find((p: number) => p === project_id)
+          let listId
+          if (user_task_list_id) {
+            listId = user_task_list_id
+          } else if (next_work_day) {
+            listId = localDate(next_work_day) < today ? 'Past' : getListId(next_work_day, lists, user_task_list_id)
+          } else {
+            listId = isPinned ? project_name : 'Unmarked'
+          }
+          return {
+            id,
+            task_id,
+            title: allTasks[lookup[task_id]].title,
+            company_user_id,
+            project_id,
+            sort_order,
+            user_task_list_id,
+            next_work_day,
+            listId
+          }
+        }
       )
-      .filter(task => {
-        if (task.listId === 'Unmarked' && pinnedProjects.find((projects: number) => projects === task.project_id)) {
-          return null
-        } else return task
-      })
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
   },
   getNextId: (state: IModuleState) => () => {
