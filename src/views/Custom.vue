@@ -33,7 +33,7 @@
             <ul>
               <li
                 v-for="{ name, id } in openClientProjects(client)"
-                @click="selectedProjectId = id"
+                @click="setProjectId(id)"
                 class="project-item__name"
               >
                 {{ name }}
@@ -98,9 +98,10 @@ export default class Custom extends Vue {
   @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
+  @Projects.Mutation('projects/SET_SELECTED_PROJECT') setProjectId!: any
+  @Projects.State(state => state.selectedProjectId) selectedProjectId!: string | number | null
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
 
-  private selectedProjectId: string | number | null = null
   private editedTaskTimerId: number | string | null = null
   private editedTaskId: number | string | null = null
 

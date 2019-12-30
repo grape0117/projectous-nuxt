@@ -1,13 +1,13 @@
 import { MutationTree } from 'vuex'
 import { IModuleState, IProject } from '@/store/modules/projects/types'
-import Vue from 'vue'
 import {
   ADD_PROJECTS,
   UPSERT_PROJECT,
   DELETE_PROJECT,
   UPDATE_PROJECT,
   UPDATE_PROJECT_ATTRIBUTE,
-  ADD_PROJECT
+  ADD_PROJECT,
+  SET_SELECTED_PROJECT
 } from '@/store/modules/projects/mutations-types'
 
 export const mutations: MutationTree<IModuleState> = {
@@ -66,5 +66,8 @@ export const mutations: MutationTree<IModuleState> = {
       //@ts-ignore
       { root: true }
     )
+  },
+  [SET_SELECTED_PROJECT](state: IModuleState, id: string | number | null) {
+    state.selectedProjectId = id
   }
 }

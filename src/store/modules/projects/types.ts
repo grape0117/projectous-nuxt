@@ -2,6 +2,7 @@ import { ICompanyUser } from '@/store/modules/company_users/types'
 
 export interface IModuleState {
   projects: IProject[]
+  selectedProjectId: string | number | null
   lookup: any
 }
 
