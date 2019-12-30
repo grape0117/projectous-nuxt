@@ -243,7 +243,6 @@ export default class Custom extends Vue {
       )
       //If listId is a date, return that I think
     } else if (!!Date.parse(listId) && isNaN(listId)) {
-      console.log('next_work_day?', listId)
       next_work_day = formatDateToYYYY_MM_DD(listId)
       //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {

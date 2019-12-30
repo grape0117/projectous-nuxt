@@ -10,7 +10,6 @@ export const setToMidnight = (date: Date) => {
 Use this anytime you want to create a Date object from a mysql Date format '2020-12-10' so it doesn't create a UTC-relative local time
  */
 export const localDate = (date: string) => {
-  console.log(date)
   return new Date(date + ' 00:00')
 }
 

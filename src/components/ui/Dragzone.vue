@@ -18,9 +18,9 @@
         draggable="true"
         @dragstart="dragstart($event, item)"
         @dragend="dragend"
-        @dragover="moveItem(index, item.id)"
       >
         <div class="dragzone__item-block">
+          <div style="width: 100%; height: 5px" @dragover="moveItem(index, item.id)" />
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
               <div class="dragzone__item-subtext">
@@ -186,6 +186,7 @@ export default class Dragzone extends Vue {
         item.user_task_list_id = this.group === 'User Lists' ? this.id : null
         item.sort_order = 0
         this.$emit('updateSorting', item, 0)
+        localStorage.setItem('item', JSON.stringify(item))
       } catch (e) {
         console.log(e)
       }
@@ -253,7 +254,7 @@ Why not create item inside this?
 
 <style>
 .dragzone {
-  /*width: calc(100% - 121px);*/
+  width: calc(100% - 121px);
   min-height: 40px;
   /*padding: 0.5rem;*/
   height: auto;

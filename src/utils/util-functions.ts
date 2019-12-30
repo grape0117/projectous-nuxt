@@ -13,7 +13,6 @@ export function getListId(
   if (listId) return listId
   if (!next_work_day) return 'Unmarked'
   const today = setToMidnight(new Date())
-  console.log('getListId', next_work_day)
   if (localDate(next_work_day).getTime() < today.getTime()) return 'Past'
   if (Date.parse(next_work_day)) {
     const list = lists.find(

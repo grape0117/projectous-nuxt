@@ -56,8 +56,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import { groupBy, cloneDeep, uniq } from 'lodash'
-import move from 'array-move'
+import { groupBy, cloneDeep, uniq, invert } from 'lodash'
 import { generateUniqId } from '@/utils/util-functions'
 
 @Component
@@ -76,6 +75,10 @@ export default class Draggable extends Vue {
 
   get groupedData() {
     return groupBy(this.clonedData, 'listId')
+  }
+
+  get clonedDataIndexes() {
+    return invert(this.clonedData.map(({ id }: any) => id))
   }
 
   @Watch('data', { immediate: true })
@@ -97,12 +100,10 @@ export default class Draggable extends Vue {
   }
 
   public updateSorting(item: any, position: number, idNewPosition: number) {
-    const index = this.clonedData.findIndex(({ id }: any) => item.id === id)
-    const elementNewPosition = this.clonedData.findIndex(
-      ({ id }: any) => id === idNewPosition
-    )
+    const index = Number(this.clonedDataIndexes[item.id])
+    const elementNewPosition = Number(this.clonedDataIndexes[idNewPosition])
     this.clonedData[index] = item
-    this.clonedData = move(this.clonedData, index, elementNewPosition)
+    this.clonedData.splice(elementNewPosition, 0, this.clonedData.splice(index, 1)[0] )
   }
   public addTempItem({ listId, id = null }: any, index: number) {
     const tempId = generateUniqId(10000)
