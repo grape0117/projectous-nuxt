@@ -8,6 +8,7 @@ import { IModuleState } from './types'
 const state = {
   projects: [],
   selectedProjectId: null,
+  pinnedProjects: [],
   lookup: {}
 }
 

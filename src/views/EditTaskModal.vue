@@ -155,7 +155,6 @@ export default {
       const company_clients = this.$store.getters[
         'company_clients/getActiveCompanyClients'
       ]
-      console.log('company_clients', company_clients)
       return company_clients
     },
     current_company: function() {

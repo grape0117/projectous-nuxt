@@ -17,7 +17,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     const { tasks: allTasks, lookup } = rootState.tasks
     const lists = rootState.lists.generalLists
     const today = setToMidnight(new Date())
-    const selectedProjectId = rootState.projects.selectedProjectId
+    const pinnedProjects = rootState.projects.pinnedProjects
     return state.task_users
       .filter(({ company_user_id }) => company_user_id === companyUserId)
       .map(
@@ -49,7 +49,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
         })
       )
       .filter(task => {
-        if (task.listId === 'Unmarked' && task.project_id === selectedProjectId) {
+        if (task.listId === 'Unmarked' && pinnedProjects.find((projects: number) => projects === task.project_id)) {
           return null
         } else return task
       })
