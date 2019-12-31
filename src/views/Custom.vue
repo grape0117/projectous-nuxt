@@ -244,23 +244,33 @@ export default class Custom extends Vue {
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let next_work_day = null
+    let user_task_list_id = null
+    console.log(listId)
     if (listId === 'Past') {
       //TODO: see note on create function
       const date = new Date()
       next_work_day = formatDateToYYYY_MM_DD(
         new Date(date.setMonth(date.getMonth() - 1))
       )
+      user_task_list_id = null
+    } else if (listId === 'Unmarked') {
+      next_work_day = null
+      user_task_list_id = null
       //If listId is a date, return that I think
     } else if (!!Date.parse(listId) && isNaN(listId)) {
       next_work_day = formatDateToYYYY_MM_DD(listId)
+      user_task_list_id = null
       //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {
       //Only user-created lists have a listId set on task_user object
-      taskUser.user_task_list_id = listId
+      next_work_day = null
+      user_task_list_id = listId
       //TODO: set next_word_day to null?
     }
     taskUser.next_work_day = next_work_day
+    taskUser.user_task_list_id = user_task_list_id
     taskUser.sort_order = sort_order
+    console.log(next_work_day, user_task_list_id)
     await this.updateTaskUserVuex(taskUser)
     //TODO: why is updating a title mixed in with moving a task?
     const task = cloneDeep(this.getTaskById(task_id))
