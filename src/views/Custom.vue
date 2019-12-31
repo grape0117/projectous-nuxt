@@ -22,6 +22,7 @@
             @taskTimerToggled="onTaskTimerToggled"
             @updateOptions="updateTaskUserSortOrder"
           />
+          <new-list-form v-if="selectedCompanyUser" :user-id="selectedCompanyUser.id" />
         </b-col>
         <b-col cols="3" class="scroll-col">
           <div class="text-center">
@@ -33,10 +34,12 @@
             <ul>
               <li
                 v-for="{ name, id } in openClientProjects(client)"
-                @click="selectedProjectId = id"
-                class="project-item__name"
               >
-                {{ name }}
+                <div class="project-item__name" @click="setProjectId(id)">{{ name }}</div>
+                <div @click="setPinnedProject(id)" class="project-item__status">
+                  <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)">
+                  <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else>
+                </div>
               </li>
             </ul>
           </div>
@@ -64,6 +67,7 @@ import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
 import TaskDetails from '@/components/draggable/TaskDetails.vue'
 import { IProject } from '@/store/modules/projects/types'
 import { ITask } from '@/store/modules/tasks/types'
+import NewListForm from '@/components/draggable/NewListForm.vue'
 
 const CompanyClients = namespace('company_clients')
 const CompanyUsers = namespace('company_users')
@@ -81,6 +85,7 @@ interface ITaskTimerToggle {
 
 @Component({
   components: {
+    NewListForm,
     TaskDetails
   }
 })
@@ -98,9 +103,12 @@ export default class Custom extends Vue {
   @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
+  @Projects.Mutation('projects/SET_SELECTED_PROJECT') setProjectId!: any
+  @Projects.Action pinProject!: any
+  @Projects.State(state => state.selectedProjectId) selectedProjectId!: string | number | null
+  @Projects.State(state => state.pinnedProjects) pinnedProjects!: number[]
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
 
-  private selectedProjectId: string | number | null = null
   private editedTaskTimerId: number | string | null = null
   private editedTaskId: number | string | null = null
 
@@ -169,6 +177,10 @@ export default class Custom extends Vue {
 
   private selectedCompanyUser: any = null
 
+  public setPinnedProject(id: number) {
+    this.pinProject({ id, userId: this.selectedCompanyUser.id })
+  }
+
   public openClientProjects(client: any) {
     return this.$store.state.projects.projects
       .filter((project: any) => {
@@ -235,22 +247,29 @@ export default class Custom extends Vue {
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let next_work_day = null
+    let user_task_list_id = null
     if (listId === 'Past') {
       //TODO: see note on create function
       const date = new Date()
       next_work_day = formatDateToYYYY_MM_DD(
         new Date(date.setMonth(date.getMonth() - 1))
       )
+      user_task_list_id = null
+    } else if (listId === 'Unmarked') {
+      next_work_day = null
+      user_task_list_id = null
       //If listId is a date, return that I think
     } else if (!!Date.parse(listId) && isNaN(listId)) {
       next_work_day = formatDateToYYYY_MM_DD(listId)
+      user_task_list_id = null
       //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {
       //Only user-created lists have a listId set on task_user object
-      taskUser.user_task_list_id = listId
-      //TODO: set next_word_day to null?
+      next_work_day = null
+      user_task_list_id = listId
     }
     taskUser.next_work_day = next_work_day
+    taskUser.user_task_list_id = user_task_list_id
     taskUser.sort_order = sort_order
     await this.updateTaskUserVuex(taskUser)
     //TODO: why is updating a title mixed in with moving a task?
@@ -306,7 +325,11 @@ export default class Custom extends Vue {
 .project-item__name:hover {
   color: blue;
 }
-
+.project-item__status {
+  padding-right: 1rem;
+  cursor: pointer;
+  text-align: right;
+}
 .scroll-col {
   height: calc(100vh - 170px);
   overflow-y: scroll;

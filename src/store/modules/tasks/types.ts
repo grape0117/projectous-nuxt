@@ -46,7 +46,6 @@ export interface ITask {
   for_today: number | null
   messages: string[]
   project_next_work_day: string | null
-  project_sort_order: number
   users: number[]
   uuid: string | null
   workflowy_id: number | null

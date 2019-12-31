@@ -12,6 +12,14 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       return state.projects.find(({ id: projectId }) => projectId === id)
     }
   },
+  getOpenCompanyProjects: (state: IModuleState) => (client_company_id: any) => {
+    return state.projects.filter(project => {
+      if (project.status != 'open') {
+        return false
+      }
+      return project.client_id == client_company_id
+    })
+  },
   getUserProjects: (state: IModuleState) => (userId: number) => {
     if (!userId) {
       return state.projects

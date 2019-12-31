@@ -2,6 +2,7 @@ import { ActionTree } from 'vuex'
 import { IModuleState } from './types'
 import { IRootState } from '@/store/types'
 import { IProject } from '@/store/modules/projects/types'
+import { generateUniqId } from '@/utils/util-functions'
 
 export const actions: ActionTree<IModuleState, IRootState> = {
   async add({ commit }: { commit: any }, project: IProject) {
@@ -35,5 +36,17 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       .put('/projects/' + project_id + 'updateAttribute', { attribute, value })
     commit('updateAttribute', { project_id, attribute, value }) //@Mikhail should I get values from response?
   },
-  async delete() {}
+  async delete() {},
+  pinProject({ commit, state }, { id, userId }) {
+    const { projects, lookup } = state
+    const { name } = projects[lookup[id]]
+    const userList = {
+      group: 'User Lists',
+      id: name,
+      title: name,
+      userId
+    }
+    commit('projects/PIN_PROJECT', id)
+    commit('lists/lists/ADD_NEW_LIST', userList, { root: true })
+  }
 }

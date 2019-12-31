@@ -6,6 +6,7 @@
         <router-view />
       </div>
     </div>
+    <task-modal />
     <edit-user-modal />
   </div>
 </template>
@@ -73,7 +74,6 @@ export default {
         { module: 'company_users', entities: company_users },
         { root: true }
       )
-      console.log('company_clients')
       this.$store.commit(
         'ADD_MANY',
         { module: 'company_clients', entities: company_clients },

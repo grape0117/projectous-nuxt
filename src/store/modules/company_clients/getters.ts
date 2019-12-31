@@ -8,5 +8,10 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   },
   getByClientCompanyId: (state: IModuleState) => (client_company_id: any) => {
     return
+  },
+  getActiveCompanyClients: (state: IModuleState) => {
+    return state.company_clients.filter(company_client => {
+      return company_client.status == 'active'
+    })
   }
 }
