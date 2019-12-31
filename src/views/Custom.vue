@@ -248,7 +248,6 @@ export default class Custom extends Vue {
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let next_work_day = null
     let user_task_list_id = null
-    console.log(listId)
     if (listId === 'Past') {
       //TODO: see note on create function
       const date = new Date()
@@ -272,7 +271,6 @@ export default class Custom extends Vue {
     taskUser.next_work_day = next_work_day
     taskUser.user_task_list_id = user_task_list_id
     taskUser.sort_order = sort_order
-    console.log(next_work_day, user_task_list_id)
     await this.updateTaskUserVuex(taskUser)
     //TODO: why is updating a title mixed in with moving a task?
     const task = cloneDeep(this.getTaskById(task_id))
