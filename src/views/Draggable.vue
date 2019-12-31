@@ -96,21 +96,6 @@ export default class Draggable extends Vue {
 
   private async created() {
     await this.fetchTasks()
-    // setInterval(() => {
-    //   const tasksList = this.allLists.find(
-    //     (list: IList) => list.name === 'tasks'
-    //   )
-    //   const oldTasks = tasksList ? tasksList.tasks : []
-    //   const getRandomArbitrary = (min: number, max: number): number =>
-    //     Math.ceil(Math.random() * (max - min) + min)
-    //   this.setTaskToList({
-    //     listName: 'tasks',
-    //     tasks: [
-    //       { id: getRandomArbitrary(1000, 999999), title: 'NEW TASK NEW TASK' },
-    //       ...oldTasks
-    //     ]
-    //   })
-    // }, 5000)
   }
 
   @Watch('selectedCompanyUser')

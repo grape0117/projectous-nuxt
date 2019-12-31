@@ -315,10 +315,12 @@ Why not create item inside this?
   float: left;
   cursor: move;
   width: 12px;
-  height: 12px;
+  height: 18px;
   margin: 0.5rem;
   margin-top: 0.2rem;
   flex: none;
+  display: flex;
+  flex-wrap: wrap;
 }
 .dragzone__item-dragbox span {
   display: block;
