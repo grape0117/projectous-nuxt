@@ -22,6 +22,7 @@
             @taskTimerToggled="onTaskTimerToggled"
             @updateOptions="updateTaskUserSortOrder"
           />
+          <new-list-form v-if="selectedCompanyUser" :user-id="selectedCompanyUser.id" />
         </b-col>
         <b-col cols="3" class="scroll-col">
           <div class="text-center">
@@ -66,6 +67,7 @@ import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
 import TaskDetails from '@/components/draggable/TaskDetails.vue'
 import { IProject } from '@/store/modules/projects/types'
 import { ITask } from '@/store/modules/tasks/types'
+import NewListForm from '@/components/draggable/NewListForm.vue'
 
 const CompanyClients = namespace('company_clients')
 const CompanyUsers = namespace('company_users')
@@ -83,6 +85,7 @@ interface ITaskTimerToggle {
 
 @Component({
   components: {
+    NewListForm,
     TaskDetails
   }
 })
@@ -265,7 +268,6 @@ export default class Custom extends Vue {
       //Only user-created lists have a listId set on task_user object
       next_work_day = null
       user_task_list_id = listId
-      //TODO: set next_word_day to null?
     }
     taskUser.next_work_day = next_work_day
     taskUser.user_task_list_id = user_task_list_id
