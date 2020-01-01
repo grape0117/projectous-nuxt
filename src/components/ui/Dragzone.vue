@@ -146,12 +146,9 @@ export default class Dragzone extends Vue {
   }
 
   private editTask(task_id: any) {
-    console.log(task_id)
     this.$store.state.settings.current_edit_task = this.$store.getters[
       'tasks/getById'
     ](task_id)
-    console.log(this.$store.getters['tasks/getById'](task_id))
-    console.log(this.$store.state.settings.current_edit_task)
     this.$bvModal.show('task-modal')
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
