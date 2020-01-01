@@ -87,14 +87,13 @@ export default class Draggable extends Vue {
   }
   @Watch('lists', { immediate: true })
   public onListsChanged(value: any) {
-    const notDraggable = ['Past Tasks', 'Current Tasks']
     // TODO: lists should have isDraggable field
     this.listGroups = uniq(value.map(({ group }: any) => group))
       // TODO: to del, only for tests
       .map((list: any) => {
         return {
           name: list,
-          isDraggable: notDraggable.indexOf(list) === -1
+          isDraggable: list !== 'undraggable'
         }
       })
   }
