@@ -7,10 +7,10 @@
       v-for="(group, index) in listGroups"
       :key="index"
       class="list"
-      :draggable="group.isDraggable"
+      draggable="true"
       @dragstart.self="dragStart($event, index)"
       @dragend.self="dragEnd"
-      @dragenter="moveList(index, group.isDraggable)"
+      @dragenter="moveList(index)"
     >
       <div v-if="!verticalAlignment" class="list__group-title">
         {{ group.name }}
@@ -25,7 +25,7 @@
         <div class="list__group-subtitle" v-if="verticalAlignment">
           <div
             v-if="group.isDraggable"
-            class="dragzone__item-dragbox dragzone__item-dragbox--active"
+            class="dragzone__item-dragbox dragzone__item-dragbox--active list-group-dragbox"
           >
             <span />
             <span />
@@ -103,7 +103,11 @@ export default class Draggable extends Vue {
     const index = Number(this.clonedDataIndexes[item.id])
     const elementNewPosition = Number(this.clonedDataIndexes[idNewPosition])
     this.clonedData[index] = item
-    this.clonedData.splice(elementNewPosition, 0, this.clonedData.splice(index, 1)[0] )
+    this.clonedData.splice(
+      elementNewPosition,
+      0,
+      this.clonedData.splice(index, 1)[0]
+    )
   }
   public addTempItem({ listId, id = null }: any, index: number) {
     const tempId = generateUniqId(10000)
@@ -127,9 +131,15 @@ export default class Draggable extends Vue {
   }
 
   private dragStart(e: any, index: number) {
-    e.dataTransfer.setData('application/node type', this)
-    this.isListDragged = true
-    this.draggedListIndex = index
+    // drag and drop will be available only if item contains node with this class
+    const selector = e.target.querySelector('.list-group-dragbox')
+    if (selector) {
+      e.dataTransfer.setData('application/node type', this)
+      this.isListDragged = true
+      this.draggedListIndex = index
+    } else {
+      e.preventDefault()
+    }
   }
   private dragEnd() {
     if (this.targetListIndex === this.draggedListIndex) return
@@ -145,8 +155,7 @@ export default class Draggable extends Vue {
     this.isListDragged = false
     this.draggedListIndex = NaN
   }
-  private moveList(targetElIndex: number, isDraggable: boolean) {
-    if (!isDraggable) return
+  private moveList(targetElIndex: number) {
     this.targetListIndex = targetElIndex
 
     // TODO: bug if change position here because of different height
