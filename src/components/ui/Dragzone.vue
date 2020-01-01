@@ -434,5 +434,6 @@ Why not create item inside this?
 }
 .hide-dragged {
   transform: translateX(-9999px);
+  height: 0;
 }
 </style>
