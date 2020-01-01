@@ -17,7 +17,7 @@
         :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
         draggable="true"
         @dragstart="dragstart($event, item)"
-        @dragend="dragend"
+        @dragend="dragend($event)"
       >
         <div class="dragzone__item-block">
           <div
@@ -163,9 +163,18 @@ export default class Dragzone extends Vue {
     e.dataTransfer.setData('application/node type', this)
     localStorage.setItem('item', JSON.stringify(item))
     this.$emit('setDraggedItemId', item.id)
+    // hiding dragged element
+    const element = e.target
+    setTimeout(function() {
+      element.classList.add('hide-dragged')
+    })
   }
-  private dragend() {
+  private dragend(e: any) {
     try {
+      // making dragged element visible
+      const element = e.srcElement
+      element.classList.remove('hide-dragged')
+      // data manipulations
       const item = JSON.parse(localStorage.getItem('item') as string)
       this.$emit('update', item)
       localStorage.removeItem('item')
@@ -422,5 +431,8 @@ Why not create item inside this?
 }
 *:focus {
   outline: none;
+}
+.hide-dragged {
+  transform: translateX(-9999px);
 }
 </style>
