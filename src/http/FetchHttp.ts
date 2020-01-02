@@ -3,6 +3,10 @@ import { IHttp } from './types'
 
 export class FetchHttp extends BaseHttp implements IHttp {
   public async fetch(url: string): Promise<any> {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
     try {
       const response = await fetch(`${this.baseUrl}${url}`, {
         headers: this.headers
@@ -13,6 +17,10 @@ export class FetchHttp extends BaseHttp implements IHttp {
     }
   }
   public async get(url: string, id: number | string) {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
     try {
       const response = await fetch(`${this.baseUrl}${url}/${id}`, {
         headers: this.headers
@@ -23,6 +31,10 @@ export class FetchHttp extends BaseHttp implements IHttp {
     }
   }
   public async post(url: string, data: any) {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
     try {
       const response = await fetch(`${this.baseUrl}${url}`, {
         method: 'POST',
@@ -38,6 +50,10 @@ export class FetchHttp extends BaseHttp implements IHttp {
     }
   }
   public async put(url: string, id: number | string, data: any) {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
     try {
       if (!url.endsWith('/')) {
         this.noSlashEndError()
@@ -57,6 +73,10 @@ export class FetchHttp extends BaseHttp implements IHttp {
     }
   }
   public async delete(url: string, id: number | string) {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
     try {
       if (!url.endsWith('/')) {
         this.noSlashEndError()

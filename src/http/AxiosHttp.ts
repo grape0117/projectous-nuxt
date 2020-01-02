@@ -4,6 +4,10 @@ import { IHttp } from './types'
 
 export class AxiosHttp extends BaseHttp implements IHttp {
   public async fetch(url: string): Promise<any> {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
     try {
       const { data } = await axios.get(`${this.baseUrl}${url}`, {
         headers: {
@@ -17,6 +21,10 @@ export class AxiosHttp extends BaseHttp implements IHttp {
     }
   }
   public async get(url: string, id: number | string) {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
     try {
       const { data } = await axios.get(`${this.baseUrl}${url}`, {
         params: { id },
@@ -31,6 +39,10 @@ export class AxiosHttp extends BaseHttp implements IHttp {
     }
   }
   public async post(url: string, data: any) {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
     try {
       const { data: response } = await axios.post(
         `${this.baseUrl}${url}`,
@@ -48,6 +60,10 @@ export class AxiosHttp extends BaseHttp implements IHttp {
     }
   }
   public async put(url: string, id: number | string, data: any) {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
     try {
       if (!url.endsWith('/')) {
         this.noSlashEndError()
@@ -68,6 +84,10 @@ export class AxiosHttp extends BaseHttp implements IHttp {
     }
   }
   public async delete(url: string, id: number | string) {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
     try {
       if (!url.endsWith('/')) {
         this.noSlashEndError()
