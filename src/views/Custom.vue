@@ -15,14 +15,14 @@
       <b-row>
         <b-col cols="3" class="scroll-col">
           <pj-draggable
-            listsBlockName="tasksUsers"
+            :listsBlockName="listsBlockNames.TASKS_USERS"
             :data="tasksUsers"
             :lists="lists"
             @create="createTaskUser"
             @update="updateTaskUser"
             @taskTimerToggled="onTaskTimerToggled"
             @updateOptions="updateTaskUserSortOrder"
-            @setCurrentListsBlockName="currentListsBlockName = 'tasksUsers'"
+            @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS"
           />
           <new-list-form v-if="selectedCompanyUser" :user-id="selectedCompanyUser.id" />
         </b-col>
@@ -48,14 +48,14 @@
         </b-col>
         <b-col v-if="selectedProjectId" cols="6">
           <pj-draggable
-            listsBlockName="projects"
+            :listsBlockName="listsBlockNames.PROJECTS"
             :data="selectedProjectTasksForStatusesColumns"
             :lists="taskPerStatusLists"
             :verticalAlignment="false"
             @create="createTask"
             @update="updateTask"
             @updateOptions="updateTaskSortOrder"
-            @setCurrentListsBlockName="currentListsBlockName = 'projects'"
+            @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS"
           />
         </b-col>
       </b-row>
@@ -85,6 +85,11 @@ const taskStatuses = ['open', 'in progress', 'turned-in', 'completed', 'closed']
 interface ITaskTimerToggle {
   taskId: number | string
   timerId: number | string | null
+}
+
+enum listsBlockNames {
+  'TASKS_USERS' = 'tasksUsers',
+  'PROJECTS' = 'projects'
 }
 
 @Component({
@@ -180,6 +185,10 @@ export default class Custom extends Vue {
     }))
   }
 
+  get listsBlockNames() {
+    return listsBlockNames
+  }
+  
   private selectedCompanyUser: any = null
 
   public setPinnedProject(id: number) {
@@ -209,7 +218,7 @@ export default class Custom extends Vue {
   }
 
   public async updateTask(task: any) {
-    if (this.currentListsBlockName !== 'projects') return
+    if (this.currentListsBlockName !== this.listsBlockNames.PROJECTS) return
     const taskCopy = cloneDeep(this.getTaskById(task.id))
     taskCopy.status = task.listId
     taskCopy.sort_order = task.sort_order
@@ -251,7 +260,7 @@ export default class Custom extends Vue {
   }
 
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
-    if (this.currentListsBlockName !== 'taskUsers') return
+    if (this.currentListsBlockName !== this.listsBlockNames.TASKS_USERS) return
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let next_work_day = null
     let user_task_list_id = null
