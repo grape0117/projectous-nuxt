@@ -125,6 +125,7 @@ export default class Dragzone extends Vue {
   private editedItemId: number | string | null = null
   private preventUpdate: boolean = false
   private newNameTouched: boolean = false
+  private currentListsBlockName: string | null = null
 
   private get isListExpandable() {
     return this.tasks.length > this.numberOfExpandedItems
@@ -169,7 +170,7 @@ export default class Dragzone extends Vue {
   private dragend(e: any) {
     try {
       // making dragged element visible
-      const element = e.srcElement
+      const element = e.target
       element.classList.remove('hide-dragged')
       // data manipulations
       const item = JSON.parse(localStorage.getItem('item') as string)
@@ -197,6 +198,7 @@ export default class Dragzone extends Vue {
     }
   }
   private moveToNewList() {
+    this.$emit('setCurrentListsBlockName')
     if (this.isListDragged) return
 
     if (!this.tasks.length) {

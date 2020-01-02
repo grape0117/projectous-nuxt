@@ -49,6 +49,7 @@
           @addTempItem="addTempItem"
           @deleteTempItem="deleteTempItem"
           @updateOptions="$emit('updateOptions', $event)"
+          @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)"
         />
       </div>
     </div>
@@ -61,6 +62,7 @@ import { generateUniqId } from '@/utils/util-functions'
 
 @Component
 export default class Draggable extends Vue {
+  @Prop({ required: true }) public listsBlockName!: string
   @Prop({ required: true }) public data!: any
   @Prop({ required: true }) public lists!: any
   @Prop({ required: false, default: true }) public verticalAlignment!: boolean

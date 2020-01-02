@@ -15,12 +15,14 @@
       <b-row>
         <b-col cols="3" class="scroll-col">
           <pj-draggable
+            listsBlockName="tasksUsers"
             :data="tasksUsers"
             :lists="lists"
             @create="createTaskUser"
             @update="updateTaskUser"
             @taskTimerToggled="onTaskTimerToggled"
             @updateOptions="updateTaskUserSortOrder"
+            @setCurrentListsBlockName="currentListsBlockName = 'tasksUsers'"
           />
           <new-list-form v-if="selectedCompanyUser" :user-id="selectedCompanyUser.id" />
         </b-col>
@@ -46,12 +48,14 @@
         </b-col>
         <b-col v-if="selectedProjectId" cols="6">
           <pj-draggable
+            listsBlockName="projects"
             :data="selectedProjectTasksForStatusesColumns"
             :lists="taskPerStatusLists"
             :verticalAlignment="false"
             @create="createTask"
             @update="updateTask"
             @updateOptions="updateTaskSortOrder"
+            @setCurrentListsBlockName="currentListsBlockName = 'projects'"
           />
         </b-col>
       </b-row>
@@ -111,6 +115,7 @@ export default class Custom extends Vue {
 
   private editedTaskTimerId: number | string | null = null
   private editedTaskId: number | string | null = null
+  private currentListsBlockName: string | null = null
 
   get lists() {
     return !this.selectedCompanyUser
@@ -204,6 +209,7 @@ export default class Custom extends Vue {
   }
 
   public async updateTask(task: any) {
+    if (this.currentListsBlockName !== 'projects') return
     const taskCopy = cloneDeep(this.getTaskById(task.id))
     taskCopy.status = task.listId
     taskCopy.sort_order = task.sort_order
@@ -245,6 +251,7 @@ export default class Custom extends Vue {
   }
 
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
+    if (this.currentListsBlockName !== 'taskUsers') return
     const taskUser = cloneDeep(this.getTaskUserById(id))
     let next_work_day = null
     let user_task_list_id = null
