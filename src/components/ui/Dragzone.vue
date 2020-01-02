@@ -159,20 +159,14 @@ export default class Dragzone extends Vue {
   }
   private dragstart(e: any, item: any) {
     e.dataTransfer.setData('application/node type', this)
+    e.dataTransfer.setDragImage(e.target, 0, 0)
     localStorage.setItem('item', JSON.stringify(item))
-    this.$emit('setDraggedItemId', item.id)
-    // hiding dragged element
-    const element = e.target
-    setTimeout(function() {
-      element.classList.add('hide-dragged')
-    })
+    setTimeout(() => {
+      this.$emit('setDraggedItemId', item.id)
+    }, 0)
   }
   private dragend(e: any) {
     try {
-      // making dragged element visible
-      const element = e.target
-      element.classList.remove('hide-dragged')
-      // data manipulations
       const item = JSON.parse(localStorage.getItem('item') as string)
       this.$emit('update', item)
       localStorage.removeItem('item')
@@ -291,6 +285,7 @@ Why not create item inside this?
   align-items: flex-start;
   padding: 2px 0;
   cursor: pointer;
+  position: relative;
 }
 .dragzone__item:hover .dragzone__add-task--item {
   display: block;
@@ -307,6 +302,15 @@ Why not create item inside this?
 }
 .dragzone__item--dragged {
   color: rgba(0, 0, 0, 0.3);
+}
+.dragzone__item--dragged:after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+  background-color: #c5c5c8;
+  width: 100%;
+  height: 100%;
 }
 .dragzone__item-block {
   width: 100%;
@@ -430,9 +434,5 @@ Why not create item inside this?
 }
 *:focus {
   outline: none;
-}
-.hide-dragged {
-  transform: translateX(-9999px);
-  height: 0;
 }
 </style>
