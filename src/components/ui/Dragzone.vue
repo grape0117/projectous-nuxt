@@ -12,7 +12,7 @@
         v-for="(item, index) in expandedList
           ? tasks
           : tasks.slice(0, numberOfExpandedItems)"
-        :key="item.id"
+        :key="item.uuid"
         class="dragzone__item"
         :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
         draggable="true"
@@ -104,8 +104,10 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
+import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
 
 const Tasks = namespace('tasks')
+const TaskUsers = namespace('task_users')
 
 @Component
 export default class Dragzone extends Vue {
@@ -116,7 +118,11 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public group!: string
   @Prop({ required: true }) public tempItemId!: number | null
   @Prop({ required: false, default: false }) public initiallyExpanded!: boolean
+  @Prop({ required: false, default: false })
+  public selectedCompanyUserId!: number
+  @Tasks.Action('createTask') private createTaskVuex!: any
   @Tasks.Getter public getById!: any
+  @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
 
   private expandedList: boolean = this.initiallyExpanded
   private numberOfExpandedItems: number = 3
@@ -211,14 +217,14 @@ export default class Dragzone extends Vue {
   /*
   If you hit enter, that fires first, set item.addItem == true. I'm not sure why we don't just addNewTask inside onEnter?
    */
-  private updateTitle({ target: { innerHTML: name } }: any, item: any) {
+  private async updateTitle({ target: { innerHTML: name } }: any, item: any) {
     if (this.tempItemId || this.preventUpdate) {
       if (this.newNameTouched) {
         item.title = name
-        this.$emit('create', item)
+        await this.createTaskUser(item)
+        // this.$emit('deleteTempItem')
         if (this.tasks.length)
           this.$emit('updateOptions', JSON.stringify(this.tasks))
-        this.$emit('deleteTempItem')
       }
       if (!name) {
         this.$emit('deleteTempItem')
@@ -231,6 +237,40 @@ export default class Dragzone extends Vue {
       updatedItem.title = name
       this.$emit('update', updatedItem)
     }
+  }
+
+  async createTaskUser({ uuid, title, listId, sort_order }: any) {
+    let next_work_day = null
+    let user_task_list_id = null
+    if (listId === 'Past') {
+      /*
+        TODO: This isn't clean. It shouldn't just be a month back. Seems like we have options:
+        1) When the list loads, resave all to have a specific listId like -1
+        2) Figure out where in the list the new entry was added and use the same next_work_day (seems wrong though)
+         */
+      const date = new Date()
+      next_work_day = formatDateToYYYY_MM_DD(
+        new Date(date.setMonth(date.getMonth() - 1))
+      )
+      //If listId is a date, return that I think
+    } else if (!!Date.parse(listId) && isNaN(listId)) {
+      //TODO: check to see if we even need to convert it
+      next_work_day = formatDateToYYYY_MM_DD(listId)
+      //If listId is a number, this is a user-created list
+    } else if (Number.isInteger(Number(listId))) {
+      //Only user-created lists have a listId set on task_user object
+      user_task_list_id = listId
+    }
+    const task = { uuid, title }
+    const { id } = await this.createTaskVuex(task)
+    const taskUser = {
+      task_id: id,
+      next_work_day,
+      company_user_id: 112,
+      user_task_list_id,
+      sort_order
+    }
+    await this.createTaskUserVuex(taskUser)
   }
 
   private async onClickAddButton() {

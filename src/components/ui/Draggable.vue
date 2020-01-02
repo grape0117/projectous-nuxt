@@ -40,6 +40,7 @@
           :draggedItemId="draggedItemId"
           :group="group"
           :tempItemId="tempItemId"
+          :selectedCompanyUserId="selectedCompanyUserId"
           :initiallyExpanded="initiallyExpanded"
           @create="$emit('create', $event)"
           @update="$emit('update', $event)"
@@ -59,6 +60,7 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { groupBy, cloneDeep, uniq, invert } from 'lodash'
 import { generateUniqId } from '@/utils/util-functions'
+import { generateUUID } from '@/store/modules/task_users/actions'
 
 @Component
 export default class Draggable extends Vue {
@@ -66,8 +68,11 @@ export default class Draggable extends Vue {
   @Prop({ required: true }) public data!: any
   @Prop({ required: true }) public lists!: any
   @Prop({ required: false, default: true }) public verticalAlignment!: boolean
+  @Prop({ required: false, default: null }) public selectedCompanyUserId!:
+    | number
+    | null
 
-  protected tempItemId: number | null = null
+  protected tempItemId: number | string | null = null
   private clonedData: any = cloneDeep(this.data)
   private listGroups: any = []
   private draggedItemId: number | null = null
@@ -111,12 +116,14 @@ export default class Draggable extends Vue {
     )
   }
   public addTempItem({ listId, id = null }: any, index: number) {
+    const uuid = generateUUID()
     const tempId = generateUniqId(10000)
     const currentIndex = this.clonedData.findIndex(
       ({ id: itemId }: any) => id === itemId
     )
     this.clonedData.splice(currentIndex > -1 ? currentIndex + 1 : 0, 0, {
       id: tempId,
+      uuid,
       title: '',
       listId: listId,
       sort_order: !isNaN(index) ? index + 1 : 0

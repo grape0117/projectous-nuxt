@@ -6,7 +6,7 @@ import {
   CREATE_TASK_USER
 } from '@/store/modules/task_users/mutations-types'
 
-const UUID = () => {
+export function generateUUID(): string {
   const date = new Date()
   return (
     date.getUTCFullYear() +
@@ -22,13 +22,11 @@ const UUID = () => {
     ':' +
     date.getUTCSeconds() +
     ':' +
-    date.getMilliseconds() +
-    ' ' +
-    Math.random()
+    date.getMilliseconds()
   )
 }
 
-function creteDefaultTaskUser(): ITaskUser {
+function creteDefaultTaskUser(uuid: string | null): ITaskUser {
   return {
     company_user_id: null,
     next_work_day: null,
@@ -38,7 +36,7 @@ function creteDefaultTaskUser(): ITaskUser {
     task_uuid: null,
     user_rate: '0.00',
     user_task_list_id: null,
-    uuid: null,
+    uuid,
     work_day_position: null
   }
 }
@@ -71,6 +69,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     { commit },
     {
       task_id,
+      uuid,
       next_work_day,
       company_user_id,
       user_task_list_id,
@@ -78,7 +77,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }: ITaskUser
   ) {
     const taskUser = {
-      ...creteDefaultTaskUser(),
+      ...creteDefaultTaskUser(uuid),
       task_id,
       next_work_day,
       company_user_id,

@@ -5,7 +5,7 @@ import { IRootState } from '@/store/types'
 // @ts-ignore
 import { uuid } from 'vue-uuid'
 
-function createDefaultTask(): ITask {
+function createDefaultTask(uuid: string): ITask {
   return {
     child_task_id: null,
     company_id: null,
@@ -31,15 +31,18 @@ function createDefaultTask(): ITask {
     status: 'open',
     title: '',
     users: [],
-    uuid: null,
+    uuid,
     workflowy_id: null
   }
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
-  async createTask({ commit, getters }: any, { title, project_id, project_sort_order }: any) {
+  async createTask(
+    { commit, getters }: any,
+    { uuid, title, project_id, project_sort_order }: any
+  ) {
     const task = {
-      ...createDefaultTask(),
+      ...createDefaultTask(uuid),
       title,
       project_id,
       project_sort_order

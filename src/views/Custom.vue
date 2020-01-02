@@ -24,7 +24,10 @@
             @updateOptions="updateTaskUserSortOrder"
             @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS"
           />
-          <new-list-form v-if="selectedCompanyUser" :user-id="selectedCompanyUser.id" />
+          <new-list-form
+            v-if="selectedCompanyUser"
+            :user-id="selectedCompanyUser.id"
+          />
         </b-col>
         <b-col cols="3" class="scroll-col">
           <div class="text-center">
@@ -34,13 +37,21 @@
             <!--            Todo: change client id to client name-->
             {{ client.name }}
             <ul>
-              <li
-                v-for="{ name, id } in openClientProjects(client)"
-              >
-                <div class="project-item__name" @click="setProjectId(id)">{{ name }}</div>
+              <li v-for="{ name, id } in openClientProjects(client)">
+                <div class="project-item__name" @click="setProjectId(id)">
+                  {{ name }}
+                </div>
                 <div @click="setPinnedProject(id)" class="project-item__status">
-                  <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)">
-                  <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else>
+                  <img
+                    src="@/assets/img/star-pin.svg"
+                    alt="star-unpin"
+                    v-if="!!pinnedProjects.find(project => project === id)"
+                  />
+                  <img
+                    src="@/assets/img/star-unpin.svg"
+                    alt="star-pin"
+                    v-else
+                  />
                 </div>
               </li>
             </ul>
@@ -52,6 +63,7 @@
             :data="selectedProjectTasksForStatusesColumns"
             :lists="taskPerStatusLists"
             :verticalAlignment="false"
+            :selectedCompanyUserId="selectedCompanyUserId"
             @create="createTask"
             @update="updateTask"
             @updateOptions="updateTaskSortOrder"
@@ -114,13 +126,20 @@ export default class Custom extends Vue {
   @Projects.Getter private getUserProjects!: any
   @Projects.Mutation('projects/SET_SELECTED_PROJECT') setProjectId!: any
   @Projects.Action pinProject!: any
-  @Projects.State(state => state.selectedProjectId) selectedProjectId!: string | number | null
+  @Projects.State(state => state.selectedProjectId) selectedProjectId!:
+    | string
+    | number
+    | null
   @Projects.State(state => state.pinnedProjects) pinnedProjects!: number[]
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
 
   private editedTaskTimerId: number | string | null = null
   private editedTaskId: number | string | null = null
   private currentListsBlockName: string | null = null
+
+  get selectedCompanyUserId() {
+    return this.selectedCompanyUser.id || null
+  }
 
   get lists() {
     return !this.selectedCompanyUser
@@ -248,9 +267,9 @@ export default class Custom extends Vue {
       user_task_list_id = listId
     }
     const task = { title }
-    const { id } = await this.createTaskVuex(task)
+    const { id: task_id } = await this.createTaskVuex(task)
     const taskUser = {
-      task_id: id,
+      task_id,
       next_work_day,
       company_user_id: this.selectedCompanyUser.id,
       user_task_list_id,
