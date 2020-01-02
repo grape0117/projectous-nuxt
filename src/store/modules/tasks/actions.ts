@@ -65,6 +65,6 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // Todo: @stephane - create endpoint to update project_sort_order for tasks
     commit('updateTasksSortOrder', ids)
     // @ts-ignore
-    this._vm.$http.post('/tasks/sort_order', { ids: ids })
+    this._vm.$http().post('/tasks/sort_order', { ids: ids })
   }
 }
