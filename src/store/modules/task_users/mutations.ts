@@ -3,7 +3,8 @@ import { IModuleState, ITaskUser } from './types'
 import {
   CREATE_TASK_USER,
   UPDATE_TASK_USER,
-  DELETE_TASK_USER
+  DELETE_TASK_USER,
+  REMOVE_TEMP_TASKS_USER
 } from './mutations-types'
 
 export const mutations: MutationTree<IModuleState> = {
@@ -29,6 +30,9 @@ export const mutations: MutationTree<IModuleState> = {
     // state.lookup = lookup
     // @Stephane I implemented it like this for now, later we can change
     state.task_users = state.task_users.filter(({ id }: any) => id !== task_user.id)
+  },
+  [REMOVE_TEMP_TASKS_USER](state: IModuleState) {
+    state.task_users = state.task_users.filter(({ temp }) => !temp)
   },
   updateTaskUsersSortOrder(state: IModuleState, ids: number[]) {
     ids.forEach((id, index) => {

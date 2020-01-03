@@ -59,7 +59,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     } else {
       //TODO: should we do this? task.id = uuid.v4();
       // @ts-ignore
-      newTask = await this._vm.$http().post('/tasks', { task }).task
+      newTask = (await this._vm.$http().post('/tasks', { task })).task
+      commit('removeTempTasks')
     }
     commit('create', newTask)
     return newTask

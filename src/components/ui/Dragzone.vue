@@ -43,7 +43,7 @@
                 contenteditable="true"
                 :data-id="item.id"
                 @blur="updateTask($event, item)"
-                @keydown.enter.prevent="onEnter($event, item, index)"
+                @keydown.enter.prevent="createTempTask(index)"
                 @click="editedItemId = item.id"
               />
             </div>
@@ -80,7 +80,7 @@
         </div>
         <div
           class="dragzone__add-task dragzone__add-task--item"
-          @click="onClickAddButton(index)"
+          @click="createTempTask(index)"
         >
           +
         </div>
@@ -89,7 +89,7 @@
       <div
         v-if="tasks.length === 0"
         class="dragzone__add-task"
-        @click="onClickAddButton(0)"
+        @click="createTempTask(0)"
       >
         +
       </div>
@@ -211,27 +211,36 @@ export default class Dragzone extends Vue {
     }
   }
 
-  private async updateTask({ target: { innerHTML: name } }: any, item: any) {
-    if (item.temp) {
-      item.title = name
-      this.$emit('delete', item)
-      this.editedItemId = null
-    } else if (item.title !== name) {
-      const updatedItem = cloneDeep(item)
-      updatedItem.title = name
-      this.$emit('update', updatedItem)
-    }
-  }
-
-  private async onClickAddButton(index: number) {
+  private async createTempTask(index: number) {
     const newItem = {
-      id: generateUUID(),
       title: '',
       listId: this.id,
       sort_order: index ? index - 1 : 0,
       temp: true
     }
     this.$emit('create', newItem)
+  }
+
+  private async updateTask({ target: { innerHTML: name } }: any, item: any) {
+    if (item.temp) {
+      if (!name) {
+        // Note: delete temp item if user didn't enter title
+        this.$emit('delete', item)
+      } else {
+        const newItem = {
+          title: name,
+          listId: this.id,
+          sort_order: item.sort_order,
+        }
+        // Note: create a new item
+        this.$emit('create', newItem)
+      }
+    } else if (item.title !== name) {
+      const updatedItem = cloneDeep(item)
+      updatedItem.title = name
+      this.$emit('update', updatedItem)
+    }
+    this.editedItemId = null
   }
 
   private async onEnter(event: any, item: any, index: number) {

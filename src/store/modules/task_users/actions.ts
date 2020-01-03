@@ -4,7 +4,8 @@ import { IRootState } from '@/store/types'
 import {
   UPDATE_TASK_USER,
   CREATE_TASK_USER,
-  DELETE_TASK_USER
+  DELETE_TASK_USER,
+  REMOVE_TEMP_TASKS_USER
 } from '@/store/modules/task_users/mutations-types'
 import { generateUniqId } from '@/utils/util-functions'
 
@@ -57,8 +58,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
         .$http()
         .post('/task-users', { task_user: taskUser }))
         .task_user
+      commit(REMOVE_TEMP_TASKS_USER)
     }
-    console.log(task_user)
     commit(CREATE_TASK_USER, task_user)
     return task_user
   },
