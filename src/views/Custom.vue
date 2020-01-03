@@ -141,6 +141,11 @@ export default class Custom extends Vue {
   private editedTaskId: number | string | null = null
   private currentListsBlockName: string | null = null
 
+  get listsBlockNames() {
+    return listsBlockNames
+  }
+
+
   get selectedCompanyUserId() {
     return this.selectedCompanyUser.id || null
   }
@@ -209,10 +214,6 @@ export default class Custom extends Vue {
     }))
   }
 
-  get listsBlockNames() {
-    return listsBlockNames
-  }
-  
   private selectedCompanyUser: any = null
 
   public setPinnedProject(id: number) {
