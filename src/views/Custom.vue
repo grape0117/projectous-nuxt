@@ -20,11 +20,15 @@
             :lists="lists"
             @create="createTaskUser"
             @update="updateTaskUser"
+            @delete="deleteTaskUser"
             @taskTimerToggled="onTaskTimerToggled"
             @updateOptions="updateTaskUserSortOrder"
             @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS"
           />
-          <new-list-form v-if="selectedCompanyUser" :user-id="selectedCompanyUser.id" />
+          <new-list-form
+            v-if="selectedCompanyUser"
+            :user-id="selectedCompanyUser.id"
+          />
         </b-col>
         <b-col cols="3" class="scroll-col">
           <div class="text-center">
@@ -34,13 +38,21 @@
             <!--            Todo: change client id to client name-->
             {{ client.name }}
             <ul>
-              <li
-                v-for="{ name, id } in openClientProjects(client)"
-              >
-                <div class="project-item__name" @click="setProjectId(id)">{{ name }}</div>
+              <li v-for="{ name, id } in openClientProjects(client)">
+                <div class="project-item__name" @click="setProjectId(id)">
+                  {{ name }}
+                </div>
                 <div @click="setPinnedProject(id)" class="project-item__status">
-                  <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)">
-                  <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else>
+                  <img
+                    src="@/assets/img/star-pin.svg"
+                    alt="star-unpin"
+                    v-if="!!pinnedProjects.find(project => project === id)"
+                  />
+                  <img
+                    src="@/assets/img/star-unpin.svg"
+                    alt="star-pin"
+                    v-else
+                  />
                 </div>
               </li>
             </ul>
@@ -52,8 +64,10 @@
             :data="selectedProjectTasksForStatusesColumns"
             :lists="taskPerStatusLists"
             :verticalAlignment="false"
+            :selectedCompanyUserId="selectedCompanyUserId"
             @create="createTask"
             @update="updateTask"
+            @delete="deleteTask"
             @updateOptions="updateTaskSortOrder"
             @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS"
           />
@@ -101,12 +115,14 @@ enum listsBlockNames {
 export default class Custom extends Vue {
   @TaskUsers.Getter('getById') private getTaskUserById!: any
   @TaskUsers.Getter private sortedByDays!: any
-  @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
   @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
+  @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
+  @TaskUsers.Action('deleteTaskUser') private deleteTaskUserVuex!: any
   @TaskUsers.Action('updateSortOrder')
   private updateTaskUsersSortOrderVuex!: any
-  @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
+  @Tasks.Action('updateTask') private updateTaskVuex!: any
+  @Tasks.Action('deleteTask') private deleteTaskVuex!: any
   @Tasks.Action('updateSortOrder') private updateTaskSortOrderVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
   @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
@@ -114,13 +130,25 @@ export default class Custom extends Vue {
   @Projects.Getter private getUserProjects!: any
   @Projects.Mutation('projects/SET_SELECTED_PROJECT') setProjectId!: any
   @Projects.Action pinProject!: any
-  @Projects.State(state => state.selectedProjectId) selectedProjectId!: string | number | null
+  @Projects.State(state => state.selectedProjectId) selectedProjectId!:
+    | string
+    | number
+    | null
   @Projects.State(state => state.pinnedProjects) pinnedProjects!: number[]
   @CompanyUsers.State(state => state.company_users) private companyUsers!: any
 
   private editedTaskTimerId: number | string | null = null
   private editedTaskId: number | string | null = null
   private currentListsBlockName: string | null = null
+
+  get listsBlockNames() {
+    return listsBlockNames
+  }
+
+
+  get selectedCompanyUserId() {
+    return this.selectedCompanyUser ? this.selectedCompanyUser.id : null
+  }
 
   get lists() {
     return !this.selectedCompanyUser
@@ -168,12 +196,16 @@ export default class Custom extends Vue {
   }
   get selectedProjectTasksForStatusesColumns() {
     const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
-    return projectTasks.map(({ id, title, status }: ITask) => ({
-      id,
-      title,
-      status,
-      listId: status
-    }))
+    return projectTasks
+      .map(({ id, title, status, sort_order, temp }: ITask) => ({
+        id,
+        title,
+        status,
+        listId: status,
+        sort_order,
+        temp
+      }))
+      .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
   }
 
   get taskPerStatusLists() {
@@ -185,10 +217,6 @@ export default class Custom extends Vue {
     }))
   }
 
-  get listsBlockNames() {
-    return listsBlockNames
-  }
-  
   private selectedCompanyUser: any = null
 
   public setPinnedProject(id: number) {
@@ -213,8 +241,14 @@ export default class Custom extends Vue {
     )
     return company_client ? company_client.name : ''
   }
-  public async createTask({ title }: any) {
-    await this.createTaskVuex({ title, project_id: this.selectedProjectId })
+  public async createTask({ title, listId = 'open', sort_order, temp }: any) {
+    return await this.createTaskVuex({
+      title,
+      project_id: this.selectedProjectId,
+      sort_order,
+      status: listId,
+      temp
+    })
   }
 
   public async updateTask(task: any) {
@@ -225,7 +259,12 @@ export default class Custom extends Vue {
     await this.updateTaskVuex(taskCopy)
   }
 
-  public async createTaskUser({ title, listId, sort_order }: any) {
+  public async deleteTask(task: any) {
+    await this.deleteTaskVuex(task)
+    return
+  }
+
+  public async createTaskUser({ title, listId, sort_order, temp }: any) {
     let next_work_day = null
     let user_task_list_id = null
     if (listId === 'Past') {
@@ -247,14 +286,15 @@ export default class Custom extends Vue {
       //Only user-created lists have a listId set on task_user object
       user_task_list_id = listId
     }
-    const task = { title }
-    const { id } = await this.createTaskVuex(task)
+    const task = { title, sort_order, temp }
+    const { id: task_id } = await this.createTask(task)
     const taskUser = {
-      task_id: id,
+      task_id,
       next_work_day,
       company_user_id: this.selectedCompanyUser.id,
       user_task_list_id,
-      sort_order
+      sort_order,
+      temp
     }
     await this.createTaskUserVuex(taskUser)
   }
@@ -294,6 +334,11 @@ export default class Custom extends Vue {
       task.title = title
       await this.updateTaskVuex(task)
     }
+  }
+
+  public async deleteTaskUser(taskUser: any) {
+    await this.deleteTaskUserVuex(taskUser)
+    await this.deleteTask({ id: taskUser.task_id })
   }
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {

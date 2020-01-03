@@ -49,4 +49,5 @@ export interface ITask {
   users: number[]
   uuid: string | null
   workflowy_id: number | null
+  temp?: boolean
 }

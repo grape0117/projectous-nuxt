@@ -64,5 +64,33 @@ export function createUserLists(lists: any) {
 }
 
 export function generateUniqId(length: number) {
-  return Math.floor(Math.random() * length)
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const charactersLength = characters.length
+  let result = ''
+  for (let i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+  }
+  return result
+}
+
+export function generateUUID(): string {
+  const date = new Date()
+  return (
+    date.getUTCFullYear() +
+    '-' +
+    date.getUTCMonth() +
+    1 +
+    '-' +
+    date.getDate() +
+    ' ' +
+    date.getUTCHours() +
+    ':' +
+    date.getUTCMinutes() +
+    ':' +
+    date.getUTCSeconds() +
+    ':' +
+    date.getMilliseconds() +
+    ' ' +
+    Math.random()
+  )
 }
