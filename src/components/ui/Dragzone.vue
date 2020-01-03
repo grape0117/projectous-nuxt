@@ -42,7 +42,7 @@
                 v-html="item.title"
                 contenteditable="true"
                 :data-id="item.id"
-                @blur="updateTitle($event, item)"
+                @blur="updateTask($event, item)"
                 @keydown.enter.prevent="onEnter($event, item, index)"
                 @click="editedItemId = item.id"
               />
@@ -143,7 +143,6 @@ export default class Dragzone extends Vue {
             // @ts-ignore
             el.focus()
           }
-
         }, 50)
       }
     }
@@ -212,11 +211,10 @@ export default class Dragzone extends Vue {
     }
   }
 
-  private async updateTitle({ target: { innerHTML: name } }: any, item: any) {
+  private async updateTask({ target: { innerHTML: name } }: any, item: any) {
     if (item.temp) {
       item.title = name
       this.$emit('delete', item)
-      // this.$emit('create', item)
       this.editedItemId = null
     } else if (item.title !== name) {
       const updatedItem = cloneDeep(item)

@@ -191,11 +191,12 @@ export default class Custom extends Vue {
   }
   get selectedProjectTasksForStatusesColumns() {
     const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
-    return projectTasks.map(({ id, title, status }: ITask) => ({
+    return projectTasks.map(({ id, title, status, temp }: ITask) => ({
       id,
       title,
       status,
-      listId: status
+      listId: status,
+      temp
     }))
   }
 
@@ -236,8 +237,14 @@ export default class Custom extends Vue {
     )
     return company_client ? company_client.name : ''
   }
-  public async createTask({ title }: any, temp: boolean) {
-    return await this.createTaskVuex({ title, project_id: this.selectedProjectId, temp })
+  public async createTask({ title, listId = 'open', sort_order, temp }: any) {
+    return await this.createTaskVuex({
+      title,
+      project_id: this.selectedProjectId,
+      project_sort_order: sort_order,
+      status: listId,
+      temp
+    })
   }
 
   public async updateTask(task: any) {
@@ -275,8 +282,8 @@ export default class Custom extends Vue {
       //Only user-created lists have a listId set on task_user object
       user_task_list_id = listId
     }
-    const task = { title }
-    const { id: task_id } = await this.createTask(task, temp)
+    const task = { title, sort_order, temp }
+    const { id: task_id } = await this.createTask(task)
     const taskUser = {
       task_id,
       next_work_day,
