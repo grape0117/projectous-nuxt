@@ -20,6 +20,7 @@
             :lists="lists"
             @create="createTaskUser"
             @update="updateTaskUser"
+            @delete="deleteTaskUser"
             @taskTimerToggled="onTaskTimerToggled"
             @updateOptions="updateTaskUserSortOrder"
             @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS"
@@ -66,6 +67,7 @@
             :selectedCompanyUserId="selectedCompanyUserId"
             @create="createTask"
             @update="updateTask"
+            @delete="deleteTask"
             @updateOptions="updateTaskSortOrder"
             @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS"
           />
@@ -113,12 +115,14 @@ enum listsBlockNames {
 export default class Custom extends Vue {
   @TaskUsers.Getter('getById') private getTaskUserById!: any
   @TaskUsers.Getter private sortedByDays!: any
-  @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
   @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
+  @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
+  @TaskUsers.Action('deleteTaskUser') private deleteTaskUserVuex!: any
   @TaskUsers.Action('updateSortOrder')
   private updateTaskUsersSortOrderVuex!: any
-  @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
+  @Tasks.Action('updateTask') private updateTaskVuex!: any
+  @Tasks.Action('deleteTask') private deleteTaskVuex!: any
   @Tasks.Action('updateSortOrder') private updateTaskSortOrderVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
   @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
@@ -232,8 +236,8 @@ export default class Custom extends Vue {
     )
     return company_client ? company_client.name : ''
   }
-  public async createTask({ title }: any) {
-    await this.createTaskVuex({ title, project_id: this.selectedProjectId })
+  public async createTask({ title }: any, temp: boolean) {
+    return await this.createTaskVuex({ title, project_id: this.selectedProjectId, temp })
   }
 
   public async updateTask(task: any) {
@@ -244,7 +248,12 @@ export default class Custom extends Vue {
     await this.updateTaskVuex(taskCopy)
   }
 
-  public async createTaskUser({ title, listId, sort_order }: any) {
+  public async deleteTask(task: any) {
+    await this.deleteTaskVuex(task)
+    return
+  }
+
+  public async createTaskUser({ title, listId, sort_order, temp }: any) {
     let next_work_day = null
     let user_task_list_id = null
     if (listId === 'Past') {
@@ -267,13 +276,14 @@ export default class Custom extends Vue {
       user_task_list_id = listId
     }
     const task = { title }
-    const { id: task_id } = await this.createTaskVuex(task)
+    const { id: task_id } = await this.createTask(task, temp)
     const taskUser = {
       task_id,
       next_work_day,
       company_user_id: this.selectedCompanyUser.id,
       user_task_list_id,
-      sort_order
+      sort_order,
+      temp
     }
     await this.createTaskUserVuex(taskUser)
   }
@@ -313,6 +323,11 @@ export default class Custom extends Vue {
       task.title = title
       await this.updateTaskVuex(task)
     }
+  }
+
+  public async deleteTaskUser(taskUser: any) {
+    await this.deleteTaskUserVuex(taskUser)
+    await this.deleteTask({ id: taskUser.task_id })
   }
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {

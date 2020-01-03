@@ -3,28 +3,10 @@ import { IModuleState, ITaskUser } from './types'
 import { IRootState } from '@/store/types'
 import {
   UPDATE_TASK_USER,
-  CREATE_TASK_USER
+  CREATE_TASK_USER,
+  DELETE_TASK_USER
 } from '@/store/modules/task_users/mutations-types'
-
-export function generateUUID(): string {
-  const date = new Date()
-  return (
-    date.getUTCFullYear() +
-    '-' +
-    date.getUTCMonth() +
-    1 +
-    '-' +
-    date.getDate() +
-    ' ' +
-    date.getUTCHours() +
-    ':' +
-    date.getUTCMinutes() +
-    ':' +
-    date.getUTCSeconds() +
-    ':' +
-    date.getMilliseconds()
-  )
-}
+import { generateUniqId } from '@/utils/util-functions'
 
 function creteDefaultTaskUser(uuid: string | null): ITaskUser {
   return {
@@ -42,29 +24,6 @@ function creteDefaultTaskUser(uuid: string | null): ITaskUser {
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
-  // async createUserTask({ dispatch, commit }: any, { list, sort_order }) {
-  //   //@Mikhail: how do I both use TS with optional properties but also use TS to help avoid errors? Just use ignore with a note?
-  //   const newTask: any = {
-  //     id: UUID(),
-  //     title: 'title'
-  //   }
-  //   const new_task = dispatch('task/CREATE', newTask)
-  //   const new_task_user = dispatch('task_user/CREATE', {
-  //     task: new_task,
-  //     list,
-  //     sort_order
-  //   })
-  //   //@ts-ignore
-  //   const { task_user, task }: any = await this._vm
-  //     .$http()
-  //     .post('users/' + company_user_id + '/tasks', {
-  //       list: list,
-  //       sort_order: sort_order
-  //     })
-  //
-  //   commit('tasks/UPDATE', task)
-  //   commit('task_users/UPDATE', task_user)
-  // },
   async createTaskUser(
     { commit },
     {
@@ -73,7 +32,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       next_work_day,
       company_user_id,
       user_task_list_id,
-      sort_order
+      sort_order,
+      temp
     }: ITaskUser
   ) {
     const taskUser = {
@@ -84,10 +44,20 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       user_task_list_id,
       sort_order
     }
-    // @ts-ignore
-    const { task_user } = await this._vm
-      .$http()
-      .post('/task-users', { task_user: taskUser })
+    let task_user
+    if (temp) {
+      task_user = {
+        ...taskUser,
+        id: generateUniqId(20),
+        temp: true
+      }
+    } else {
+      // @ts-ignore
+      task_user = (await this._vm
+        .$http()
+        .post('/task-users', { task_user: taskUser }))
+        .task_user
+    }
     commit(CREATE_TASK_USER, task_user)
     return task_user
   },
@@ -97,6 +67,10 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       .$http()
       .put('/task-users/', taskUser.id, { task_user: taskUser })
     commit(UPDATE_TASK_USER, task_user)
+  },
+  async deleteTaskUser({ commit }, taskUser: ITaskUser) {
+    commit(DELETE_TASK_USER, taskUser)
+    return
   },
   updateSortOrder({ commit }, ids) {
     // Todo: @stephane - create endpoint to update sort_order for tasks

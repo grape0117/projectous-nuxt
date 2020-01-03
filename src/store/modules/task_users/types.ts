@@ -14,5 +14,6 @@ export interface ITaskUser {
   sort_order: number | null
   task_uuid: string | null
   user_rate: string
-  work_day_position: number | null
+  work_day_position: number | null,
+  temp?: boolean
 }

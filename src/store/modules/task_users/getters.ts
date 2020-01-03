@@ -27,7 +27,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
           sort_order,
           user_task_list_id,
           company_user_id,
-          next_work_day
+          next_work_day,
+          temp
         }: any) => {
           const project_id = allTasks[lookup[task_id]].project_id
           const project = projects[projectsLookup[allTasks[lookup[task_id]].project_id]]
@@ -50,7 +51,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
             sort_order,
             user_task_list_id,
             next_work_day,
-            listId
+            listId,
+            temp
           }
         }
       )

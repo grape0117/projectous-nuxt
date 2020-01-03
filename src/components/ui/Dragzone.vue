@@ -45,7 +45,6 @@
                 @blur="updateTitle($event, item)"
                 @keydown.enter.prevent="onEnter($event, item, index)"
                 @click="editedItemId = item.id"
-                @input="newNameTouched = true"
               />
             </div>
             <div
@@ -81,7 +80,7 @@
         </div>
         <div
           class="dragzone__add-task dragzone__add-task--item"
-          @click="onClickAddButton"
+          @click="onClickAddButton(index)"
         >
           +
         </div>
@@ -90,7 +89,7 @@
       <div
         v-if="tasks.length === 0"
         class="dragzone__add-task"
-        @click="onClickAddButton"
+        @click="onClickAddButton(0)"
       >
         +
       </div>
@@ -104,10 +103,9 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
-import { formatDateToYYYY_MM_DD } from '@/utils/dateFunctions'
+import { generateUUID } from '@/utils/util-functions'
 
 const Tasks = namespace('tasks')
-const TaskUsers = namespace('task_users')
 
 @Component
 export default class Dragzone extends Vue {
@@ -116,38 +114,37 @@ export default class Dragzone extends Vue {
   @Prop({ required: true, default: () => [] }) public tasks!: any
   @Prop({ required: true }) public isListDragged!: boolean
   @Prop({ required: true }) public group!: string
-  @Prop({ required: true }) public tempItemId!: number | null
   @Prop({ required: false, default: false }) public initiallyExpanded!: boolean
   @Prop({ required: false, default: false })
   public selectedCompanyUserId!: number
-  @Tasks.Action('createTask') private createTaskVuex!: any
   @Tasks.Getter public getById!: any
-  @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
 
   private expandedList: boolean = this.initiallyExpanded
   private numberOfExpandedItems: number = 3
   private newItem: any = null
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
-  private preventUpdate: boolean = false
-  private newNameTouched: boolean = false
   private currentListsBlockName: string | null = null
 
   private get isListExpandable() {
     return this.tasks.length > this.numberOfExpandedItems
   }
 
-  @Watch('tempItemId')
-  private async onTempItemIdChanged(id: number | null) {
-    if (id !== null) {
-      await this.$nextTick()
-      const newEl =
-        this.$el.querySelector(`.dragzone__item-text[data-id="${id}"]`) ||
-        this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
-      if (newEl) {
-        this.expandedList = true
-        // @ts-ignore
-        newEl.focus()
+  @Watch('tasks')
+  onTaskChanged(newTasks: any, oldTasks: any) {
+    if (newTasks.length > oldTasks.length) {
+      const tempTask = newTasks.find(({ temp }: any) => temp)
+      if (tempTask) {
+        setTimeout(() => {
+          const el = this.$el.querySelector(`.dragzone__item-text[data-id="${tempTask.id}"]`) ||
+            this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
+          if (el) {
+            this.expandedList = true
+            // @ts-ignore
+            el.focus()
+          }
+
+        }, 50)
       }
     }
   }
@@ -214,24 +211,13 @@ export default class Dragzone extends Vue {
       }
     }
   }
-  /*
-  If you hit enter, that fires first, set item.addItem == true. I'm not sure why we don't just addNewTask inside onEnter?
-   */
+
   private async updateTitle({ target: { innerHTML: name } }: any, item: any) {
-    if (this.tempItemId || this.preventUpdate) {
-      if (this.newNameTouched) {
-        item.title = name
-        await this.createTaskUser(item)
-        // this.$emit('deleteTempItem')
-        if (this.tasks.length)
-          this.$emit('updateOptions', JSON.stringify(this.tasks))
-      }
-      if (!name) {
-        this.$emit('deleteTempItem')
-      }
-      this.preventUpdate = false
+    if (item.temp) {
+      item.title = name
+      this.$emit('delete', item)
+      // this.$emit('create', item)
       this.editedItemId = null
-      this.newNameTouched = false
     } else if (item.title !== name) {
       const updatedItem = cloneDeep(item)
       updatedItem.title = name
@@ -239,62 +225,24 @@ export default class Dragzone extends Vue {
     }
   }
 
-  async createTaskUser({ uuid, title, listId, sort_order }: any) {
-    let next_work_day = null
-    let user_task_list_id = null
-    if (listId === 'Past') {
-      /*
-        TODO: This isn't clean. It shouldn't just be a month back. Seems like we have options:
-        1) When the list loads, resave all to have a specific listId like -1
-        2) Figure out where in the list the new entry was added and use the same next_work_day (seems wrong though)
-         */
-      const date = new Date()
-      next_work_day = formatDateToYYYY_MM_DD(
-        new Date(date.setMonth(date.getMonth() - 1))
-      )
-      //If listId is a date, return that I think
-    } else if (!!Date.parse(listId) && isNaN(listId)) {
-      //TODO: check to see if we even need to convert it
-      next_work_day = formatDateToYYYY_MM_DD(listId)
-      //If listId is a number, this is a user-created list
-    } else if (Number.isInteger(Number(listId))) {
-      //Only user-created lists have a listId set on task_user object
-      user_task_list_id = listId
+  private async onClickAddButton(index: number) {
+    const newItem = {
+      id: generateUUID(),
+      title: '',
+      listId: this.id,
+      sort_order: index ? index + 1 : 0,
+      temp: true
     }
-    const task = { uuid, title }
-    const { id } = await this.createTaskVuex(task)
-    const taskUser = {
-      task_id: id,
-      next_work_day,
-      company_user_id: 112,
-      user_task_list_id,
-      sort_order
-    }
-    await this.createTaskUserVuex(taskUser)
+    this.$emit('create', newItem)
   }
 
-  private async onClickAddButton() {
-    if (!this.tempItemId) {
-      this.newNameTouched = false
-      this.preventUpdate = true
-      this.$emit('addTempItem', {
-        listId: this.id
-      })
-    }
-  }
-
-  /*
-Why not create item inside this?
- */
   private async onEnter(event: any, item: any, index: number) {
-    if (!this.tempItemId) {
-      this.newNameTouched = false
-      this.preventUpdate = true
-      this.$emit('addTempItem', item, index)
-    } else {
-      const { target } = event
-      target.blur()
-    }
+    // if (!this.tempItemId) {
+    //   this.$emit('addTempItem', item, index)
+    // } else {
+    //   const { target } = event
+    //   target.blur()
+    // }
   }
 
   /*

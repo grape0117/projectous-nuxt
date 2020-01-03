@@ -4,8 +4,9 @@ import { IModuleState, ITask } from './types'
 import { IRootState } from '@/store/types'
 // @ts-ignore
 import { uuid } from 'vue-uuid'
+import { generateUUID } from '@/utils/util-functions'
 
-function createDefaultTask(uuid: string): ITask {
+function createDefaultTask(): ITask {
   return {
     child_task_id: null,
     company_id: null,
@@ -31,7 +32,7 @@ function createDefaultTask(uuid: string): ITask {
     status: 'open',
     title: '',
     users: [],
-    uuid,
+    uuid: null,
     workflowy_id: null
   }
 }
@@ -39,17 +40,26 @@ function createDefaultTask(uuid: string): ITask {
 export const actions: ActionTree<IModuleState, IRootState> = {
   async createTask(
     { commit, getters }: any,
-    { uuid, title, project_id, project_sort_order }: any
+    { title, project_id, project_sort_order, temp }: any
   ) {
     const task = {
-      ...createDefaultTask(uuid),
+      ...createDefaultTask(),
       title,
       project_id,
       project_sort_order
     }
-    //TODO: should we do this? task.id = uuid.v4();
-    // @ts-ignore
-    const { task: newTask } = await this._vm.$http().post('/tasks', { task })
+    let newTask
+    if (temp) {
+      newTask = {
+        ...task,
+        id: generateUUID(),
+        temp: true
+      }
+    } else {
+      //TODO: should we do this? task.id = uuid.v4();
+      // @ts-ignore
+      newTask = await this._vm.$http().post('/tasks', { task }).task
+    }
     commit('create', newTask)
     return newTask
   },
@@ -58,6 +68,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     await this._vm.$http().put('/tasks/', task.id, { task })
     // TODO @stephane send task to server
     commit('upsert', task)
+  },
+  async deleteTask({ commit }: any, task: any) {
+    commit('delete', task)
   },
   /**
    * @param commit - vuex mutation

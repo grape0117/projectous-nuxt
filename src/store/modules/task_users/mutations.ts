@@ -18,15 +18,17 @@ export const mutations: MutationTree<IModuleState> = {
   },
   [DELETE_TASK_USER](state: IModuleState, task_user: ITaskUser) {
     //@Mikhail not sure if I should use deleted_at. I'm wondering if it's faster and better to not change the keys
-    const lookup: any = {}
-    for (let i = 0; i >= state.task_users.length; i++) {
-      if (state.task_users[i].uuid !== task_user.uuid) {
-        lookup[i] = state.task_users[i].uuid
-      } else {
-        state.task_users.slice(i, 1)
-      }
-    }
-    state.lookup = lookup
+    // const lookup: any = {}
+    // for (let i = 0; i >= state.task_users.length; i++) {
+    //   if (state.task_users[i].uuid !== task_user.uuid) {
+    //     lookup[i] = state.task_users[i].uuid
+    //   } else {
+    //     state.task_users.slice(i, 1)
+    //   }
+    // }
+    // state.lookup = lookup
+    // @Stephane I implemented it like this for now, later we can change
+    state.task_users = state.task_users.filter(({ id }: any) => id !== task_user.id)
   },
   updateTaskUsersSortOrder(state: IModuleState, ids: number[]) {
     ids.forEach((id, index) => {
