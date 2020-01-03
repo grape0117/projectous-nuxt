@@ -40,13 +40,13 @@ function createDefaultTask(): ITask {
 export const actions: ActionTree<IModuleState, IRootState> = {
   async createTask(
     { commit, getters }: any,
-    { title, project_id, project_sort_order, status, temp }: any
+    { title, project_id, sort_order, status, temp }: any
   ) {
     const task = {
       ...createDefaultTask(),
       title,
       project_id,
-      project_sort_order,
+      sort_order,
       status
     }
     let newTask

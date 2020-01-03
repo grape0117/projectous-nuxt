@@ -30,8 +30,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
           next_work_day,
           temp
         }: any) => {
-          const project_id = allTasks[lookup[task_id]].project_id
-          const project = projects[projectsLookup[allTasks[lookup[task_id]].project_id]]
+          const project_id = allTasks[lookup[task_id]] ? allTasks[lookup[task_id]].project_id : null
+          const project = project_id ? projects[projectsLookup[allTasks[lookup[task_id]].project_id]] : null
           const project_name = project ? project.name : 'Unknown project'
           const isPinned = !!pinnedProjects.find((p: number) => p === project_id)
           let listId
@@ -45,7 +45,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
           return {
             id,
             task_id,
-            title: allTasks[lookup[task_id]].title,
+            title: allTasks[lookup[task_id]] ? allTasks[lookup[task_id]].title : '',
             company_user_id,
             project_id,
             sort_order,

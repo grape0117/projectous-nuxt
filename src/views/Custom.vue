@@ -147,7 +147,7 @@ export default class Custom extends Vue {
 
 
   get selectedCompanyUserId() {
-    return this.selectedCompanyUser.id || null
+    return this.selectedCompanyUser ? this.selectedCompanyUser.id : null
   }
 
   get lists() {
@@ -196,13 +196,16 @@ export default class Custom extends Vue {
   }
   get selectedProjectTasksForStatusesColumns() {
     const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
-    return projectTasks.map(({ id, title, status, temp }: ITask) => ({
-      id,
-      title,
-      status,
-      listId: status,
-      temp
-    }))
+    return projectTasks
+      .map(({ id, title, status, sort_order, temp }: ITask) => ({
+        id,
+        title,
+        status,
+        listId: status,
+        sort_order,
+        temp
+      }))
+      .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
   }
 
   get taskPerStatusLists() {
@@ -242,7 +245,7 @@ export default class Custom extends Vue {
     return await this.createTaskVuex({
       title,
       project_id: this.selectedProjectId,
-      project_sort_order: sort_order,
+      sort_order,
       status: listId,
       temp
     })

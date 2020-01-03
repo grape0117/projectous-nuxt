@@ -135,11 +135,11 @@ export default class Dragzone extends Vue {
     if (newTasks.length > oldTasks.length) {
       const tempTask = newTasks.find(({ temp }: any) => temp)
       if (tempTask) {
+        this.expandedList = true
         setTimeout(() => {
           const el = this.$el.querySelector(`.dragzone__item-text[data-id="${tempTask.id}"]`) ||
             this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
           if (el) {
-            this.expandedList = true
             // @ts-ignore
             el.focus()
           }
@@ -228,7 +228,7 @@ export default class Dragzone extends Vue {
       id: generateUUID(),
       title: '',
       listId: this.id,
-      sort_order: index ? index + 1 : 0,
+      sort_order: index ? index - 1 : 0,
       temp: true
     }
     this.$emit('create', newItem)

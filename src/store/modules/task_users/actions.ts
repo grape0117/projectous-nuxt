@@ -58,6 +58,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
         .post('/task-users', { task_user: taskUser }))
         .task_user
     }
+    console.log(task_user)
     commit(CREATE_TASK_USER, task_user)
     return task_user
   },
