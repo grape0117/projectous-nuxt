@@ -103,7 +103,6 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
-import { generateUUID } from '@/utils/util-functions'
 
 const Tasks = namespace('tasks')
 
@@ -135,7 +134,10 @@ export default class Dragzone extends Vue {
     if (newTasks.length > oldTasks.length) {
       const tempTask = newTasks.find(({ temp }: any) => temp)
       if (tempTask) {
+        // Note: expanding list prevents that a new task appears in the hided area
+        // since it could be many tasks with the same sort_order number
         this.expandedList = true
+        // Note: added timeout to wait once new task node appears in DOM
         setTimeout(() => {
           const el = this.$el.querySelector(`.dragzone__item-text[data-id="${tempTask.id}"]`) ||
             this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
@@ -241,15 +243,6 @@ export default class Dragzone extends Vue {
       this.$emit('update', updatedItem)
     }
     this.editedItemId = null
-  }
-
-  private async onEnter(event: any, item: any, index: number) {
-    // if (!this.tempItemId) {
-    //   this.$emit('addTempItem', item, index)
-    // } else {
-    //   const { target } = event
-    //   target.blur()
-    // }
   }
 
   /*
