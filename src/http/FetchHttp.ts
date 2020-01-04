@@ -30,7 +30,7 @@ export class FetchHttp extends BaseHttp implements IHttp {
       console.log(e)
     }
   }
-  public async post(url: string, data: any) {
+  public async post(url: string, data: any, stringify: boolean = true) {
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)
       return
@@ -38,7 +38,7 @@ export class FetchHttp extends BaseHttp implements IHttp {
     try {
       const response = await fetch(`${this.baseUrl}${url}`, {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: stringify ? JSON.stringify(data) : data,
         headers: {
           ...this.headers,
           'Content-Type': 'application/json'
