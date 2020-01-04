@@ -37,7 +37,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('updateAttribute', { project_id, attribute, value }) //@Mikhail should I get values from response?
   },
   async delete() {},
-  pinProject({ commit, state }, { id, userId }) {
+  async pinProject({ commit, state }, { id, userId }) {
     const { projects, lookup } = state
     const { name } = projects[lookup[id]]
     const userList = {
@@ -48,5 +48,10 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }
     commit('projects/PIN_PROJECT', id)
     commit('lists/lists/ADD_NEW_LIST', userList, { root: true })
+    // Todo: @Stephane added this http request to send id of pinned project
+    // @ts-ignore
+    // const response = await this._vm
+    //   .$http()
+    //   .post('/project-user/', { project_id: id })
   }
 }
