@@ -29,7 +29,9 @@ export const mutations: MutationTree<IModuleState> = {
     // }
     // state.lookup = lookup
     // @Stephane I implemented it like this for now, later we can change
-    state.task_users = state.task_users.filter(({ id }: any) => id !== task_user.id)
+    state.task_users = state.task_users.filter(
+      ({ id }: any) => id !== task_user.id
+    )
   },
   [REMOVE_TEMP_TASKS_USER](state: IModuleState) {
     state.task_users = state.task_users.filter(({ temp }) => !temp)
@@ -39,5 +41,11 @@ export const mutations: MutationTree<IModuleState> = {
       const taskUser = state.task_users[state.lookup[id]]
       if (taskUser) taskUser.sort_order = index
     })
+  },
+  task_uuid_to_id(state: IModuleState, { uuid, id }) {
+    state.task_users[state.lookup[uuid]].id = id
+    state.lookup[id] = state.lookup[uuid]
+
+    //TODO: do we need to delete from lookup? Doesn't seem to matter
   }
 }
