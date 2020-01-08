@@ -30,7 +30,8 @@ export class AxiosHttp extends BaseHttp implements IHttp {
         params: { id },
         headers: {
           Authorization: 'Bearer ' + '123456789012345678901234567890qwertyuiop',
-          'Content-Type': 'text/plain'
+          'Content-Type': 'text/plain',
+          'Cache-Control': 'no-cache'
         }
       })
       return data
@@ -49,8 +50,10 @@ export class AxiosHttp extends BaseHttp implements IHttp {
         { data },
         {
           headers: {
-            Authorization: 'Bearer ' + '123456789012345678901234567890qwertyuiop',
-            'Content-Type': 'text/plain'
+            Authorization:
+              'Bearer ' + '123456789012345678901234567890qwertyuiop',
+            'Content-Type': 'text/plain',
+            'Cache-Control': 'no-cache'
           }
         }
       )
@@ -74,8 +77,10 @@ export class AxiosHttp extends BaseHttp implements IHttp {
         { data },
         {
           headers: {
-            Authorization: 'Bearer ' + '123456789012345678901234567890qwertyuiop',
-            'Content-Type': 'text/plain'
+            Authorization:
+              'Bearer ' + '123456789012345678901234567890qwertyuiop',
+            'Content-Type': 'text/plain',
+            'Cache-Control': 'no-cache'
           }
         }
       )
@@ -96,7 +101,8 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       return await axios.delete(`${this.baseUrl}${url}${id}`, {
         headers: {
           Authorization: 'Bearer ' + '123456789012345678901234567890qwertyuiop',
-          'Content-Type': 'text/plain'
+          'Content-Type': 'text/plain',
+          'Cache-Control': 'no-cache'
         }
       })
     } catch (e) {

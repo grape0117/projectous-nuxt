@@ -16,7 +16,9 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <div class="navbar-brand" @click="home()">Projectous</div>
+        <div class="navbar-brand" @click="home()">
+          Projectous {{ total_task_users }}
+        </div>
         <!--        <button-->
         <!--          data-toggle="collapse"-->
         <!--          data-target="#notification"-->
@@ -59,6 +61,9 @@
 <script>
 export default {
   computed: {
+    total_task_users: function() {
+      return this.$store.state.task_users.task_users.length
+    },
     total_time_today: function() {
       return 'total_time'
       let self = this

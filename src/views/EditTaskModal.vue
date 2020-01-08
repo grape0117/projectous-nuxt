@@ -1,5 +1,11 @@
 <template>
-  <b-modal :title="task.title" id="task-modal" class="modal fade" role="dialog">
+  <b-modal
+    :title="task.title"
+    id="task-modal"
+    class="modal fade"
+    role="dialog"
+    @ok="saveTask"
+  >
     <form id="editTaskForm" class="form-horizontal">
       <input
         id="taskIDEdit"
@@ -19,7 +25,7 @@
             type="text"
             name="title"
             placeholder="Task"
-            :value="task.title"
+            v-model="task.title"
           />
         </div>
       </div>
@@ -71,7 +77,7 @@
             type="date"
             name="due_at"
             placeholder="Due Date"
-            :value="due_date()"
+            v-model="task.due_date"
           />
         </div>
       </div>
@@ -86,7 +92,7 @@
             type="text"
             name="estimate"
             placeholder="Estimate"
-            :value="task.estimate"
+            v-model="task.estimate"
           />
         </div>
       </div>
@@ -95,38 +101,13 @@
           Users:
         </p>
       </div>
-      <div class="form-group" v-for="user in active_users()">
-        <label class="control-label col-sm-4">{{ user.name }}: </label>
-        <div class="col-sm-8">
-          <input
-            type="checkbox"
-            :checked="userChecked(user.id)"
-            :name="'user[' + user.id + ']'"
-            value="1"
-          />
-          <input
-            class=""
-            type="text"
-            :name="'user_rate[' + user.id + ']'"
-            :value="userRate(user.id)"
-          />
-          <select :name="'user_type[' + user.id + ']'">
-            <option
-              value="assigned"
-              :selected="userSelected('assigned', user.id)"
-              >Assigned
-            </option>
-            <option
-              value="reviewer"
-              :selected="userSelected('reviewer', user.id)"
-              >Reviewer
-            </option>
-            <option value="manager" :selected="userSelected('manager', user.id)"
-              >Manager
-            </option>
-          </select>
-        </div>
-      </div>
+      <edit-task-modal-user
+        @toggle="toggleUser"
+        v-bind:task_users="task_users"
+        v-bind:user="user"
+        v-bind:task="task"
+        v-for="user in active_users()"
+      ></edit-task-modal-user>
     </form>
 
     <!-- /.modal-dialog --> </b-modal
@@ -134,8 +115,19 @@
 </template>
 
 <script>
+import EditTaskModalUser from './EditTaskModalUser.vue'
+import uuid from 'uuid'
+
 export default {
   name: 'task-modal',
+  components: {
+    'edit-task-modal-user': EditTaskModalUser
+  },
+  data: function() {
+    return {
+      local_task_users: []
+    }
+  },
   computed: {
     task: function() {
       return this.$store.state.settings.current_edit_task
@@ -162,15 +154,44 @@ export default {
     },
     current_company_user: function() {
       return this.$store.state.settings.current_company_user
+    },
+    task_users: function() {
+      let task_users = this.$store.state.task_users.task_users.filter(
+        task_user => task_user.task_id === this.task.id
+      )
+      console.log(task_users)
+      console.log(this.$store.state.task_users.task_users.pop())
+      return task_users
     }
   },
   mounted: function() {
-    let self = this
+    //let self = this
+    console.log(this.$store.state.task_users.task_users)
     //TODO $('#task-modal').on('hidden.bs.modal', function () {
     //self.$store.dispatch('settings/closedModal')
     //})
   },
   methods: {
+    toggleUser(user) {
+      console.log('toggle', user)
+      console.log('task', this.task)
+
+      //each through local data of task_users?
+      const task_user_index = this.local_task_users.findIndex(task_user => {
+        console.log(user)
+        return task_user.company_user_id === user.company_user_id
+      })
+      if (task_user_index !== -1) {
+        //update
+        this.local_task_users[task_user_index].user_rate = user.user_rate
+        this.local_task_users[task_user_index].role = user.role
+        this.local_task_users[task_user_index].user_checked = user.user_checked
+      } else {
+        //create
+        user.id = uuid.v4()
+        this.local_task_users.push(user)
+      }
+    },
     isCreateProject: function() {},
     isEditTaskTypes: function(event) {
       if (event.target.value == 'edit') {
@@ -201,59 +222,15 @@ export default {
       }
       return '' //dateTimeToInput(this.task.due_date)
     },
-    userSelected: function(user_type, user_id) {
-      let self = this
-      let userSelected = false
-      if (!self.task.users) {
-        return false
-      }
-      self.task.users.forEach((key, user) => {
-        if (user.id == user_id) {
-          if (user_type == user.pivot.role) {
-            userSelected = 'selected'
-            return false
-          }
-        }
-      })
-
-      return userSelected
-    },
-    userChecked: function(user_id) {
-      let self = this
-      let userChecked = false
-      if (!self.task.users) {
-        return false
-      }
-
-      self.task.users.forEach((key, user) => {
-        if (user.id == user_id) {
-          userChecked = true
-          return false
-        }
-      })
-      return userChecked
-    },
-    userRate: function(user_id) {
-      let self = this
-      let userRate = ''
-      if (!self.task.users) {
-        return
-      }
-      self.task.users.forEach((key, user) => {
-        if (user.id == user_id) {
-          //console.log('user rate found');
-          //console.log(user);
-          userRate = user.pivot.user_rate
-          return false
-        }
-      })
-      return userRate
-    },
     saveTask: function(callback) {
-      return this.$store.dispatch(
-        'tasks/saveTask'
-        //TODO: $('#editTaskForm').serialize()
-      )
+      /*const task_users = this.local_task_users.filter((task_user) => {
+          return task_user.user_checked === true
+        })
+        console.log('const task_users', task_users)*/
+      return this.$store.dispatch('tasks/saveTask', {
+        task: this.task,
+        task_users: this.local_task_users
+      })
     },
     client_name: function(client_id) {
       let company_client = this.$store.getters[
