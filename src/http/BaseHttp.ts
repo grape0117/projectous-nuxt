@@ -5,8 +5,12 @@ export class BaseHttp implements IHttp {
   protected headers: any = {
     Authorization: 'Bearer ' + '123456789012345678901234567890qwertyuiop'
   }
+  protected offlineMode: boolean = false
+  protected offlineNotifyUserMessage: string = 'You are offline, try later'
+  constructor() {
+    if (!window.navigator.onLine) this.setOfflineMode()
+  }
   public async fetch(url: string): Promise<any> {
-    alert('basefetch')
     this.throwError()
   }
   public async get(url: string, id: number | string): Promise<any> {
@@ -21,7 +25,17 @@ export class BaseHttp implements IHttp {
   public async delete(url: string, id: number | string): Promise<any> {
     this.throwError()
   }
+  protected noSlashEndError() {
+    return new Error('URL string must end with slash')
+  }
+  protected notifyUser(message: string) {
+    // @stephane later we can add notification for user
+    console.log(message)
+  }
   private throwError() {
     throw Error('Method is not implemented')
+  }
+  private setOfflineMode() {
+    this.offlineMode = true
   }
 }

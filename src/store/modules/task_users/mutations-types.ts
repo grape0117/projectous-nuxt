@@ -1,6 +1,5 @@
 export const DELETE_TASK_USER = 'task_users/DELETE_TASK_USER'
 export const UPDATE_TASK_USER = 'task_users/UPDATE_TASK_USER'
 export const CREATE_TASK_USER = 'task_users/CREATE_TASK_USER'
+export const REMOVE_TEMP_TASKS_USER = 'task_users/REMOVE_TEMP_TASKS_USER'
 export const CREATE_TASK_USER_BY_LIST = 'task_users/CREATE_TASK_USER_BY_LIST'
-export const UPDATE_TASK_USER_BY_LIST = 'task_users/UPDATE_TASK_USER_BY_LIST'
-export const ADD_TASK_USER_TO_LIST = 'task_users/ADD_TASK_USER_TO_LIST'

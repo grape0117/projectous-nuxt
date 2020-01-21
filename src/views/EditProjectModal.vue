@@ -285,7 +285,7 @@ export default {
       )
     },
     due_date: function() {
-      return dateTimeToInput(this.project.due_at)
+      return '' //dateTimeToInput(this.project.due_at)
     },
     isProjectClient: function(client_id) {
       return this.project.client_id == client_id
@@ -305,7 +305,7 @@ export default {
       this.$store.dispatch('company_clients/editClient', this.projectClient())
     },
     projectClient: function() {
-      return this.$store.getters['company_clients/getCompanyClientByClientId'](
+      return this.$store.getters['company_clients/getByClientCompanyId'](
         this.project.client_id
       )
     },

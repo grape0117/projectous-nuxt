@@ -6,11 +6,14 @@
         <router-view />
       </div>
     </div>
+    <task-modal />
     <edit-user-modal />
   </div>
 </template>
 <script>
 import EditUserModal from './views/EditUserModal'
+import { createListsByDays, createUserLists } from '@/utils/util-functions'
+
 export default {
   components: { EditUserModal },
   computed: {
@@ -37,11 +40,13 @@ export default {
     async init() {
       //this.$bvModal.show('edit-user-modal')
       const {
+        company_clients,
+        company_users,
         task_users,
         tasks,
-        company_users,
         projects,
-        project_users
+        project_users,
+        user_task_lists
         // @ts-ignore
       } = await this.$http().fetch('/test-tasks')
       this.$store.commit(
@@ -69,6 +74,21 @@ export default {
         { module: 'company_users', entities: company_users },
         { root: true }
       )
+      this.$store.commit(
+        'ADD_MANY',
+        { module: 'company_clients', entities: company_clients },
+        { root: true }
+      )
+      const daysLists = createListsByDays()
+      const userLists = createUserLists(user_task_lists)
+      this.$store.commit('lists/lists/CREATE_LISTS', {
+        listName: 'generalLists',
+        lists: daysLists
+      })
+      this.$store.commit('lists/lists/CREATE_LISTS', {
+        listName: 'userLists',
+        lists: userLists
+      })
       //TODO: companies
     }
   }

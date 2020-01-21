@@ -4,93 +4,48 @@ import {
   CREATE_TASK_USER,
   UPDATE_TASK_USER,
   DELETE_TASK_USER,
-  CREATE_TASK_USER_BY_LIST,
-  UPDATE_TASK_USER_BY_LIST,
-  ADD_TASK_USER_TO_LIST
+  REMOVE_TEMP_TASKS_USER
 } from './mutations-types'
-import { Normalizer } from '@/utils/Normalizer'
-import { resetTime } from '@/utils/dateFunctions'
-import { cloneDeep } from 'lodash'
 
 export const mutations: MutationTree<IModuleState> = {
   [CREATE_TASK_USER](state: IModuleState, task_user: ITaskUser) {
     state.task_users.push(task_user)
-    for (let i = state.task_users.length; i >= 0; i--) {
-      if (state.task_users[i].id === task_user.id) {
-        state.lookup[task_user.uuid] = i
-      }
-    }
+    state.task_users.forEach((taskUser: ITaskUser, key: number) => {
+      state.lookup[taskUser.id as number] = key
+    })
   },
   [UPDATE_TASK_USER](state: IModuleState, task_user: ITaskUser) {
-    state.task_users[state.lookup[task_user.uuid]] = task_user
+    state.task_users.splice(state.lookup[task_user.id as number], 1, task_user)
   },
   [DELETE_TASK_USER](state: IModuleState, task_user: ITaskUser) {
     //@Mikhail not sure if I should use deleted_at. I'm wondering if it's faster and better to not change the keys
-    const lookup: any = {}
-    for (let i = 0; i >= state.task_users.length; i++) {
-      if (state.task_users[i].uuid !== task_user.uuid) {
-        lookup[i] = state.task_users[i].uuid
-      } else {
-        state.task_users.slice(i, 1)
-      }
-    }
-    state.lookup = lookup
+    // const lookup: any = {}
+    // for (let i = 0; i >= state.task_users.length; i++) {
+    //   if (state.task_users[i].uuid !== task_user.uuid) {
+    //     lookup[i] = state.task_users[i].uuid
+    //   } else {
+    //     state.task_users.slice(i, 1)
+    //   }
+    // }
+    // state.lookup = lookup
+    // @Stephane I implemented it like this for now, later we can change
+    state.task_users = state.task_users.filter(
+      ({ id }: any) => id !== task_user.id
+    )
   },
-  [CREATE_TASK_USER_BY_LIST](state: IModuleState, { lists, tasks, userId }) {
-    state.tasks_by_user = []
-    const task_users: any = state['task_users']
-    const normalizedTasks = new Normalizer({ tasks }).flatNormalizationById(
-      'tasks'
-    )
-    const filteredTasks = task_users
-      .map(({ task_id, company_user_id, next_work_day }: ITaskUser) => ({
-        ...normalizedTasks[task_id],
-        company_user_id,
-        next_work_day
-      }))
-      .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
-      .filter(({ company_user_id }: any) => company_user_id === userId)
-    const unmarkedTasks = filteredTasks.filter(
-      ({ next_work_day }: ITaskUser) => !next_work_day
-    )
-    const markedTasks = filteredTasks.filter(
-      ({ next_work_day }: ITaskUser) => next_work_day
-    )
-    lists.forEach(({ id }: any) => {
-      const today = resetTime(new Date())
-      let day_tasks
-      if (id === 'Past') {
-        day_tasks = markedTasks
-          .filter(
-            ({ next_work_day }: any) =>
-              resetTime(next_work_day).getDate() < today.getDate()
-          )
-          .sort(({ next_work_day: a }: any, { next_work_day: b }: any) => {
-            return (
-              resetTime(a as Date).getTime() - resetTime(b as Date).getTime()
-            )
-          })
-      } else if (id === 'Unmarked') {
-        day_tasks = unmarkedTasks
-      } else {
-        day_tasks = markedTasks.filter(
-          ({ next_work_day }: any) => resetTime(next_work_day).toString() === id
-        )
-      }
-      state.tasks_by_user.push(day_tasks)
+  [REMOVE_TEMP_TASKS_USER](state: IModuleState) {
+    state.task_users = state.task_users.filter(({ temp }) => !temp)
+  },
+  updateTaskUsersSortOrder(state: IModuleState, ids: number[]) {
+    ids.forEach((id, index) => {
+      const taskUser = state.task_users[state.lookup[id]]
+      if (taskUser) taskUser.sort_order = index
     })
   },
-  [UPDATE_TASK_USER_BY_LIST](
-    state: IModuleState,
-    { task, listIndex, taskIndex }
-  ) {
-    const tasks = cloneDeep(state.tasks_by_user)
-    tasks[listIndex][taskIndex] = task
-    state.tasks_by_user = tasks
-  },
-  [ADD_TASK_USER_TO_LIST](state: IModuleState, { task, listIndex, taskIndex }) {
-    const tasks = cloneDeep(state.tasks_by_user)
-    tasks[listIndex].splice(taskIndex, 0, task)
-    state.tasks_by_user = tasks
+  task_uuid_to_id(state: IModuleState, { uuid, id }) {
+    state.task_users[state.lookup[uuid]].id = id
+    state.lookup[id] = state.lookup[uuid]
+
+    //TODO: do we need to delete from lookup? Doesn't seem to matter
   }
 }

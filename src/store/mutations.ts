@@ -4,6 +4,7 @@ import Vue from 'vue'
 
 export const mutations: MutationTree<IRootState> = {
   ADD_MANY(state: IRootState, { module, entities }: any) {
+    console.log('ADD_MANY ' + module)
     if (!state[module]) return
     //@ts-ignore
     entities.forEach((value, key) => {
@@ -41,12 +42,12 @@ export const mutations: MutationTree<IRootState> = {
     let key
     // @ts-ignore
     key = state[module].lookup[entity.id]
-    if (key) {
+    if (key && state[module][key]) {
       //TODO: call 'UPDATE' here? How to share key?
       for (property in entity) {
         if (entity.hasOwnProperty(property)) {
           // @ts-ignore
-          state[module][key][property] = project[property]
+          state[module][key][property] = entity[property]
         }
       }
     } else {
@@ -59,7 +60,6 @@ export const mutations: MutationTree<IRootState> = {
     let key = state[module].lookup[entity.id]
     if (key) {
       for (let property in entity) {
-        //@Mikhail am I creating a variable each loop? Should I declare it before? Does it matter?
         if (entity.hasOwnProperty(property)) {
           // @ts-ignore
           state[module][key][property] = project[property]
@@ -76,10 +76,18 @@ export const mutations: MutationTree<IRootState> = {
     state[module][state[module].lookup[id]][attribute] = value
   },
   DELETE(state: IRootState, { module, entity }) {
+    console.log(state.task_users, module, state['task_users'], state[module])
+    if (!state[module].lookup[entity.id]) return
     // @ts-ignore
-    Vue.delete(state[module], state[module].lookup[entity.id])
+    Vue.delete(state[module][module], state[module].lookup[entity.id])
     // @ts-ignore
     Vue.delete(state[module].lookup, entity.id)
     //TODO: what to do with project_tasks and project_users
+  },
+  uuid_to_id(state: IRootState, { module, uuid, id }) {
+    let index = state[module].lookup[uuid]
+    state[module][module][index].id = id
+    state[module].lookup[id] = state[module].lookup[uuid]
+    //TODO: do we need to delete from lookup? Doesn't seem to matter
   }
 }
