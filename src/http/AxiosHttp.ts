@@ -19,6 +19,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       console.log(e)
     }
   }*/
+
   public async get(url: string, id: number | string) {
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)
@@ -82,9 +83,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
         return
       }
       return await axios.delete(`${this.baseUrl}${url}${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: this.headers
       })
     } catch (e) {
       console.log(e)

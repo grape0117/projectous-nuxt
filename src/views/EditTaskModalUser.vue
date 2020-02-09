@@ -1,7 +1,6 @@
 <template>
   <div class="form-group">
     <div class="col-sm-12">
-      <!--{{ id }}-->
       <label class="control-label col-sm-4">{{ user.name }}: </label>
       <input type="checkbox" v-model="user_checked" />
       <input type="text" v-model="user_rate" />
@@ -53,39 +52,6 @@ export default {
         role: this.role
       })
     }
-    /*userChecked: function(company_user_id) {
-      let userChecked = false
-
-      this.task_users.forEach(user => {
-        if (user.company_user_id === company_user_id) {
-          userChecked = true
-          return false
-        }
-      })
-      return userChecked
-    },
-    userRate(company_user_id) {
-      let userRate = ''
-      this.task_users.forEach(user => {
-        if (user.company_user_id === company_user_id) {
-          //console.log('user rate found');
-          //console.log(user);
-          userRate = user.user_rate
-          return false
-        }
-      })
-      return userRate
-    },
-    userRole(company_user_id) {
-      let role = 'assigned'
-      this.task_users.forEach(user => {
-        if (user.company_user_id === company_user_id) {
-          role = user.role
-          return false
-        }
-      })
-      return role
-    }*/
   }
 }
 </script>

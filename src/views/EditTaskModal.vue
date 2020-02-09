@@ -117,6 +117,7 @@
       <button class="btn btn-info" @click="ok()">Save</button>
       <button class="btn" @click="cancel()">Cancel</button>
     </template>
+
     <!-- /.modal-dialog --> </b-modal
   ><!-- /.modal -->
 </template>
