@@ -147,6 +147,7 @@ export default class Custom extends Vue {
   private editedTaskTimerId: number | string | null = null
   private editedTaskId: number | string | null = null
   private currentListsBlockName: string | null = null
+  private project_search: string = ''
 
   get listsBlockNames() {
     return listsBlockNames

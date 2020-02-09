@@ -11,11 +11,6 @@ export class BaseHttp implements IHttp {
   constructor() {
     if (!window.navigator.onLine) this.setOfflineMode()
   }
-  protected offlineMode: boolean = false
-  protected offlineNotifyUserMessage: string = 'You are offline, try later'
-  constructor() {
-    if (!window.navigator.onLine) this.setOfflineMode()
-  }
   public async fetch(url: string): Promise<any> {
     this.throwError()
   }
