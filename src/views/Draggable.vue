@@ -35,7 +35,7 @@
           <AddNewTaskForm
             :list-index="index"
             :task-index="i + 1"
-            :user-id="selectedCompanyUser ? selectedCompanyUser.id : null"
+            :user-id="selectedCompanyUserId ? selectedCompanyUserId : null"
             :is-creating="isCreating === `${index}_${i}`"
             @setIsCreating="isCreating = $event"
             class="tasks-list__add"
@@ -46,7 +46,7 @@
         v-if="tasks[index] && !tasks[index].length"
         :list-index="index"
         :task-index="0"
-        :user-id="selectedCompanyUser ? selectedCompanyUser.id : null"
+        :user-id="selectedCompanyUserId ? selectedCompanyUserId : null"
         :is-creating="isCreating === `${index}_${0}`"
         @setIsCreating="isCreating = $event"
       />
@@ -79,7 +79,7 @@ const TaskUsers = namespace('task_users')
   }
 })
 export default class Draggable extends Vue {
-  @Prop({ required: false }) public selectedCompanyUser: any
+  @Prop({ required: false }) public selectedCompanyUserId: any
   @Lists.Action private fetchTasks!: any
   @Lists.Mutation('lists/ADD_NEW_LIST') private addNewList!: any
   @Lists.State(state => state.lists) private lists!: IList[]
@@ -96,27 +96,12 @@ export default class Draggable extends Vue {
 
   private async created() {
     await this.fetchTasks()
-    // setInterval(() => {
-    //   const tasksList = this.allLists.find(
-    //     (list: IList) => list.name === 'tasks'
-    //   )
-    //   const oldTasks = tasksList ? tasksList.tasks : []
-    //   const getRandomArbitrary = (min: number, max: number): number =>
-    //     Math.ceil(Math.random() * (max - min) + min)
-    //   this.setTaskToList({
-    //     listName: 'tasks',
-    //     tasks: [
-    //       { id: getRandomArbitrary(1000, 999999), title: 'NEW TASK NEW TASK' },
-    //       ...oldTasks
-    //     ]
-    //   })
-    // }, 5000)
   }
 
-  @Watch('selectedCompanyUser')
+  @Watch('selectedCompanyUserId')
   private onSelectedUserChanged(value: any) {
     if (value) {
-      this.createTaskUsersList(value.id)
+      this.createTaskUsersList(value)
     }
   }
 
@@ -131,7 +116,7 @@ export default class Draggable extends Vue {
 
   private addNewListHandler() {
     if (!this.nameNewList) return
-    if (this.lists.some((list: IList) => list.name === this.nameNewList)) {
+    if (this.lists.some((list: IList) => list.title === this.nameNewList)) {
       return
     }
     this.addNewList(this.nameNewList)

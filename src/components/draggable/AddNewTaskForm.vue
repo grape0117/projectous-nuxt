@@ -58,7 +58,7 @@ export default class AddNewTaskForm extends Vue {
     const getRandomArbitrary = (min: number, max: number): number =>
       Math.ceil(Math.random() * (max - min) + min)
     const id = getRandomArbitrary(1000, 999999).toString()
-    const task: ITask = {
+    const task: any = {
       id,
       title: this.nameOfNewTask,
       company_user_id: this.userId

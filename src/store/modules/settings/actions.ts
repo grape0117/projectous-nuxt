@@ -51,7 +51,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('tasks/UPDATE', task)
     commit('task_users/UPDATE', task_user)
   },
-  openModal() {},
+  openModal(context, { modal }) {
+    // @ts-ignore
+    this._vm.$bvModal.show(modal + '-modal')
+    //$('#'+modal+'-modal').modal({});
+  },
   closedModal(context) {
     console.log('closedModal')
     console.log('check_action_stack', context.state.check_action_stack)

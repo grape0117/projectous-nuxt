@@ -4,7 +4,7 @@ import { FetchHttp } from '@/http/FetchHttp'
 import { AxiosHttp } from '@/http/AxiosHttp'
 
 export class Http extends BaseHttp implements IHttp {
-  private provider: any = new FetchHttp()
+  private provider: any = new AxiosHttp()
   public async fetch(url: string): Promise<any> {
     return await this.provider.fetch(url)
   }

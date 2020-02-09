@@ -1,76 +1,11 @@
 import { ActionTree } from 'vuex'
 import { IListsState } from '../lists/types'
 import { IRootState } from '@/store/types'
-import { CREATE_LISTS, UPDATE_LIST } from './mutations-types'
+import { ADD_NEW_LIST } from '@/store/modules/lists/mutations-types'
 
 export const actions: ActionTree<IListsState, IRootState> = {
-  async fetchTasks({ commit }) {
-    const {
-      task_users,
-      tasks,
-      company_users,
-      projects,
-      project_users
-      // @ts-ignore
-    } = await this._vm.$http().fetch('/test-tasks')
-    // commit(
-    //   'ADD_MANY',
-    //   { module: 'task_users', entities: task_users },
-    //   { root: true }
-    // )
-    // commit('ADD_MANY', { module: 'tasks', entities: tasks }, { root: true })
-    // commit(
-    //   'ADD_MANY',
-    //   { module: 'projects', entities: projects },
-    //   { root: true }
-    // )
-    commit(CREATE_LISTS, { task_users, allTasks: tasks })
-    /*commit(
-        'ADD_MANY',
-        { module: 'project_users', entities: project_users },
-        { root: true }
-      )*/
-    commit(
-      'ADD_MANY',
-      { module: 'company_users', entities: company_users },
-      { root: true }
-    )
-  },
-  updateList({ commit }, { event, listName }) {
-    commit(UPDATE_LIST, { event, listName })
-  },
-
-  //  updateTask({ commit }, task) {
-  //   console.log(`I've dispatched action`)
-  //   console.log(task)
-  //   const { id } = task;
-  //   commit(UPDATE_TASK, task);
-  // },
-  /*  async addNewTask(
-    { commit }: any,
-    { listName, taskName, index }: any
-  ): Promise<ITask> {
-    //create uuid
-    commit(ADD_TASK, task)
-    const {task} = await this._vm
-        .$http()
-        .post('tasks', {listName, taskName, index})
-    commit(SAVE_TASK_BY_UUID)
-    return task
-    },*/
-  async moveTask({ commit }, { element, newIndex, list }): Promise<any> {
-    element.sort_order = newIndex
-    element.next_work_day = list
-    console.log(element, newIndex, list)
-
-    commit('UPDATE', { module: 'task_users', entity: element }, { root: true })
-    //@ts-ignore
-    await this._vm.$http().put('/task_users/move-to-list', element.id, {
-      task: element,
-      sort_order: newIndex,
-      list: list
-    })
-    console.log(element)
-    console.log('SEND TO REQUEST CHANGE ORDER')
+  async createList({ commit }, newList) {
+    // Todo: @stephane - add new endpoint to create list
+    commit(ADD_NEW_LIST, newList)
   }
 }

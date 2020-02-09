@@ -1,73 +1,66 @@
 <template>
-  <b-modal id="task-modal" class="modal fade" role="dialog">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title">Edit Task</h4>
+  <b-modal
+    :title="task.title"
+    id="task-modal"
+    class="modal fade"
+    role="dialog"
+    @ok="saveTask"
+  >
+    <form id="editTaskForm" class="form-horizontal">
+      <input
+        id="taskIDEdit"
+        class="form-control"
+        type="hidden"
+        name="id"
+        :value="task.id"
+      />
+      <div class="form-group">
+        <label class="control-label col-sm-4" for="projecNameEdit"
+          >Task:
+        </label>
+        <div class="col-sm-8">
+          <div
+            contenteditable="true"
+            style="height: auto;"
+            id="taskTitledit"
+            class="form-control"
+            type="text"
+            name="title"
+            placeholder="Task"
+            v-html="task.title"
+            @blur="setTitle"
+          ></div>
         </div>
-        <div class="modal-body">
-          <form id="editTaskForm" class="form-horizontal">
-            <input
-              id="taskIDEdit"
-              class="form-control"
-              type="hidden"
-              name="id"
-              :value="task.id"
-            />
-            <div class="form-group">
-              <label class="control-label col-sm-4" for="projecNameEdit"
-                >Task:
-              </label>
-              <div class="col-sm-8">
-                <input
-                  id="taskTitledit"
-                  class="form-control"
-                  type="text"
-                  name="title"
-                  placeholder="Task"
-                  :value="task.title"
-                />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-4">Project: </label>
-              <div class="col-sm-8">
-                <select
-                  id="timer-modal-project-id"
-                  class="form-control select2-select"
-                  name="project_id"
-                  v-on:change="isCreateProject()"
-                  v-model="task.project_id"
-                >
-                  <option value="">***** Select Project *****</option>
-                  <option v-if="isAdmin()" value="create"
-                    >Create New Project</option
-                  >
-                  <optgroup
-                    :label="company_client.name"
-                    v-bind:company_client="company_client"
-                    v-for="company_client in company_clients"
-                  >
-                    <option
-                      v-for="project in openprojects(company_client)"
-                      v-bind:company_client="company_client"
-                      v-bind:value="project.id"
-                    >
-                      {{ client_name(project.client_id) }} - {{ project.name }}
-                    </option>
-                  </optgroup>
-                </select>
-              </div>
-            </div>
-            <!--<div class="form-group">
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-4">Project: </label>
+        <div class="col-sm-8">
+          <select
+            id="timer-modal-project-id"
+            class="form-control select2-select"
+            name="project_id"
+            v-on:change="isCreateProject()"
+            v-model="task.project_id"
+          >
+            <option value="">***** Select Project *****</option>
+            <option v-if="isAdmin()" value="create">Create New Project </option>
+            <optgroup
+              :label="company_client.name"
+              v-bind:company_client="company_client"
+              v-for="company_client in company_clients"
+            >
+              <option
+                v-for="project in openprojects(company_client)"
+                v-bind:company_client="company_client"
+                :value="project.id"
+              >
+                {{ client_name(project.client_id) }} - {{ project.name }}
+              </option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <!--<div class="form-group">
               <label  class="control-label col-sm-4" >Task Type: </label>
               <div class="col-sm-8">
                   <select :name="'task_type['+task.id+']'" id="taskTypeSelect" class="form-control" :value="task.task_type_id" v-on:change="isEditTaskTypes">
@@ -76,95 +69,72 @@
                   </select>
               </div>
           </div>-->
-            <div class="form-group">
-              <label class="control-label col-sm-4" for="taskDueDate"
-                >Due Date:
-              </label>
-              <div class="col-sm-8">
-                <input
-                  id="taskDueDate"
-                  class="form-control"
-                  type="date"
-                  name="due_at"
-                  placeholder="Due Date"
-                  :value="due_date()"
-                />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="control-label col-sm-4" for="taskEditEstimate"
-                >Estimate:
-              </label>
-              <div class="col-sm-8">
-                <input
-                  id="taskEditEstimate"
-                  class="form-control"
-                  type="text"
-                  name="estimate"
-                  placeholder="Estimate"
-                  :value="task.estimate"
-                />
-              </div>
-            </div>
-            <div class="row without-margin">
-              <p style="max-width: 100%; margin-bottom: 5px; font-weight: 700;">
-                Users:
-              </p>
-            </div>
-            <div class="form-group" v-for="user in active_users()">
-              <label class="control-label col-sm-4">{{ user.name }}: </label>
-              <div class="col-sm-8">
-                <input
-                  type="checkbox"
-                  :checked="userChecked(user.id)"
-                  :name="'user[' + user.id + ']'"
-                  value="1"
-                />
-                <input
-                  class=""
-                  type="text"
-                  :name="'user_rate[' + user.id + ']'"
-                  :value="userRate(user.id)"
-                />
-                <select :name="'user_type[' + user.id + ']'">
-                  <option
-                    value="assigned"
-                    :selected="userSelected('assigned', user.id)"
-                    >Assigned</option
-                  >
-                  <option
-                    value="reviewer"
-                    :selected="userSelected('reviewer', user.id)"
-                    >Reviewer</option
-                  >
-                  <option
-                    value="manager"
-                    :selected="userSelected('manager', user.id)"
-                    >Manager</option
-                  >
-                </select>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">
-            Close
-          </button>
-          <button type="button" class="btn btn-primary" v-on:click="saveTask()">
-            Save changes
-          </button>
+      <div class="form-group">
+        <label class="control-label col-sm-4" for="taskDueDate"
+          >Due Date:
+        </label>
+        <div class="col-sm-8">
+          <input
+            id="taskDueDate"
+            class="form-control"
+            type="date"
+            name="due_at"
+            placeholder="Due Date"
+            v-model="task.due_date"
+          />
         </div>
       </div>
-      <!-- /.modal-content -->
-    </div>
+      <div class="form-group">
+        <label class="control-label col-sm-4" for="taskEditEstimate"
+          >Estimate:
+        </label>
+        <div class="col-sm-8">
+          <input
+            id="taskEditEstimate"
+            class="form-control"
+            type="text"
+            name="estimate"
+            placeholder="Estimate"
+            v-model="task.estimate"
+          />
+        </div>
+      </div>
+      <div class="row without-margin">
+        <p style="max-width: 100%; margin-bottom: 5px; font-weight: 700;">
+          Users:
+        </p>
+      </div>
+      <edit-task-modal-user
+        @toggle="toggleUser"
+        v-bind:task_user="task_user(user)"
+        v-bind:user="user"
+        v-bind:task="task"
+        v-for="user in active_users()"
+      ></edit-task-modal-user>
+    </form>
+    <template v-slot:modal-footer="{ ok, cancel }">
+      <button style="float: left" class="btn btn-danger">Delete</button>
+      <button class="btn btn-info" @click="ok()">Save</button>
+      <button class="btn" @click="cancel()">Cancel</button>
+    </template>
     <!-- /.modal-dialog --> </b-modal
   ><!-- /.modal -->
 </template>
 
 <script>
+import EditTaskModalUser from './EditTaskModalUser.vue'
+import uuid from 'uuid'
+
 export default {
   name: 'task-modal',
+  components: {
+    'edit-task-modal-user': EditTaskModalUser
+  },
+  data: function() {
+    return {
+      changed_task_users: []
+    }
+  },
   computed: {
     task: function() {
       return this.$store.state.settings.current_edit_task
@@ -173,28 +143,81 @@ export default {
       return this.$store.state.company_users.company_users
     },
     projects: function() {
-      return this.$store.state.projects.projects
+      const projects = this.$store.state.projects.projects
+      console.log(projects)
+      return projects
     },
     task_types: function() {
       return this.$store.state.task_types.task_types
     },
     company_clients: function() {
-      return this.$store.getters['company_clients/unarchived_company_clients']
+      const company_clients = this.$store.getters[
+        'company_clients/getActiveCompanyClients'
+      ]
+      return company_clients
     },
     current_company: function() {
       return this.$store.state.settings.current_company
     },
     current_company_user: function() {
       return this.$store.state.settings.current_company_user
+    },
+    task_users: function() {
+      let self = this
+      let task_users = this.$store.state.task_users.task_users.filter(
+        task_user => task_user.task_id === this.task.id
+      )
+      console.log('task_users', task_users)
+      //console.log(this.$store.state.task_users.task_users.pop())
+      return task_users
     }
   },
   mounted: function() {
-    let self = this
-    $('#task-modal').on('hidden.bs.modal', function() {
-      self.$store.dispatch('settings/closedModal')
-    })
+    //let self = this
+    console.log(this.$store.state.task_users.task_users)
+    //TODO $('#task-modal').on('hidden.bs.modal', function () {
+    //self.$store.dispatch('settings/closedModal')
+    //})
   },
   methods: {
+    toggleUser(user) {
+      console.log('toggle', user)
+      console.log('task', this.task)
+
+      //only add each entry once into changed_task_users
+      const task_user_index = this.changed_task_users.findIndex(
+        changed_task_user => {
+          console.log(user)
+          //TODO: figure out why no match
+          return changed_task_user.company_user_id === user.company_user_id
+        }
+      )
+      if (task_user_index !== -1) {
+        //update only things that can change
+        this.changed_task_users[task_user_index].user_rate = user.user_rate
+        this.changed_task_users[task_user_index].role = user.role
+        this.changed_task_users[task_user_index].user_checked =
+          user.user_checked
+      } else {
+        //create
+        this.changed_task_users.push(user)
+      }
+    },
+    setTitle(e) {
+      let title = e.target.innerHTML
+      this.task.title = title
+    },
+    task_user(company_user) {
+      let self = this
+      let task_user = this.$store.state.task_users.task_users.find(function(
+        task_user
+      ) {
+        if (task_user.task_id !== self.task.id) return false
+        return task_user.company_user_id === company_user.id
+      })
+
+      return task_user !== -1 ? task_user : false
+    },
     isCreateProject: function() {},
     isEditTaskTypes: function(event) {
       if (event.target.value == 'edit') {
@@ -205,84 +228,55 @@ export default {
       return this.$store.getters['settings/isAdmin']
     },
     active_users: function() {
-      return this.$store.getters['company_users/getActiveUsers']
+      return this.$store.getters['company_users/getActive']
     },
     clientName: function(client_id) {
       let company_client = this.$store.getters[
-        'company_clients/getCompanyClientByClientId'
+        'company_clients/getByClientCompanyId'
       ](client_id)
       return company_client ? company_client.name : ''
     },
     openprojects: function(company) {
       //labeledConsole('company', company);
-      return this.$store.getters['projects/open_company_projects'](company)
+      return this.$store.getters['projects/getOpenCompanyProjects'](
+        company.client_id
+      )
     },
     due_date: function() {
       if (this.task.due_date == '0000-00-00 00:00:00') {
         return ''
       }
-      return dateTimeToInput(this.task.due_date)
-    },
-    userSelected: function(user_type, user_id) {
-      let self = this
-      let userSelected = false
-      if (!self.task.users) {
-        return false
-      }
-      $.each(self.task.users, function(key, user) {
-        if (user.id == user_id) {
-          if (user_type == user.pivot.role) {
-            userSelected = 'selected'
-            return false
-          }
-        }
-      })
-
-      return userSelected
-    },
-    userChecked: function(user_id) {
-      let self = this
-      let userChecked = false
-      if (!self.task.users) {
-        return false
-      }
-
-      $.each(self.task.users, function(key, user) {
-        if (user.id == user_id) {
-          userChecked = true
-          return false
-        }
-      })
-      return userChecked
-    },
-    userRate: function(user_id) {
-      let self = this
-      let userRate = ''
-      if (!self.task.users) {
-        return
-      }
-      $.each(self.task.users, function(key, user) {
-        if (user.id == user_id) {
-          //console.log('user rate found');
-          //console.log(user);
-          userRate = user.pivot.user_rate
-          return false
-        }
-      })
-      return userRate
+      return '' //dateTimeToInput(this.task.due_date)
     },
     saveTask: function(callback) {
-      return this.$store.dispatch(
-        'tasks/saveTask',
-        $('#editTaskForm').serialize()
-      )
+      /*const task_users = this.changed_task_users.filter((task_user) => {
+          return task_user.user_checked === true
+        })
+        console.log('const task_users', task_users)*/
+      this.$store.dispatch('tasks/saveTask', {
+        task: this.task,
+        task_users: this.changed_task_users
+      })
+
+      this.$store.commit('settings/setCurrentEditTask', {})
     },
     client_name: function(client_id) {
       let company_client = this.$store.getters[
-        'company_clients/getCompanyClientByClientId'
+        'company_clients/getByClientCompanyId'
       ](client_id)
+      console.log(company_client)
       return company_client ? company_client.name : ''
     }
   }
 }
 </script>
+
+<style>
+#task-modal___BV_modal_footer_ button {
+  float: right;
+}
+#task-modal___BV_modal_footer_ {
+  display: block;
+  flex: none;
+}
+</style>

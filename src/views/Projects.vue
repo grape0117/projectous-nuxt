@@ -20,7 +20,7 @@ import Draggable from './Draggable.vue'
   components: { Draggable }
 })
 export default class Projects extends Vue {
-  private selectedCompanyUser: any = null
+  private selectedCompanyUserId: any = null
 
   get company_users() {
     return this.$store.state.company_users.company_users.sort(
@@ -37,21 +37,21 @@ export default class Projects extends Vue {
 
   @Watch('company_users', { immediate: true })
   private onCompanyUsersChanged(company_users: any) {
-    if (company_users.length && this.selectedCompanyUser === null) {
+    if (company_users.length && this.selectedCompanyUserId === null) {
       // Note: select first user by default
-      this.selectedCompanyUser = this.$store.state.settings.current_company_user
+      this.selectedCompanyUserId = this.$store.state.settings.current_company_user
     }
     this.updateSelectedUser()
   }
 
   @Watch('selectedCompanyUser', { immediate: true, deep: true })
-  private onSelectedUserChanged(user: any) {
-    if (user && `${user.id}` !== this.$route.query.user) {
+  private onSelectedUserChanged(userId: any) {
+    if (userId && `${userId}` !== this.$route.query.user) {
       this.$router.replace({
         path: `${this.$route.fullPath}`,
         query: {
           ...this.$route.query,
-          user: user.id
+          user: userId
         }
       })
     }
@@ -68,7 +68,7 @@ export default class Projects extends Vue {
       (item: any) => `${item.id}` === queryUserID
     )
     if (matchingUser) {
-      this.selectedCompanyUser = matchingUser
+      this.selectedCompanyUserId = matchingUser.id
     }
   }
 }
