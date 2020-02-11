@@ -74,10 +74,10 @@ export default {
   },
   computed: {
     project: function() {
-      var self = this
-      var project = this.$store.state.projects.projects.find(function(project) {
-        return project.id == self.timer.project_id
-      })
+      const self = this
+      const project = this.$store.state.projects.projects.find(
+        projectInStore => projectInStore.id == self.timer.project_id
+      )
 
       if (!project) {
         return { name: 'No Project', id: null }
@@ -86,11 +86,9 @@ export default {
       }
     },
     user: function() {
-      var self = this
-      var company_user = this.$store.state.company_users.company_users.find(
-        function(company_user) {
-          return company_user.id == self.timer.company_user_id
-        }
+      const self = this
+      const company_user = this.$store.state.company_users.company_users.find(
+        cu => cu.id == self.timer.company_user_id
       )
 
       if (!company_user) {
@@ -100,10 +98,10 @@ export default {
       }
     },
     task: function() {
-      var self = this
-      var task = this.$store.state.tasks.tasks.find(function(task) {
-        return task.id == self.timer.task_id
-      })
+      const self = this
+      const task = this.$store.state.tasks.tasks.find(
+        t => t.id == self.timer.company_user_id
+      )
 
       if (!task) {
         return { name: '', id: null }
@@ -132,11 +130,11 @@ export default {
   },
   methods: {
     tasktitle: function() {
-      var self = this
+      const self = this
       if (this.timer.task_id) {
-        var task = this.$store.state.tasks.tasks.find(function(task) {
-          return task.id == self.timer.task_id
-        })
+        const task = this.$store.state.tasks.tasks.find(
+          t => t.id == self.timer.task_id
+        )
 
         if (task) {
           return task.title
@@ -153,7 +151,7 @@ export default {
 
              */
     durationDisplay: function() {
-      var totalDuration = this.timer.duration
+      const totalDuration = this.timer.duration
       if (totalDuration > this.totalDuration && this.timer.status == 'running')
         this.totalDuration = totalDuration
       else if (this.timer.status != 'running')
@@ -210,30 +208,30 @@ export default {
       if (!this.timer.project_id) {
         return
       }
-      var project = this.$store.getters['projects/getProjectById'](
+      const project = this.$store.getters['projects/getProjectById'](
         this.timer.project_id
       )
       if (project) {
-        var company_client = this.$store.getters[
+        const company_client = this.$store.getters[
           'company_clients/getCompanyClientByClientId'
         ](project.client_id)
         return company_client ? company_client.name : ''
       }
     },
     incrementDuration: function() {
-      var self = this
+      const self = this
       self.totalDuration = self.timer.duration
       window.setInterval(function() {
         self.incrementRunningTimers()
       }, 100)
     },
     incrementRunningTimers: function() {
-      var self = this
+      const self = this
       if (
         !self.running_timers[self.timer.id] &&
         self.timer.status == 'running'
       ) {
-        var start_time
+        let start_time
         if (self.timer.restarted_at) {
           start_time = Math.round(
             datetimeToJS(self.timer.restarted_at).getTime() / 1000
@@ -244,7 +242,7 @@ export default {
           )
         }
         self.running_timers[self.timer.id] = window.setInterval(function() {
-          var duration =
+          const duration =
             Math.round(new Date().getTime() / 1000) -
             start_time +
             Number(self.timer.duration)
