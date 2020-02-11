@@ -13,8 +13,8 @@ const Lists = namespace('lists')
 
 @Component
 export default class NewListForm extends Vue {
-  @Prop({ required: true }) userId!: number
-  @Lists.Action('createList') createListVuex!: any
+  @Prop({ required: true }) public userId!: number
+  @Lists.Action('createList') public createListVuex!: any
   private title: string = ''
   private createNewList() {
     const list = {

@@ -3,7 +3,6 @@ import { ActionTree } from 'vuex'
 import { IModuleState, ITask } from './types'
 import { IRootState } from '@/store/types'
 // @ts-ignore
-import { uuid } from 'vue-uuid'
 import { generateUUID } from '@/utils/util-functions'
 
 function createDefaultTask(): ITask {

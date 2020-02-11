@@ -121,34 +121,6 @@ enum listsBlockNames {
   }
 })
 export default class Custom extends Vue {
-  @TaskUsers.Getter('getById') private getTaskUserById!: any
-  @TaskUsers.Getter private sortedByDays!: any
-  @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
-  @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
-  @TaskUsers.Action('deleteTaskUser') private deleteTaskUserVuex!: any
-  @TaskUsers.Action('updateSortOrder')
-  private updateTaskUsersSortOrderVuex!: any
-  @Tasks.Action('createTask') private createTaskVuex!: any
-  @Tasks.Action('updateTask') private updateTaskVuex!: any
-  @Tasks.Action('deleteTask') private deleteTaskVuex!: any
-  @Tasks.Action('updateSortOrder') private updateTaskSortOrderVuex!: any
-  @Tasks.Getter('getById') private getTaskById!: any
-  @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
-  @Lists.Getter private getUserLists!: any
-  @Projects.Getter private getUserProjects!: any
-  @Projects.Mutation('projects/SET_SELECTED_PROJECT') setProjectId!: any
-  @Projects.Action pinProject!: any
-  @Projects.State(state => state.selectedProjectId) selectedProjectId!:
-    | string
-    | number
-    | null
-  @Projects.State(state => state.pinnedProjects) pinnedProjects!: number[]
-
-  private editedTaskTimerId: number | string | null = null
-  private editedTaskId: number | string | null = null
-  private currentListsBlockName: string | null = null
-  private project_search: string = ''
-
   get listsBlockNames() {
     return listsBlockNames
   }
@@ -210,6 +182,34 @@ export default class Custom extends Vue {
       initiallyExpanded: true
     }))
   }
+  @Projects.Mutation('projects/SET_SELECTED_PROJECT') public setProjectId!: any
+  @Projects.Action public pinProject!: any
+  @Projects.State(state => state.selectedProjectId) public selectedProjectId!:
+    | string
+    | number
+    | null
+  @Projects.State(state => state.pinnedProjects)
+  public pinnedProjects!: number[]
+  @TaskUsers.Getter('getById') private getTaskUserById!: any
+  @TaskUsers.Getter private sortedByDays!: any
+  @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
+  @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
+  @TaskUsers.Action('deleteTaskUser') private deleteTaskUserVuex!: any
+  @TaskUsers.Action('updateSortOrder')
+  private updateTaskUsersSortOrderVuex!: any
+  @Tasks.Action('createTask') private createTaskVuex!: any
+  @Tasks.Action('updateTask') private updateTaskVuex!: any
+  @Tasks.Action('deleteTask') private deleteTaskVuex!: any
+  @Tasks.Action('updateSortOrder') private updateTaskSortOrderVuex!: any
+  @Tasks.Getter('getById') private getTaskById!: any
+  @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
+  @Lists.Getter private getUserLists!: any
+  @Projects.Getter private getUserProjects!: any
+
+  private editedTaskTimerId: number | string | null = null
+  private editedTaskId: number | string | null = null
+  private currentListsBlockName: string | null = null
+  private project_search: string = ''
 
   private selectedCompanyUserId: any = null
 

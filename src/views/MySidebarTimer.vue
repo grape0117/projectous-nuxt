@@ -47,8 +47,7 @@ export default {
   },
   methods: {
     mytimers: function() {
-      var self = this
-      var allTimers = this.timers
+      const self = this
       if (this.$store.state.settings.current_company_user.id == 36) {
         //TODO: different sort for Chad
         return this.timers
@@ -69,14 +68,14 @@ export default {
             return timer.user_id == self.$store.state.settings.current_user_id //TODO: company_user_id
           })
           .sort(function(a, b) {
-            var aClientKey = ''
-            var bClientKey = ''
-            var aClientName = ''
-            var bClientName = ''
-            var aProjectKey = ''
-            var bProjectKey = ''
-            var aProjectName = ''
-            var bProjectName = ''
+            let aClientKey = ''
+            let bClientKey = ''
+            let aClientName = ''
+            let bClientName = ''
+            let aProjectKey = ''
+            let bProjectKey = ''
+            let aProjectName = ''
+            let bProjectName = ''
             if (!a.company_client_id || !a.project_id) {
               return -1
             }

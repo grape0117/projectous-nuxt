@@ -15,9 +15,7 @@
         :value="task.id"
       />
       <div class="form-group">
-        <label class="control-label col-sm-4" for="projecNameEdit"
-          >Task:
-        </label>
+        <label class="control-label col-sm-4" for="taskTitledit">Task: </label>
         <div class="col-sm-8">
           <div
             contenteditable="true"
@@ -48,9 +46,11 @@
               :label="company_client.name"
               v-bind:company_client="company_client"
               v-for="company_client in company_clients"
+              :key="company_client.id"
             >
               <option
                 v-for="project in openprojects(company_client)"
+                :key="projects.id"
                 v-bind:company_client="company_client"
                 :value="project.id"
               >
@@ -210,14 +210,14 @@ export default {
     },
     task_user(company_user) {
       let self = this
-      let task_user = this.$store.state.task_users.task_users.find(function(
+      let userTask = this.$store.state.task_users.task_users.find(function(
         task_user
       ) {
         if (task_user.task_id !== self.task.id) return false
         return task_user.company_user_id === company_user.id
       })
 
-      return task_user !== -1 ? task_user : false
+      return userTask !== -1 ? userTask : false
     },
     isCreateProject: function() {},
     isEditTaskTypes: function(event) {

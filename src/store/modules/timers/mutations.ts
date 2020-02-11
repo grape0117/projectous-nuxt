@@ -41,7 +41,6 @@ export const mutations: MutationTree<IModuleState> = {
         return item.id == object.id
       })
     }
-    ;``
   },
   upsertTimer(state, timer) {
     let index = state.timers.findIndex((search: any) => {
