@@ -18,6 +18,7 @@ import {
   createUserLists,
   getCookie
 } from '@/utils/util-functions'
+import { idbKeyval } from '@/plugins/idb'
 
 export default {
   components: { EditUserModal },
@@ -38,24 +39,31 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     if (getCookie('auth_token')) {
-      this.init()
+      const appData = await this.getAppData()
+      this.setAppData(appData)
     }
   },
   methods: {
-    async init() {
+    async getAppData() {
+      const appDataInIDB = await idbKeyval.get('data')
+      if (appDataInIDB) {
+        return appDataInIDB
+      } else {
+        return await this.$http().get('/test-tasks')
+      }
+    },
+    async setAppData({
+      company_clients,
+      company_users,
+      task_users,
+      tasks,
+      projects,
+      project_users,
+      user_task_lists
+    }) {
       //this.$bvModal.show('edit-user-modal')
-      const {
-        company_clients,
-        company_users,
-        task_users,
-        tasks,
-        projects,
-        project_users,
-        user_task_lists
-        // @ts-ignore
-      } = await this.$http().get('/test-tasks')
       this.$store.commit(
         'ADD_MANY',
         { module: 'task_users', entities: task_users },
