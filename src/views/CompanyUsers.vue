@@ -15,8 +15,9 @@
             <td>Address</td>
           </tr>
           <tr
-            v-bind:user="user"
             v-for="user in filteredusers"
+            :key="user.id"
+            v-bind:user="user"
             is="company-users-row"
           ></tr>
         </tbody>

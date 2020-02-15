@@ -105,12 +105,13 @@
         </p>
       </div>
       <edit-task-modal-user
+        v-for="user in active_users()"
+        :key="user.id"
         @toggle="toggleUser"
         v-bind:task_user="task_user(user)"
         v-bind:user="user"
         v-bind:task="task"
-        v-for="user in active_users()"
-      ></edit-task-modal-user>
+      />
     </form>
     <template v-slot:modal-footer="{ ok, cancel }">
       <button style="float: left" class="btn btn-danger">Delete</button>
