@@ -19,7 +19,7 @@
             :key="user.id"
             v-bind:user="user"
             is="company-users-row"
-          ></tr>
+          />
         </tbody>
       </table>
     </div>

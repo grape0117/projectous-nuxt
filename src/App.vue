@@ -48,8 +48,11 @@ export default {
   },
   methods: {
     async getAppDataFromApi() {
-      // ToDo: error handling
-      return await this.$http().get('/test-tasks')
+      try {
+        return await this.$http().get('/test-tasks')
+      } catch (e) {
+        console.log(e)
+      }
     },
     async getAppData() {
       const appDataInIDB = await idbKeyval.get('data')
