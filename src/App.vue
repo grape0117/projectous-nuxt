@@ -8,6 +8,7 @@
     </div>
     <task-modal />
     <edit-user-modal />
+    <div id="update-data-button" @click="onUpdateClick" />
   </div>
 </template>
 
@@ -46,12 +47,15 @@ export default {
     }
   },
   methods: {
+    async getAppDataFromApi() {
+      return await this.$http().get('/test-tasks')
+    },
     async getAppData() {
       const appDataInIDB = await idbKeyval.get('data')
       if (appDataInIDB) {
         return appDataInIDB
       } else {
-        return await this.$http().get('/test-tasks')
+        return this.getAppDataFromApi()
       }
     },
     async setAppData({
@@ -105,7 +109,23 @@ export default {
         lists: userLists
       })
       //TODO: companies
+    },
+    async onUpdateClick() {
+      const appData = await this.getAppDataFromApi()
+      await idbKeyval.set('data', appData)
     }
   }
 }
 </script>
+
+<style lang="scss">
+#update-data-button {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  background: url('assets/icons/refresh-icon.svg');
+}
+</style>
