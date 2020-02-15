@@ -48,6 +48,7 @@ export default {
   },
   methods: {
     async getAppDataFromApi() {
+      // ToDo: error handling
       return await this.$http().get('/test-tasks')
     },
     async getAppData() {
