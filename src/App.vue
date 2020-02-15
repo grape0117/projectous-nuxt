@@ -8,6 +8,7 @@
     </div>
     <task-modal />
     <edit-user-modal />
+    <div id="update-data-button" @click="onUpdateClick" />
   </div>
 </template>
 
@@ -18,6 +19,7 @@ import {
   createUserLists,
   getCookie
 } from '@/utils/util-functions'
+import { idbKeyval } from '@/plugins/idb'
 
 export default {
   components: { EditUserModal },
@@ -38,24 +40,38 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     if (getCookie('auth_token')) {
-      this.init()
+      const appData = await this.getAppData()
+      this.setAppData(appData)
     }
   },
   methods: {
-    async init() {
+    async getAppDataFromApi() {
+      try {
+        return await this.$http().get('/test-tasks')
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    async getAppData() {
+      const appDataInIDB = await idbKeyval.get('data')
+      if (appDataInIDB) {
+        return appDataInIDB
+      } else {
+        return this.getAppDataFromApi()
+      }
+    },
+    async setAppData({
+      company_clients,
+      company_users,
+      task_users,
+      tasks,
+      projects,
+      project_users,
+      user_task_lists
+    }) {
       //this.$bvModal.show('edit-user-modal')
-      const {
-        company_clients,
-        company_users,
-        task_users,
-        tasks,
-        projects,
-        project_users,
-        user_task_lists
-        // @ts-ignore
-      } = await this.$http().get('/test-tasks')
       this.$store.commit(
         'ADD_MANY',
         { module: 'task_users', entities: task_users },
@@ -97,7 +113,23 @@ export default {
         lists: userLists
       })
       //TODO: companies
+    },
+    async onUpdateClick() {
+      const appData = await this.getAppDataFromApi()
+      await idbKeyval.set('data', appData)
     }
   }
 }
 </script>
+
+<style lang="scss">
+#update-data-button {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  background: url('assets/icons/refresh-icon.svg');
+}
+</style>
