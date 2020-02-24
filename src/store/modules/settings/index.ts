@@ -6,9 +6,10 @@ export const settings = {
     action_stack: [],
     modules: [],
     check_action_stack: true,
-    current_company_user_id: null,
-    current_company_user: {},
+    current_company_user_id: null, //TODO remove?
+    current_company_user: {}, //TODO remove?
     current_company_id: null,
+    current_user_id: null,
     current_running_timer: {},
     current_project: {},
     current_company: { name: '', modules: [] },
@@ -92,11 +93,17 @@ export const settings = {
     isTecharound(state: any) {
       return state.current_company.id === 1
     },
-    isAdmin(state: any) {
-      if (!state.current_company_user.user_role) {
+    isAdmin(state: any, getters: any, rootState: any, rootGetters: any) {
+      console.log('isadmin')
+      const current_company_user = rootGetters['company_users/getById'](
+        state.current_company_user_id
+      )
+      if (!current_company_user) {
+        console.log('no current company user', state.current_company_user_id)
         return false
       }
-      return state.current_company_user.user_role === 'admin' // TODO: add more roles
+      console.log('company current user', current_company_user)
+      return current_company_user.user_role === 'admin' // TODO: add more roles
     },
     home(state: any) {
       let path = ''

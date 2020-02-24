@@ -10,6 +10,7 @@ export interface IModuleState {
   current_company_user: {}
   current_company_id: string
   current_running_timer: {}
+  current_user_id: number
   current_project: {}
   current_company: {} // TODO ICompany
   current_module_settings: {}

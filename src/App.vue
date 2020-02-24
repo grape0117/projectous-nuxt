@@ -8,33 +8,35 @@
     </div>
     <task-modal />
     <edit-user-modal />
+    <edit-timer-modal />
   </div>
 </template>
 
 <script>
 import EditUserModal from './views/EditUserModal'
+import EditTaskModal from './views/EditTaskModal'
+import EditTimerModal from './views/EditTimerModal'
 import {
   createListsByDays,
   createUserLists,
   getCookie
 } from '@/utils/util-functions'
-
+import Vue from 'vue'
 export default {
-  components: { EditUserModal },
+  components: { EditUserModal, EditTaskModal, EditTimerModal },
   computed: {
-    // current_edit_project: () => this.$store.state.settings.current_edit_project,
-    // current_edit_company_user: () =>
-    //   this.$store.state.settings.current_edit_company_user,
-    // current_edit_company_client: () =>
-    //   this.$store.state.settings.current_edit_company_client,
-    // current_edit_task: () => this.$store.state.settings.current_edit_task,
-    // current_edit_timer: () => this.$store.state.settings.current_edit_timer,
-    // current_edit_task_type: () =>
-    //   this.$store.state.settings.current_edit_task_type
+    current_edit_task: function() {
+      return this.$store.getters['settings/get_current_edit_task']
+    }
   },
   watch: {
-    current_edit_company_user() {
-      if (this.current_edit_company_user.id) {
+    current_edit_task: function(value) {
+      console.log(value)
+      alert('watched!')
+      if (this.current_edit_task.id) {
+        this.$bvModal.show('timer-modal')
+      } else {
+        this.$bvModal.hide('timer-modal')
       }
     }
   },
@@ -49,13 +51,27 @@ export default {
       const {
         company_clients,
         company_users,
+        current_company_id,
+        current_company_user_id,
         task_users,
         tasks,
         projects,
         project_users,
-        user_task_lists
+        user_task_lists,
+        user_id
         // @ts-ignore
       } = await this.$http().get('/test-tasks')
+      Vue.set(this.$store.state.settings, 'current_user_id', user_id)
+      Vue.set(
+        this.$store.state.settings,
+        'current_company_user_id',
+        current_company_user_id
+      )
+      Vue.set(
+        this.$store.state.settings,
+        'current_company_id',
+        current_company_id
+      )
       this.$store.commit(
         'ADD_MANY',
         { module: 'task_users', entities: task_users },

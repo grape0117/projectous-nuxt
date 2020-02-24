@@ -281,6 +281,7 @@ export default class Dragzone extends Vue {
   This is for toggling the Play/Stop icon
    */
   private onTaskTimerClicked(taskId: number | string, itemId: number | string) {
+    //TODO: timerId could be from a getter checking for a timer associated with taskId today with logged in user
     const timerId = this.timerId === null ? itemId : null
     this.timerId = timerId
     this.$emit('taskTimerToggled', { taskId, timerId })

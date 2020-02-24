@@ -96,6 +96,32 @@ export function generateUUID(): string {
   )
 }
 
+export function format_report_at(due_date: string) {
+  let options = {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  }
+  // @ts-ignore
+  let formatted_date = due_date.toLocaleString('en-US', options)
+  //return moment(due_date).utc().format('MMM Do, h:mm a');
+  return formatted_date
+}
+
+export function datetimeToJS(datetime: string) {
+  if (!datetime) {
+    return 0
+  }
+  // Split timestamp into [ Y, M, D, h, m, s ]
+  let t = datetime.split(/[- :]/)
+
+  // @ts-ignore Apply each element to the Date function
+  return new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5]))
+}
+
 export function getCookie(name: string) {
   let v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)')
   return v ? v[2] : null

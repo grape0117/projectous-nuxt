@@ -6,7 +6,7 @@
       v-bind:running_timers="running_timers"
       v-bind:projects="projects"
       v-bind:users="users"
-      v-for="timer in mytimers()"
+      v-for="timer in timers"
       v-bind:timer="timer"
       :key="timer.id"
     ></sidebar-timer>
@@ -22,6 +22,7 @@ export default {
   },
   computed: {
     timers: function() {
+      console.log('trigger!')
       return this.$store.state.timers.timers
     },
     projects: function() {
@@ -61,7 +62,7 @@ export default {
               return false
             }
             if (
-              self.$store.getters['projects/getProjectById'](timer.project_id)
+              self.$store.getters['projects/getById'](timer.project_id)
                 .status == 'closed'
             ) {
               return false
@@ -103,10 +104,10 @@ export default {
               }
               return -1
             } else {
-              aProjectName = self.$store.getters['projects/getProjectById'](
+              aProjectName = self.$store.getters['projects/getById'](
                 a.project_id
               ).name.toLowerCase()
-              bProjectName = self.$store.getters['projects/getProjectById'](
+              bProjectName = self.$store.getters['projects/getById'](
                 b.project_id
               ).name.toLowerCase()
               if (aProjectName == bProjectName) {

@@ -1,6 +1,7 @@
 export interface IModuleState {
   company_clients: ICompanyClient[]
   lookup: any
+  lookup_by_client_company_id: any
 }
 
 export interface ICompanyClient {

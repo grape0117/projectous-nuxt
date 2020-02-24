@@ -2,6 +2,7 @@ import { ActionTree } from 'vuex'
 import { IModuleState } from './types'
 import { IRootState } from '@/store/types'
 import { ICompanyUser } from '@/store/modules/company_users/types.ts'
+import { BvModal } from 'bootstrap-vue'
 
 const company_user_id: number = 1
 
@@ -53,7 +54,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   openModal(context, { modal }) {
     // @ts-ignore
-    this._vm.$bvModal.show(modal + '-modal')
+    BvModal.show(modal + '-modal')
     //$('#'+modal+'-modal').modal({});
   },
   closedModal(context) {
@@ -64,7 +65,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       let next_action = context.state.action_stack.pop()
       console.log('next_action', next_action)
       // @ts-ignore
-      this._vm.$bvModal.show(next_action + '-modal').modal()
+      BvModal.show(next_action + '-modal')
     }
     console.log('setting check to true')
     context.commit('setCheckActionStack', true)
@@ -74,7 +75,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     context.commit('setCheckActionStack', false)
     console.log('closing ' + modal)
     // @ts-ignore
-    $('#' + modal + '-modal').modal('hide')
+    BvModal.hide(modal + '-modal')
 
     if (push) {
       context.commit('pushActionStack', modal)
@@ -90,7 +91,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
         })
       }
       // @ts-ignore
-      this._vm.$bvModal.show(next_action + '-modal').modal()
+      BvModal.show(next_action + '-modal').modal()
     }
   },
   checkForRunningTimers(context) {
@@ -110,7 +111,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   editProject(context, project) {
     // @ts-ignore
-    this._vm.$bvmodal.show('project-modal')
+    BvModal.show('project-modal')
   },
   loadCurrentCompanyUser(context, { user_id, company_id }) {
     let company_user = context.rootState.company_users.company_users.find(

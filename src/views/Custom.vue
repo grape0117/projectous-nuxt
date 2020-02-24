@@ -93,6 +93,7 @@ import { IProject } from '@/store/modules/projects/types'
 import { ITask } from '@/store/modules/tasks/types'
 import NewListForm from '@/components/draggable/NewListForm.vue'
 import TimerTab from './TimerTab.vue'
+import { ITimer } from '../store/modules/timers/types'
 
 const CompanyClients = namespace('company_clients')
 const CompanyUsers = namespace('company_users')
@@ -348,6 +349,18 @@ export default class Custom extends Vue {
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {
     const { taskId, timerId } = payload
+    const task = this.$store.getters['tasks/getById'](taskId)
+    console.log('task', task)
+    let timer = {
+      task_id: taskId
+    }
+    if (task.project_id) {
+      console.log('fetching project')
+      const project = this.$store.getters['projects/getById'](task.project_id)
+      timer['project_id'] = project.id
+      console.log(timer)
+    }
+    this.$store.dispatch('timers/startTimer', timer)
     this.editedTaskId = taskId
     this.editedTaskTimerId = timerId
   }

@@ -1,20 +1,15 @@
+import Vue from 'vue'
 import { MutationTree } from 'vuex'
 import { IModuleState } from './types'
 import { IRootState } from '@/store/types'
 
 export const mutations: MutationTree<IModuleState> = {
-  ADD_MANY(state: IModuleState, { company_clients }: any) {
-    // @ts-ignore
-    this.commit('ADD_MANY', {
-      module: 'company_clients',
-      entities: company_clients
-    })
+  //NOTE: do not call this directly. Call ADD_MANY from root store
+  ADD_MANY(state: IModuleState, company_clients: any) {
     //@ts-ignore
-    state.lookup_by_client_company_id = {}
-    //@ts-ignore
-    state.company_clients.forEach((company_client, key) => {
+    company_clients.forEach(function(company_client, key) {
       //@ts-ignore
-      state.lookup_by_client_company_id[company_client.client_company_id] = key
+      Vue.set(state.lookup_by_client_company_id, company_client.company_id, key) //TODO: risk of having more than one client with the same company id?
     })
   }
 }

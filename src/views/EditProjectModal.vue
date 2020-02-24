@@ -263,7 +263,7 @@ export default {
       if (!this.project_id) {
         return []
       }
-      return this.$store.getters['tasks/projecttasks'](this.project.id)
+      return this.$store.getters['tasks/getByProjectId'](this.project.id)
     },
     addTask: function() {
       this.$store.dispatch('tasks/createTask', { project_id: this.project.id })

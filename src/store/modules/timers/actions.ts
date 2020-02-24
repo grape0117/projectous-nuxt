@@ -27,6 +27,13 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       .post('/timer/stop/' + timer.id, timer)
     context.commit('updateTimer', response.timer)
   },
+  async pauseTimer(context, timer) {
+    // @ts-ignore
+    const response = await this._vm
+      .$http()
+      .post('/timer/pause/' + timer.id, timer)
+    context.commit('updateTimer', response.timer)
+  },
   async hideTimer(context, timer) {
     // @ts-ignore
     const response = await this._vm
@@ -49,14 +56,19 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     const response = await this._vm
       .$http()
       .post('/timer/start-project-timer', timer)
-    context.commit('upsertTimer', response.timer)
-    context.dispatch(
+    //console.log(response.timer)
+    context.commit(
+      'UPSERT',
+      { module: 'timers', entity: response.timer },
+      { root: true }
+    )
+    /*context.dispatch(
       'projects/setCurrentProjectById',
       response.timer.project_id,
       { root: true }
-    )
+    )*/
     response.timers.forEach(function(timer: any) {
-      context.commit('upsertTimer', timer)
+      //context.commit('upsertTimer', timer)
     })
   },
   async addTimer(context, data) {
@@ -87,9 +99,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }
     //TODO: if reviewed, prevent access
 
+    //alert('setting timer')
+
     context.commit('settings/setCurrentEditTimer', timer, { root: true })
 
-    const data = {
+    /*const data = {
       timer_id: timer.id,
       user_id: timer.user_id,
       project_id: timer.project_id
@@ -98,8 +112,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     const response = await this._vm.$http().get('timer/timelog-history', data)
     context.commit('settings/setCurrentEditTimerHistory', response[0], {
       root: true
-    })
-    //$('#timer-modal').modal({});
+    })*/
   },
   async stopTaskTimer(context, task) {
     // @ts-ignore

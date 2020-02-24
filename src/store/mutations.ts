@@ -21,6 +21,12 @@ export const mutations: MutationTree<IRootState> = {
 
     // @ts-ignore
     this.commit('LOOKUP', { module })
+    try {
+      // @ts-ignore
+      this.commit(module + '/ADD_MANY', entities)
+    } catch (e) {
+      //No need
+    }
   },
   ADD_ONE(state: IRootState, { module, entity }) {
     if (!state[module]) return
@@ -34,14 +40,14 @@ export const mutations: MutationTree<IRootState> = {
     })
   },
   UPSERT(state: IRootState, { module, entity }: any) {
+    console.log(module, entity)
     if (!state[module]) return
-    let property
-    let key
+    console.log('module exists')
     // @ts-ignore
-    key = state[module].lookup[entity.id]
+    let key = state[module].lookup[entity.id]
     if (key && state[module][key]) {
       //TODO: call 'UPDATE' here? How to share key?
-      for (property in entity) {
+      for (let property in entity) {
         if (entity.hasOwnProperty(property)) {
           // @ts-ignore
           state[module][key][property] = entity[property]
@@ -51,6 +57,8 @@ export const mutations: MutationTree<IRootState> = {
       // @ts-ignore
       this.commit('ADD_ONE', { entity: entity, module: module })
     }
+    console.log('done')
+    console.log(state[module][module])
   },
   UPDATE(state: IRootState, { module, entity }) {
     if (!state[module]) return

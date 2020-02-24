@@ -2,17 +2,6 @@
   <b-modal id="timer-modal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title">Timer</h4>
-        </div>
         <div class="modal-body">
           <ul id="timerModalTabs" class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
@@ -60,6 +49,7 @@
                       <option value="create">Create New Project</option>
                       <option
                         v-for="project in openprojects()"
+                        v-bind:project="project"
                         :value="project.id"
                       >
                         {{ client_name(project.client_id) }} -
@@ -501,8 +491,14 @@
 </template>
 
 <script>
+import TimerModalTimeStandard from './TimerModalTimeStandard.vue'
+import TimerFifteenTemplate from './TimerFifteenTemplate.vue'
 export default {
   name: 'timer-modal',
+  components: {
+    'timer-modal-time-standard': TimerModalTimeStandard,
+    'timer-fifteen-template': TimerFifteenTemplate
+  },
   computed: {
     timer: function() {
       return this.$store.state.settings.current_edit_timer
@@ -527,6 +523,12 @@ export default {
     },
     my_companies: function() {
       return this.$store.state.companies.companies //TODO
+    },
+    company_clients: function() {
+      const company_clients = this.$store.getters[
+        'company_clients/getActiveCompanyClients'
+      ]
+      return company_clients
     }
   },
   data: function() {
@@ -543,7 +545,7 @@ export default {
   },
   watch: {
     'timer.project_id': function() {
-      if (this.timer.project_id == 'create') {
+      if (this.timer.project_id === 'create') {
         this.$store.dispatch('settings/closeModal', {
           modal: 'timer',
           object: this.timer,
@@ -584,7 +586,7 @@ export default {
     invoiceDurationHours: function() {
       if (!this.timer.invoice_duration)
         this.timer.invoice_duration = this.timer.duration
-      if (typeof this.timer.invoice_duration != 'number') {
+      if (typeof this.timer.invoice_duration !== 'number') {
         return ''
       }
       return Math.floor(this.timer.invoice_duration / 3600)
@@ -592,7 +594,7 @@ export default {
     invoiceDurationMinutes: function() {
       if (!this.timer.invoice_duration)
         this.timer.invoice_duration = this.timer.duration
-      if (typeof this.timer.invoice_duration != 'number') {
+      if (typeof this.timer.invoice_duration !== 'number') {
         return ''
       }
       return (
@@ -602,7 +604,7 @@ export default {
     invoiceDurationSeconds: function() {
       if (!this.timer.invoice_duration)
         this.timer.invoice_duration = this.timer.duration
-      if (typeof this.timer.invoice_duration != 'number') {
+      if (typeof this.timer.invoice_duration !== 'number') {
         return ''
       }
       return Math.floor(this.timer.invoice_duration % 60)
@@ -613,7 +615,7 @@ export default {
     isIHI: function() {
       return this.$store.getters['settings/isIHI']
     },
-    openprojects: function() {
+    openprojects: function(company_client) {
       return this.$store.getters['projects/openprojects']()
     },
     calculateDuration: function() {
@@ -638,7 +640,7 @@ export default {
       return task_id == this.timer.task_id
     },
     projecttasks: function(project_id) {
-      return this.$store.getters['tasks/projecttasks'](project_id)
+      return this.$store.getters['tasks/getByProjectId'](project_id)
     },
     isCurrentUserOrAdmin: function() {
       return this.$store.getters['settings/isCurrentUserOrAdmin'](
@@ -693,20 +695,18 @@ export default {
       )
     },
     timerProject: function() {
-      return this.$store.getters['projects/getProjectById'](
-        this.timer.project_id
-      )
+      return this.$store.getters['projects/getById'](this.timer.project_id)
     },
     isTimerProjectTask: function(project_id) {
-      return this.timer.project_id == project_id
+      return this.timer.project_id === project_id
     },
     isTimerUser: function(user_id) {
-      return this.timer.user_id == user_id
+      return this.timer.user_id === user_id
     },
     checkInputValue: function(input) {
       if (!input.length) {
         return true //Skip over elements that aren't part of the form
-      } else if (input.val() == '') {
+      } else if (input.val() === '') {
         return false
       } else if (input.val() == null) {
         return false
@@ -752,7 +752,7 @@ export default {
       }
       let formData = $('#editTimerForm').serialize()
       console.log(formData)
-      let project = self.$store.getters['projects/getProjectById'](
+      let project = self.$store.getters['projects/getById'](
         $('#editTimerForm select[name=project_id]').val()
       )
       if (project) {
@@ -800,6 +800,7 @@ export default {
       this.$store.dispatch('timers/saveTimer', formData) //TODO: .then()
     },
     client_name: function(client_id) {
+      console.log('project client id', client_id)
       let company_client = this.$store.getters[
         'company_clients/getByClientCompanyId'
       ](client_id)

@@ -52,10 +52,9 @@ export default {
   },
   methods: {
     getProjectFromTaskId: function(task_id) {
-      let task = this.$store.getters['tasks/getTaskById'](task_id)
+      let task = this.$store.getters['tasks/getById'](task_id)
       if (task.project_id) {
-        return this.$store.getters['projects/getProjectById'](task.project_id)
-          .acronym
+        return this.$store.getters['projects/getById'](task.project_id).acronym
       } else {
         return {}
       }

@@ -366,7 +366,7 @@ export default {
       return task_id == this.expense.task_id
     },
     projecttasks: function(project_id) {
-      return this.$store.getters['tasks/projecttasks'](project_id)
+      return this.$store.getters['tasks/getByProjectId'](project_id)
     },
     isCurrentUserOrAdmin: function() {
       return this.$store.getters['settings/isCurrentUserOrAdmin'](

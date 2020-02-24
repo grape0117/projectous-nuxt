@@ -10,20 +10,20 @@
     </div>
     <div v-if="isCurrentUser()">
       <button
-        v-if="timer.status == 'running'"
+        v-if="timer.status === 'running'"
         v-on:click="pauseTimer"
         class="btn btn-default"
         style="float: left; margin-right: 5px;margin-top:2px;"
       >
-        <i class="glyphicon glyphicon-pause"></i>
+        <b-icon icon="pause"></b-icon>
       </button>
       <button
-        v-if="timer.status == 'running'"
+        v-if="timer.status === 'running'"
         v-on:click="stopTimer"
         class="btn btn-default"
         style="float: left; margin-right: 5px;margin-top:2px;"
       >
-        <i class="glyphicon glyphicon-stop"></i>
+        <b-icon icon="stop"></b-icon>
       </button>
       <button
         v-else
@@ -31,7 +31,7 @@
         class="btn btn-default"
         style="float: left;  margin-right: 5px;margin-top:5px;"
       >
-        <i class="glyphicon glyphicon-play"></i>
+        <b-icon icon="play"></b-icon>
       </button>
     </div>
     <div
@@ -63,6 +63,9 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import { format_report_at, datetimeToJS } from '../utils/util-functions'
+
 export default {
   name: 'sidebar-timer',
   props: ['timer', 'projects', 'users', 'tasks', 'running_timers'],
@@ -73,6 +76,9 @@ export default {
     }
   },
   computed: {
+    current_user_id: function() {
+      return this.$store.state.settings.current_user_id
+    },
     project: function() {
       var self = this
       var project = this.$store.state.projects.projects.find(function(project) {
@@ -195,27 +201,21 @@ export default {
       return ('00' + Math.floor(this.totalDuration % 60)).slice(-2)
     },
     isCurrentUser: function() {
-      return (
-        this.$store.state.settings.current_company_user.user_id ==
-        this.timer.user_id
-      )
+      return this.current_user_id === this.timer.user_id
     },
     isNotCurrentUser: function() {
-      return (
-        this.$store.state.settings.current_company_user.user_id !=
-        this.timer.user_id
-      )
+      !this.isCurrentUser()
     },
     client_name: function() {
       if (!this.timer.project_id) {
         return
       }
-      var project = this.$store.getters['projects/getProjectById'](
+      let project = this.$store.getters['projects/getById'](
         this.timer.project_id
       )
       if (project) {
-        var company_client = this.$store.getters[
-          'company_clients/getCompanyClientByClientId'
+        let company_client = this.$store.getters[
+          'company_clients/getByClientCompanyId'
         ](project.client_id)
         return company_client ? company_client.name : ''
       }
@@ -263,7 +263,12 @@ export default {
       return format_report_at(datetimeToJS(this.timer.report_at))
     },
     editTimer: function() {
-      this.$store.dispatch('timers/editTimer', this.timer)
+      console.log('editTimer')
+      Vue.set(this.$store.state.settings, 'current_edit_timer', this.timer)
+      console.log(this.$store.state.settings.current_edit_timer)
+      this.$bvModal.show('timer-modal')
+
+      //this.$store.dispatch('timers/editTimer', this.timer)
     },
     notesClass: function() {
       if (this.timer.notes == '') {
