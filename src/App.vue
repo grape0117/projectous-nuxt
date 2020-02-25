@@ -116,7 +116,11 @@ export default {
     },
     async onUpdateClick() {
       const appData = await this.getAppDataFromApi()
-      await idbKeyval.set('data', appData)
+      for (let prop in appData) {
+        if (appData.hasOwnProperty(prop)) {
+          await idbKeyval.set(prop, appData[prop])
+        }
+      }
     }
   }
 }
