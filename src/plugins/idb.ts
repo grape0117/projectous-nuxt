@@ -30,3 +30,12 @@ export const idbKeyval = {
     return (await dbPromise).getAllKeys(storeName)
   }
 }
+
+export async function idbGetAll(storeName: string) {
+  const keys = await idbKeyval.keys(storeName)
+  const result: any[] = []
+  keys.forEach(async key => {
+    result.push(await idbKeyval.get(key, storeName))
+  })
+  return result
+}
