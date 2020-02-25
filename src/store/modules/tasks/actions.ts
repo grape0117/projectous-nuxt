@@ -88,6 +88,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       //}
     })
 
+    await commit(
+      'updateIndexDBEntity',
+      { module: 'tasks', value: task },
+      { root: true }
+    )
     // @ts-ignore
     const response = await this._vm
       .$http()
@@ -101,6 +106,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }
   },
   async updateTask({ commit }: any, task: any) {
+    await commit(
+      'updateIndexDBEntity',
+      { module: 'tasks', value: task },
+      { root: true }
+    )
     // @ts-ignore
     await this._vm.$http().post('/tasks/' + task.id, { task })
     // TODO @stephane send task to server
