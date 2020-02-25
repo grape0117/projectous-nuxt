@@ -66,7 +66,7 @@ export default {
     },
     async getAppData() {
       const indexDBExists = (await window.indexedDB.databases()).find(
-        db => db.name === 'application-data'
+        db => db.name === 'projectous-data'
       )
       if (indexDBExists) {
         const allData = {}
