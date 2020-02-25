@@ -1,6 +1,7 @@
 import { MutationTree } from 'vuex'
 import { IRootState } from './types'
 import Vue from 'vue'
+import { idbKeyval } from '@/plugins/idb'
 
 export const mutations: MutationTree<IRootState> = {
   ADD_MANY(state: IRootState, { module, entities }: any) {
@@ -94,5 +95,11 @@ export const mutations: MutationTree<IRootState> = {
     state[module][module][index].id = id
     state[module].lookup[id] = state[module].lookup[uuid]
     //TODO: do we need to delete from lookup? Doesn't seem to matter
+  },
+  async updateIndexDBEntity(state: IRootState, { module, value }) {
+    await idbKeyval.set(value.id, value, module)
+  },
+  async deleteIndexDBEntity(state: IRootState, { module, id }) {
+    await idbKeyval.delete(id, module)
   }
 }
