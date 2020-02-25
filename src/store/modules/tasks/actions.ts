@@ -57,6 +57,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       }
     } else {
       //TODO: should we do this? task.id = uuid.v4();
+      await commit(
+        'updateIndexDBEntity',
+        { module: 'tasks', value: newTask },
+        { root: true }
+      )
       // @ts-ignore
       newTask = (await this._vm.$http().post('/tasks', { task })).task
       commit('removeTempTasks')
