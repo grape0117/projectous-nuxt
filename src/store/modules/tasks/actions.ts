@@ -122,6 +122,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('upsert', task)
   },
   async deleteTask({ commit }: any, task: any) {
+    await commit(
+      'deleteIndexDBEntity',
+      { module: 'tasks', value: task.id },
+      { root: true }
+    )
     commit('delete', task)
   },
   /**
