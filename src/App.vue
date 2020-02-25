@@ -19,7 +19,17 @@ import {
   createUserLists,
   getCookie
 } from '@/utils/util-functions'
-import { idbKeyval } from '@/plugins/idb'
+import { idbKeyval, idbGetAll } from '@/plugins/idb'
+
+const dataFromAPIPropertiesList = [
+  'company_clients',
+  'company_users',
+  'projects',
+  'project_users',
+  'task_users',
+  'tasks',
+  'user_task_lists'
+]
 
 export default {
   components: { EditUserModal },
@@ -55,11 +65,18 @@ export default {
       }
     },
     async getAppData() {
-      const appDataInIDB = await idbKeyval.get('data')
-      if (appDataInIDB) {
-        return appDataInIDB
+      const indexDBExists = (await window.indexedDB.databases()).find(
+        db => db.name === 'application-data'
+      )
+      if (indexDBExists) {
+        const allData = {}
+        for (let propertyName of dataFromAPIPropertiesList) {
+          const allEntities = await idbGetAll(propertyName)
+          allData[propertyName] = allEntities
+        }
+        return allData
       } else {
-        return this.getAppDataFromApi()
+        return await this.getAppDataFromApi()
       }
     },
     async setAppData({
@@ -117,8 +134,23 @@ export default {
     async onUpdateClick() {
       const appData = await this.getAppDataFromApi()
       for (let prop in appData) {
-        if (appData.hasOwnProperty(prop)) {
-          await idbKeyval.set(prop, appData[prop])
+        if (
+          appData.hasOwnProperty(prop) &&
+          dataFromAPIPropertiesList.includes(prop)
+        ) {
+          if (
+            Object.prototype.toString.call(appData[prop]) === '[object Array]'
+          ) {
+            // for the case where data stored in batches
+            appData[prop].forEach(async entity => {
+              await idbKeyval.set(entity.id, entity, prop)
+            })
+          } else {
+            // for the default case with entities
+            if (appData[prop].id) {
+              await idbKeyval.set(appData[prop].id, appData[prop], prop)
+            }
+          }
         }
       }
     }
