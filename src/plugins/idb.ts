@@ -1,6 +1,6 @@
 import { openDB } from 'idb'
 
-const dbPromise = openDB('application-data', 1, {
+const dbPromise = openDB('projectous-data', 1, {
   upgrade(db) {
     db.createObjectStore('company_clients')
     db.createObjectStore('company_users')
