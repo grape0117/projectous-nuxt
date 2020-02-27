@@ -1,4 +1,4 @@
-export const modulesNames: any = {
+export const modulesNames: object = {
   TASKS: 'tasks',
   TASK_USERS: 'task_users',
   COMPANY_CLIENTS: 'company_clients',
@@ -9,4 +9,4 @@ export const modulesNames: any = {
   TIMERS: 'timers'
 }
 
-export const modulesList = Object.values(modulesNames)
+export const modulesNamesList = Object.values(modulesNames)

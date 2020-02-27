@@ -1,15 +1,11 @@
 import { openDB } from 'idb'
+import { modulesNamesList } from '@/store/modules-names'
 
 const dbPromise = openDB('projectous-data', 1, {
   upgrade(db) {
-    db.createObjectStore('company_clients')
-    db.createObjectStore('company_users')
-    db.createObjectStore('projects')
-    db.createObjectStore('project_users')
-    db.createObjectStore('task_users')
-    db.createObjectStore('tasks')
-    db.createObjectStore('user_task_lists')
-    db.createObjectStore('timers')
+    modulesNamesList.forEach((moduleName: string) => {
+      db.createObjectStore(moduleName)
+    })
   }
 })
 
