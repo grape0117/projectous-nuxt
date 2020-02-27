@@ -82,32 +82,32 @@ export default {
       //this.$bvModal.show('edit-user-modal')
       this.$store.commit(
         'ADD_MANY',
-        { module: 'task_users', entities: task_users },
+        { module: modulesNames.TASK_USERS, entities: task_users },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: 'tasks', entities: tasks },
+        { module: modulesNames.TASKS, entities: tasks },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: 'projects', entities: projects },
+        { module: modulesNames.PROJECTS, entities: projects },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: 'project_users', entities: project_users },
+        { module: modulesNames.PROJECT_USERS, entities: project_users },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: 'company_users', entities: company_users },
+        { module: modulesNames.COMPANY_USERS, entities: company_users },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: 'company_clients', entities: company_clients },
+        { module: modulesNames.COMPANY_CLIENTS, entities: company_clients },
         { root: true }
       )
       const daysLists = createListsByDays()
