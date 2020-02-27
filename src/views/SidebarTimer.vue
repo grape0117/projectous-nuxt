@@ -100,7 +100,7 @@ export default {
     task: function() {
       const self = this
       const task = this.$store.state.tasks.tasks.find(
-        t => t.id == self.timer.company_user_id
+        t => t.id == self.timer.task_id
       )
 
       if (!task) {
