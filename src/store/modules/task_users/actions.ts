@@ -60,7 +60,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       commit(REMOVE_TEMP_TASKS_USER)
     }
     await commit(
-      'updateIndexDBEntity',
+      'updateCreateIndexDBEntity',
       { module: 'task_users', value: task_user },
       { root: true }
     )
@@ -69,7 +69,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   async updateTaskUser({ commit }: any, taskUser: ITaskUser) {
     await commit(
-      'updateIndexDBEntity',
+      'updateCreateIndexDBEntity',
       { module: 'task_users', value: taskUser },
       { root: true }
     )

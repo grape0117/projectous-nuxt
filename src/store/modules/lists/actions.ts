@@ -6,7 +6,7 @@ import { ADD_NEW_LIST } from '@/store/modules/lists/mutations-types'
 export const actions: ActionTree<IListsState, IRootState> = {
   async createList({ commit }, newList) {
     await commit(
-      'updateIndexDBEntity',
+      'updateCreateIndexDBEntity',
       { module: 'user_task_lists', value: newList },
       { root: true }
     )

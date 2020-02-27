@@ -58,7 +58,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     } else {
       //TODO: should we do this? task.id = uuid.v4();
       await commit(
-        'updateIndexDBEntity',
+        'updateCreateIndexDBEntity',
         { module: 'tasks', value: newTask },
         { root: true }
       )
@@ -94,7 +94,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     })
 
     await commit(
-      'updateIndexDBEntity',
+      'updateCreateIndexDBEntity',
       { module: 'tasks', value: task },
       { root: true }
     )
@@ -112,7 +112,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   async updateTask({ commit }: any, task: any) {
     await commit(
-      'updateIndexDBEntity',
+      'updateCreateIndexDBEntity',
       { module: 'tasks', value: task },
       { root: true }
     )
