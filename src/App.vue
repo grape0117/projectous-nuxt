@@ -20,16 +20,7 @@ import {
   getCookie
 } from '@/utils/util-functions'
 import { idbKeyval, idbGetAll } from '@/plugins/idb'
-
-const dataFromAPIPropertiesList = [
-  'company_clients',
-  'company_users',
-  'projects',
-  'project_users',
-  'task_users',
-  'tasks',
-  'user_task_lists'
-]
+import { modulesNames, modulesList } from './store/modules-names'
 
 export default {
   components: { EditUserModal },
@@ -70,7 +61,7 @@ export default {
       )
       if (indexDBExists) {
         const allData = {}
-        for (let propertyName of dataFromAPIPropertiesList) {
+        for (let propertyName of modulesList) {
           const allEntities = await idbGetAll(propertyName)
           allData[propertyName] = allEntities
         }
@@ -134,10 +125,7 @@ export default {
     async onUpdateClick() {
       const appData = await this.getAppDataFromApi()
       for (let prop in appData) {
-        if (
-          appData.hasOwnProperty(prop) &&
-          dataFromAPIPropertiesList.includes(prop)
-        ) {
+        if (appData.hasOwnProperty(prop) && modulesList.includes(prop)) {
           if (
             Object.prototype.toString.call(appData[prop]) === '[object Array]'
           ) {
