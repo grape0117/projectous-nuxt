@@ -59,7 +59,8 @@ export default {
       const indexDBExists = (await window.indexedDB.databases()).find(
         db => db.name === 'projectous-data'
       )
-      if (indexDBExists) {
+      const indexDBHasData = (await idbKeyval.keys(modulesNames.TASKS)).length
+      if (indexDBExists && indexDBHasData) {
         const allData = {}
         for (let propertyName of modulesNamesList) {
           const allEntities = await idbGetAll(propertyName)
