@@ -32,7 +32,7 @@ export default class Login extends Vue {
     })
     if (auth_token) {
       document.cookie = 'auth_token=' + auth_token
-      document.location.href = '/'
+      this.$router.push('/')
     } else {
       alert('Invalid email or password')
     }

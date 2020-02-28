@@ -57,6 +57,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       }
     } else {
       //TODO: should we do this? task.id = uuid.v4();
+      await commit(
+        'updateCreateIndexDBEntity',
+        { module: 'tasks', value: newTask },
+        { root: true }
+      )
       // @ts-ignore
       newTask = (await this._vm.$http().post('/tasks', { task })).task
       commit('removeTempTasks')
@@ -88,6 +93,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       //}
     })
 
+    await commit(
+      'updateCreateIndexDBEntity',
+      { module: 'tasks', value: task },
+      { root: true }
+    )
     // @ts-ignore
     const response = await this._vm
       .$http()
@@ -101,12 +111,22 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }
   },
   async updateTask({ commit }: any, task: any) {
+    await commit(
+      'updateCreateIndexDBEntity',
+      { module: 'tasks', value: task },
+      { root: true }
+    )
     // @ts-ignore
     await this._vm.$http().post('/tasks/' + task.id, { task })
     // TODO @stephane send task to server
     commit('upsert', task)
   },
   async deleteTask({ commit }: any, task: any) {
+    await commit(
+      'deleteIndexDBEntity',
+      { module: 'tasks', value: task.id },
+      { root: true }
+    )
     commit('delete', task)
   },
   /**
@@ -116,6 +136,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
    */
   updateSortOrder({ commit }, ids) {
     // Todo: @stephane - create endpoint to update project_sort_order for tasks
+    // ToDo: hook up indexDB
     commit('updateTasksSortOrder', ids)
     // @ts-ignore
     this._vm.$http().post('/tasks/sort_order', { ids: ids })

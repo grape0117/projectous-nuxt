@@ -8,7 +8,7 @@
     </div>
     <task-modal />
     <edit-user-modal />
-    <div id="update-data-button" @click="onUpdateClick" />
+    <div id="update-data-button" @click="storeDataInIndexedDb" />
   </div>
 </template>
 
@@ -19,7 +19,8 @@ import {
   createUserLists,
   getCookie
 } from '@/utils/util-functions'
-import { idbKeyval } from '@/plugins/idb'
+import { idbKeyval, idbGetAll } from '@/plugins/idb'
+import { modulesNames, modulesNamesList } from './store/modules-names'
 
 export default {
   components: { EditUserModal },
@@ -38,12 +39,19 @@ export default {
     current_edit_company_user() {
       if (this.current_edit_company_user.id) {
       }
+    },
+    '$route.path': {
+      handler(newRoute, oldRoute) {
+        if (oldRoute === '/login') {
+          this.getAppData()
+        }
+      },
+      deep: true
     }
   },
   async mounted() {
     if (getCookie('auth_token')) {
-      const appData = await this.getAppData()
-      this.setAppData(appData)
+      await this.getAppData()
     }
   },
   methods: {
@@ -55,12 +63,39 @@ export default {
       }
     },
     async getAppData() {
-      const appDataInIDB = await idbKeyval.get('data')
-      if (appDataInIDB) {
-        return appDataInIDB
+      const indexDBExists = (await window.indexedDB.databases()).find(
+        db => db.name === 'projectous-data'
+      )
+      const dataValidation = await this.checkDataInIndexDB()
+      let data = {}
+      if (indexDBExists && dataValidation) {
+        for (let propertyName of modulesNamesList) {
+          const allEntities = await idbGetAll(propertyName)
+          if (propertyName === 'properties') {
+            Object.keys(allEntities).forEach(key => {
+              data[key] = allEntities[key]
+            })
+          } else {
+            data[propertyName] = allEntities
+          }
+        }
       } else {
-        return this.getAppDataFromApi()
+        data = await this.storeDataInIndexedDb()
       }
+      this.setAppData(data)
+    },
+    async checkDataInIndexDB() {
+      let valid = true
+      for (let key in modulesNames) {
+        if (modulesNames.hasOwnProperty(key)) {
+          try {
+            await idbKeyval.keys(modulesNames[key])
+          } catch (e) {
+            valid = false
+          }
+        }
+      }
+      return valid
     },
     async setAppData({
       company_clients,
@@ -74,32 +109,32 @@ export default {
       //this.$bvModal.show('edit-user-modal')
       this.$store.commit(
         'ADD_MANY',
-        { module: 'task_users', entities: task_users },
+        { module: modulesNames.TASK_USERS, entities: task_users },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: 'tasks', entities: tasks },
+        { module: modulesNames.TASKS, entities: tasks },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: 'projects', entities: projects },
+        { module: modulesNames.PROJECTS, entities: projects },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: 'project_users', entities: project_users },
+        { module: modulesNames.PROJECT_USERS, entities: project_users },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: 'company_users', entities: company_users },
+        { module: modulesNames.COMPANY_USERS, entities: company_users },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: 'company_clients', entities: company_clients },
+        { module: modulesNames.COMPANY_CLIENTS, entities: company_clients },
         { root: true }
       )
       const daysLists = createListsByDays()
@@ -114,9 +149,18 @@ export default {
       })
       //TODO: companies
     },
-    async onUpdateClick() {
+    async storeDataInIndexedDb() {
       const appData = await this.getAppDataFromApi()
-      await idbKeyval.set('data', appData)
+      for (let key in appData) {
+        if (Array.isArray(appData[key])) {
+          appData[key].forEach(async entity => {
+            await idbKeyval.set(entity.id, entity, key)
+          })
+        } else {
+          await idbKeyval.set(key, appData[key], 'properties')
+        }
+      }
+      return appData
     }
   }
 }
