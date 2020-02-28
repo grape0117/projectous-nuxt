@@ -146,7 +146,6 @@ export default {
     },
     projects: function() {
       const projects = this.$store.state.projects.projects
-      console.log(projects)
       return projects
     },
     task_types: function() {
@@ -169,27 +168,22 @@ export default {
       let task_users = this.$store.state.task_users.task_users.filter(
         task_user => task_user.task_id === this.task.id
       )
-      console.log('task_users', task_users)
+      // console.log('task_users', task_users)
       //console.log(this.$store.state.task_users.task_users.pop())
       return task_users
     }
   },
   mounted: function() {
     //let self = this
-    console.log(this.$store.state.task_users.task_users)
     //TODO $('#task-modal').on('hidden.bs.modal', function () {
     //self.$store.dispatch('settings/closedModal')
     //})
   },
   methods: {
     toggleUser(user) {
-      console.log('toggle', user)
-      console.log('task', this.task)
-
       //only add each entry once into changed_task_users
       const task_user_index = this.changed_task_users.findIndex(
         changed_task_user => {
-          console.log(user)
           //TODO: figure out why no match
           return changed_task_user.company_user_id === user.company_user_id
         }
@@ -266,7 +260,6 @@ export default {
       let company_client = this.$store.getters[
         'company_clients/getByClientCompanyId'
       ](client_id)
-      console.log(company_client)
       return company_client ? company_client.name : ''
     }
   }

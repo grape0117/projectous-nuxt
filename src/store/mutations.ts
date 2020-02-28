@@ -5,7 +5,6 @@ import { idbKeyval } from '@/plugins/idb'
 
 export const mutations: MutationTree<IRootState> = {
   ADD_MANY(state: IRootState, { module, entities }: any) {
-    console.log('ADD_MANY ' + module)
     if (!state[module]) return
     //@ts-ignore
     entities.forEach((value, key) => {
@@ -74,7 +73,6 @@ export const mutations: MutationTree<IRootState> = {
     state[module][state[module].lookup[id]][attribute] = value
   },
   DELETE(state: IRootState, { module, entity }) {
-    console.log(state.task_users, module, state['task_users'], state[module])
     if (!state[module].lookup[entity.id]) return
     // @ts-ignore
     Vue.delete(state[module][module], state[module].lookup[entity.id])

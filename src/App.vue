@@ -8,7 +8,7 @@
     </div>
     <task-modal />
     <edit-user-modal />
-    <div id="update-data-button" @click="onUpdateClick" />
+    <div id="update-data-button" @click="storeDataInIndexedDb" />
   </div>
 </template>
 
@@ -39,12 +39,19 @@ export default {
     current_edit_company_user() {
       if (this.current_edit_company_user.id) {
       }
+    },
+    '$route.path': {
+      handler(newRoute, oldRoute) {
+        if (oldRoute === '/login') {
+          this.getAppData()
+        }
+      },
+      deep: true
     }
   },
   async mounted() {
     if (getCookie('auth_token')) {
-      const appData = await this.getAppData()
-      this.setAppData(appData)
+      await this.getAppData()
     }
   },
   methods: {
@@ -59,17 +66,36 @@ export default {
       const indexDBExists = (await window.indexedDB.databases()).find(
         db => db.name === 'projectous-data'
       )
-      const indexDBHasData = (await idbKeyval.keys(modulesNames.TASKS)).length
-      if (indexDBExists && indexDBHasData) {
-        const allData = {}
+      const dataValidation = await this.checkDataInIndexDB()
+      let data = {}
+      if (indexDBExists && dataValidation) {
         for (let propertyName of modulesNamesList) {
           const allEntities = await idbGetAll(propertyName)
-          allData[propertyName] = allEntities
+          if (propertyName === 'properties') {
+            Object.keys(allEntities).forEach(key => {
+              data[key] = allEntities[key]
+            })
+          } else {
+            data[propertyName] = allEntities
+          }
         }
-        return allData
       } else {
-        return await this.getAppDataFromApi()
+        data = await this.storeDataInIndexedDb()
       }
+      this.setAppData(data)
+    },
+    async checkDataInIndexDB() {
+      let valid = true
+      for (let key in modulesNames) {
+        if (modulesNames.hasOwnProperty(key)) {
+          try {
+            await idbKeyval.keys(modulesNames[key])
+          } catch (e) {
+            valid = false
+          }
+        }
+      }
+      return valid
     },
     async setAppData({
       company_clients,
@@ -123,25 +149,18 @@ export default {
       })
       //TODO: companies
     },
-    async onUpdateClick() {
+    async storeDataInIndexedDb() {
       const appData = await this.getAppDataFromApi()
-      for (let prop in appData) {
-        if (appData.hasOwnProperty(prop) && modulesNamesList.includes(prop)) {
-          if (
-            Object.prototype.toString.call(appData[prop]) === '[object Array]'
-          ) {
-            // for the case where data stored in batches
-            appData[prop].forEach(async entity => {
-              await idbKeyval.set(entity.id, entity, prop)
-            })
-          } else {
-            // for the default case with entities
-            if (appData[prop].id) {
-              await idbKeyval.set(appData[prop].id, appData[prop], prop)
-            }
-          }
+      for (let key in appData) {
+        if (Array.isArray(appData[key])) {
+          appData[key].forEach(async entity => {
+            await idbKeyval.set(entity.id, entity, key)
+          })
+        } else {
+          await idbKeyval.set(key, appData[key], 'properties')
         }
       }
+      return appData
     }
   }
 }
