@@ -63,9 +63,12 @@ export default {
       }
     },
     async getAppData() {
-      const indexDBExists = (await window.indexedDB.databases()).find(
-        db => db.name === 'projectous-data'
-      )
+      let indexDBExists = true
+      let request = window.indexedDB.open('projectous-data')
+      request.onupgradeneeded = function(e) {
+        e.target.transaction.abort()
+        indexDBExists = false
+      }
       const dataValidation = await this.checkDataInIndexDB()
       let data = {}
       if (indexDBExists && dataValidation) {
