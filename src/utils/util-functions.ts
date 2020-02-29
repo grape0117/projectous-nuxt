@@ -53,11 +53,11 @@ export function createListsByDays(): IList[] {
 }
 
 export function createUserLists(lists: any) {
-  return lists.map(({ id, label: title, company_user_id: userId }: any) => {
+  return lists.map((list: any) => {
     return {
-      id,
-      userId,
-      title,
+      id: list.id,
+      userId: list.userId || list.company_user_id,
+      title: list.title || list.label,
       group: 'User Lists'
     }
   })

@@ -8,10 +8,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       return timer.status == 'running'
     })
   },
-  myTodayTimers: (state: IModuleState, getters, rootState: IRootState) => {
+  myTodayTimers: (state: IModuleState, _getters, rootState: IRootState) => {
     let midnight = new Date()
     midnight.setHours(0, 0, 0, 0)
-    console.log(rootState.settings.current_company_user_id)
 
     return state.timers.filter(function(timer) {
       return new Date(timer.report_at) >= midnight

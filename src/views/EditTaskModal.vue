@@ -15,9 +15,7 @@
         :value="task.id"
       />
       <div class="form-group">
-        <label class="control-label col-sm-4" for="projecNameEdit"
-          >Task:
-        </label>
+        <label class="control-label col-sm-4" for="taskTitledit">Task: </label>
         <div class="col-sm-8">
           <div
             contenteditable="true"
@@ -48,9 +46,11 @@
               :label="company_client.name"
               v-bind:company_client="company_client"
               v-for="company_client in company_clients"
+              :key="company_client.id"
             >
               <option
                 v-for="project in openprojects(company_client)"
+                :key="projects.id"
                 v-bind:company_client="company_client"
                 :value="project.id"
               >
@@ -105,12 +105,13 @@
         </p>
       </div>
       <edit-task-modal-user
+        v-for="user in active_users()"
+        :key="user.id"
         @toggle="toggleUser"
         v-bind:task_user="task_user(user)"
         v-bind:user="user"
         v-bind:task="task"
-        v-for="user in active_users()"
-      ></edit-task-modal-user>
+      />
     </form>
     <template v-slot:modal-footer="{ ok, cancel }">
       <button style="float: left" class="btn btn-danger">Delete</button>
@@ -145,7 +146,6 @@ export default {
     },
     projects: function() {
       const projects = this.$store.state.projects.projects
-      console.log(projects)
       return projects
     },
     task_types: function() {
@@ -168,27 +168,22 @@ export default {
       let task_users = this.$store.state.task_users.task_users.filter(
         task_user => task_user.task_id === this.task.id
       )
-      console.log('task_users', task_users)
+      // console.log('task_users', task_users)
       //console.log(this.$store.state.task_users.task_users.pop())
       return task_users
     }
   },
   mounted: function() {
     //let self = this
-    console.log(this.$store.state.task_users.task_users)
     //TODO $('#task-modal').on('hidden.bs.modal', function () {
     //self.$store.dispatch('settings/closedModal')
     //})
   },
   methods: {
     toggleUser(user) {
-      console.log('toggle', user)
-      console.log('task', this.task)
-
       //only add each entry once into changed_task_users
       const task_user_index = this.changed_task_users.findIndex(
         changed_task_user => {
-          console.log(user)
           //TODO: figure out why no match
           return changed_task_user.company_user_id === user.company_user_id
         }
@@ -210,14 +205,14 @@ export default {
     },
     task_user(company_user) {
       let self = this
-      let task_user = this.$store.state.task_users.task_users.find(function(
+      let userTask = this.$store.state.task_users.task_users.find(function(
         task_user
       ) {
         if (task_user.task_id !== self.task.id) return false
         return task_user.company_user_id === company_user.id
       })
 
-      return task_user !== -1 ? task_user : false
+      return userTask !== -1 ? userTask : false
     },
     isCreateProject: function() {},
     isEditTaskTypes: function(event) {

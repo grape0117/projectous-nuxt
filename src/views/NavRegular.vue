@@ -68,19 +68,17 @@ export default {
   computed: {
     total_task_users: function() {
       let key = this.$store.state.task_users.lookup[this.id]
-      console.log('trying')
       if (key) {
-        console.log(this.$store.state.task_users.task_users[key])
         let task_user = this.$store.state.task_users.task_users[key]
         let company_user = this.$store.getters['company_users/getById'](
           task_user.company_user_id
         )
-        console.log(
-          task_user.company_user_id,
-          company_user,
-          this.$store.state.company_users.lookup[task_user.company_user_id]
-        )
-        console.log(this.$store.state.company_users.company_users)
+        // console.log(
+        //   task_user.company_user_id,
+        //   company_user,
+        //   this.$store.state.company_users.lookup[task_user.company_user_id]
+        // )
+        // console.log(this.$store.state.company_users.company_users)
         let name = company_user ? company_user.name : '??'
         let task = this.$store.getters['tasks/getById'](task_user.task_id)
         return 'task_user.id ' + task_user.id + ' ' + task.title + ' -- ' + name

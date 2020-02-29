@@ -59,10 +59,20 @@ export const actions: ActionTree<IModuleState, IRootState> = {
         .post('/task-users', { task_user: taskUser })).task_user
       commit(REMOVE_TEMP_TASKS_USER)
     }
+    await commit(
+      'updateCreateIndexDBEntity',
+      { module: 'task_users', value: task_user },
+      { root: true }
+    )
     commit(CREATE_TASK_USER, task_user)
     return task_user
   },
   async updateTaskUser({ commit }: any, taskUser: ITaskUser) {
+    await commit(
+      'updateCreateIndexDBEntity',
+      { module: 'task_users', value: taskUser },
+      { root: true }
+    )
     commit(UPDATE_TASK_USER, taskUser)
     // @ts-ignore
     const task_user = await this._vm
@@ -70,11 +80,17 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       .put('/task-users/', taskUser.id, { task_user: taskUser })
   },
   async deleteTaskUser({ commit }, taskUser: ITaskUser) {
+    await commit(
+      'deleteIndexDBEntity',
+      { module: 'task_users', id: taskUser.id },
+      { root: true }
+    )
     commit(DELETE_TASK_USER, taskUser)
     return
   },
   updateSortOrder({ commit }, ids) {
     // Todo: @stephane - create endpoint to update sort_order for tasks
+    // ToDo: hook up indexDB
     commit('updateTaskUsersSortOrder', ids)
     // @ts-ignore
     this._vm //@Mikhail this isn't working with put. It's not getting called at all unless I use post and not because of the id parameter (which I still don't like)

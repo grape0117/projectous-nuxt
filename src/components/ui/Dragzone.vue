@@ -67,6 +67,7 @@
             <div class="dragzone__task-users">
               <b-badge
                 v-for="task_user in getTaskUsers(item.task_id || item.id)"
+                :key="task_user.id"
                 :variant="task_user.role == 'assigned' ? 'info' : 'secondary'"
                 v-bind:task_user="task_user"
                 >{{ getCompanyUserName(task_user.company_user_id) }}
@@ -88,7 +89,7 @@
               :class="{
                 'dragzone__item-tracker-name--active': timerId === item.id
               }"
-            ></div>
+            />
             <span
               class="dragzone__item-tracker-circle"
               :class="{
@@ -122,6 +123,9 @@ const Tasks = namespace('tasks')
 
 @Component
 export default class Dragzone extends Vue {
+  private get isListExpandable() {
+    return this.tasks.length > this.numberOfExpandedItems
+  }
   @Prop({ required: true }) public id!: number
   @Prop({ required: true }) public draggedItemId!: number | null
   @Prop({ required: true, default: () => [] }) public tasks!: any
@@ -139,27 +143,8 @@ export default class Dragzone extends Vue {
   private editedItemId: number | string | null = null
   private currentListsBlockName: string | null = null
 
-  private get isListExpandable() {
-    return this.tasks.length > this.numberOfExpandedItems
-  }
-
-  private getTaskUsers(task_id: any) {
-    return this.$store.getters['task_users/getByTaskId'](task_id)
-  }
-  private getCompanyUserName(company_user_id: any) {
-    let company_user = this.$store.getters['company_users/getById'](
-      company_user_id
-    )
-    //console.log(company_user)
-    return company_user ? company_user.name : ''
-  }
-  private getTaskDueDate(task_id: any) {
-    let task = this.$store.getters['tasks/getById'](task_id)
-    return task.due_date ? task.due_date : null
-  }
-
   @Watch('tasks')
-  onTaskChanged(newTasks: any, oldTasks: any) {
+  public onTaskChanged(newTasks: any, oldTasks: any) {
     if (newTasks.length > oldTasks.length) {
       const tempTask = newTasks.find(({ temp }: any) => temp)
       if (tempTask) {
@@ -180,6 +165,21 @@ export default class Dragzone extends Vue {
         }, 50)
       }
     }
+  }
+
+  private getTaskUsers(task_id: any) {
+    return this.$store.getters['task_users/getByTaskId'](task_id)
+  }
+  private getCompanyUserName(company_user_id: any) {
+    let company_user = this.$store.getters['company_users/getById'](
+      company_user_id
+    )
+    //console.log(company_user)
+    return company_user ? company_user.name : ''
+  }
+  private getTaskDueDate(task_id: any) {
+    let task = this.$store.getters['tasks/getById'](task_id)
+    return task.due_date ? task.due_date : null
   }
 
   private editTask(task_id: any) {
