@@ -23,7 +23,7 @@ import {
   getCookie
 } from '@/utils/util-functions'
 import Vue from 'vue'
-import { idbKeyval, idbGetAll } from '@/plugins/idb'
+import { idbKeyval, idbGetAll } from '@/plugins/idb.ts'
 import { modulesNames, modulesNamesList } from './store/modules-names'
 
 export default {
@@ -114,16 +114,9 @@ export default {
     }) {
       //this.$bvModal.show('edit-user-modal')
       const {
-        company_clients,
-        company_users,
         current_company_id,
         current_company_user_id,
-        task_users,
-        tasks,
         timers,
-        projects,
-        project_users,
-        user_task_lists,
         user_id
         // @ts-ignore
       } = await this.$http().get('/test-tasks')
@@ -141,12 +134,12 @@ export default {
 
       this.$store.commit(
         'ADD_MANY',
-        { module: modulesNames.TASK_USERS, entities: task_users },
+        { module: 'task_users', entities: task_users },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: modulesNames.TASKS, entities: tasks },
+        { module: 'tasks', entities: tasks },
         { root: true }
       )
       this.$store.commit(
@@ -161,17 +154,17 @@ export default {
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: modulesNames.PROJECT_USERS, entities: project_users },
+        { module: 'project_users', entities: project_users },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: modulesNames.COMPANY_USERS, entities: company_users },
+        { module: 'company_users', entities: company_users },
         { root: true }
       )
       this.$store.commit(
         'ADD_MANY',
-        { module: modulesNames.COMPANY_CLIENTS, entities: company_clients },
+        { module: 'company_clients', entities: company_clients },
         { root: true }
       )
       const daysLists = createListsByDays()
