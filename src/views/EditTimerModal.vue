@@ -556,7 +556,7 @@ export default {
     },
     deleteTimer: function() {
       console.log(this.timer)
-      this.$store.dispatch('timers/deleteTimer', this.timer.id)
+      this.$store.dispatch('timers/deleteTimer', this.timer)
     },
     durationHours: function() {
       if (typeof this.timer.duration != 'number') {

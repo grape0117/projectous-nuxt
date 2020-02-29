@@ -1,12 +1,7 @@
 import { ActionTree } from 'vuex'
 import { IModuleState, ITaskUser } from './types'
 import { IRootState } from '@/store/types'
-import {
-  UPDATE_TASK_USER,
-  CREATE_TASK_USER,
-  DELETE_TASK_USER,
-  REMOVE_TEMP_TASKS_USER
-} from '@/store/modules/task_users/mutations-types'
+import { REMOVE_TEMP_TASKS_USER } from '@/store/modules/task_users/mutations-types'
 import { generateUniqId } from '@/utils/util-functions'
 
 function creteDefaultTaskUser(uuid: string | null): ITaskUser {
@@ -59,34 +54,22 @@ export const actions: ActionTree<IModuleState, IRootState> = {
         .post('/task-users', { task_user: taskUser })).task_user
       commit(REMOVE_TEMP_TASKS_USER)
     }
-    await commit(
-      'updateCreateIndexDBEntity',
-      { module: 'task_users', value: task_user },
+    commit(
+      'ADD_ONE',
+      { module: 'task_users', entity: task_user },
       { root: true }
     )
-    commit(CREATE_TASK_USER, task_user)
     return task_user
   },
   async updateTaskUser({ commit }: any, taskUser: ITaskUser) {
-    await commit(
-      'updateCreateIndexDBEntity',
-      { module: 'task_users', value: taskUser },
-      { root: true }
-    )
-    commit(UPDATE_TASK_USER, taskUser)
+    commit('UPDATE', { module: 'task_users', entity: taskUser }, { root: true })
     // @ts-ignore
     const task_user = await this._vm
       .$http()
       .put('/task-users/', taskUser.id, { task_user: taskUser })
   },
   async deleteTaskUser({ commit }, taskUser: ITaskUser) {
-    await commit(
-      'deleteIndexDBEntity',
-      { module: 'task_users', id: taskUser.id },
-      { root: true }
-    )
-    commit(DELETE_TASK_USER, taskUser)
-    return
+    commit('DELETE', { module: 'task_users', entity: taskUser }, { root: true })
   },
   updateSortOrder({ commit }, ids) {
     // Todo: @stephane - create endpoint to update sort_order for tasks

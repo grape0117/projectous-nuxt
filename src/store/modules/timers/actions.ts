@@ -10,14 +10,22 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     const response = await this._vm
       .$http()
       .post('/timer/restart/' + timer.id, timer)
-    context.commit('updateTimer', response.timer)
+    context.commit(
+      'UPDATE',
+      { module: 'timers', entity: response.timer },
+      { root: true }
+    )
     context.dispatch(
       'projects/setCurrentProjectById',
       response.timer.project_id,
       { root: true }
     )
     response.timers.forEach(function(timerFromResponse: any) {
-      context.commit('upsertTimer', timerFromResponse)
+      context.commit(
+        'UPSERT',
+        { module: 'timers', entity: timerFromResponse },
+        { root: true }
+      )
     })
   },
   async stopTimer(context, timer) {
@@ -25,21 +33,33 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     const response = await this._vm
       .$http()
       .post('/timer/stop/' + timer.id, timer)
-    context.commit('updateTimer', response.timer)
+    context.commit(
+      'UPDATE',
+      { module: 'timers', entity: response.timer },
+      { root: true }
+    )
   },
   async pauseTimer(context, timer) {
     // @ts-ignore
     const response = await this._vm
       .$http()
       .post('/timer/pause/' + timer.id, timer)
-    context.commit('updateTimer', response.timer)
+    context.commit(
+      'UPDATE',
+      { module: 'timers', entity: response.timer },
+      { root: true }
+    )
   },
   async hideTimer(context, timer) {
     // @ts-ignore
     const response = await this._vm
       .$http()
       .post('/timer/hide/' + timer.id, timer)
-    context.commit('updateTimer', response.timer)
+    context.commit(
+      'UPDATE',
+      { module: 'timers', entity: response.timer },
+      { root: true }
+    )
   },
 
   async saveTimer(context, timer) {
@@ -91,7 +111,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
     // @ts-ignore
     const response = await this._vm.$http().post('/timer/save/ajax', data)
-    context.commit('upsertTimer', response.timer)
+    context.commit(
+      'UPSERT',
+      { module: 'timers', entity: response.timer },
+      { root: true }
+    )
     context.commit('settings/setCurrentEditTimer', response.timer, {
       root: true
     })
@@ -137,12 +161,16 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     })
     context.commit('startTimer', response.timer)
   },
-  async deleteTimer(context, timer_id) {
+  async deleteTimer(context, timer) {
     // @ts-ignore
     const response = await this._vm
       .$http()
-      .post('/timer/delete/' + timer_id, {})
-    context.commit('deleteTimer', timer_id)
+      .post('/timer/delete/' + timer.id, {})
+    context.commit(
+      'DELETE',
+      { module: 'timers', entity: timer },
+      { root: true }
+    )
     //$('#timer-modal').modal('hide');
   }
 }

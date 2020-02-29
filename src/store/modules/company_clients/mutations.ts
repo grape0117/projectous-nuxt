@@ -4,8 +4,14 @@ import { IModuleState } from './types'
 import { IRootState } from '@/store/types'
 
 export const mutations: MutationTree<IModuleState> = {
-  //NOTE: do not call this directly. Call ADD_MANY from root store
-  ADD_MANY(state: IModuleState, company_clients: any) {
+  /**
+   * Creates additional lookup for company_clients
+   * NOTE: do not call this directly. Call LOOKUP from root store
+   * @param {IModuleState} state
+   * @param company_clients
+   * @constructor
+   */
+  LOOKUP(state: IModuleState, company_clients: any) {
     //@ts-ignore
     company_clients.forEach(function(company_client, key) {
       //@ts-ignore

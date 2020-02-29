@@ -57,21 +57,16 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       }
     } else {
       //TODO: should we do this? task.id = uuid.v4();
-      await commit(
-        'updateCreateIndexDBEntity',
-        { module: 'tasks', value: newTask },
-        { root: true }
-      )
       // @ts-ignore
       newTask = (await this._vm.$http().post('/tasks', { task })).task
       commit('removeTempTasks')
     }
-    commit('create', newTask)
+    commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
     return newTask
   },
   async saveTask({ commit, state, rootState }: any, { task, task_users }: any) {
     console.log('last task edited', task, task_users)
-    commit('upsert', task)
+    commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
 
     task_users.forEach((task_user: any) => {
       //if(!isNaN(task_user.id - parseFloat(task_user.id))) { //jQuery implementation of is_numeric: https://stackoverflow.com/a/21070520/193930
@@ -93,11 +88,6 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       //}
     })
 
-    await commit(
-      'updateCreateIndexDBEntity',
-      { module: 'tasks', value: task },
-      { root: true }
-    )
     // @ts-ignore
     const response = await this._vm
       .$http()
@@ -111,23 +101,13 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }
   },
   async updateTask({ commit }: any, task: any) {
-    await commit(
-      'updateCreateIndexDBEntity',
-      { module: 'tasks', value: task },
-      { root: true }
-    )
     // @ts-ignore
     await this._vm.$http().post('/tasks/' + task.id, { task })
     // TODO @stephane send task to server
-    commit('upsert', task)
+    commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
   },
   async deleteTask({ commit }: any, task: any) {
-    await commit(
-      'deleteIndexDBEntity',
-      { module: 'tasks', value: task.id },
-      { root: true }
-    )
-    commit('delete', task)
+    commit('DELETE', { module: 'tasks', entity: task }, { root: true })
   },
   /**
    * @param commit - vuex mutation
