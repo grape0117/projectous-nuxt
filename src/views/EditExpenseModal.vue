@@ -357,9 +357,7 @@ export default {
       return this.$store.getters['projects/openprojects']()
     },
     myCompanies: function() {
-      $.each(this.my_companies, function(key, value) {
-        //labeledConsole('company',value.name);
-      })
+      $.each(this.my_companies, function(key, value) {})
       return this.my_companies
     },
     isExpenseTask: function(task_id) {
@@ -430,7 +428,6 @@ export default {
 
       //TODO: change Save button to Saving...
       //TODO: save time? or process on php side?
-      labeledConsole('duration: ', this.expense.duration)
       let save = true
       if (!self.checkInputValue($('#expense-modal-project-id'))) {
         save = false

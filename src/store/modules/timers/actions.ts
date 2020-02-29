@@ -41,14 +41,16 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       .post('/timer/hide/' + timer.id, timer)
     context.commit('updateTimer', response.timer)
   },
-  async saveTimer(context, data) {
+
+  async saveTimer(context, timer) {
     // @ts-ignore
-    const response = await this._vm.$http().post('/timer/save/ajax', data)
-    context.commit('updateTimer', response.timer)
-    Vue.set(
-      context.rootState.settings,
-      'timer_watch',
-      context.rootState.settings.timer_watch + 1
+    const response = await this._vm
+      .$http()
+      .post('/timer/save/' + timer.id, timer)
+    context.commit(
+      'UPSERT',
+      { module: 'timers', entity: response.timer },
+      { root: true }
     )
   },
   async startTimer(context, timer) {
@@ -62,13 +64,18 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       { module: 'timers', entity: response.timer },
       { root: true }
     )
+    //TODO:?
     /*context.dispatch(
       'projects/setCurrentProjectById',
       response.timer.project_id,
       { root: true }
     )*/
     response.timers.forEach(function(timer: any) {
-      //context.commit('upsertTimer', timer)
+      context.commit(
+        'UPSERT',
+        { module: 'timers', entity: timer },
+        { root: true }
+      )
     })
   },
   async addTimer(context, data) {

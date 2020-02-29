@@ -357,6 +357,7 @@ export default class Custom extends Vue {
     if (task.project_id) {
       console.log('fetching project')
       const project = this.$store.getters['projects/getById'](task.project_id)
+      // @ts-ignore
       timer['project_id'] = project.id
       console.log(timer)
     }

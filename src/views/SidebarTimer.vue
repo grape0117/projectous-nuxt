@@ -164,9 +164,6 @@ export default {
         this.totalDuration = totalDuration
       else if (this.timer.status != 'running')
         this.totalDuration = this.timer.duration
-      //labeledConsole('status', this.timer.status);
-      //labeledConsole('totalDuration', totalDuration);
-      //labeledConsole('this.totalDuration', this.totalDuration);
 
       //if(this.timer.status == 'running'){
       return (

@@ -238,7 +238,6 @@ export default {
       return company_client ? company_client.name : ''
     },
     openprojects: function(company) {
-      //labeledConsole('company', company);
       return this.$store.getters['projects/getOpenCompanyProjects'](
         company.client_id
       )
@@ -265,7 +264,6 @@ export default {
       let company_client = this.$store.getters[
         'company_clients/getByClientCompanyId'
       ](client_id)
-      console.log(company_client)
       return company_client ? company_client.name : ''
     }
   }

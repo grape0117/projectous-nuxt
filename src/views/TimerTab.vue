@@ -53,7 +53,7 @@ export default {
   name: 'timer-tab',
   data: function() {
     return {
-      expanded: false,
+      expanded: true,
       timer_filter: ''
     }
   },

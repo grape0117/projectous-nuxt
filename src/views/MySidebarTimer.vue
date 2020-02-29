@@ -6,9 +6,9 @@
       v-bind:running_timers="running_timers"
       v-bind:projects="projects"
       v-bind:users="users"
-      v-for="timer in timers"
+      v-for="timer in mytimers()"
       v-bind:timer="timer"
-      :key="timer.id"
+      :key="'sidebar-' + timer.id"
     ></sidebar-timer>
   </div>
 </template>
@@ -120,12 +120,21 @@ export default {
             }
           })
       }
-      return this.timers.filter(function(timer) {
-        return (
-          timer.user_id ==
-          self.$store.state.settings.current_company_user.user_id
-        )
-      })
+      return this.timers
+        .filter(function(timer) {
+          return true
+          return (
+            timer.company_user_id ===
+            self.$store.state.settings.current_company_user.id
+          )
+        })
+        .sort(function(a, b) {
+          let aDate = new Date(a.updated_at)
+          let bDate = new Date(b.updated_at)
+          if (aDate > bDate) return -1
+          if (aDate < bDate) return 1
+          return 0
+        })
     },
     addTimer: function() {
       this.$store.dispatch('timers/addTimer') //timers/addTimer2 signature

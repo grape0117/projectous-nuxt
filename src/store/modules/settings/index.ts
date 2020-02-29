@@ -63,7 +63,6 @@ export const settings = {
       return state.current_edit_company_user_removable
     },
     getCurrentCompanyModules: (state: any) => {
-      // labeledConsole('current_company_modules', state.current_company.modules);
       return state.current_company.modules.slice().sort((a: any, b: any) => {
         return a.pivot.sort_order - b.pivot.sort_order
       })

@@ -40,17 +40,19 @@ export const mutations: MutationTree<IRootState> = {
     })
   },
   UPSERT(state: IRootState, { module, entity }: any) {
-    console.log(module, entity)
+    //console.log(module, entity)
     if (!state[module]) return
-    console.log('module exists')
+    //console.log('module exists')
     // @ts-ignore
     let key = state[module].lookup[entity.id]
-    if (key && state[module][key]) {
+    console.log('key', key)
+    console.log(state[module][module][key])
+    if (key && state[module][module][key]) {
       //TODO: call 'UPDATE' here? How to share key?
       for (let property in entity) {
         if (entity.hasOwnProperty(property)) {
           // @ts-ignore
-          state[module][key][property] = entity[property]
+          state[module][module][key][property] = entity[property]
         }
       }
     } else {

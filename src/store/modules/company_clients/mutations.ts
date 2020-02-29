@@ -9,7 +9,7 @@ export const mutations: MutationTree<IModuleState> = {
     //@ts-ignore
     company_clients.forEach(function(company_client, key) {
       //@ts-ignore
-      Vue.set(state.lookup_by_client_company_id, company_client.company_id, key) //TODO: risk of having more than one client with the same company id?
+      Vue.set(state.lookup_by_client_company_id, company_client.client_id, key) //TODO: risk of having more than one client with the same company id?
     })
   }
 }

@@ -55,6 +55,7 @@ export default {
         current_company_user_id,
         task_users,
         tasks,
+        timers,
         projects,
         project_users,
         user_task_lists,
@@ -80,6 +81,11 @@ export default {
       this.$store.commit(
         'ADD_MANY',
         { module: 'tasks', entities: tasks },
+        { root: true }
+      )
+      this.$store.commit(
+        'ADD_MANY',
+        { module: 'timers', entities: timers },
         { root: true }
       )
       this.$store.commit(
