@@ -792,9 +792,7 @@ div:hover > .hover-action {
 }
 
 @media (min-width: 768px) {
-  html body {
-   padding-top: 60px;
-  }  
+
 
 /* moves logo out of the way. */
  nav.navbar  .navbar-header .navbar-brand{

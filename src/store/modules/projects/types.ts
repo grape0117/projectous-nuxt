@@ -27,6 +27,7 @@ export interface IProject {
   updated_at: string
   deleted_at: string
   url: string
+  project_url: string
   completed_at: string
   is_open_tasked: boolean
 }

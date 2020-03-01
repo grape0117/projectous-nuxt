@@ -38,6 +38,10 @@
                 <span v-else class="dragzone__item-tracker-icon-triangle" />
               </div>
               <div class="dragzone__item-subtext">
+                <img
+                  :data-src="'--' + project_url(item)"
+                  :src="project_url(item)"
+                />
                 {{ projectName(item.project_id) }}
               </div>
               <div
@@ -66,15 +70,16 @@
             </div>
             <div class="dragzone__task-users">
               <b-badge
+                v-if="task_user.company_user_id !== current_company_user_id"
                 v-for="task_user in getTaskUsers(item.task_id || item.id)"
                 :key="task_user.id"
-                :variant="task_user.role == 'assigned' ? 'info' : 'secondary'"
+                :variant="task_user.role === 'assigned' ? 'info' : 'secondary'"
                 v-bind:task_user="task_user"
                 >{{ getCompanyUserName(task_user.company_user_id) }}
               </b-badge>
             </div>
           </div>
-          <div
+          <!-- <div
             v-if="true || editedItemId === item.id"
             class="dragzone__item-tracker"
           >
@@ -97,7 +102,7 @@
               }"
             />
             <div class="dragzone__item-tracker-time">00:00:00</div>
-          </div>
+          </div>-->
         </div>
       </div>
 
@@ -109,9 +114,9 @@
         +
       </div>
     </div>
-    <div v-if="!expandedList && isListExpandable" class="pl-2">
+    <!--<div v-if="!expandedList && isListExpandable" class="pl-2">
       ...
-    </div>
+    </div>-->
   </div>
 </template>
 <script lang="ts">
@@ -136,6 +141,8 @@ export default class Dragzone extends Vue {
   public selectedCompanyUserId!: number
   @Tasks.Getter public getById!: any
 
+  private current_company_user_id: any = this.$store.state.settings
+    .current_company_user_id
   private expandedList: boolean = this.initiallyExpanded
   private numberOfExpandedItems: number = 3
   private newItem: any = null
@@ -165,6 +172,21 @@ export default class Dragzone extends Vue {
         }, 50)
       }
     }
+  }
+
+  private project_url(item: any) {
+    if (!item.project_id) {
+      return 'no project_id'
+    }
+
+    const project = this.$store.getters['projects/getById'](item.project_id)
+    if (!project) {
+      return 'no project'
+    }
+
+    return project.project_url
+      ? 'https://api.projectous.com/api/projects/' + project.id + '/favicon.png'
+      : 'false'
   }
 
   private getTaskUsers(task_id: any) {
@@ -374,7 +396,7 @@ export default class Dragzone extends Vue {
 }
 .dragzone__item-subtext {
   margin-left: 30px;
-  width: 100%;
+  width: calc(100% - 30px);
   margin-bottom: -0.1rem;
   line-height: 0.8rem;
   font-size: 0.7rem;

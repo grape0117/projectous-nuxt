@@ -1,57 +1,45 @@
 <template>
-  <div>
-    Project Filter: <input v-model="project_search" />
-    <hr />
-    <b-container fluid>
-      <b-row>
-        <b-col cols="3" class="scroll-col">
-          <div class="text-center">
-            Projects
-          </div>
-          <div v-for="client in activeClients">
-            <!--            Todo: change client id to client name-->
-            {{ client.name }}
-            <ul>
-              <li v-for="{ name, id } in openClientProjects(client)">
-                <div @click="setPinnedProject(id)" class="project-item__status">
-                  <img
-                    src="@/assets/img/star-pin.svg"
-                    alt="star-unpin"
-                    v-if="!!pinnedProjects.find(project => project === id)"
-                  />
-                  <img
-                    src="@/assets/img/star-unpin.svg"
-                    alt="star-pin"
-                    v-else
-                  />
-                </div>
-                <div class="project-item__name" @click="setProjectId(id)">
-                  {{ name }}
-                </div>
-              </li>
-            </ul>
-          </div>
-        </b-col>
-        <b-col v-if="selectedProjectId" cols="6">
-          <pj-draggable
-            :listsBlockName="listsBlockNames.PROJECTS"
-            :data="selectedProjectTasksForStatusesColumns"
-            :lists="taskPerStatusLists"
-            :verticalAlignment="false"
-            :selectedCompanyUserId="selectedCompanyUserId"
-            @create="createTask"
-            @update="updateTask"
-            @delete="deleteTask"
-            @updateOptions="updateTaskSortOrder"
-            @setCurrentListsBlockName="
-              currentListsBlockName = listsBlockNames.PROJECTS
-            "
-          />
-        </b-col>
-      </b-row>
-    </b-container>
-    <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
-    <timer-tab></timer-tab>
+  <div
+    id="task-tray"
+    style="overflow-y: scroll; z-index: 1; height: 100vh; width: 300px;"
+  >
+    <select id="selectCompanyUser" v-model="selectedCompanyUserId">
+      <option
+        v-for="(companyUser, i) in sortedCompanyUsers"
+        :value="companyUser.id"
+        :id="'company_user-' + companyUser.id"
+        :key="`${companyUser.id}-${i}`"
+      >
+        {{ companyUser.name }}
+      </option>
+    </select>
+    <pj-draggable
+      :listsBlockName="listsBlockNames.TASKS_USERS"
+      :data="tasksUsers"
+      :lists="lists"
+      @create="createTaskUser"
+      @update="updateTaskUser"
+      @delete="deleteTaskUser"
+      @taskTimerToggled="onTaskTimerToggled"
+      @updateOptions="updateTaskUserSortOrder"
+      @setCurrentListsBlockName="
+        currentListsBlockName = listsBlockNames.TASKS_USERS
+      "
+    />
+    <new-list-form
+      v-if="selectedCompanyUserId"
+      :user-id="selectedCompanyUserId"
+    />
+    <div class="chat-hide-btn">
+      <button
+        type="button"
+        id="chat-tray-btn"
+        class="btn btn-purple"
+        style="margin-left: 300px;"
+      >
+        tasks
+      </button>
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -246,10 +234,10 @@ export default class Custom extends Vue {
     let user_task_list_id = null
     if (listId === 'Past') {
       /*
-        TODO: This isn't clean. It shouldn't just be a month back. Seems like we have options:
-        1) When the list loads, resave all to have a specific listId like -1
-        2) Figure out where in the list the new entry was added and use the same next_work_day (seems wrong though)
-         */
+                  TODO: This isn't clean. It shouldn't just be a month back. Seems like we have options:
+                  1) When the list loads, resave all to have a specific listId like -1
+                  2) Figure out where in the list the new entry was added and use the same next_work_day (seems wrong though)
+                   */
       const date = new Date()
       next_work_day = formatDateToYYYY_MM_DD(
         new Date(date.setMonth(date.getMonth() - 1))
@@ -369,7 +357,14 @@ export default class Custom extends Vue {
 }
 </script>
 
-<style>
+<style type="scss">
+#task-tray {
+  @media (max-width 800px) {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
 .project-item__name {
   cursor: pointer;
 }
@@ -387,5 +382,24 @@ export default class Custom extends Vue {
 .scroll-col {
   height: calc(100vh - 170px);
   overflow-y: scroll;
+}
+button.btn.btn-purple {
+  color: #ffffff !important;
+  background-color: #993399;
+  border-color: #993399;
+  position: fixed;
+  bottom: 26px;
+  left: -29px;
+  transform: rotate(-90deg);
+  font-size: 20px;
+  text-transform: uppercase;
+  padding: 8px 25px;
+  border-radius: 0 0 5px 0;
+  z-index: 999;
+  -webkit-transition: all 600ms cubic-bezier(0.19, 1, 0.22, 1);
+  transition: all 600ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+.chat-hide-btn {
+  position: relative;
 }
 </style>

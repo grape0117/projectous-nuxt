@@ -1,11 +1,15 @@
 <template>
   <div id="app">
-    <nav-bar></nav-bar>
-    <div class="container-fluid">
-      <div class="row-no-padding">
-        <router-view />
+    <task-tray />
+    <main>
+      <nav-bar />
+      <div class="container-fluid">
+        <div class="row-no-padding">
+          <router-view />
+        </div>
       </div>
-    </div>
+    </main>
+    <timer-tab />
     <task-modal />
     <edit-user-modal />
     <edit-timer-modal />
@@ -25,9 +29,10 @@ import {
 import Vue from 'vue'
 import { idbKeyval, idbGetAll } from '@/plugins/idb.ts'
 import { modulesNames, modulesNamesList } from './store/modules-names'
+import TaskTray from './views/TaskTray'
 
 export default {
-  components: { EditUserModal, EditTaskModal, EditTimerModal },
+  components: { TaskTray, EditUserModal, EditTaskModal, EditTimerModal },
   computed: {
     current_edit_task: function() {
       return this.$store.getters['settings/get_current_edit_task']
@@ -184,10 +189,10 @@ export default {
       for (let key in appData) {
         if (Array.isArray(appData[key])) {
           appData[key].forEach(async entity => {
-            await idbKeyval.set(entity.id, entity, key)
+            //await idbKeyval.set(entity.id, entity, key)
           })
         } else {
-          await idbKeyval.set(key, appData[key], 'properties')
+          //await idbKeyval.set(key, appData[key], 'properties')
         }
       }
       return appData
@@ -197,6 +202,9 @@ export default {
 </script>
 
 <style lang="scss">
+#app {
+  display: flex;
+}
 #update-data-button {
   position: absolute;
   top: 30px;
