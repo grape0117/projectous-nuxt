@@ -9,10 +9,10 @@
         </div>
       </div>
     </main>
-    <timer-tab />
+    <!--    <timer-tab />-->
     <task-modal />
-    <edit-user-modal />
-    <edit-timer-modal />
+    <edit-user-modal id="edit-user-modal" />
+    <edit-timer-modal id="edit-timer-modal" />
     <div id="update-data-button" @click="storeDataInIndexedDb" />
   </div>
 </template>
@@ -117,7 +117,7 @@ export default {
       project_users,
       user_task_lists
     }) {
-      //this.$bvModal.show('edit-user-modal')
+      this.$bvModal.show('edit-user-modal')
       const {
         current_company_id,
         current_company_user_id,
