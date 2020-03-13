@@ -117,7 +117,7 @@ export default {
       project_users,
       user_task_lists
     }) {
-      this.$bvModal.show('edit-user-modal')
+      // this.$bvModal.show('edit-user-modal')
       const {
         current_company_id,
         current_company_user_id,
