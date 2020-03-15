@@ -51,7 +51,7 @@
       </b-row>
     </b-container>
     <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
-    <timer-tab></timer-tab>
+    <!--    <timer-tab />-->
   </div>
 </template>
 <script lang="ts">
@@ -64,7 +64,6 @@ import { IProject } from '@/store/modules/projects/types'
 import { ITask } from '@/store/modules/tasks/types'
 import NewListForm from '@/components/draggable/NewListForm.vue'
 import TimerTab from './TimerTab.vue'
-import { ITimer } from '../store/modules/timers/types'
 
 const CompanyClients = namespace('company_clients')
 const CompanyUsers = namespace('company_users')

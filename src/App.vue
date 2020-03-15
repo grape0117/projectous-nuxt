@@ -40,7 +40,6 @@ export default {
   },
   watch: {
     current_edit_task: function(value) {
-      console.log(value)
       alert('watched!')
       if (this.current_edit_task.id) {
         this.$bvModal.show('timer-modal')
@@ -115,16 +114,13 @@ export default {
       tasks,
       projects,
       project_users,
-      user_task_lists
+      user_task_lists,
+      current_company_id,
+      current_company_user_id,
+      timers,
+      user_id
     }) {
       // this.$bvModal.show('edit-user-modal')
-      const {
-        current_company_id,
-        current_company_user_id,
-        timers,
-        user_id
-        // @ts-ignore
-      } = await this.$http().get('/test-tasks')
       Vue.set(this.$store.state.settings, 'current_user_id', user_id)
       Vue.set(
         this.$store.state.settings,
@@ -189,10 +185,10 @@ export default {
       for (let key in appData) {
         if (Array.isArray(appData[key])) {
           appData[key].forEach(async entity => {
-            //await idbKeyval.set(entity.id, entity, key)
+            await idbKeyval.set(entity.id, entity, key)
           })
         } else {
-          //await idbKeyval.set(key, appData[key], 'properties')
+          await idbKeyval.set(key, appData[key], 'properties')
         }
       }
       return appData
