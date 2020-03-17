@@ -1,7 +1,5 @@
 <template id="mytimer-sidebar-template">
   <div style="background: white;">
-    <button @click="addTimer()">Modal</button>
-    <button @click="startTimer()">Start New</button>
     <sidebar-timer
       v-bind:running_timers="running_timers"
       v-bind:projects="projects"
@@ -109,7 +107,7 @@ export default {
               bProjectName = self.$store.getters['projects/getById'](
                 b.project_id
               ).name.toLowerCase()
-              if (aProjectName == bProjectName) {
+              if (aProjectName === bProjectName) {
                 return 0 //TODO: check report_at?
               }
               if (aProjectName > bProjectName) {
@@ -119,6 +117,7 @@ export default {
             }
           })
       }
+      console.log('getting timers')
       return this.timers
         .filter(function(timer) {
           return true
@@ -128,25 +127,12 @@ export default {
           )
         })
         .sort(function(a, b) {
-          let aDate = new Date(a.updated_at)
-          let bDate = new Date(b.updated_at)
+          let aDate = new Date(a.report_at)
+          let bDate = new Date(b.report_at)
           if (aDate > bDate) return -1
           if (aDate < bDate) return 1
           return 0
         })
-    },
-    addTimer: function() {
-      this.$store.dispatch('timers/addTimer') //timers/addTimer2 signature
-    },
-    startTimer: function() {
-      this.$store.dispatch('timers/startTimer', {
-        current_company_id: this.$store.state.settings.current_company.id,
-        company_client_id: '',
-        project_id: '',
-        task_id: '',
-        is_billable: 1,
-        report_at: ''
-      })
     }
   }
 }

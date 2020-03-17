@@ -1,7 +1,8 @@
 <template>
   <div
     id="task-tray"
-    style="overflow-y: scroll; z-index: 1; height: 100vh; width: 300px;"
+    :class="trayClass()"
+    style="overflow-y: scroll; z-index: 1; height: 100vh;"
   >
     <select id="selectCompanyUser" v-model="selectedCompanyUserId">
       <option
@@ -30,12 +31,12 @@
       v-if="selectedCompanyUserId"
       :user-id="selectedCompanyUserId"
     />
-    <div class="chat-hide-btn">
+    <div :class="'chat-hide-btn ' + trayClass()">
       <button
+        @click="trayToggle()"
         type="button"
         id="chat-tray-btn"
-        class="btn btn-purple"
-        style="margin-left: 300px;"
+        :class="'btn btn-purple ' + trayClass()"
       >
         tasks
       </button>
@@ -170,6 +171,7 @@ export default class Custom extends Vue {
   private editedTaskId: number | string | null = null
   private currentListsBlockName: string | null = null
   private project_search: string = ''
+  private tray_expanded: boolean = false
 
   private selectedCompanyUserId: any = null
 
@@ -306,6 +308,14 @@ export default class Custom extends Vue {
     await this.deleteTask({ id: taskUser.task_id })
   }
 
+  private trayClass() {
+    return this.tray_expanded ? 'expanded' : ''
+  }
+
+  private trayToggle() {
+    this.tray_expanded = this.tray_expanded === false
+  }
+
   private onTaskTimerToggled(payload: ITaskTimerToggle) {
     const { taskId, timerId } = payload
     const task = this.$store.getters['tasks/getById'](taskId)
@@ -357,13 +367,26 @@ export default class Custom extends Vue {
 }
 </script>
 
-<style type="scss">
+<style lang="scss">
 #task-tray {
+  width: 0;
+  &.expanded {
+    width: 300px;
+    -webkit-transition: all 600ms cubic-bezier(0.19, 1, 0.22, 1);
+    transition: all 600ms cubic-bezier(0.19, 1, 0.22, 1);
+  }
   @media (max-width 800px) {
     position: absolute;
     top: 0;
     left: 0;
   }
+}
+
+.chat-hide-btn {
+  margin-left: 0;
+}
+.chat-hide-btn .expanded {
+  margin-left: 300px;
 }
 .project-item__name {
   cursor: pointer;
@@ -383,7 +406,7 @@ export default class Custom extends Vue {
   height: calc(100vh - 170px);
   overflow-y: scroll;
 }
-button.btn.btn-purple {
+#task-tray button.btn.btn-purple {
   color: #ffffff !important;
   background-color: #993399;
   border-color: #993399;

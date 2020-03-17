@@ -9,7 +9,8 @@ const state = {
   projects: [],
   selectedProjectId: null,
   pinnedProjects: [],
-  lookup: {}
+  lookup: {},
+  lookup_by_client_company_id: {}
 }
 
 export const projects: Module<IModuleState, IRootState> = {

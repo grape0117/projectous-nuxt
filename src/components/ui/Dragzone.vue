@@ -38,10 +38,7 @@
                 <span v-else class="dragzone__item-tracker-icon-triangle" />
               </div>
               <div class="dragzone__item-subtext">
-                <img
-                  :data-src="'--' + project_url(item)"
-                  :src="project_url(item)"
-                />
+                <img v-if="project_url(item)" :src="project_url(item)" />
                 {{ projectName(item.project_id) }}
               </div>
               <div
@@ -176,17 +173,17 @@ export default class Dragzone extends Vue {
 
   private project_url(item: any) {
     if (!item.project_id) {
-      return 'no project_id'
+      return false
     }
 
     const project = this.$store.getters['projects/getById'](item.project_id)
     if (!project) {
-      return 'no project'
+      return false
     }
 
     return project.project_url
       ? 'https://api.projectous.com/api/projects/' + project.id + '/favicon.png'
-      : 'false'
+      : false
   }
 
   private getTaskUsers(task_id: any) {
@@ -313,15 +310,14 @@ export default class Dragzone extends Vue {
 
 <style>
 .dragzone {
-  /*width: calc(100% - 121px);*/
+  width: 100%;
   min-height: 40px;
-  /*padding: 0.5rem;*/
   height: auto;
 }
 .dragzone__content {
-  /*max-height: 350px;*/
-  /*overflow-y: auto;*/
-  /*padding: 0.5rem;*/
+  /*  max-height: 350px;
+  overflow-y: auto;
+  padding: 0.5rem;*/
 }
 .dragzone__item {
   /*display: flex;*/
@@ -361,6 +357,7 @@ export default class Dragzone extends Vue {
 .dragzone__item-block-content {
   /*display: flex;*/
   align-items: center;
+  clear: both;
 }
 .dragzone__item-block-content-text {
   flex-grow: 1;

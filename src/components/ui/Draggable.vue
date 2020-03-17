@@ -149,7 +149,6 @@ export default class Draggable extends Vue {
   width: 100%;
   max-width: 600px;
   cursor: pointer;
-  text-transform: capitalize;
 }
 .list__wrapper.horizontal-alignment {
   display: flex;

@@ -13,7 +13,78 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       return state.projects.find(({ id: projectId }) => projectId === id)
     }
   },
-  getOpenCompanyProjects: (state: IModuleState) => (client_company_id: any) => {
+  getOpenProjectsSortedByClient: function(
+    state: IModuleState,
+    getters,
+    rootState,
+    rootGetters
+  ) {
+    let self = this
+    //console.log('openprojects')
+    let active_clients = rootGetters['company_clients/getActiveCompanyClients']
+    // @ts-ignore
+    let projects = []
+    if (!active_clients) {
+      return
+    }
+    // @ts-ignore
+    let client_projects = []
+
+    //console.log(state.lookup_by_client_company_id)
+    // @ts-ignore
+    active_clients.forEach(function(company_client) {
+      //console.log(company_client)
+      client_projects = []
+      // @ts-ignore
+      let client_project_keys =
+        state.lookup_by_client_company_id[company_client.client_id]
+      // @ts-ignore
+      client_project_keys.forEach(function(key) {
+        //console.log(project_id)
+        /*console.log(self.$store.state.projects.lookup[project_id])
+                console.log(self.$store.state.projects.projects[self.$store.state.projects.lookup[project_id]])*/
+        if (!state.projects[key]) {
+          return
+        }
+        let project = state.projects[key]
+        //console.log(project.status)
+        if (project.status === 'open') {
+          client_projects.push(project)
+        }
+      })
+      // @ts-ignore
+      projects = projects.concat(
+        client_projects.sort(function(a, b) {
+          if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+          if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+          return 0
+        })
+      )
+    })
+    // @ts-ignore
+    return projects
+  },
+  getOpenCompanyProjects: (state: IModuleState, getters) => (
+    client_company_id: any
+  ) => {
+    // @ts-ignore
+    return state.lookup_by_client_company_id[client_company_id]
+      .map(project_id => {
+        let project = getters['getById'](project_id)
+        if (!project) {
+          console.log(project_id)
+          return false
+        }
+        if (project.status != 'open') {
+          return false
+        }
+        return project
+      })
+      .sort(function(a: IProject, b: IProject) {
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+        return 0
+      })
     return state.projects.filter(project => {
       if (project.status != 'open') {
         return false
@@ -154,7 +225,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     //console.log('projects', projects)
     return projects
   },
-  openprojects: (state, getters, rootState, rootGetters) => (
+  openprojects2: (state, getters, rootState, rootGetters) => (
     search: any,
     sort: any
   ) => {

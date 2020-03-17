@@ -12,6 +12,7 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   ADD_MANY(state: IRootState, { module, entities }: any) {
+    console.log('ADD_MANY')
     if (!state[module]) return
     //@ts-ignore
     entities.forEach((value, key) => {
@@ -44,6 +45,7 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   ADD_ONE(state: IRootState, { module, entity }) {
+    console.log('ADD_ONE')
     if (!state[module]) return
     //@ts-ignore
     state[module][module].push(entity)
@@ -73,14 +75,14 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   UPSERT(state: IRootState, { module, entity }: any) {
-    //console.log(module, entity)
+    console.log('UPSERT', module, entity)
     if (!state[module]) return
     //console.log('module exists')
     // @ts-ignore
     let key = state[module].lookup[entity.id]
     console.log('key', key)
     console.log(state[module][module][key])
-    if (key && state[module][module][key]) {
+    if (state[module][module][key]) {
       //TODO: call 'UPDATE' here? How to share key?
       for (let property in entity) {
         if (entity.hasOwnProperty(property)) {
@@ -113,13 +115,34 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   UPDATE(state: IRootState, { module, entity }) {
-    if (!state[module]) return
-    let key = state[module].lookup[entity.id]
-    if (key) {
+    console.log('UPDATE', module, entity)
+    if (!state[module]) {
+      console.log('Module ' + module + ' not found!')
+      return
+    }
+    let modulestate = state[module]
+    let key = modulestate.lookup[entity.id]
+    if (state[module][key]) {
+      console.log(
+        'UPDATE: entity not found in lookup',
+        entity.id,
+        modulestate.lookup
+      )
+      return
+    }
+    if (modulestate[module][key].id !== entity.id) {
+      console.log('mismatched ids!')
+      return
+    }
+    if (key >= 0) {
       for (let property in entity) {
         if (entity.hasOwnProperty(property)) {
+          if (!modulestate[module][key][property]) {
+            console.log(entity, property)
+            continue
+          }
           // @ts-ignore
-          state[module][key][property] = project[property]
+          Vue.set(modulestate[module][key], property, entity[property])
         }
       }
     }
@@ -147,6 +170,7 @@ export const mutations: MutationTree<IRootState> = {
     state: IRootState,
     { module, id: number, attribute: string, value }
   ) {
+    console.log('UPDATE_ATTRIBUTE')
     if (!state[module]) return
     // @ts-ignore
     state[module][state[module].lookup[id]][attribute] = value
@@ -218,10 +242,7 @@ export const mutations: MutationTree<IRootState> = {
     state[module].lookup[id] = state[module].lookup[uuid]
     //TODO: do we need to delete from lookup? Doesn't seem to matter
   },
-  async updateCreateIndexDBEntity(
-    state: IRootState,
-    { module, value: entity }
-  ) {
+  async updateCreateIndexDBEntity(state: IRootState, { module, entity }) {
     await idbKeyval.set(entity.id, entity, module)
   },
   async deleteIndexDBEntity(state: IRootState, { module, id }) {

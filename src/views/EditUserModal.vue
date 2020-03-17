@@ -177,7 +177,7 @@
             type="button"
             class="btn btn-primary"
             v-on:click="removeUser()"
-            v-if="isAdmin && has_no_timers"
+            v-if="isAdmin && false"
           >
             Remove from Company
           </button>

@@ -5,6 +5,7 @@ export interface IModuleState {
   selectedProjectId: string | number | null
   pinnedProjects: number[]
   lookup: any
+  lookup_by_client_company_id: {}
 }
 
 export interface IProject {

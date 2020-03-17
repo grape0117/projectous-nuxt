@@ -1,49 +1,28 @@
 <template>
-  <div :class="'timer-tab ' + getSidebarClass()" style="text-align: right;">
-    {{ getSidebarClass() }}
-    <div class="btn btn-info" @click="expandContract()">+ / -</div>
-    <button @click="addTimer()">Modal</button>
-    <button @click="startTimer()">Start New</button>
-    <ul class="nav nav-tabs" role="tablist">
-      <li role="presentation" class="active">
-        <a
-          href="#tab-active"
-          aria-controls="tab-active"
-          role="tab"
-          data-toggle="tab"
-          >Active</a
-        >
-      </li>
-      <li role="presentation">
-        <a
-          href="#tab-hidden"
-          aria-controls="tab-hidden"
-          role="tab"
-          data-toggle="tab"
-          >Hidden</a
-        >
-      </li>
-    </ul>
+  <div
+    id="timer-tray"
+    :class="trayClass()"
+    style="overflow-y: scroll; z-index: 1; height: 100vh;"
+  >
+    <div style="position: sticky; height: 30px; top: 0">
+      <button @click="addTimer()">Modal</button>
+      <button @click="startTimer()">Start New</button>
+    </div>
 
-    <div class="tab-content">
-      <input v-model="timer_filter" placeholder="Search Projects" />
-      <div id="tab-active" role="tabpanel" class="tab-pane active">
-        <my-sidebar-timer
-          :class="getSidebarClass()"
-          style="text-align: left; overflow-y: scroll; border: solid 1px #cccccc;"
-          v-bind:only_hidden="false"
-          v-bind:timer_filter="timer_filter"
-        ></my-sidebar-timer>
-      </div>
-      <div id="tab-hidden" role="tabpanel" class="tab-pane">
-        hidden
-        <my-sidebar-timer
-          :class="getSidebarClass()"
-          style="text-align: left; overflow-y: scroll; border: solid 1px #cccccc;"
-          v-bind:only_hidden="true"
-          v-bind:timer_filter="timer_filter"
-        ></my-sidebar-timer>
-      </div>
+    <my-sidebar-timer
+      :class="getSidebarClass()"
+      style="text-align: left; overflow-y: scroll; border: solid 1px #cccccc;"
+      v-bind:only_hidden="false"
+      v-bind:timer_filter="timer_filter"
+    ></my-sidebar-timer>
+    <div :class="'chat-hide-btn ' + trayClass()">
+      <button
+        @click="trayToggle()"
+        type="button"
+        :class="'btn btn-purple ' + trayClass()"
+      >
+        timers
+      </button>
     </div>
   </div>
 </template>
@@ -53,7 +32,7 @@ export default {
   name: 'timer-tab',
   data: function() {
     return {
-      expanded: true,
+      tray_expanded: true,
       timer_filter: ''
     }
   },
@@ -61,6 +40,12 @@ export default {
     'my-sidebar-timer': MySideBarTimer
   },
   methods: {
+    trayClass: function() {
+      return this.tray_expanded ? 'expanded' : ''
+    },
+    trayToggle: function() {
+      this.tray_expanded = this.tray_expanded === false
+    },
     getSidebarClass: function() {
       return this.expanded ? 'expanded' : 'contracted'
     },
@@ -84,7 +69,44 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+#timer-tray {
+  width: 0;
+  -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
+  transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
+  &.expanded {
+    width: 300px;
+  }
+  button.btn.btn-purple {
+    color: #ffffff !important;
+    background-color: #993399;
+    border-color: #993399;
+    position: fixed;
+    bottom: 37px;
+    right: -38px;
+    transform: rotate(-90deg);
+    font-size: 20px;
+    text-transform: uppercase;
+    padding: 8px 25px;
+    border-radius: 0 5px 0 0;
+    z-index: 999;
+    -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
+    transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
+  }
+  @media (max-width 800px) {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+}
+
+.chat-hide-btn {
+  margin-right: 0;
+}
+.chat-hide-btn .expanded {
+  margin-right: 300px;
+}
+
 .timer-tab {
   position: fixed;
   bottom: 0;
@@ -94,13 +116,5 @@ export default {
   max-width: 200px;
   opacity: 0.99;
   z-index: 1;
-}
-
-.expanded {
-  max-height: calc(100vh - 100px);
-}
-
-.contracted {
-  max-height: 300px;
 }
 </style>

@@ -51,7 +51,6 @@
       </b-row>
     </b-container>
     <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
-    <timer-tab></timer-tab>
   </div>
 </template>
 <script lang="ts">

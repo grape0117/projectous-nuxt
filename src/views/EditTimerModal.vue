@@ -448,9 +448,9 @@ export default {
   },
   mounted: function() {
     let self = this
-    $('#timer-modal').on('hidden.bs.modal', function() {
+    /*$('#timer-modal').on('hidden.bs.modal', function() {
       self.$store.dispatch('settings/closedModal')
-    })
+    })*/
   },
   watch: {
     'timer.project_id': function() {
@@ -524,15 +524,11 @@ export default {
     isIHI: function() {
       return this.$store.getters['settings/isIHI']
     },
-    openprojects: function(company_client) {
-      return this.$store.getters['projects/openprojects']()
+    openprojects: function() {
+      return this.$store.getters['projects/getOpenProjectsSortedByClient']
     },
     calculateDuration: function() {
       this.timer.duration = this.endSeconds - this.startSeconds
-    },
-    myCompanies: function() {
-      $.each(this.my_companies, function(key, value) {})
-      return this.my_companies
     },
     isTimerAction: function(action_id) {
       return action_id == this.timer.action_id

@@ -3,20 +3,21 @@
     :class="'project-item timer-' + timer.status"
     v-bind:data-restarted="timer.restart_at"
   >
+    {{ timer.status }}
     <div class="hover-tab project-details" @click="editTimer()">
       <p class="title-project-client-name">{{ client_name() }}</p>
       <p class="title-project-project-name">{{ project.name }}</p>
       <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>
     </div>
     <div v-if="isCurrentUser()">
-      <button
+      <b-button
         v-if="timer.status === 'running'"
         v-on:click="pauseTimer"
         class="btn btn-default"
         style="float: left; margin-right: 5px;margin-top:2px;"
       >
         <b-icon icon="pause"></b-icon>
-      </button>
+      </b-button>
       <button
         v-if="timer.status === 'running'"
         v-on:click="stopTimer"
@@ -25,14 +26,14 @@
       >
         <b-icon icon="stop"></b-icon>
       </button>
-      <button
+      <b-button
+        variant="outline-secondary"
         v-else
         v-on:click="restartTimer"
-        class="btn btn-default"
         style="float: left;  margin-right: 5px;margin-top:5px;"
       >
-        <b-icon icon="play"></b-icon>
-      </button>
+        <b-icon icon="play-fill"></b-icon>
+      </b-button>
     </div>
     <div
       style="font-size: 19px; margin-top: 5px; margin-right: -1px; text-align: left;"
@@ -125,12 +126,12 @@ export default {
       this.timer.status == 'running' &&
       this.timer.user_id == this.$store.state.settings.current_user_id
     ) {
-      if (this.timer.project_id) {
+      /*if (this.timer.project_id) {
         this.$store.dispatch(
           'projects/setCurrentProjectById',
           this.timer.project_id
         )
-      }
+      }*/
     }
     this.incrementDuration()
   },

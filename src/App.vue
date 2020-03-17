@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import TimerTab from './views/TimerTab'
 import EditUserModal from './views/EditUserModal'
 import EditTaskModal from './views/EditTaskModal'
 import EditTimerModal from './views/EditTimerModal'
@@ -32,7 +33,13 @@ import { modulesNames, modulesNamesList } from './store/modules-names'
 import TaskTray from './views/TaskTray'
 
 export default {
-  components: { TaskTray, EditUserModal, EditTaskModal, EditTimerModal },
+  components: {
+    TimerTab,
+    TaskTray,
+    EditUserModal,
+    EditTaskModal,
+    EditTimerModal
+  },
   computed: {
     current_edit_task: function() {
       return this.$store.getters['settings/get_current_edit_task']
@@ -71,13 +78,18 @@ export default {
       }
     },
     async getAppData() {
-      let indexDBExists = true
+      let indexDBExists = false
       let request = window.indexedDB.open('projectous-data')
+
       request.onupgradeneeded = function(e) {
         e.target.transaction.abort()
         indexDBExists = false
       }
-      const dataValidation = await this.checkDataInIndexDB()
+      let data = {}
+
+      data = await this.storeDataInIndexedDb()
+
+      /*  const dataValidation = await this.checkDataInIndexDB()
       let data = {}
       if (indexDBExists && dataValidation) {
         for (let propertyName of modulesNamesList) {
@@ -92,7 +104,7 @@ export default {
         }
       } else {
         data = await this.storeDataInIndexedDb()
-      }
+      }*/
       this.setAppData(data)
     },
     async checkDataInIndexDB() {
@@ -186,13 +198,14 @@ export default {
     },
     async storeDataInIndexedDb() {
       const appData = await this.getAppDataFromApi()
+      console.log(appData)
       for (let key in appData) {
         if (Array.isArray(appData[key])) {
           appData[key].forEach(async entity => {
-            //await idbKeyval.set(entity.id, entity, key)
+            await idbKeyval.set(entity.id, entity, key)
           })
         } else {
-          //await idbKeyval.set(key, appData[key], 'properties')
+          await idbKeyval.set(key, appData[key], 'properties')
         }
       }
       return appData

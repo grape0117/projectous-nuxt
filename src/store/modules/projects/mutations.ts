@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { MutationTree } from 'vuex'
 import { IModuleState, IProject } from '@/store/modules/projects/types'
 import {
@@ -6,6 +7,18 @@ import {
 } from '@/store/modules/projects/mutations-types'
 
 export const mutations: MutationTree<IModuleState> = {
+  LOOKUP(state: IModuleState, projects: any) {
+    //@ts-ignore
+    projects.forEach(function(project, key) {
+      //@ts-ignore
+      if (!state.lookup_by_client_company_id[project.client_id]) {
+        // @ts-ignore
+        state.lookup_by_client_company_id[project.client_id] = []
+      }
+      // @ts-ignore
+      state.lookup_by_client_company_id[project.client_id].push(key)
+    })
+  },
   [SET_SELECTED_PROJECT](state: IModuleState, id: string | number | null) {
     state.selectedProjectId = id
   },

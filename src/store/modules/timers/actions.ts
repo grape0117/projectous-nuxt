@@ -15,11 +15,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       { module: 'timers', entity: response.timer },
       { root: true }
     )
-    context.dispatch(
+    /*    context.dispatch(
       'projects/setCurrentProjectById',
       response.timer.project_id,
       { root: true }
-    )
+    )*/
     response.timers.forEach(function(timerFromResponse: any) {
       context.commit(
         'UPSERT',
