@@ -9,10 +9,10 @@
         </div>
       </div>
     </main>
-    <timer-tab />
+    <!--    <timer-tab />-->
     <task-modal />
-    <edit-user-modal />
-    <edit-timer-modal />
+    <edit-user-modal id="edit-user-modal" />
+    <edit-timer-modal id="edit-timer-modal" />
     <div id="update-data-button" @click="storeDataInIndexedDb" />
   </div>
 </template>
@@ -47,7 +47,6 @@ export default {
   },
   watch: {
     current_edit_task: function(value) {
-      console.log(value)
       alert('watched!')
       if (this.current_edit_task.id) {
         this.$bvModal.show('timer-modal')
@@ -127,16 +126,13 @@ export default {
       tasks,
       projects,
       project_users,
-      user_task_lists
+      user_task_lists,
+      current_company_id,
+      current_company_user_id,
+      timers,
+      user_id
     }) {
-      //this.$bvModal.show('edit-user-modal')
-      const {
-        current_company_id,
-        current_company_user_id,
-        timers,
-        user_id
-        // @ts-ignore
-      } = await this.$http().get('/test-tasks')
+      // this.$bvModal.show('edit-user-modal')
       Vue.set(this.$store.state.settings, 'current_user_id', user_id)
       Vue.set(
         this.$store.state.settings,

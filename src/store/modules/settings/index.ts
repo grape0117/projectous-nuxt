@@ -101,7 +101,6 @@ export const settings = {
         console.log('no current company user', state.current_company_user_id)
         return false
       }
-      console.log('company current user', current_company_user)
       return current_company_user.user_role === 'admin' // TODO: add more roles
     },
     home(state: any) {

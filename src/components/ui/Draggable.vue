@@ -22,7 +22,14 @@
         :key="id"
         class="list__group"
       >
-        <div class="list__group-subtitle" v-if="verticalAlignment">
+        <div
+          class="list__group-subtitle"
+          :style="{
+            background:
+              isListDragged && targetListIndex === index ? '#333333' : '#f0fbfc'
+          }"
+          v-if="verticalAlignment"
+        >
           <div
             v-if="group.isDraggable"
             class="dragzone__item-dragbox dragzone__item-dragbox--active list-group-dragbox"
@@ -123,7 +130,11 @@ export default class Draggable extends Vue {
     }
   }
   private dragEnd() {
-    if (this.targetListIndex === this.draggedListIndex) return
+    if (this.targetListIndex === this.draggedListIndex) {
+      this.draggedListIndex = NaN
+      this.isListDragged = false
+      return
+    }
 
     const listGroupsCopy = [...this.listGroups]
     const targetEl = listGroupsCopy[this.targetListIndex]
@@ -172,7 +183,7 @@ export default class Draggable extends Vue {
   width: 40px;
   padding: 0.5rem;
   border-right: 1px solid #f6f6f6;
-  background: #f0fbfc;
+  /*background: #f0fbfc;*/
   flex: none;
   text-transform: uppercase;
   color: #85868a;

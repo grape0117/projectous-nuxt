@@ -447,10 +447,10 @@ export default {
     }
   },
   mounted: function() {
-    let self = this
-    /*$('#timer-modal').on('hidden.bs.modal', function() {
-      self.$store.dispatch('settings/closedModal')
-    })*/
+    // let self = this
+    // $('#timer-modal').on('hidden.bs.modal', function() {
+    //   self.$store.dispatch('settings/closedModal')
+    // })
   },
   watch: {
     'timer.project_id': function() {

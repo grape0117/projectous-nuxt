@@ -3,6 +3,7 @@ import { IModuleState, ITaskUser } from './types'
 import { IRootState } from '@/store/types'
 import { REMOVE_TEMP_TASKS_USER } from '@/store/modules/task_users/mutations-types'
 import { generateUniqId } from '@/utils/util-functions'
+import { $showModal } from '@/plugins/bootstrap'
 
 function creteDefaultTaskUser(uuid: string | null): ITaskUser {
   return {
