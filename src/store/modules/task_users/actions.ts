@@ -3,19 +3,20 @@ import { IModuleState, ITaskUser } from './types'
 import { IRootState } from '@/store/types'
 import { REMOVE_TEMP_TASKS_USER } from '@/store/modules/task_users/mutations-types'
 import { generateUniqId } from '@/utils/util-functions'
-import { $showModal } from '@/plugins/bootstrap'
+import uuid from 'uuid'
 
-function creteDefaultTaskUser(uuid: string | null): ITaskUser {
+function creteDefaultTaskUser(task_id: number): ITaskUser {
   return {
+    id: uuid.v4(),
     company_user_id: null,
     next_work_day: null,
     role: '',
     sort_order: 0,
-    task_id: 0,
+    task_id,
     task_uuid: null,
     user_rate: '0.00',
     user_task_list_id: null,
-    uuid,
+    uuid: null,
     work_day_position: null
   }
 }
@@ -34,8 +35,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }: ITaskUser
   ) {
     const taskUser = {
-      ...creteDefaultTaskUser(uuid),
-      task_id,
+      ...creteDefaultTaskUser(task_id),
       next_work_day,
       company_user_id,
       user_task_list_id,

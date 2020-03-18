@@ -9,7 +9,7 @@
         </div>
       </div>
     </main>
-    <!--    <timer-tab />-->
+    <timer-tab />
     <task-modal />
     <edit-user-modal id="edit-user-modal" />
     <edit-timer-modal id="edit-timer-modal" />
@@ -84,11 +84,8 @@ export default {
         e.target.transaction.abort()
         indexDBExists = false
       }
-      let data = {}
 
-      data = await this.storeDataInIndexedDb()
-
-      /*  const dataValidation = await this.checkDataInIndexDB()
+      const dataValidation = await this.checkDataInIndexDB()
       let data = {}
       if (indexDBExists && dataValidation) {
         for (let propertyName of modulesNamesList) {
@@ -103,7 +100,7 @@ export default {
         }
       } else {
         data = await this.storeDataInIndexedDb()
-      }*/
+      }
       this.setAppData(data)
     },
     async checkDataInIndexDB() {

@@ -4,9 +4,11 @@ import { IModuleState, ITask } from './types'
 import { IRootState } from '@/store/types'
 // @ts-ignore
 import { generateUUID } from '@/utils/util-functions'
+import uuid from 'uuid'
 
 function createDefaultTask(): ITask {
   return {
+    id: uuid.v4(),
     child_task_id: null,
     company_id: null,
     completed_at: null,
@@ -47,6 +49,63 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       project_id,
       sort_order,
       status
+    }
+    let newTask
+    if (temp) {
+      newTask = {
+        ...task,
+        //id: generateUUID(),
+        temp: true
+      }
+    } else {
+      //TODO: should we do this? task.id = uuid.v4();
+      // @ts-ignore
+      newTask = (await this._vm.$http().post('/tasks', { task })).task
+      commit('removeTempTasks')
+    }
+    commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
+    return newTask
+  },
+  async createProjectTask(
+    { commit, getters }: any,
+    { title, project_id, sort_order, status, temp }: any
+  ) {
+    const task = {
+      ...createDefaultTask(),
+      title,
+      project_id,
+      sort_order,
+      status
+    }
+    let newTask
+    if (temp) {
+      newTask = {
+        ...task,
+        id: generateUUID(),
+        temp: true
+      }
+    } else {
+      //TODO: should we do this? task.id = uuid.v4();
+      // @ts-ignore
+      newTask = (await this._vm.$http().post('/tasks', { task })).task
+      commit('removeTempTasks')
+    }
+    commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
+    return newTask
+  },
+  async createUserTask(
+    { commit, getters }: any,
+    { title, project_id, sort_order, status, temp }: any
+  ) {
+    const task = {
+      ...createDefaultTask(),
+      title,
+      project_id,
+      sort_order,
+      status
+    }
+    const userTask = {
+      task_id: task.id
     }
     let newTask
     if (temp) {

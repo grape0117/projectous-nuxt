@@ -2,7 +2,9 @@
   <div
     id="timer-tray"
     :class="trayClass()"
-    style="overflow-y: scroll; z-index: 1; height: 100vh;"
+    style="overflow-y: scroll; z-index: 1; height: 100vh; position: fixed;
+
+right: 0;"
   >
     <div style="position: sticky; height: 30px; top: 0">
       <button @click="addTimer()">Modal</button>

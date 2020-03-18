@@ -371,7 +371,7 @@ export default class Custom extends Vue {
 #task-tray {
   width: 0;
   &.expanded {
-    width: 300px;
+    min-width: 300px;
     -webkit-transition: all 600ms cubic-bezier(0.19, 1, 0.22, 1);
     transition: all 600ms cubic-bezier(0.19, 1, 0.22, 1);
   }

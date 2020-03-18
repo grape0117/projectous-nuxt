@@ -69,28 +69,36 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   ) => {
     // @ts-ignore
     return state.lookup_by_client_company_id[client_company_id]
-      .map(project_id => {
+      .reduce(function(result: any, project_id: any) {
         let project = getters['getById'](project_id)
         if (!project) {
           console.log(project_id)
-          return false
+          return result
         }
         if (project.status != 'open') {
-          return false
+          return result
         }
-        return project
+        if (!result) {
+          result = []
+        }
+        // @ts-ignore
+        console.log(result)
+
+        result.push(project)
+        return result
       })
       .sort(function(a: IProject, b: IProject) {
+        console.log(a, b)
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
         if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
         return 0
       })
-    return state.projects.filter(project => {
+    /*return state.projects.filter(project => {
       if (project.status != 'open') {
         return false
       }
       return project.client_id == client_company_id
-    })
+    })*/
   },
   getUserProjects: (state: IModuleState) => (userId: number) => {
     if (!userId) {
