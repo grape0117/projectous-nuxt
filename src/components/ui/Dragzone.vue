@@ -21,7 +21,7 @@
       >
         <div class="dragzone__item-block">
           <div
-            style="width: 100%; height: 5px"
+            style="width: 100%; height: 20px"
             @dragover="moveItem(index, item.id)"
           />
           <div class="dragzone__item-block-content">
@@ -290,7 +290,7 @@ export default class Dragzone extends Vue {
 
 <style>
 .dragzone {
-  /*width: calc(100% - 121px);*/
+  width: calc(100% - 121px);
   min-height: 40px;
   /*padding: 0.5rem;*/
   height: auto;

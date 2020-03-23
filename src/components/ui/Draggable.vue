@@ -33,6 +33,7 @@
           </div>
           <div>{{ title }}</div>
         </div>
+
         <pj-dragzone
           :id="id"
           :tasks="groupedData[id]"
@@ -182,10 +183,7 @@ export default class Draggable extends Vue {
 
 .list__group-subtitle > div {
   float: left;
-}
-
-.list__group-subtitle div {
+  height: 100px;
   writing-mode: vertical-rl;
-  text-align: center;
 }
 </style>
