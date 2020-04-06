@@ -23,7 +23,7 @@
             @update="updateTaskUser"
             @delete="deleteTaskUser"
             @taskTimerToggled="onTaskTimerToggled"
-            @updateOptions="updateTaskUserSortOrder"
+            @updateSortOrders="updateTaskUserSortOrders"
             @setCurrentListsBlockName="
               currentListsBlockName = listsBlockNames.TASKS_USERS
             "
@@ -71,7 +71,7 @@
             @create="createTask"
             @update="updateTask"
             @delete="deleteTask"
-            @updateOptions="updateTaskSortOrder"
+            @updateSortOrders="updateTaskSortOrders"
             @setCurrentListsBlockName="
               currentListsBlockName = listsBlockNames.PROJECTS
             "
@@ -195,12 +195,12 @@ export default class Custom extends Vue {
   @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
   @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
   @TaskUsers.Action('deleteTaskUser') private deleteTaskUserVuex!: any
-  @TaskUsers.Action('updateSortOrder')
-  private updateTaskUsersSortOrderVuex!: any
+  @TaskUsers.Action('updateSortOrders')
+  private updateTaskUsersSortOrdersVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
   @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('deleteTask') private deleteTaskVuex!: any
-  @Tasks.Action('updateSortOrder') private updateTaskSortOrderVuex!: any
+  @Tasks.Action('updateSortOrders') private updateTaskSortOrdersVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
   @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
   @Lists.Getter private getUserLists!: any
@@ -256,9 +256,10 @@ export default class Custom extends Vue {
     })
   }
 
+  //TODO: rename as move project task
   public async updateTask(task: any) {
     if (this.currentListsBlockName !== this.listsBlockNames.PROJECTS) return
-    const taskCopy = cloneDeep(this.getTaskById(task.id))
+    const taskCopy = cloneDeep(this.getTaskById(task.id)) //@Mikhail, what purpose does clonedeep do here?
     taskCopy.status = task.listId
     taskCopy.sort_order = task.sort_order
     await this.updateTaskVuex(taskCopy)
@@ -306,7 +307,7 @@ export default class Custom extends Vue {
 
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
     if (this.currentListsBlockName !== this.listsBlockNames.TASKS_USERS) return
-    const taskUser = cloneDeep(this.getTaskUserById(id))
+    const taskUser = cloneDeep(this.getTaskUserById(id)) //TODO: test this.$store.getters...
     let next_work_day = null
     let user_task_list_id = null
     if (listId === 'Past') {
@@ -352,16 +353,18 @@ export default class Custom extends Vue {
     this.editedTaskTimerId = timerId
   }
 
-  private updateTaskUserSortOrder(tasks: any): void {
+  //TODO: pass only ids instead of whole objects?
+  private updateTaskUserSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.updateTaskUsersSortOrderVuex(
+    this.updateTaskUsersSortOrdersVuex(
       parsedTasks.map(({ id }: { id: number }) => id)
     )
   }
 
-  private updateTaskSortOrder(tasks: any): void {
+  //TODO: pass only ids instead of whole objects?
+  private updateTaskSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.updateTaskSortOrderVuex(
+    this.updateTaskSortOrdersVuex(
       parsedTasks.map(({ id }: { id: number }) => id)
     )
   }

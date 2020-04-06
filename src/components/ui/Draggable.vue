@@ -46,9 +46,9 @@
           @update="$emit('update', $event)"
           @delete="$emit('delete', $event)"
           @taskTimerToggled="$emit('taskTimerToggled', $event)"
-          @updateSorting="updateSorting"
+          @updateDataIndexes="updateDataIndexes"
           @setDraggedItemId="draggedItemId = $event"
-          @updateOptions="$emit('updateOptions', $event)"
+          @updateSortOrders="$emit('updateSortOrders', $event)"
           @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)"
         />
       </div>
@@ -101,14 +101,22 @@ export default class Draggable extends Vue {
       })
   }
 
-  public updateSorting(item: any, position: number, idNewPosition: number) {
-    const index = Number(this.clonedDataIndexes[item.id])
-    const elementNewPosition = Number(this.clonedDataIndexes[idNewPosition])
-    this.clonedData[index] = item
+  /**
+   * Splices in item in place of dropped item
+   *
+   * @param item item that is being dragged
+   * @param {number} dropped_id item_id that is being replaced
+   */
+  public updateDataIndexes(item: any, dropped_id: number) {
+    //Update item TODO: not sure this is necessary since all data reloads
+    const itemIndex = Number(this.clonedDataIndexes[item.id])
+    this.clonedData[itemIndex] = item
+
+    const droppedIndex = Number(this.clonedDataIndexes[dropped_id])
     this.clonedData.splice(
-      elementNewPosition,
+      droppedIndex,
       0,
-      this.clonedData.splice(index, 1)[0]
+      this.clonedData.splice(itemIndex, 1)[0]
     )
   }
 
@@ -116,7 +124,7 @@ export default class Draggable extends Vue {
     // drag and drop will be available only if item contains node with this class
     const selector = e.target.querySelector('.list-group-dragbox')
     if (selector) {
-      e.dataTransfer.setData('application/node type', this)
+      e.dataTransfer.setData('application/node type', this) //@Mikhail, what is this for?
       this.isListDragged = true
       this.draggedListIndex = index
     } else {
@@ -140,6 +148,7 @@ export default class Draggable extends Vue {
   private moveList(targetElIndex: number) {
     this.targetListIndex = targetElIndex
 
+    //@Mikhail: not sure what this TODO means
     // TODO: bug if change position here because of different height
   }
 }

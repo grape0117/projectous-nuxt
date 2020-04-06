@@ -114,9 +114,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
    * @param { number[] } ids - list of tasks ids, where index is equal sort_order
    * @description: update tasks sort order
    */
-  updateSortOrder({ commit }, ids) {
+  updateSortOrders({ commit }, ids) {
     // Todo: @stephane - create endpoint to update project_sort_order for tasks
-    commit('updateTasksSortOrder', ids)
+    commit('updateTasksSortOrders', ids)
     // @ts-ignore
     this._vm.$http().post('/tasks/sort_order', { ids: ids })
   }
