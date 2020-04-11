@@ -1,12 +1,7 @@
 import { ActionTree } from 'vuex'
 import { IModuleState, ITaskUser } from './types'
 import { IRootState } from '@/store/types'
-import {
-  UPDATE_TASK_USER,
-  CREATE_TASK_USER,
-  DELETE_TASK_USER,
-  REMOVE_TEMP_TASKS_USER
-} from '@/store/modules/task_users/mutations-types'
+import { UPDATE_TASK_USER, CREATE_TASK_USER, DELETE_TASK_USER, REMOVE_TEMP_TASKS_USER } from '@/store/modules/task_users/mutations-types'
 import { generateUniqId } from '@/utils/util-functions'
 
 function creteDefaultTaskUser(uuid: string | null): ITaskUser {
@@ -25,19 +20,12 @@ function creteDefaultTaskUser(uuid: string | null): ITaskUser {
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
-  async createUserTask(
-    { commit },
-    { taskUser, task, ids_of_taskUsers_to_shift_up }: any
-  ) {
+  async createUserTask({ commit }, { taskUser, task, ids_of_taskUsers_to_shift_up }: any) {
     console.log('********** ACTION *********')
     console.log(ids_of_taskUsers_to_shift_up)
     //TODO: Vue.nextTick
     //commit taskUser
-    commit(
-      'ADD_ONE',
-      { module: 'task_users', entity: taskUser },
-      { root: true }
-    )
+    commit('ADD_ONE', { module: 'task_users', entity: taskUser }, { root: true })
     //commit task
     commit('ADD_ONE', { module: 'tasks', entity: task }, { root: true })
 
@@ -57,28 +45,15 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     //http all
 
     // @ts-ignore
-    const task_user = await this._vm
-      .$http()
-      .post('/user-tasks', {
-        task_user: taskUser,
-        task,
-        ids_of_taskUsers_to_shift_up
-      })
+    const task_user = await this._vm.$http().post('/user-tasks', {
+      task_user: taskUser,
+      task,
+      ids_of_taskUsers_to_shift_up
+    })
 
     //TODO: I would like a common data handler for http returns
   },
-  async createTaskUser(
-    { commit },
-    {
-      task_id,
-      uuid,
-      next_work_day,
-      company_user_id,
-      user_task_list_id,
-      sort_order,
-      temp
-    }: ITaskUser
-  ) {
+  async createTaskUser({ commit }, { task_id, uuid, next_work_day, company_user_id, user_task_list_id, sort_order, temp }: ITaskUser) {
     const taskUser = {
       ...creteDefaultTaskUser(uuid),
       task_id,
@@ -96,9 +71,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       }
     } else {
       // @ts-ignore
-      task_user = (
-        await this._vm.$http().post('/task-users', { task_user: taskUser })
-      ).task_user
+      task_user = await this._vm.$http().post('/task-users', { task_user: taskUser }).task_user
       commit(REMOVE_TEMP_TASKS_USER)
     }
     commit(CREATE_TASK_USER, task_user)
@@ -107,9 +80,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   async updateTaskUser({ commit }: any, taskUser: ITaskUser) {
     commit(UPDATE_TASK_USER, taskUser)
     // @ts-ignore
-    const task_user = await this._vm
-      .$http()
-      .put('/task-users/', taskUser.id, { task_user: taskUser })
+    const task_user = await this._vm.$http().put('/task-users/', taskUser.id, { task_user: taskUser })
   },
   async deleteTaskUser({ commit }, taskUser: ITaskUser) {
     commit(DELETE_TASK_USER, taskUser)

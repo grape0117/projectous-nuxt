@@ -2,7 +2,7 @@ import { IHttp } from '@/http/types'
 import { getCookie } from '@/utils/util-functions'
 
 export class BaseHttp implements IHttp {
-  protected baseUrl: any = 'https://api.projectous.com/api'
+  protected baseUrl: any = process.env.VUE_APP_API_URL
   protected headers: any = {
     Authorization: 'Bearer ' + getCookie('auth_token')
   }
