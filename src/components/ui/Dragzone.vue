@@ -56,7 +56,7 @@
               </div>
               <div
                 class="dragzone__add-task dragzone__add-task--item"
-                @click="createTempTask(index)"
+                @click="createTempItem(index, item.id)"
               >
                 +
               </div>
@@ -66,12 +66,16 @@
                 contenteditable="true"
                 :data-id="item.id"
                 @blur="updateTask($event, item)"
-                @keydown.enter.prevent="createTempTask(index)"
+                @keydown.enter.prevent="createTempItem(index, item.id)"
                 @click="editedItemId = item.id"
               />
             </div>
             <div class="dragzone__task-users">
-              <!--<small>sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small>-->
+              <small
+                >sort: {{ item.sort_order }} index: {{ index }}
+                <small v-if="item.task_id">TaskUser</small
+                ><small v-else>Task.id</small>: {{ item.id }}</small
+              >
               <b-badge
                 v-for="task_user in getTaskUsers(item.task_id || item.id)"
                 :key="task_user.id"
@@ -111,7 +115,7 @@
       <div
         v-if="tasks.length === 0"
         class="dragzone__add-task"
-        @click="createTempTask(0)"
+        @click="createTempItem(-1)"
       >
         +
       </div>
@@ -125,6 +129,7 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
+import uuid from 'uuid'
 
 const Tasks = namespace('tasks')
 
@@ -212,7 +217,7 @@ export default class Dragzone extends Vue {
   /**
    * Triggers only on destination list
    **/
-  private drop(e) {
+  private drop() {
     //console.log('************* DROP *************')
     const item = JSON.parse(localStorage.getItem('item') as string)
     if (item) {
@@ -243,7 +248,7 @@ export default class Dragzone extends Vue {
   /**
    * Dragover event
    **/
-  private moveItem(index: number, id: number) {
+  private moveItem(index: number, id: string) {
     localStorage.setItem('displaced_item_id', id) //TODO: should this be after the next line?
     if (this.isListDragged) return
 
@@ -266,17 +271,20 @@ export default class Dragzone extends Vue {
    * - Quick return if a list is being dragged.
    * -TODO: why is it checking tasks.length? Aside from setting sort order, I don't see a reason yet
    **/
-  private moveToNewList(e) {
+  private moveToNewList() {
     this.$emit('setCurrentListsBlockName') //TODO: move after next line?
     if (this.isListDragged) return
 
     if (!this.tasks.length) {
       //Set sort order to 0 because there is no item index we are dragging over
-      this.updateDraggedLocalStorageItem(0)
+      this.updateDraggedLocalStorageItem(0, '')
     }
   }
 
-  private updateDraggedLocalStorageItem(sort_order, dropped_id) {
+  private updateDraggedLocalStorageItem(
+    sort_order: number,
+    dropped_id: string
+  ) {
     try {
       const item = JSON.parse(localStorage.getItem('item') as string)
       //TODO: listId should be a uuid and user_task_list_id should also be that so we don't need diff ids?
@@ -291,14 +299,47 @@ export default class Dragzone extends Vue {
     }
   }
 
-  private async createTempTask(index: number) {
-    const newItem = {
+  private async createTempItem(index: number, after_id: number) {
+    index = index + 1
+    console.log(
+      '******** CREATE TEMP ITEM @index ' +
+        index +
+        ' @after ' +
+        after_id +
+        ' @group ' +
+        this.group.name +
+        ' ********'
+    )
+    const id = uuid.v4()
+    const tempItem = {
+      id,
       title: '',
       listId: this.id,
-      sort_order: index ? index - 1 : 0,
-      temp: true
+      status: this.group.name,
+      sort_order: index,
+      temp: false
     }
-    this.$emit('create', newItem)
+
+    // @ts-ignore
+    const ids_of_items_to_shift_up = this.tasks
+      .slice(index)
+      .map(item => item.id)
+    this.$parent.$emit('createItem', {
+      item: tempItem,
+      ids_of_items_to_shift_up
+    })
+    //console.log('emit createItem')
+    Vue.nextTick(() => {
+      console.log('*** TICK ***')
+      // @ts-ignore
+      const elements = document.querySelectorAll('[data-id="' + id + '"]')
+      if (elements.length) {
+        // @ts-ignore
+        elements[0].focus()
+      } else {
+        console.log('[data-id="' + id + '"] Not Found')
+      }
+    })
   }
 
   private async updateTask({ target: { innerHTML: name } }: any, item: any) {

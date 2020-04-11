@@ -25,6 +25,48 @@ function creteDefaultTaskUser(uuid: string | null): ITaskUser {
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
+  async createUserTask(
+    { commit },
+    { taskUser, task, ids_of_taskUsers_to_shift_up }: any
+  ) {
+    console.log('********** ACTION *********')
+    console.log(ids_of_taskUsers_to_shift_up)
+    //TODO: Vue.nextTick
+    //commit taskUser
+    commit(
+      'ADD_ONE',
+      { module: 'task_users', entity: taskUser },
+      { root: true }
+    )
+    //commit task
+    commit('ADD_ONE', { module: 'tasks', entity: task }, { root: true })
+
+    //commit ids_of_taskUsers_to_shift_up
+    ids_of_taskUsers_to_shift_up.forEach(function(id: any, index: any) {
+      commit(
+        'UPDATE_ATTRIBUTE',
+        {
+          module: 'task_users',
+          id,
+          attribute: 'sort_order',
+          value: taskUser.sort_order + index + 1
+        },
+        { root: true }
+      )
+    })
+    //http all
+
+    // @ts-ignore
+    const task_user = await this._vm
+      .$http()
+      .post('/user-tasks', {
+        task_user: taskUser,
+        task,
+        ids_of_taskUsers_to_shift_up
+      })
+
+    //TODO: I would like a common data handler for http returns
+  },
   async createTaskUser(
     { commit },
     {
@@ -54,9 +96,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       }
     } else {
       // @ts-ignore
-      task_user = (await this._vm
-        .$http()
-        .post('/task-users', { task_user: taskUser })).task_user
+      task_user = (
+        await this._vm.$http().post('/task-users', { task_user: taskUser })
+      ).task_user
       commit(REMOVE_TEMP_TASKS_USER)
     }
     commit(CREATE_TASK_USER, task_user)

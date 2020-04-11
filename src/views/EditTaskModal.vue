@@ -5,6 +5,7 @@
     class="modal fade"
     role="dialog"
     @ok="saveTask"
+    @complete="completeTask"
   >
     <form id="editTaskForm" class="form-horizontal">
       <input
@@ -99,6 +100,20 @@
           />
         </div>
       </div>
+      <div class="form-group">
+        <label class="control-label col-sm-4" for="taskEditEstimate"
+          >Status:
+        </label>
+        <div class="col-sm-8">
+          <select class="form-control" v-model="task.status">
+            <option value="open">Open</option>
+            <option value="turned-in">Turned-In</option>
+            <option value="reviewed">Reviewed</option>
+            <option value="completed">Completed</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+      </div>
       <div class="row without-margin">
         <p style="max-width: 100%; margin-bottom: 5px; font-weight: 700;">
           Users:
@@ -114,6 +129,9 @@
     </form>
     <template v-slot:modal-footer="{ ok, cancel }">
       <button style="float: left" class="btn btn-danger">Delete</button>
+      <button style="float: left" @click="complete()" class="btn btn-primary">
+        Complete
+      </button>
       <button class="btn btn-info" @click="ok()">Save</button>
       <button class="btn" @click="cancel()">Cancel</button>
     </template>
@@ -248,6 +266,9 @@ export default {
         return ''
       }
       return '' //dateTimeToInput(this.task.due_date)
+    },
+    completeTask: function() {
+      alert('complete task! non-functional. Use the save instead')
     },
     saveTask: function(callback) {
       /*const task_users = this.changed_task_users.filter((task_user) => {

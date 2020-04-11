@@ -27,7 +27,7 @@ export function createListsByDays(): IList[] {
   const today = setToMidnight(new Date())
   lists.push({
     id: 'Past',
-    title: 'Outdated tasks',
+    title: 'Older',
     group: 'Past Tasks'
   })
   lists.push({

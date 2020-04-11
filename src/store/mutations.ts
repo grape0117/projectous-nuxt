@@ -64,13 +64,10 @@ export const mutations: MutationTree<IRootState> = {
       }
     }
   },
-  UPDATE_ATTRIBUTE(
-    state: IRootState,
-    { module, id: number, attribute: string, value }
-  ) {
+  UPDATE_ATTRIBUTE(state: IRootState, { module, id, attribute, value }) {
     if (!state[module]) return
     // @ts-ignore
-    state[module][state[module].lookup[id]][attribute] = value
+    state[module][module][state[module].lookup[id]][attribute] = value
   },
   DELETE(state: IRootState, { module, entity }) {
     console.log(state.task_users, module, state['task_users'], state[module])

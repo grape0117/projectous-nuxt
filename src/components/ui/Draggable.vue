@@ -42,7 +42,6 @@
           :group="group"
           :selectedCompanyUserId="selectedCompanyUserId"
           :initiallyExpanded="initiallyExpanded"
-          @create="$emit('create', $event)"
           @update="$emit('update', $event)"
           @delete="$emit('delete', $event)"
           @taskTimerToggled="$emit('taskTimerToggled', $event)"
@@ -191,6 +190,7 @@ export default class Draggable extends Vue {
 }
 
 .list__group-subtitle > div {
+  white-space: nowrap;
   float: left;
   height: 100px;
   writing-mode: vertical-rl;
