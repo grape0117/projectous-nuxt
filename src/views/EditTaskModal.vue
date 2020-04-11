@@ -5,6 +5,7 @@
     class="modal fade"
     role="dialog"
     @ok="saveTask"
+    @complete="completeTask"
   >
     <form id="editTaskForm" class="form-horizontal">
       <input
@@ -15,9 +16,7 @@
         :value="task.id"
       />
       <div class="form-group">
-        <label class="control-label col-sm-4" for="projecNameEdit"
-          >Task:
-        </label>
+        <label class="control-label col-sm-4" for="taskTitledit">Task: </label>
         <div class="col-sm-8">
           <div
             contenteditable="true"
@@ -48,9 +47,11 @@
               :label="company_client.name"
               v-bind:company_client="company_client"
               v-for="company_client in company_clients"
+              :key="company_client.id"
             >
               <option
                 v-for="project in openprojects(company_client)"
+                :key="projects.id"
                 v-bind:company_client="company_client"
                 :value="project.id"
               >
@@ -99,6 +100,20 @@
           />
         </div>
       </div>
+      <div class="form-group">
+        <label class="control-label col-sm-4" for="taskEditEstimate"
+          >Status:
+        </label>
+        <div class="col-sm-8">
+          <select class="form-control" v-model="task.status">
+            <option value="open">Open</option>
+            <option value="turned-in">Turned-In</option>
+            <option value="reviewed">Reviewed</option>
+            <option value="completed">Completed</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+      </div>
       <div class="row without-margin">
         <p style="max-width: 100%; margin-bottom: 5px; font-weight: 700;">
           Users:
@@ -114,6 +129,9 @@
     </form>
     <template v-slot:modal-footer="{ ok, cancel }">
       <button style="float: left" class="btn btn-danger">Delete</button>
+      <button style="float: left" @click="complete()" class="btn btn-primary">
+        Complete
+      </button>
       <button class="btn btn-info" @click="ok()">Save</button>
       <button class="btn" @click="cancel()">Cancel</button>
     </template>
@@ -210,14 +228,14 @@ export default {
     },
     task_user(company_user) {
       let self = this
-      let task_user = this.$store.state.task_users.task_users.find(function(
+      let userTask = this.$store.state.task_users.task_users.find(function(
         task_user
       ) {
         if (task_user.task_id !== self.task.id) return false
         return task_user.company_user_id === company_user.id
       })
 
-      return task_user !== -1 ? task_user : false
+      return userTask !== -1 ? userTask : false
     },
     isCreateProject: function() {},
     isEditTaskTypes: function(event) {
@@ -248,6 +266,9 @@ export default {
         return ''
       }
       return '' //dateTimeToInput(this.task.due_date)
+    },
+    completeTask: function() {
+      alert('complete task! non-functional. Use the save instead')
     },
     saveTask: function(callback) {
       /*const task_users = this.changed_task_users.filter((task_user) => {

@@ -16,8 +16,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       response.timer.project_id,
       { root: true }
     )
-    response.timers.forEach(function(timer: any) {
-      context.commit('upsertTimer', timer)
+    response.timers.forEach(function(timerFromResponse: any) {
+      context.commit('upsertTimer', timerFromResponse)
     })
   },
   async stopTimer(context, timer) {
@@ -55,8 +55,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       response.timer.project_id,
       { root: true }
     )
-    response.timers.forEach(function(timer: any) {
-      context.commit('upsertTimer', timer)
+    response.timers.forEach(function(timerFromResponse: any) {
+      context.commit('upsertTimer', timerFromResponse)
     })
   },
   async addTimer(context, data) {

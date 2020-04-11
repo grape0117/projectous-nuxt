@@ -1,6 +1,10 @@
 import { MutationTree } from 'vuex'
 import { IListsState, IList } from './types'
 import { CREATE_LISTS, ADD_NEW_LIST } from './mutations-types'
+import {
+  getUserTaskListFormattedDate,
+  setToMidnight
+} from '@/utils/dateFunctions'
 
 export const mutations: MutationTree<IListsState> = {
   [CREATE_LISTS](state: IListsState, { listName, lists }) {
@@ -15,5 +19,35 @@ export const mutations: MutationTree<IListsState> = {
     } else {
       state.userLists = [...state.userLists, newList]
     }
+  },
+  createListsByDays(state: IListsState) {
+    const lists: IList[] = []
+    const today = setToMidnight(new Date())
+    lists.push({
+      id: 'Past',
+      title: 'Older',
+      group: 'Past Tasks'
+    })
+    lists.push({
+      id: today.toString(),
+      title: getUserTaskListFormattedDate(today),
+      group: 'Current Tasks'
+    })
+    for (let day = 1; day < 7; day++) {
+      const date = setToMidnight(new Date())
+      date.setDate(setToMidnight(new Date()).getDate() + day)
+      lists.push({
+        id: date.toString(),
+        title: getUserTaskListFormattedDate(date),
+        group: 'Current Tasks'
+      })
+    }
+    lists.push({
+      id: 'Unmarked',
+      title: 'Unmarked',
+      group: 'Unsorted'
+    })
+    state.generalLists = lists
+    console.log('****** DAY LISTS SET ******')
   }
 }

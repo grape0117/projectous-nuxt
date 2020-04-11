@@ -60,9 +60,13 @@ export const mutations: MutationTree<IModuleState> = {
   removeTempTasks(state: IModuleState) {
     state.tasks = state.tasks.filter(({ temp }) => !temp)
   },
-  updateTasksSortOrder(state: IModuleState, ids: number[]) {
+  updateTasksSortOrders(state: IModuleState, ids: number[]) {
     ids.forEach((id, index) => {
       const task = state.tasks[state.lookup[id]]
+      console.log(
+        index + ' updateTasksSortOrders: updating sort order for task',
+        task
+      )
       if (task) task.sort_order = index //Project?
     })
   },

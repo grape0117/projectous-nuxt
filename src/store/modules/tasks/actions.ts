@@ -3,7 +3,6 @@ import { ActionTree } from 'vuex'
 import { IModuleState, ITask } from './types'
 import { IRootState } from '@/store/types'
 // @ts-ignore
-import { uuid } from 'vue-uuid'
 import { generateUUID } from '@/utils/util-functions'
 
 function createDefaultTask(): ITask {
@@ -115,9 +114,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
    * @param { number[] } ids - list of tasks ids, where index is equal sort_order
    * @description: update tasks sort order
    */
-  updateSortOrder({ commit }, ids) {
+  updateSortOrders({ commit }, ids) {
     // Todo: @stephane - create endpoint to update project_sort_order for tasks
-    commit('updateTasksSortOrder', ids)
+    commit('updateTasksSortOrders', ids)
     // @ts-ignore
     this._vm.$http().post('/tasks/sort_order', { ids: ids })
   }

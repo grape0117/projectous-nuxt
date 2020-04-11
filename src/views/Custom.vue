@@ -19,11 +19,11 @@
             :listsBlockName="listsBlockNames.TASKS_USERS"
             :data="tasksUsers"
             :lists="lists"
-            @create="createTaskUser"
+            @createItem="createTaskUser"
             @update="updateTaskUser"
             @delete="deleteTaskUser"
             @taskTimerToggled="onTaskTimerToggled"
-            @updateOptions="updateTaskUserSortOrder"
+            @updateSortOrders="updateTaskUserSortOrders"
             @setCurrentListsBlockName="
               currentListsBlockName = listsBlockNames.TASKS_USERS
             "
@@ -68,10 +68,10 @@
             :lists="taskPerStatusLists"
             :verticalAlignment="false"
             :selectedCompanyUserId="selectedCompanyUserId"
-            @create="createTask"
+            @createItem="createTask"
             @update="updateTask"
             @delete="deleteTask"
-            @updateOptions="updateTaskSortOrder"
+            @updateSortOrders="updateTaskSortOrders"
             @setCurrentListsBlockName="
               currentListsBlockName = listsBlockNames.PROJECTS
             "
@@ -93,6 +93,7 @@ import { IProject } from '@/store/modules/projects/types'
 import { ITask } from '@/store/modules/tasks/types'
 import NewListForm from '@/components/draggable/NewListForm.vue'
 import TimerTab from './TimerTab.vue'
+import uuid from 'uuid'
 
 const CompanyClients = namespace('company_clients')
 const CompanyUsers = namespace('company_users')
@@ -121,34 +122,6 @@ enum listsBlockNames {
   }
 })
 export default class Custom extends Vue {
-  @TaskUsers.Getter('getById') private getTaskUserById!: any
-  @TaskUsers.Getter private sortedByDays!: any
-  @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
-  @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
-  @TaskUsers.Action('deleteTaskUser') private deleteTaskUserVuex!: any
-  @TaskUsers.Action('updateSortOrder')
-  private updateTaskUsersSortOrderVuex!: any
-  @Tasks.Action('createTask') private createTaskVuex!: any
-  @Tasks.Action('updateTask') private updateTaskVuex!: any
-  @Tasks.Action('deleteTask') private deleteTaskVuex!: any
-  @Tasks.Action('updateSortOrder') private updateTaskSortOrderVuex!: any
-  @Tasks.Getter('getById') private getTaskById!: any
-  @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
-  @Lists.Getter private getUserLists!: any
-  @Projects.Getter private getUserProjects!: any
-  @Projects.Mutation('projects/SET_SELECTED_PROJECT') setProjectId!: any
-  @Projects.Action pinProject!: any
-  @Projects.State(state => state.selectedProjectId) selectedProjectId!:
-    | string
-    | number
-    | null
-  @Projects.State(state => state.pinnedProjects) pinnedProjects!: number[]
-
-  private editedTaskTimerId: number | string | null = null
-  private editedTaskId: number | string | null = null
-  private currentListsBlockName: string | null = null
-  private project_search: string = ''
-
   get listsBlockNames() {
     return listsBlockNames
   }
@@ -210,6 +183,34 @@ export default class Custom extends Vue {
       initiallyExpanded: true
     }))
   }
+  @Projects.Mutation('projects/SET_SELECTED_PROJECT') public setProjectId!: any
+  @Projects.Action public pinProject!: any
+  @Projects.State(state => state.selectedProjectId) public selectedProjectId!:
+    | string
+    | number
+    | null
+  @Projects.State(state => state.pinnedProjects)
+  public pinnedProjects!: number[]
+  @TaskUsers.Getter('getById') private getTaskUserById!: any
+  @TaskUsers.Getter private sortedByDays!: any
+  @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
+  @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
+  @TaskUsers.Action('deleteTaskUser') private deleteTaskUserVuex!: any
+  @TaskUsers.Action('updateSortOrders')
+  private updateTaskUsersSortOrdersVuex!: any
+  @Tasks.Action('createTask') private createTaskVuex!: any
+  @Tasks.Action('updateTask') private updateTaskVuex!: any
+  @Tasks.Action('deleteTask') private deleteTaskVuex!: any
+  @Tasks.Action('updateSortOrders') private updateTaskSortOrdersVuex!: any
+  @Tasks.Getter('getById') private getTaskById!: any
+  @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
+  @Lists.Getter private getUserLists!: any
+  @Projects.Getter private getUserProjects!: any
+
+  private editedTaskTimerId: number | string | null = null
+  private editedTaskId: number | string | null = null
+  private currentListsBlockName: string | null = null
+  private project_search: string = ''
 
   private selectedCompanyUserId: any = null
 
@@ -222,12 +223,12 @@ export default class Custom extends Vue {
       .filter((project: any) => {
         if (
           this.project_search &&
-          (project.name
+          project.name
             .toLowerCase()
             .indexOf(this.project_search.toLowerCase()) === -1 &&
             client.name
               .toLowerCase()
-              .indexOf(this.project_search.toLowerCase()) === -1)
+              .indexOf(this.project_search.toLowerCase()) === -1
         ) {
           return false
         }
@@ -246,33 +247,28 @@ export default class Custom extends Vue {
     )
     return company_client ? company_client.name : ''
   }
-  public async createTask({ title, listId = 'open', sort_order, temp }: any) {
-    return await this.createTaskVuex({
-      title,
-      project_id: this.selectedProjectId,
-      sort_order,
-      status: listId,
-      temp
-    })
+  public async createTask({ item, ids_of_items_to_shift_up }: any) {
+    console.log('CREATE TASK CUSTOM')
+    item.project_id = this.selectedProjectId
+
+    console.log(item)
+    this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: item })
   }
 
-  public async updateTask(task: any) {
+  //TODO: rename as move project task
+  public updateTask(task: any) {
     if (this.currentListsBlockName !== this.listsBlockNames.PROJECTS) return
-    const taskCopy = cloneDeep(this.getTaskById(task.id))
-    taskCopy.status = task.listId
-    taskCopy.sort_order = task.sort_order
-    await this.updateTaskVuex(taskCopy)
+    this.$store.dispatch('UPDATE', { module: 'tasks', entity: task })
   }
 
-  public async deleteTask(task: any) {
-    await this.deleteTaskVuex(task)
-    return
+  public deleteTask(task: any) {
+    this.$store.dispatch('DELETE', { module: 'tasks', entity: task })
   }
 
-  public async createTaskUser({ title, listId, sort_order, temp }: any) {
+  public async createTaskUser({ item, ids_of_items_to_shift_up }: any) {
     let next_work_day = null
     let user_task_list_id = null
-    if (listId === 'Past') {
+    if (item.listId === 'Past') {
       /*
         TODO: This isn't clean. It shouldn't just be a month back. Seems like we have options:
         1) When the list loads, resave all to have a specific listId like -1
@@ -283,30 +279,52 @@ export default class Custom extends Vue {
         new Date(date.setMonth(date.getMonth() - 1))
       )
       //If listId is a date, return that I think
-    } else if (!!Date.parse(listId) && isNaN(listId)) {
+    } else if (!!Date.parse(item.listId) && isNaN(item.listId)) {
       //TODO: check to see if we even need to convert it
-      next_work_day = formatDateToYYYY_MM_DD(listId)
+      next_work_day = formatDateToYYYY_MM_DD(item.listId)
       //If listId is a number, this is a user-created list
-    } else if (Number.isInteger(Number(listId))) {
+    } else if (Number.isInteger(Number(item.listId))) {
       //Only user-created lists have a listId set on task_user object
-      user_task_list_id = listId
+      user_task_list_id = item.listId
     }
-    const task = { title, sort_order, temp }
-    const { id: task_id } = await this.createTask(task)
+
+    const task_id = uuid.v4()
+    const task_user_id = uuid.v4()
+    const task = { id: task_id, title: item.title } //TODO: sort_order? maybe put at the top of the list?
+    //const { id: task_id } = await this.createTask(task)
     const taskUser = {
+      id: task_user_id,
       task_id,
       next_work_day,
       company_user_id: this.selectedCompanyUserId,
       user_task_list_id,
-      sort_order,
-      temp
+      sort_order: item.sort_order
     }
-    await this.createTaskUserVuex(taskUser)
+    //await this.createTaskUserVuex(taskUser)
+    console.log(task, taskUser)
+    this.$store
+      .dispatch('task_users/createUserTask', {
+        taskUser,
+        task,
+        ids_of_taskUsers_to_shift_up: ids_of_items_to_shift_up
+      })
+      .then(function() {
+        // @ts-ignore
+        const elements = document.querySelectorAll(
+          '[data-id="' + task_user_id + '"]'
+        )
+        if (elements.length) {
+          // @ts-ignore
+          elements[0].focus()
+        } else {
+          console.log(elements)
+        }
+      })
   }
 
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
     if (this.currentListsBlockName !== this.listsBlockNames.TASKS_USERS) return
-    const taskUser = cloneDeep(this.getTaskUserById(id))
+    const taskUser = cloneDeep(this.getTaskUserById(id)) //TODO: test this.$store.getters...
     let next_work_day = null
     let user_task_list_id = null
     if (listId === 'Past') {
@@ -352,16 +370,18 @@ export default class Custom extends Vue {
     this.editedTaskTimerId = timerId
   }
 
-  private updateTaskUserSortOrder(tasks: any): void {
+  //TODO: pass only ids instead of whole objects?
+  private updateTaskUserSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.updateTaskUsersSortOrderVuex(
+    this.updateTaskUsersSortOrdersVuex(
       parsedTasks.map(({ id }: { id: number }) => id)
     )
   }
 
-  private updateTaskSortOrder(tasks: any): void {
+  //TODO: pass only ids instead of whole objects?
+  private updateTaskSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.updateTaskSortOrderVuex(
+    this.updateTaskSortOrdersVuex(
       parsedTasks.map(({ id }: { id: number }) => id)
     )
   }

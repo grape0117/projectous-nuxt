@@ -17,6 +17,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     return state.task_users.filter(task_user => task_user.task_id === task_id)
   },
   sortedByDays: (state: IModuleState, _, rootState) => (companyUserId: any) => {
+    //console.log('************* GETTER USER TASKS *************')
     const { tasks: allTasks, lookup } = rootState.tasks
     const lists = rootState.lists.generalLists
     const today = setToMidnight(new Date())
@@ -26,7 +27,13 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       projects
     } = rootState.projects
     return state.task_users
-      .filter(({ company_user_id }) => company_user_id === companyUserId)
+      .filter(({ company_user_id, task_id }) => {
+        const task = allTasks[lookup[task_id]]
+        if (task && (task.status === 'closed' || task.status === 'completed')) {
+          return false
+        }
+        return company_user_id === companyUserId
+      })
       .map(
         ({
           id,

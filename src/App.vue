@@ -86,17 +86,18 @@ export default {
         { module: 'company_clients', entities: company_clients },
         { root: true }
       )
-      const daysLists = createListsByDays()
       const userLists = createUserLists(user_task_lists)
-      this.$store.commit('lists/lists/CREATE_LISTS', {
-        listName: 'generalLists',
-        lists: daysLists
-      })
       this.$store.commit('lists/lists/CREATE_LISTS', {
         listName: 'userLists',
         lists: userLists
       })
+      this.dateInterval()
+      setInterval(this.dateInterval, 1800000)
+
       //TODO: companies
+    },
+    dateInterval() {
+      this.$store.commit('lists/createListsByDays')
     }
   }
 }
