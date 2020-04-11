@@ -1,88 +1,34 @@
 <template>
-  <div
-    class="dragzone"
-    @dragover.prevent
-    @dragenter="moveToNewList"
-    @drop="drop($event)"
-  >
-    <div
-      v-if="isListExpandable"
-      @click="expandedList = !expandedList"
-      class="dragzone__item-icon"
-    >
+  <div class="dragzone" @dragover.prevent @dragenter="moveToNewList" @drop="drop($event)">
+    <div v-if="isListExpandable" @click="expandedList = !expandedList" class="dragzone__item-icon">
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
     <div class="dragzone__content">
-      <div
-        v-for="(item, index) in expandedList
-          ? tasks
-          : tasks.slice(0, numberOfExpandedItems)"
-        :key="item.uuid"
-        class="dragzone__item"
-        :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
-        draggable="true"
-        @dragstart="dragstart($event, item)"
-        @dragend="dragend($event)"
-        @drop="drop($event)"
-      >
+      <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
-          <div
-            style="width: 100%; height: 20px"
-            @dragover="moveItem(index, item.id)"
-          />
+          <div style="width: 100%; height: 20px" @dragover="moveItem(index, item.id)" />
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
-              <div
-                v-if="true || editedItemId === item.id"
-                class="dragzone__item-tracker-icon"
-                @click="onTaskTimerClicked(item.task_id, item.id)"
-              >
-                <span
-                  v-if="timerId === item.id"
-                  class="dragzone__item-tracker-icon-square"
-                />
+              <div v-if="true || editedItemId === item.id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
+                <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
                 <span v-else class="dragzone__item-tracker-icon-triangle" />
               </div>
               <div class="dragzone__item-subtext">
                 {{ projectName(item.project_id) }}
               </div>
-              <div
-                class="dragzone__item-dragbox dragzone__item-dragbox--active"
-                @click="editTask(item.task_id || item.id)"
-              >
+              <div class="dragzone__item-dragbox dragzone__item-dragbox--active" @click="editTask(item.task_id || item.id)">
                 <span />
                 <span />
                 <span />
               </div>
-              <div
-                class="dragzone__add-task dragzone__add-task--item"
-                @click="createTempItem(index, item.id)"
-              >
+              <div class="dragzone__add-task dragzone__add-task--item" @click="createTempItem(index, item.id)">
                 +
               </div>
-              <div
-                class="dragzone__item-text"
-                v-html="item.title"
-                contenteditable="true"
-                :data-id="item.id"
-                @blur="updateTask($event, item)"
-                @keydown.enter.prevent="createTempItem(index, item.id)"
-                @click="editedItemId = item.id"
-              />
+              <div class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTask($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
             </div>
             <div class="dragzone__task-users">
-              <small
-                >sort: {{ item.sort_order }} index: {{ index }}
-                <small v-if="item.task_id">TaskUser</small
-                ><small v-else>Task.id</small>: {{ item.id }}</small
-              >
-              <b-badge
-                v-for="task_user in getTaskUsers(item.task_id || item.id)"
-                :key="task_user.id"
-                :variant="task_user.role == 'assigned' ? 'info' : 'secondary'"
-                v-bind:task_user="task_user"
-                >{{ getCompanyUserName(task_user.company_user_id) }}
-              </b-badge>
+              <small>sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small>
+              <b-badge v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role == 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
             </div>
           </div>
           <!--<div
@@ -112,11 +58,7 @@
         </div>
       </div>
 
-      <div
-        v-if="tasks.length === 0"
-        class="dragzone__add-task"
-        @click="createTempItem(-1)"
-      >
+      <div v-if="tasks.length === 0" class="dragzone__add-task" @click="createTempItem(-1)">
         +
       </div>
     </div>
@@ -142,7 +84,7 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public draggedItemId!: number | null
   @Prop({ required: true, default: () => [] }) public tasks!: any
   @Prop({ required: true }) public isListDragged!: boolean
-  @Prop({ required: true }) public group!: string
+  @Prop({ required: true }) public group!: any
   @Prop({ required: false, default: false }) public initiallyExpanded!: boolean
   @Prop({ required: false, default: false })
   public selectedCompanyUserId!: number
@@ -165,11 +107,7 @@ export default class Dragzone extends Vue {
         this.expandedList = true
         // Note: added timeout to wait once new task node appears in DOM
         setTimeout(() => {
-          const el =
-            this.$el.querySelector(
-              `.dragzone__item-text[data-id="${tempTask.id}"]`
-            ) ||
-            this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
+          const el = this.$el.querySelector(`.dragzone__item-text[data-id="${tempTask.id}"]`) || this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
           if (el) {
             // @ts-ignore
             el.focus()
@@ -183,9 +121,7 @@ export default class Dragzone extends Vue {
     return this.$store.getters['task_users/getByTaskId'](task_id)
   }
   private getCompanyUserName(company_user_id: any) {
-    let company_user = this.$store.getters['company_users/getById'](
-      company_user_id
-    )
+    let company_user = this.$store.getters['company_users/getById'](company_user_id)
     //console.log(company_user)
     return company_user ? company_user.name : ''
   }
@@ -281,10 +217,7 @@ export default class Dragzone extends Vue {
     }
   }
 
-  private updateDraggedLocalStorageItem(
-    sort_order: number,
-    dropped_id: string
-  ) {
+  private updateDraggedLocalStorageItem(sort_order: number, dropped_id: string) {
     try {
       const item = JSON.parse(localStorage.getItem('item') as string)
       //TODO: listId should be a uuid and user_task_list_id should also be that so we don't need diff ids?
@@ -301,15 +234,7 @@ export default class Dragzone extends Vue {
 
   private async createTempItem(index: number, after_id: number) {
     index = index + 1
-    console.log(
-      '******** CREATE TEMP ITEM @index ' +
-        index +
-        ' @after ' +
-        after_id +
-        ' @group ' +
-        this.group.name +
-        ' ********'
-    )
+    console.log('******** CREATE TEMP ITEM @index ' + index + ' @after ' + after_id + ' @group ' + this.group.name + ' ********')
     const id = uuid.v4()
     const tempItem = {
       id,
@@ -321,9 +246,7 @@ export default class Dragzone extends Vue {
     }
 
     // @ts-ignore
-    const ids_of_items_to_shift_up = this.tasks
-      .slice(index)
-      .map(item => item.id)
+    const ids_of_items_to_shift_up = this.tasks.slice(index).map(item => item.id)
     this.$parent.$emit('createItem', {
       item: tempItem,
       ids_of_items_to_shift_up
