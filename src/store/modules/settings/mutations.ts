@@ -3,6 +3,9 @@ import { IModuleState } from '@/store/modules/settings/types'
 import Vue from 'vue'
 
 export const mutations: MutationTree<IModuleState> = {
+  registerModals(state, bvModal) {
+    state.bvModal = bvModal
+  },
   setCurrentEditTimerProject(state, project) {
     state.current_edit_timer.project_id = project.id
   },
@@ -25,15 +28,18 @@ export const mutations: MutationTree<IModuleState> = {
     state.current_edit_company_user = JSON.parse(JSON.stringify(company_user))
   },
   setCurrentEditCompanyClient(state, company_client) {
-    state.current_edit_company_client = JSON.parse(
-      JSON.stringify(company_client)
-    )
+    state.current_edit_company_client = JSON.parse(JSON.stringify(company_client))
   },
   setCurrentEditProject(state, project) {
     state.current_edit_project = JSON.parse(JSON.stringify(project))
   },
   setCurrentEditTask(state, task) {
     state.current_edit_task = JSON.parse(JSON.stringify(task))
+    if (task.id) {
+      state.bvModal.show('task-modal')
+    } else {
+      state.bvModal.hide('task-modal')
+    }
   },
   setCurrentEditTimer(state, timer) {
     /**

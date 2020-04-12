@@ -60,11 +60,15 @@ export default {
     }
   },
   async mounted() {
+    this.registerModals()
     if (getCookie('auth_token')) {
       await this.getAppData()
     }
   },
   methods: {
+    registerModals() {
+      this.$store.commit('settings/registerModals', this.$bvModal)
+    },
     async getAppDataFromApi() {
       try {
         return await this.$http().get('/test-tasks')

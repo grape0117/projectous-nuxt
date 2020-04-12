@@ -34,7 +34,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   openModal(context, { modal }) {
     // @ts-ignore
-    //BvModal.show(modal + '-modal')
+    this.bvModal.show(modal + '-modal')
     //$('#'+modal+'-modal').modal({});
   },
   closedModal(context) {
@@ -45,7 +45,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       let next_action = context.state.action_stack.pop()
       console.log('next_action', next_action)
       // @ts-ignore
-      //BvModal.show(next_action + '-modal')
+      this.bvModal.show(next_action + '-modal')
     }
     console.log('setting check to true')
     context.commit('setCheckActionStack', true)
@@ -55,7 +55,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     context.commit('setCheckActionStack', false)
     console.log('closing ' + modal)
     // @ts-ignore
-    //BvModal.hide(modal + '-modal')
+    this.bvModal.hide(modal + '-modal')
 
     if (push) {
       context.commit('pushActionStack', modal)
@@ -71,7 +71,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
         })
       }
       // @ts-ignore
-      //BvModal.show(next_action + '-modal').modal()
+      this.bvModal.show(next_action + '-modal').modal()
     }
   },
   checkForRunningTimers(context) {
@@ -91,7 +91,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   editProject(context, project) {
     // @ts-ignore
-    //BvModal.show('project-modal')
+    this.bvModal.show('project-modal')
   },
   loadCurrentCompanyUser(context, { user_id, company_id }) {
     let company_user = context.rootState.company_users.company_users.find(({ company_id: companyId, user_id: userId }: ICompanyUser) => companyId == company_id && userId == user_id)

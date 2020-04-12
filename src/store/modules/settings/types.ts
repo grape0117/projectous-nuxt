@@ -5,6 +5,7 @@ import { ITask } from '@/store/modules/tasks/types'
 export interface IModuleState {
   action_stack: []
   modules: []
+  bvModal: any
   check_action_stack: boolean
   current_company_user_id: string
   current_company_user: {}

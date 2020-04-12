@@ -28,18 +28,10 @@
               <div class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTask($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
             </div>
             <div class="dragzone__task-users">
-              <<<<<<< HEAD
               <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
             </div>
           </div>
           <!-- <div
-=======
-              <small>sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small>
-              <b-badge v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role == 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
-            </div>
-          </div>
-          <!--<div
->>>>>>> master
             v-if="true || editedItemId === item.id"
             class="dragzone__item-tracker"
           >
@@ -156,7 +148,6 @@ export default class Dragzone extends Vue {
     let task = this.$store.getters['tasks/getById'](task_id)
     console.log('editing task: ', task)
     this.$store.state.commit('settings/setCurrentEditTask', cloneDeep(task))
-    this.$bvModal.show('task-modal')
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
   private projectName(project_id: any) {
@@ -279,6 +270,8 @@ export default class Dragzone extends Vue {
       // @ts-ignore
       const elements = document.querySelectorAll('[data-id="' + id + '"]')
       if (elements.length) {
+        // @ts-ignore
+        elements[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
         // @ts-ignore
         elements[0].focus()
       } else {

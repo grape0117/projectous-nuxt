@@ -5,6 +5,7 @@ export const settings = {
   state: {
     action_stack: [],
     modules: [],
+    bvModal: null,
     check_action_stack: true,
     current_company_user_id: null, //TODO remove?
     current_company_user: {}, //TODO remove?
@@ -20,9 +21,7 @@ export const settings = {
     current_edit_task: {},
     current_edit_timer: {},
     current_edit_task_type: {},
-    last_seen_at: new Date()
-      .toISOString()
-      .replace(/([^T]+)T([^.]+).*/g, '$1 $2'),
+    last_seen_at: new Date().toISOString().replace(/([^T]+)T([^.]+).*/g, '$1 $2'),
     notes: '',
     timer_watch: 1
   },
@@ -41,10 +40,7 @@ export const settings = {
         permissions[module.id] = 0
       })
       state.current_company.modules.forEach((module: any) => {
-        if (
-          module.pivot.company_user_role ===
-          rootState.settings.current_company_user.user_role
-        ) {
+        if (module.pivot.company_user_role === rootState.settings.current_company_user.user_role) {
           permissions[module.id] = 1
         }
       })
@@ -75,10 +71,7 @@ export const settings = {
       return user_id === state.current_company_user.user_id
     },
     hasAccess: (state: any, getters: any, rootState: any) => (module: any) => {
-      return (
-        module.pivot.company_user_role ===
-        rootState.settings.current_company_user.user_role
-      )
+      return module.pivot.company_user_role === rootState.settings.current_company_user.user_role
     },
     isNotDiseno: (state: any, getters: any) => {
       return !getters.isDiseno
@@ -94,9 +87,7 @@ export const settings = {
     },
     isAdmin(state: any, getters: any, rootState: any, rootGetters: any) {
       console.log('isadmin')
-      const current_company_user = rootGetters['company_users/getById'](
-        state.current_company_user_id
-      )
+      const current_company_user = rootGetters['company_users/getById'](state.current_company_user_id)
       if (!current_company_user) {
         console.log('no current company user', state.current_company_user_id)
         return false
@@ -106,10 +97,7 @@ export const settings = {
     home(state: any) {
       let path = ''
       state.current_company.modules.find((module: any) => {
-        if (
-          module.pivot.is_home > 0 &&
-          module.pivot.company_user_role == state.current_company_user.user_role
-        ) {
+        if (module.pivot.is_home > 0 && module.pivot.company_user_role == state.current_company_user.user_role) {
           path = module.path
           return true
         }

@@ -243,6 +243,8 @@ export default class Custom extends Vue {
         const elements = document.querySelectorAll('[data-id="' + task_user_id + '"]')
         if (elements.length) {
           // @ts-ignore
+          elements[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+          // @ts-ignore
           elements[0].focus()
         } else {
           console.log(elements)
