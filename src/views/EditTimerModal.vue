@@ -1,12 +1,5 @@
 <template>
-  <b-modal
-    id="timer-modal"
-    tabindex="-1"
-    title="Edit Timer"
-    class="modal fade"
-    role="dialog"
-    @ok="saveTimer"
-  >
+  <b-modal id="timer-modal" tabindex="-1" title="Edit Timer" class="modal fade" role="dialog" @ok="saveTimer">
     <template v-slot:modal-header="{ ok, cancel }">
       <b-tabs content-class="mt-3">
         <b-tab title="Edit" active><p>I'm the first tab</p></b-tab>
@@ -15,22 +8,10 @@
     </template>
     <ul id="timerModalTabs" class="nav nav-tabs" role="tablist">
       <li role="presentation" class="active">
-        <a
-          href="#timerEditTabShow"
-          aria-controls="timerEditTabShow"
-          role="tab"
-          data-toggle="tab"
-          >Edit Timer</a
-        >
+        <a href="#timerEditTabShow" aria-controls="timerEditTabShow" role="tab" data-toggle="tab">Edit Timer</a>
       </li>
       <li role="presentation">
-        <a
-          href="#timerTableTab"
-          aria-controls="timerTableTab"
-          role="tab"
-          data-toggle="tab"
-          >Timer History</a
-        >
+        <a href="#timerTableTab" aria-controls="timerTableTab" role="tab" data-toggle="tab">Timer History</a>
       </li>
     </ul>
     <div class="tab-content">
@@ -38,23 +19,12 @@
         <form id="editTimerForm" class="form-horizontal">
           <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
           <div class="form-group">
-            <label class="control-label col-sm-4" for="timer-modal-project-id"
-              >Project:
-            </label>
+            <label class="control-label col-sm-4" for="timer-modal-project-id">Project: </label>
             <div class="col-sm-6">
-              <select
-                id="timer-modal-project-id"
-                class="form-control"
-                name="project_id"
-                v-model="timer.project_id"
-              >
+              <select id="timer-modal-project-id" class="form-control" name="project_id" v-model="timer.project_id">
                 <option>***** Select Project *****</option>
                 <option value="create">Create New Project</option>
-                <option
-                  v-for="project in openprojects()"
-                  v-bind:project="project"
-                  :value="project.id"
-                >
+                <option v-for="project in openprojects()" v-bind:project="project" :value="project.id">
                   {{ client_name(project.client_id) }} -
                   {{ project.name }}
                 </option>
@@ -66,42 +36,20 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="control-label col-sm-4" for="timerTaskSelect"
-              >Task:
-            </label>
+            <label class="control-label col-sm-4" for="timerTaskSelect">Task: </label>
             <div class="col-sm-8">
-              <select
-                name="task_id"
-                id="timerTaskSelect"
-                class="form-control"
-                v-model="timer.task_id"
-              >
+              <select name="task_id" id="timerTaskSelect" class="form-control" v-model="timer.task_id">
                 <option value="0">***** Select Task *****</option>
-                <option
-                  v-for="task in projecttasks(timer.project_id)"
-                  :value="task.id"
-                  >{{ task.title }}
-                </option>
+                <option v-for="task in projecttasks(timer.project_id)" :value="task.id">{{ task.title }} </option>
               </select>
             </div>
           </div>
           <div v-if="isAdmin()" class="form-group">
-            <label class="control-label col-sm-4" for="timerUserSelect"
-              >User:
-            </label>
+            <label class="control-label col-sm-4" for="timerUserSelect">User: </label>
             <div class="col-sm-8">
-              <select
-                name="user_id"
-                id="timerUserSelect"
-                class="form-control"
-                v-model="timer.company_user_id"
-              >
+              <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer.company_user_id">
                 <option value="">***** Select User *****</option>
-                <option
-                  :selected="isTimerUser(user.user_id)"
-                  v-for="user in users"
-                  v-bind:value="user.user_id"
-                >
+                <option :selected="isTimerUser(user.user_id)" v-for="user in users" v-bind:value="user.user_id">
                   {{ user.name }}
                 </option>
                 <option>Selected or Current User if Editing Timer?</option>
@@ -109,262 +57,98 @@
             </div>
           </div>
           <div v-if="isAdmin()" class="form-group">
-            <label class="control-label col-sm-4" for="timerUserTime"
-              >Is billable?
-            </label>
+            <label class="control-label col-sm-4" for="timerUserTime">Is billable? </label>
             <div class="col-sm-8">
               <div class="checkbox">
                 <label>
-                  <input
-                    name="is_billable"
-                    type="checkbox"
-                    id="blankCheckbox"
-                    value="1"
-                    v-model="timer.is_billable"
-                    aria-label="..."
-                  />
+                  <input name="is_billable" type="checkbox" id="blankCheckbox" value="1" v-model="timer.is_billable" aria-label="..." />
                 </label>
               </div>
             </div>
           </div>
           <div v-if="isAdmin()" class="form-group">
-            <label class="control-label col-sm-4" for="report_at"
-              >User Rate:
-            </label>
+            <label class="control-label col-sm-4" for="report_at">User Rate: </label>
             <div class="col-sm-8">
-              <input
-                name="user_rate"
-                type="datetime"
-                id="user_rate"
-                :placeholder="user_rate_placeholder()"
-                class="form-control"
-                :value="user_rate_value()"
-              />
+              <input name="user_rate" type="datetime" id="user_rate" :placeholder="user_rate_placeholder()" class="form-control" :value="user_rate_value()" />
             </div>
           </div>
           <div v-if="isAdmin()" class="form-group">
-            <label class="control-label col-sm-4" for="client_rate"
-              >Client Rate:
-            </label>
+            <label class="control-label col-sm-4" for="client_rate">Client Rate: </label>
             <div class="col-sm-8">
-              <input
-                name="client_rate"
-                type="datetime"
-                id="client_rate"
-                :placeholder="client_rate_placeholder()"
-                class="form-control"
-                :value="client_rate_value()"
-              />
+              <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value()" />
             </div>
           </div>
           <div class="form-group">
-            <label class="control-label col-sm-4" for="timerUserNotes"
-              >Notes:
-            </label>
+            <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
             <div class="col-sm-8">
-              <div
-                contenteditable="true"
-                id="timerUserNotes"
-                class="form-control"
-                style="height: auto; min-height: 35px;"
-                v-html="checkNotes(timer.notes)"
-                @blur="setNotes"
-              ></div>
+              <div contenteditable="true" id="timerUserNotes" class="form-control" style="height: auto; min-height: 35px;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
             </div>
           </div>
           <div v-if="isAdmin()" class="form-group">
-            <label class="control-label col-sm-4" for="timerInvoiceNotes"
-              >Invoice Notes:
-            </label>
+            <label class="control-label col-sm-4" for="timerInvoiceNotes">Invoice Notes: </label>
             <div class="col-sm-8">
-              <div
-                contenteditable="true"
-                id="timerInvoiceNotes"
-                class="form-control"
-                style="height: auto; min-height: 35px;"
-                v-html="checkNotes(timer.invoice_notes)"
-                @blur="setInvoiceNotes"
-              ></div>
+              <div contenteditable="true" id="timerInvoiceNotes" class="form-control" style="height: auto; min-height: 35px;" v-html="checkNotes(timer.invoice_notes)" @blur="setInvoiceNotes"></div>
             </div>
           </div>
           <div v-if="isAdmin()" class="form-group">
-            <label class="control-label col-sm-4" for="timerInvoiceNotes"
-              >Admin Notes: (visible to users, not clients)</label
-            >
+            <label class="control-label col-sm-4" for="timerInvoiceNotes">Admin Notes: (visible to users, not clients)</label>
             <div class="col-sm-8">
-              <div
-                contenteditable="true"
-                id="timerAdminNotes"
-                class="form-control"
-                style="height: auto; min-height: 35px;"
-                v-html="checkNotes(timer.admin_notes)"
-                @blur="setAdminNotes"
-              ></div>
+              <div contenteditable="true" id="timerAdminNotes" class="form-control" style="height: auto; min-height: 35px;" v-html="checkNotes(timer.admin_notes)" @blur="setAdminNotes"></div>
             </div>
           </div>
           <div class="form-group">
-            <label class="control-label col-sm-4" for="report_at"
-              >Started at:
-            </label>
+            <label class="control-label col-sm-4" for="report_at">Started at: </label>
             <div class="col-sm-8">
-              <input
-                name="report_at"
-                type="datetime"
-                id="report_at"
-                class="form-control"
-                v-modal="timer.report_at"
-              />
+              <input name="report_at" type="datetime" id="report_at" class="form-control" v-modal="timer.report_at" />
             </div>
           </div>
           <div v-if="isIHI()" class="form-group">
-            <label class="control-label col-sm-4" for="timerUserTime"
-              >Date:
-            </label>
+            <label class="control-label col-sm-4" for="timerUserTime">Date: </label>
             <div class="col-sm-8">
-              <input
-                type="date"
-                id="timerUserDate"
-                class="form-control"
-                :value="timerDate()"
-              />
+              <input type="date" id="timerUserDate" class="form-control" :value="timerDate()" />
             </div>
           </div>
-          <timer-modal-time-standard
-            v-if="!isIHI()"
-            v-bind:status="timer.status"
-            v-bind:hours="durationHours()"
-            v-bind:minutes="durationMinutes()"
-            v-bind:seconds="durationSeconds()"
-          ></timer-modal-time-standard>
-          <div
-            class="form-group"
-            v-if="timer.status != 'running' && !isIHI() && isAdmin()"
-          >
-            <label class="control-label col-sm-4" for="timerDuration"
-              >Invoice Duration:
-            </label>
+          <timer-modal-time-standard v-if="!isIHI()" v-bind:status="timer.status" v-bind:hours="durationHours()" v-bind:minutes="durationMinutes()" v-bind:seconds="durationSeconds()"></timer-modal-time-standard>
+          <div class="form-group" v-if="timer.status != 'running' && !isIHI() && isAdmin()">
+            <label class="control-label col-sm-4" for="timerDuration">Invoice Duration: </label>
             <div class="col-sm-6">
               <div id="timerDuration" class="form-control-static">
-                <input
-                  name="invoice_duration_hours"
-                  placeholder="00"
-                  style="display:inline; width: 15%;"
-                  :value="invoiceDurationHours()"
-                />:<input
-                  name="invoice_duration_minutes"
-                  style="display:inline; width: 15%;"
-                  placeholder="00"
-                  :value="invoiceDurationMinutes()"
-                />:<input
-                  class="btn-xs"
-                  name="invoice_duration_seconds"
-                  style="display:inline; width: 15%;"
-                  placeholder="00"
-                  :value="invoiceDurationSeconds()"
-                />
+                <input name="invoice_duration_hours" placeholder="00" style="display:inline; width: 15%;" :value="invoiceDurationHours()" />:<input name="invoice_duration_minutes" style="display:inline; width: 15%;" placeholder="00" :value="invoiceDurationMinutes()" />:<input class="btn-xs" name="invoice_duration_seconds" style="display:inline; width: 15%;" placeholder="00" :value="invoiceDurationSeconds()" />
                 (hours : minutes)
               </div>
             </div>
           </div>
           <div v-if="isIHI()" class="form-group row">
-            <label
-              for="projectName"
-              class="control-label labelLeft col-sm-4"
-              style="line-height:46px;"
-              >Start:
-            </label>
+            <label for="projectName" class="control-label labelLeft col-sm-4" style="line-height:46px;">Start: </label>
             <div class="col-sm-8 fieldRight">
-              <div
-                id="timesSliderStart"
-                class="carousel timesSlider slide"
-                data-ride="carousel"
-                data-interval="false"
-              >
+              <div id="timesSliderStart" class="carousel timesSlider slide" data-ride="carousel" data-interval="false">
                 <div class="carousel-inner" role="listbox">
-                  <timer-fifteen-template
-                    @setstarttime="setStartTime"
-                    v-bind:timer="timer"
-                    v-bind:type="'start'"
-                    v-bind:compareto="'endSeconds'"
-                    v-bind:hour="hour"
-                    v-for="hour in startHours()"
-                    v-bind:minute="'15'"
-                  ></timer-fifteen-template>
+                  <timer-fifteen-template @setstarttime="setStartTime" v-bind:timer="timer" v-bind:type="'start'" v-bind:compareto="'endSeconds'" v-bind:hour="hour" v-for="hour in startHours()" :key="hour" v-bind:minute="'15'"></timer-fifteen-template>
                 </div>
-                <a
-                  class="carousel-control-prev"
-                  href="#timesSliderStart"
-                  role="button"
-                  data-slide="prev"
-                >
-                  <i
-                    class="glyphicon glyphicon-chevron-left"
-                    aria-hidden="true"
-                  ></i>
+                <a class="carousel-control-prev" href="#timesSliderStart" role="button" data-slide="prev">
+                  <i class="glyphicon glyphicon-chevron-left" aria-hidden="true"></i>
                   <span class="sr-only"></span>
                 </a>
-                <a
-                  class="carousel-control-next"
-                  href="#timesSliderStart"
-                  role="button"
-                  data-slide="next"
-                >
-                  <i
-                    class="glyphicon glyphicon-chevron-right"
-                    aria-hidden="true"
-                  ></i>
+                <a class="carousel-control-next" href="#timesSliderStart" role="button" data-slide="next">
+                  <i class="glyphicon glyphicon-chevron-right" aria-hidden="true"></i>
                   <span class="sr-only"></span>
                 </a>
               </div>
             </div>
           </div>
           <div v-if="isIHI()" class="form-group row">
-            <label
-              for="projectName"
-              class="control-label labelLeft col-sm-4"
-              style="line-height:46px;"
-              >End:
-            </label>
+            <label for="projectName" class="control-label labelLeft col-sm-4" style="line-height:46px;">End: </label>
             <div class="col-sm-8 fieldRight">
-              <div
-                id="timesSliderEnd"
-                class="carousel timesSlider slide"
-                data-ride="carousel"
-                data-interval="false"
-              >
+              <div id="timesSliderEnd" class="carousel timesSlider slide" data-ride="carousel" data-interval="false">
                 <div class="carousel-inner" role="listbox">
-                  <timer-fifteen-template
-                    v-on:setendtime="setendtime"
-                    v-bind:timer="timer"
-                    v-bind:type="'end'"
-                    v-bind:compareto="'startSeconds'"
-                    v-bind:hour="hour"
-                    v-for="hour in endHours()"
-                    v-bind:minute="'15'"
-                  ></timer-fifteen-template>
+                  <timer-fifteen-template v-on:setendtime="setendtime" v-bind:timer="timer" v-bind:type="'end'" v-bind:compareto="'startSeconds'" v-bind:hour="hour" v-for="hour in endHours()" :key="hour" v-bind:minute="'15'"></timer-fifteen-template>
                 </div>
-                <a
-                  class="carousel-control-prev"
-                  href="#timesSliderEnd"
-                  role="button"
-                  data-slide="prev"
-                >
-                  <i
-                    class="glyphicon glyphicon-chevron-left"
-                    aria-hidden="true"
-                  ></i>
+                <a class="carousel-control-prev" href="#timesSliderEnd" role="button" data-slide="prev">
+                  <i class="glyphicon glyphicon-chevron-left" aria-hidden="true"></i>
                   <span class="sr-only"></span>
                 </a>
-                <a
-                  class="carousel-control-next"
-                  href="#timesSliderEnd"
-                  role="button"
-                  data-slide="next"
-                >
-                  <i
-                    class="glyphicon glyphicon-chevron-right"
-                    aria-hidden="true"
-                  ></i>
+                <a class="carousel-control-next" href="#timesSliderEnd" role="button" data-slide="next">
+                  <i class="glyphicon glyphicon-chevron-right" aria-hidden="true"></i>
                   <span class="sr-only"></span>
                 </a>
               </div>
@@ -381,11 +165,7 @@
               <td>Status</td>
               <td>UpdatedAt</td>
             </tr>
-            <tr
-              v-bind:history="history"
-              v-for="history in timer.histories"
-              is="timelog-history-row"
-            ></tr>
+            <tr v-bind:history="history" v-for="history in timer.histories" :key="history" is="timelog-history-row"></tr>
           </tbody>
         </table>
       </div>
@@ -434,9 +214,7 @@ export default {
       return this.$store.state.companies.companies //TODO
     },
     company_clients: function() {
-      const company_clients = this.$store.getters[
-        'company_clients/getActiveCompanyClients'
-      ]
+      const company_clients = this.$store.getters['company_clients/getActiveCompanyClients']
       return company_clients
     }
   },
@@ -470,17 +248,13 @@ export default {
       return this.timer.default_client_rate
     },
     client_rate_value: function() {
-      return this.timer.default_client_rate != this.timer.client_rate
-        ? this.timer.client_rate
-        : ''
+      return this.timer.default_client_rate != this.timer.client_rate ? this.timer.client_rate : ''
     },
     user_rate_placeholder: function() {
       return this.timer.default_user_rate
     },
     user_rate_value: function() {
-      return this.timer.default_user_rate != this.timer.user_rate
-        ? this.timer.user_rate
-        : ''
+      return this.timer.default_user_rate != this.timer.user_rate ? this.timer.user_rate : ''
     },
     isBillable: function() {
       return this.timer.is_billable == 1 ? 'checked' : ''
@@ -493,26 +267,21 @@ export default {
       }
     },
     invoiceDurationHours: function() {
-      if (!this.timer.invoice_duration)
-        this.timer.invoice_duration = this.timer.duration
+      if (!this.timer.invoice_duration) this.timer.invoice_duration = this.timer.duration
       if (typeof this.timer.invoice_duration !== 'number') {
         return ''
       }
       return Math.floor(this.timer.invoice_duration / 3600)
     },
     invoiceDurationMinutes: function() {
-      if (!this.timer.invoice_duration)
-        this.timer.invoice_duration = this.timer.duration
+      if (!this.timer.invoice_duration) this.timer.invoice_duration = this.timer.duration
       if (typeof this.timer.invoice_duration !== 'number') {
         return ''
       }
-      return (
-        '00' + Math.floor((this.timer.invoice_duration % 3600) / 60)
-      ).slice(-2)
+      return ('00' + Math.floor((this.timer.invoice_duration % 3600) / 60)).slice(-2)
     },
     invoiceDurationSeconds: function() {
-      if (!this.timer.invoice_duration)
-        this.timer.invoice_duration = this.timer.duration
+      if (!this.timer.invoice_duration) this.timer.invoice_duration = this.timer.duration
       if (typeof this.timer.invoice_duration !== 'number') {
         return ''
       }
@@ -546,9 +315,7 @@ export default {
       return this.$store.getters['tasks/getByProjectId'](project_id)
     },
     isCurrentUserOrAdmin: function() {
-      return this.$store.getters['settings/isCurrentUserOrAdmin'](
-        this.timer.user_id
-      )
+      return this.$store.getters['settings/isCurrentUserOrAdmin'](this.timer.user_id)
     },
     deleteTimer: function() {
       console.log(this.timer)
@@ -593,9 +360,7 @@ export default {
     },
     timerClient: function() {
       let timerProject = this.timerProject()
-      return this.$store.getters['company_clients/getByClientCompanyId'](
-        timerProject.client_id
-      )
+      return this.$store.getters['company_clients/getByClientCompanyId'](timerProject.client_id)
     },
     timerProject: function() {
       return this.$store.getters['projects/getById'](this.timer.project_id)
@@ -631,13 +396,9 @@ export default {
     },
     saveTimer: function(callback) {
       if (this.timer.project_id) {
-        let project = this.$store.getters['projects/getById'](
-          this.timer.project_id
-        )
+        let project = this.$store.getters['projects/getById'](this.timer.project_id)
         if (project) {
-          let company_client = this.$store.getters[
-            'company_clients/getByClientCompanyId'
-          ]()
+          let company_client = this.$store.getters['company_clients/getByClientCompanyId']()
           if (company_client) {
             this.timer.company_client_id = company_client.id
           }
@@ -647,9 +408,7 @@ export default {
       this.$store.dispatch('timers/saveTimer', this.timer)
     },
     client_name: function(client_id) {
-      let company_client = this.$store.getters[
-        'company_clients/getByClientCompanyId'
-      ](client_id)
+      let company_client = this.$store.getters['company_clients/getByClientCompanyId'](client_id)
       return company_client ? company_client.name : ''
     }
   }

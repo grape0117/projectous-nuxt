@@ -1,82 +1,45 @@
 <template>
-  <div class="dragzone" @dragover.prevent @dragenter="moveToNewList">
-    <div
-      v-if="isListExpandable"
-      @click="expandedList = !expandedList"
-      class="dragzone__item-icon"
-    >
+  <div class="dragzone" @dragover.prevent @dragenter="moveToNewList" @drop="drop($event)">
+    <div v-if="isListExpandable" @click="expandedList = !expandedList" class="dragzone__item-icon">
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
     <div class="dragzone__content">
-      <div
-        v-for="(item, index) in expandedList
-          ? tasks
-          : tasks.slice(0, numberOfExpandedItems)"
-        :key="item.uuid"
-        class="dragzone__item"
-        :class="{ 'dragzone__item--dragged': item.id === draggedItemId }"
-        draggable="true"
-        @dragstart="dragstart($event, item)"
-        @dragend="dragend($event)"
-      >
+      <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
-          <div
-            style="width: 100%; height: 5px"
-            @dragover="moveItem(index, item.id)"
-          />
+          <div style="width: 100%; height: 20px" @dragover="moveItem(index, item.id)" />
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
-              <div
-                v-if="true || editedItemId === item.id"
-                class="dragzone__item-tracker-icon"
-                @click="onTaskTimerClicked(item.task_id, item.id)"
-              >
-                <span
-                  v-if="timerId === item.id"
-                  class="dragzone__item-tracker-icon-square"
-                />
+              <div v-if="true || editedItemId === item.id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
+                <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
                 <span v-else class="dragzone__item-tracker-icon-triangle" />
               </div>
               <div class="dragzone__item-subtext">
                 <img v-if="project_url(item)" :src="project_url(item)" />
                 {{ projectName(item.project_id) }}
               </div>
-              <div
-                class="dragzone__item-dragbox dragzone__item-dragbox--active"
-                @click="editTask(item.task_id || item.id)"
-              >
+              <div class="dragzone__item-dragbox dragzone__item-dragbox--active" @click="editTask(item.task_id || item.id)">
                 <span />
                 <span />
                 <span />
               </div>
-              <div
-                class="dragzone__add-task dragzone__add-task--item"
-                @click="createTempTask(index)"
-              >
+              <div class="dragzone__add-task dragzone__add-task--item" @click="createTempItem(index, item.id)">
                 +
               </div>
-              <div
-                class="dragzone__item-text"
-                v-html="item.title"
-                contenteditable="true"
-                :data-id="item.id"
-                @blur="updateTask($event, item)"
-                @keydown.enter.prevent="createTempTask(index)"
-                @click="editedItemId = item.id"
-              />
+              <div class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTask($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
             </div>
             <div class="dragzone__task-users">
-              <b-badge
-                v-if="task_user.company_user_id !== current_company_user_id"
-                v-for="task_user in getTaskUsers(item.task_id || item.id)"
-                :key="task_user.id"
-                :variant="task_user.role === 'assigned' ? 'info' : 'secondary'"
-                v-bind:task_user="task_user"
-                >{{ getCompanyUserName(task_user.company_user_id) }}
-              </b-badge>
+              <<<<<<< HEAD
+              <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
             </div>
           </div>
           <!-- <div
+=======
+              <small>sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small>
+              <b-badge v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role == 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
+            </div>
+          </div>
+          <!--<div
+>>>>>>> master
             v-if="true || editedItemId === item.id"
             class="dragzone__item-tracker"
           >
@@ -103,11 +66,7 @@
         </div>
       </div>
 
-      <div
-        v-if="tasks.length === 0"
-        class="dragzone__add-task"
-        @click="createTempTask(0)"
-      >
+      <div v-if="tasks.length === 0" class="dragzone__add-task" @click="createTempItem(-1)">
         +
       </div>
     </div>
@@ -120,6 +79,7 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
+import uuid from 'uuid'
 
 const Tasks = namespace('tasks')
 
@@ -132,16 +92,15 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public draggedItemId!: number | null
   @Prop({ required: true, default: () => [] }) public tasks!: any
   @Prop({ required: true }) public isListDragged!: boolean
-  @Prop({ required: true }) public group!: string
+  @Prop({ required: true }) public group!: any
   @Prop({ required: false, default: false }) public initiallyExpanded!: boolean
   @Prop({ required: false, default: false })
   public selectedCompanyUserId!: number
   @Tasks.Getter public getById!: any
 
-  private current_company_user_id: any = this.$store.state.settings
-    .current_company_user_id
+  private current_company_user_id: any = this.$store.state.settings.current_company_user_id
   private expandedList: boolean = this.initiallyExpanded
-  private numberOfExpandedItems: number = 3
+  private numberOfExpandedItems: number = 8
   private newItem: any = null
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
@@ -157,11 +116,7 @@ export default class Dragzone extends Vue {
         this.expandedList = true
         // Note: added timeout to wait once new task node appears in DOM
         setTimeout(() => {
-          const el =
-            this.$el.querySelector(
-              `.dragzone__item-text[data-id="${tempTask.id}"]`
-            ) ||
-            this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
+          const el = this.$el.querySelector(`.dragzone__item-text[data-id="${tempTask.id}"]`) || this.$el.querySelectorAll('.dragzone__item-text')[this.tasks.length]
           if (el) {
             // @ts-ignore
             el.focus()
@@ -181,18 +136,14 @@ export default class Dragzone extends Vue {
       return false
     }
 
-    return project.project_url
-      ? 'https://api.projectous.com/api/projects/' + project.id + '/favicon.png'
-      : false
+    return project.project_url ? 'https://api.projectous.com/api/projects/' + project.id + '/favicon.png' : false
   }
 
   private getTaskUsers(task_id: any) {
     return this.$store.getters['task_users/getByTaskId'](task_id)
   }
   private getCompanyUserName(company_user_id: any) {
-    let company_user = this.$store.getters['company_users/getById'](
-      company_user_id
-    )
+    let company_user = this.$store.getters['company_users/getById'](company_user_id)
     //console.log(company_user)
     return company_user ? company_user.name : ''
   }
@@ -204,7 +155,7 @@ export default class Dragzone extends Vue {
   private editTask(task_id: any) {
     let task = this.$store.getters['tasks/getById'](task_id)
     console.log('editing task: ', task)
-    this.$store.state.settings.current_edit_task = task
+    this.$store.state.commit('settings/setCurrentEditTask', cloneDeep(task))
     this.$bvModal.show('task-modal')
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
@@ -220,19 +171,43 @@ export default class Dragzone extends Vue {
       this.$emit('setDraggedItemId', item.id)
     }, 0)
   }
-  private dragend(e: any) {
-    try {
-      const item = JSON.parse(localStorage.getItem('item') as string)
+
+  /**
+   * Triggers only on destination list
+   */
+  private drop() {
+    //console.log('************* DROP *************')
+    const item = JSON.parse(localStorage.getItem('item') as string)
+    if (item) {
+      //DROP event triggers twice for some reason.
       this.$emit('update', item)
       localStorage.removeItem('item')
-      this.$emit('setDraggedItemId', null)
-      if (this.tasks.length)
-        this.$emit('updateOptions', JSON.stringify(this.tasks))
-    } catch (e) {
-      console.log(e)
+      const displaced_item_id = localStorage.getItem('displaced_item_id')
+      this.$emit('updateDataIndexes', item, displaced_item_id)
+      if (this.tasks.length) {
+        this.$emit('updateSortOrders', JSON.stringify(this.tasks))
+      }
     }
   }
-  private moveItem(index: number, id: number) {
+
+  /**
+   * Triggers only on source list
+   */
+  private dragend(e: any) {
+    this.$emit('setDraggedItemId', null)
+
+    //Update Source List item.sort_order
+    if (this.tasks.length) {
+      //TODO: check to see if source and destination are the same to save an api call
+      this.$emit('updateSortOrders', JSON.stringify(this.tasks))
+    }
+  }
+
+  /**
+   * Dragover event
+   */
+  private moveItem(index: number, id: string) {
+    localStorage.setItem('displaced_item_id', id) //TODO: should this be after the next line?
     if (this.isListDragged) return
 
     try {
@@ -240,38 +215,76 @@ export default class Dragzone extends Vue {
       item.listId = this.id
       item.user_task_list_id = this.group === 'User Lists' ? this.id : null
       item.sort_order = index
-      this.$emit('updateSorting', item, index, id)
+      this.$emit('updateDataIndexes', item, id)
+      localStorage.setItem('item', JSON.stringify(item))
+    } catch (e) {
+      alert('moveItem error check console')
+      console.log(e)
+    }
+  }
+
+  /**
+   * List Dragenter: Triggers on every drag event and during every drag event multiple times.
+   *
+   * - Quick return if a list is being dragged.
+   * -TODO: why is it checking tasks.length? Aside from setting sort order, I don't see a reason yet
+   */
+  private moveToNewList() {
+    this.$emit('setCurrentListsBlockName') //TODO: move after next line?
+    if (this.isListDragged) return
+
+    if (!this.tasks.length) {
+      //Set sort order to 0 because there is no item index we are dragging over
+      this.updateDraggedLocalStorageItem(0, '')
+    }
+  }
+
+  private updateDraggedLocalStorageItem(sort_order: number, dropped_id: string) {
+    try {
+      const item = JSON.parse(localStorage.getItem('item') as string)
+      //TODO: listId should be a uuid and user_task_list_id should also be that so we don't need diff ids?
+      item.listId = this.id
+      item.user_task_list_id = this.group === 'User Lists' ? this.id : null
+      item.user_task_list_id = this.group === 'User Lists' ? this.id : null
+      item.sort_order = sort_order
+      this.$emit('updateDataIndexes', item, dropped_id)
       localStorage.setItem('item', JSON.stringify(item))
     } catch (e) {
       console.log(e)
     }
   }
-  private moveToNewList() {
-    this.$emit('setCurrentListsBlockName')
-    if (this.isListDragged) return
 
-    if (!this.tasks.length) {
-      try {
-        const item = JSON.parse(localStorage.getItem('item') as string)
-        item.listId = this.id
-        item.user_task_list_id = this.group === 'User Lists' ? this.id : null
-        item.sort_order = 0
-        this.$emit('updateSorting', item, 0)
-        localStorage.setItem('item', JSON.stringify(item))
-      } catch (e) {
-        console.log(e)
-      }
-    }
-  }
-
-  private async createTempTask(index: number) {
-    const newItem = {
+  private async createTempItem(index: number, after_id: number) {
+    index = index + 1
+    console.log('******** CREATE TEMP ITEM @index ' + index + ' @after ' + after_id + ' @group ' + this.group.name + ' ********')
+    const id = uuid.v4()
+    const tempItem = {
+      id,
       title: '',
       listId: this.id,
-      sort_order: index ? index - 1 : 0,
-      temp: true
+      status: this.group.name,
+      sort_order: index,
+      temp: false
     }
-    this.$emit('create', newItem)
+
+    // @ts-ignore
+    const ids_of_items_to_shift_up = this.tasks.slice(index).map(item => item.id)
+    this.$parent.$emit('createItem', {
+      item: tempItem,
+      ids_of_items_to_shift_up
+    })
+    //console.log('emit createItem')
+    Vue.nextTick(() => {
+      console.log('*** TICK ***')
+      // @ts-ignore
+      const elements = document.querySelectorAll('[data-id="' + id + '"]')
+      if (elements.length) {
+        // @ts-ignore
+        elements[0].focus()
+      } else {
+        console.log('[data-id="' + id + '"] Not Found')
+      }
+    })
   }
 
   private async updateTask({ target: { innerHTML: name } }: any, item: any) {
@@ -311,6 +324,7 @@ export default class Dragzone extends Vue {
 <style>
 .dragzone {
   width: 100%;
+  /*width: calc(100% - 121px);*/
   min-height: 40px;
   height: auto;
 }

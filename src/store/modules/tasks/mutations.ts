@@ -6,16 +6,15 @@ import { IRootState } from '@/store/types'
 
 export const mutations: MutationTree<IModuleState> = {
   DELETE(state: IModuleState, { entity: task }) {
-    console.log(
-      'task deleted, but are task_users and other task tables getting updated?'
-    )
+    console.log('task deleted, but are task_users and other task tables getting updated?')
   },
   removeTempTasks(state: IModuleState) {
     state.tasks = state.tasks.filter(({ temp }) => !temp)
   },
-  updateTasksSortOrder(state: IModuleState, ids: number[]) {
+  updateTasksSortOrders(state: IModuleState, ids: number[]) {
     ids.forEach((id, index) => {
       const task = state.tasks[state.lookup[id]]
+      console.log(index + ' updateTasksSortOrders: updating sort order for task', task)
       if (task) task.sort_order = index //Project?
     })
   },

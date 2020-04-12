@@ -1,8 +1,5 @@
 <template id="timer-row-template">
-  <li
-    :class="'project-item timer-' + timer.status"
-    v-bind:data-restarted="timer.restart_at"
-  >
+  <li :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at">
     {{ timer.status }}
     <div class="hover-tab project-details" @click="editTimer()">
       <p class="title-project-client-name">{{ client_name() }}</p>
@@ -10,53 +7,25 @@
       <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>
     </div>
     <div v-if="isCurrentUser()">
-      <b-button
-        v-if="timer.status === 'running'"
-        v-on:click="pauseTimer"
-        class="btn btn-default"
-        style="float: left; margin-right: 5px;margin-top:2px;"
-      >
+      <b-button v-if="timer.status === 'running'" v-on:click="pauseTimer" class="btn btn-default" style="float: left; margin-right: 5px;margin-top:2px;">
         <b-icon icon="pause"></b-icon>
       </b-button>
-      <button
-        v-if="timer.status === 'running'"
-        v-on:click="stopTimer"
-        class="btn btn-default"
-        style="float: left; margin-right: 5px;margin-top:2px;"
-      >
+      <button v-if="timer.status === 'running'" v-on:click="stopTimer" class="btn btn-default" style="float: left; margin-right: 5px;margin-top:2px;">
         <b-icon icon="stop"></b-icon>
       </button>
-      <b-button
-        variant="outline-secondary"
-        v-else
-        v-on:click="restartTimer"
-        style="float: left;  margin-right: 5px;margin-top:5px;"
-      >
+      <b-button variant="outline-secondary" v-else v-on:click="restartTimer" style="float: left;  margin-right: 5px;margin-top:5px;">
         <b-icon icon="play-fill"></b-icon>
       </b-button>
     </div>
-    <div
-      style="font-size: 19px; margin-top: 5px; margin-right: -1px; text-align: left;"
-    >
+    <div style="font-size: 19px; margin-top: 5px; margin-right: -1px; text-align: left;">
       {{ durationDisplay() }}
     </div>
     <div style="float: left; clear: right;">{{ reportAt() }}</div>
     <div v-if="isCurrentUser()">
-      <div
-        placeholder="Notes..."
-        v-bind:class="'timer-task ' + notesClass()"
-        v-on:blur="saveNotes"
-        contenteditable="true"
-        v-html="timer.notes"
-      ></div>
+      <div placeholder="Notes..." v-bind:class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
     </div>
     <div v-else>
-      <div
-        placeholder="Notes..."
-        v-bind:class="'timer-task ' + notesClass()"
-        contenteditable="false"
-        v-html="timer.notes"
-      ></div>
+      <div placeholder="Notes..." v-bind:class="'timer-task ' + notesClass()" contenteditable="false" v-html="timer.notes"></div>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
     <small>{{ timer.id }}</small>
@@ -82,9 +51,7 @@ export default {
     },
     project: function() {
       const self = this
-      const project = this.$store.state.projects.projects.find(
-        projectInStore => projectInStore.id == self.timer.project_id
-      )
+      const project = this.$store.state.projects.projects.find(projectInStore => projectInStore.id == self.timer.project_id)
 
       if (!project) {
         return { name: 'No Project', id: null }
@@ -94,9 +61,7 @@ export default {
     },
     user: function() {
       const self = this
-      const company_user = this.$store.state.company_users.company_users.find(
-        cu => cu.id == self.timer.company_user_id
-      )
+      const company_user = this.$store.state.company_users.company_users.find(cu => cu.id == self.timer.company_user_id)
 
       if (!company_user) {
         return { name: 'not found', id: null }
@@ -106,9 +71,7 @@ export default {
     },
     task: function() {
       const self = this
-      const task = this.$store.state.tasks.tasks.find(
-        t => t.id == self.timer.task_id
-      )
+      const task = this.$store.state.tasks.tasks.find(t => t.id == self.timer.task_id)
 
       if (!task) {
         return { name: '', id: null }
@@ -122,10 +85,7 @@ export default {
     /**
      * load in current running project if one exists
      */
-    if (
-      this.timer.status == 'running' &&
-      this.timer.user_id == this.$store.state.settings.current_user_id
-    ) {
+    if (this.timer.status == 'running' && this.timer.user_id == this.$store.state.settings.current_user_id) {
       /*if (this.timer.project_id) {
         this.$store.dispatch(
           'projects/setCurrentProjectById',
@@ -139,9 +99,7 @@ export default {
     tasktitle: function() {
       const self = this
       if (this.timer.task_id) {
-        const task = this.$store.state.tasks.tasks.find(
-          t => t.id == self.timer.task_id
-        )
+        const task = this.$store.state.tasks.tasks.find(t => t.id == self.timer.task_id)
 
         if (task) {
           return task.title
@@ -159,19 +117,11 @@ export default {
              */
     durationDisplay: function() {
       const totalDuration = this.timer.duration
-      if (totalDuration > this.totalDuration && this.timer.status == 'running')
-        this.totalDuration = totalDuration
-      else if (this.timer.status != 'running')
-        this.totalDuration = this.timer.duration
+      if (totalDuration > this.totalDuration && this.timer.status == 'running') this.totalDuration = totalDuration
+      else if (this.timer.status != 'running') this.totalDuration = this.timer.duration
 
       //if(this.timer.status == 'running'){
-      return (
-        this.durationHours() +
-        ':' +
-        this.durationMinutes() +
-        ':' +
-        this.durationSeconds()
-      )
+      return this.durationHours() + ':' + this.durationMinutes() + ':' + this.durationSeconds()
       //} else {
       //    return this.durationHours()+':'+this.durationMinutes();
       //}
@@ -200,19 +150,15 @@ export default {
       return this.current_user_id === this.timer.user_id
     },
     isNotCurrentUser: function() {
-      !this.isCurrentUser()
+      return !this.isCurrentUser()
     },
     client_name: function() {
       if (!this.timer.project_id) {
         return
       }
-      const project = this.$store.getters['projects/getById'](
-        this.timer.project_id
-      )
+      const project = this.$store.getters['projects/getById'](this.timer.project_id)
       if (project) {
-        const company_client = this.$store.getters[
-          'company_clients/getByClientCompanyId'
-        ](project.client_id)
+        const company_client = this.$store.getters['company_clients/getByClientCompanyId'](project.client_id)
         return company_client ? company_client.name : ''
       }
     },
@@ -225,31 +171,18 @@ export default {
     },
     incrementRunningTimers: function() {
       const self = this
-      if (
-        !self.running_timers[self.timer.id] &&
-        self.timer.status == 'running'
-      ) {
+      if (!self.running_timers[self.timer.id] && self.timer.status == 'running') {
         let start_time
         if (self.timer.restarted_at) {
-          start_time = Math.round(
-            datetimeToJS(self.timer.restarted_at).getTime() / 1000
-          )
+          start_time = Math.round(datetimeToJS(self.timer.restarted_at).getTime() / 1000)
         } else {
-          start_time = Math.round(
-            datetimeToJS(self.timer.created_at).getTime() / 1000
-          )
+          start_time = Math.round(datetimeToJS(self.timer.created_at).getTime() / 1000)
         }
         self.running_timers[self.timer.id] = window.setInterval(function() {
-          const duration =
-            Math.round(new Date().getTime() / 1000) -
-            start_time +
-            Number(self.timer.duration)
+          const duration = Math.round(new Date().getTime() / 1000) - start_time + Number(self.timer.duration)
           self.totalDuration = duration
         }, 500)
-      } else if (
-        self.running_timers[self.timer.id] &&
-        self.timer.status != 'running'
-      ) {
+      } else if (self.running_timers[self.timer.id] && self.timer.status != 'running') {
         window.clearInterval(self.running_timers[self.timer.id])
         delete self.running_timers[self.timer.id]
       } else {

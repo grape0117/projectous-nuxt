@@ -1,23 +1,13 @@
-import {
-  getUserTaskListFormattedDate,
-  setToMidnight,
-  localDate
-} from '@/utils/dateFunctions'
+import { getUserTaskListFormattedDate, setToMidnight, localDate } from '@/utils/dateFunctions'
 import { IList } from '@/store/modules/lists/types'
 
-export function getListId(
-  next_work_day: string | null,
-  lists: any,
-  listId: any = null
-) {
+export function getListId(next_work_day: string | null, lists: any, listId: any = null) {
   if (listId) return listId
   if (!next_work_day) return 'Unmarked'
   const today = setToMidnight(new Date())
   if (localDate(next_work_day).getTime() < today.getTime()) return 'Past'
   if (Date.parse(next_work_day)) {
-    const list = lists.find(
-      ({ id }: any) => localDate(next_work_day).toString() === id
-    )
+    const list = lists.find(({ id }: any) => localDate(next_work_day).toString() === id)
     return list ? list.id : 'Unmarked'
   }
 }
@@ -27,7 +17,7 @@ export function createListsByDays(): IList[] {
   const today = setToMidnight(new Date())
   lists.push({
     id: 'Past',
-    title: 'Outdated tasks',
+    title: 'Older',
     group: 'Past Tasks'
   })
   lists.push({
@@ -64,8 +54,7 @@ export function createUserLists(lists: any) {
 }
 
 export function generateUniqId(length: number) {
-  const characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   const charactersLength = characters.length
   let result = ''
   for (let i = 0; i < length; i++) {
@@ -76,24 +65,7 @@ export function generateUniqId(length: number) {
 
 export function generateUUID(): string {
   const date = new Date()
-  return (
-    date.getUTCFullYear() +
-    '-' +
-    date.getUTCMonth() +
-    1 +
-    '-' +
-    date.getDate() +
-    ' ' +
-    date.getUTCHours() +
-    ':' +
-    date.getUTCMinutes() +
-    ':' +
-    date.getUTCSeconds() +
-    ':' +
-    date.getMilliseconds() +
-    ' ' +
-    Math.random()
-  )
+  return date.getUTCFullYear() + '-' + date.getUTCMonth() + 1 + '-' + date.getDate() + ' ' + date.getUTCHours() + ':' + date.getUTCMinutes() + ':' + date.getUTCSeconds() + ':' + date.getMilliseconds() + ' ' + Math.random()
 }
 
 export function format_report_at(due_date: string) {

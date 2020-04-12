@@ -13,12 +13,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       return state.projects.find(({ id: projectId }) => projectId === id)
     }
   },
-  getOpenProjectsSortedByClient: function(
-    state: IModuleState,
-    getters,
-    rootState,
-    rootGetters
-  ) {
+  getOpenProjectsSortedByClient: function(state: IModuleState, _getters, rootState, rootGetters) {
     let self = this
     //console.log('openprojects')
     let active_clients = rootGetters['company_clients/getActiveCompanyClients']
@@ -36,8 +31,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       //console.log(company_client)
       client_projects = []
       // @ts-ignore
-      let client_project_keys =
-        state.lookup_by_client_company_id[company_client.client_id]
+      // @ts-ignore
+      let client_project_keys = state.lookup_by_client_company_id[company_client.client_id]
       // @ts-ignore
       client_project_keys.forEach(function(key) {
         //console.log(project_id)
@@ -54,6 +49,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       })
       // @ts-ignore
       projects = projects.concat(
+        // @ts-ignore
         client_projects.sort(function(a, b) {
           if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
           if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
@@ -64,13 +60,11 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     // @ts-ignore
     return projects
   },
-  getOpenCompanyProjects: (state: IModuleState, getters) => (
-    client_company_id: any
-  ) => {
+  getOpenCompanyProjects: (state: IModuleState, _getters) => (client_company_id: any) => {
     // @ts-ignore
     return state.lookup_by_client_company_id[client_company_id]
       .reduce(function(result: any, project_id: any) {
-        let project = getters['getById'](project_id)
+        let project = _getters['getById'](project_id)
         if (!project) {
           console.log(project_id)
           return result
@@ -133,9 +127,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   projectProjectName: (
     state: IModuleState,
     // tslint:disable-next-line:no-shadowed-variable
-    getters: any
+    _getters: any
   ) => (project_id: number) => {
-    let project = getters.getprojectById(project_id)
+    let project = _getters.getprojectById(project_id)
     if (project) {
       return project.name
     }
@@ -144,11 +138,11 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   projectClientName: (
     state: IModuleState,
     // tslint:disable-next-line:no-shadowed-variable
-    getters: any,
+    _getters: any,
     rootState: IRootState,
     rootGetters: any
   ) => (project_id: number) => {
-    let project = getters.getprojectById(project_id)
+    let project = _getters.getprojectById(project_id)
     if (!project) {
       return ''
     } else if (project.client_id) {
@@ -159,10 +153,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     }
     return ''
   },
-  openprojects: (state, getters, rootState, rootGetters) => (
-    search: any,
-    sort: any
-  ) => {
+  openprojects: (state, _getters, rootState, rootGetters) => (search: any, sort: any) => {
     let isAdmin = rootGetters['settings/isAdmin']
     console.log('isAdmin', isAdmin)
     let projects = state.projects.filter(function(project) {
@@ -170,9 +161,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       if (project.status != 'open') {
         return false
       }
-      let company_client = rootGetters['company_clients/getByClientCompanyId'](
-        project.client_id
-      )
+      let company_client = rootGetters['company_clients/getByClientCompanyId'](project.client_id)
       if (company_client && company_client.status != 'active') {
         return false
       }
@@ -191,10 +180,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       ) {
         return false
         //admin users get to see all company projects and shared projects
-      } else if (
-        rootGetters['settings/isAdmin'] &&
-        project.owner_company_id != rootState.settings.current_company_id
-      ) {
+      } else if (rootGetters['settings/isAdmin'] && project.owner_company_id != rootState.settings.current_company_id) {
         return false
       }
 
@@ -207,18 +193,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
               .replace(' ', '.*') +
             ')'
         )
-        let companyClientKey =
-          rootState.company_clients.lookup_by_client_id[project.client_id]
+        let companyClientKey = rootState.company_clients.lookup_by_client_id[project.client_id]
         if (typeof companyClientKey !== 'undefined') {
-          if (
-            !(
-              rootState.company_clients.company_clients[companyClientKey].name +
-              ' ' +
-              project.name
-            )
-              .toLowerCase()
-              .match(regex)
-          ) {
+          if (!(rootState.company_clients.company_clients[companyClientKey].name + ' ' + project.name).toLowerCase().match(regex)) {
             //return false;
           }
         } else {
@@ -233,10 +210,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     //console.log('projects', projects)
     return projects
   },
-  openprojects2: (state, getters, rootState, rootGetters) => (
-    search: any,
-    sort: any
-  ) => {
+  openprojects2: (state, _getters, rootState, rootGetters) => (search: any, sort: any) => {
     let isAdmin = rootGetters['settings/isAdmin']
     console.log('isAdmin', isAdmin)
     let projects = state.projects.filter(function(project) {
@@ -244,9 +218,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       if (project.status != 'open') {
         return false
       }
-      let company_client = rootGetters['company_clients/getByClientCompanyId'](
-        project.client_id
-      )
+      let company_client = rootGetters['company_clients/getByClientCompanyId'](project.client_id)
       if (company_client && company_client.status != 'active') {
         return false
       }
@@ -265,10 +237,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       ) {
         return false
         //admin users get to see all company projects and shared projects
-      } else if (
-        rootGetters['settings/isAdmin'] &&
-        project.owner_company_id != rootState.settings.current_company_id
-      ) {
+      } else if (rootGetters['settings/isAdmin'] && project.owner_company_id != rootState.settings.current_company_id) {
         return false
       }
 
@@ -281,18 +250,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
               .replace(' ', '.*') +
             ')'
         )
-        let companyClientKey =
-          rootState.company_clients.lookup_by_client_id[project.client_id]
+        let companyClientKey = rootState.company_clients.lookup_by_client_id[project.client_id]
         if (typeof companyClientKey !== 'undefined') {
-          if (
-            !(
-              rootState.company_clients.company_clients[companyClientKey].name +
-              ' ' +
-              project.name
-            )
-              .toLowerCase()
-              .match(regex)
-          ) {
+          if (!(rootState.company_clients.company_clients[companyClientKey].name + ' ' + project.name).toLowerCase().match(regex)) {
             //return false;
           }
         } else {

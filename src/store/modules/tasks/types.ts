@@ -20,7 +20,7 @@ export interface IModuleState {
 export interface ITask {
   id?: string
   sort_order?: number
-  title?: string
+  title?: string | null
   company_id?: string | null
   project_id?: string | null
   detail?: string | null
@@ -47,7 +47,6 @@ export interface ITask {
   messages: string[]
   next_work_day: string | null
   users: number[]
-  uuid: string | null
   workflowy_id: number | null
   temp?: boolean
 }

@@ -2,30 +2,12 @@ import { ActionTree } from 'vuex'
 import { IModuleState } from './types'
 import { IRootState } from '@/store/types'
 import { ICompanyUser } from '@/store/modules/company_users/types.ts'
-import { BvModal } from 'bootstrap-vue'
 
 const company_user_id: number = 1
 
 const UUID = () => {
   const date = new Date()
-  return (
-    date.getUTCFullYear() +
-    '-' +
-    date.getUTCMonth() +
-    1 +
-    '-' +
-    date.getDate() +
-    ' ' +
-    date.getUTCHours() +
-    ':' +
-    date.getUTCMinutes() +
-    ':' +
-    date.getUTCSeconds() +
-    ':' +
-    date.getMilliseconds() +
-    ' ' +
-    Math.random()
-  )
+  return date.getUTCFullYear() + '-' + date.getUTCMonth() + 1 + '-' + date.getDate() + ' ' + date.getUTCHours() + ':' + date.getUTCMinutes() + ':' + date.getUTCSeconds() + ':' + date.getMilliseconds() + ' ' + Math.random()
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
@@ -42,19 +24,17 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       sort_order
     })
     //@ts-ignore
-    const { task_user, task }: any = await this._vm
-      .$http()
-      .post('users/' + company_user_id + '/tasks', {
-        list: list,
-        sort_order: sort_order
-      })
+    const { task_user, task }: any = await this._vm.$http().post('users/' + company_user_id + '/tasks', {
+      list: list,
+      sort_order: sort_order
+    })
 
     commit('tasks/UPDATE', task)
     commit('task_users/UPDATE', task_user)
   },
   openModal(context, { modal }) {
     // @ts-ignore
-    BvModal.show(modal + '-modal')
+    //BvModal.show(modal + '-modal')
     //$('#'+modal+'-modal').modal({});
   },
   closedModal(context) {
@@ -65,7 +45,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       let next_action = context.state.action_stack.pop()
       console.log('next_action', next_action)
       // @ts-ignore
-      BvModal.show(next_action + '-modal')
+      //BvModal.show(next_action + '-modal')
     }
     console.log('setting check to true')
     context.commit('setCheckActionStack', true)
@@ -75,7 +55,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     context.commit('setCheckActionStack', false)
     console.log('closing ' + modal)
     // @ts-ignore
-    BvModal.hide(modal + '-modal')
+    //BvModal.hide(modal + '-modal')
 
     if (push) {
       context.commit('pushActionStack', modal)
@@ -91,7 +71,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
         })
       }
       // @ts-ignore
-      BvModal.show(next_action + '-modal').modal()
+      //BvModal.show(next_action + '-modal').modal()
     }
   },
   checkForRunningTimers(context) {
@@ -111,28 +91,23 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   editProject(context, project) {
     // @ts-ignore
-    BvModal.show('project-modal')
+    //BvModal.show('project-modal')
   },
   loadCurrentCompanyUser(context, { user_id, company_id }) {
-    let company_user = context.rootState.company_users.company_users.find(
-      ({ company_id: companyId, user_id: userId }: ICompanyUser) =>
-        companyId == company_id && userId == user_id
-    )
+    let company_user = context.rootState.company_users.company_users.find(({ company_id: companyId, user_id: userId }: ICompanyUser) => companyId == company_id && userId == user_id)
     context.commit('setCurrentCompanyUser', company_user)
   },
   setCurrentCompany({ commit, dispatch, rootState }, company_id) {
     // @ts-ignore
-    const company = this._vm
-      .$http()
-      .put('/set-current-company/' + company_id, {}, function() {
-        rootState.companies.companies.find((c: any) => {
-          if (company_id == c.id) {
-            commit('setCurrentCompany', company)
-            dispatch('getData')
-            return true
-          }
-        })
+    const company = this._vm.$http().put('/set-current-company/' + company_id, {}, function() {
+      rootState.companies.companies.find((c: any) => {
+        if (company_id == c.id) {
+          commit('setCurrentCompany', company)
+          dispatch('getData')
+          return true
+        }
       })
+    })
   },
   setCurrentProject: (context, project) => {
     context.commit('setCurrentProject', project)

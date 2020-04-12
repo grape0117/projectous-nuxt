@@ -3,7 +3,7 @@ import { modulesNamesList } from '@/store/modules-names'
 
 const dbPromise = () =>
   openDB('projectous-data', 1, {
-    upgrade(db) {
+    upgrade(db: any) {
       modulesNamesList.forEach((moduleName: string) => {
         db.createObjectStore(moduleName)
       })
@@ -40,7 +40,7 @@ export async function idbGetAll(storeName: string) {
     }
   } else {
     result = []
-    keys.forEach(async key => {
+    keys.forEach(async (key: any) => {
       result.push(await idbKeyval.get(key, storeName))
     })
   }

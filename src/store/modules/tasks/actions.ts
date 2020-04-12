@@ -33,16 +33,12 @@ function createDefaultTask(): ITask {
     status: 'open',
     title: '',
     users: [],
-    uuid: null,
     workflowy_id: null
   }
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
-  async createTask(
-    { commit, getters }: any,
-    { title, project_id, sort_order, status, temp }: any
-  ) {
+  async createTask({ commit, getters }: any, { title, project_id, sort_order, status, temp }: any) {
     const task = {
       ...createDefaultTask(),
       title,
@@ -66,10 +62,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
     return newTask
   },
-  async createProjectTask(
-    { commit, getters }: any,
-    { title, project_id, sort_order, status, temp }: any
-  ) {
+  async createProjectTask({ commit, getters }: any, { title, project_id, sort_order, status, temp }: any) {
     const task = {
       ...createDefaultTask(),
       title,
@@ -93,10 +86,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
     return newTask
   },
-  async createUserTask(
-    { commit, getters }: any,
-    { title, project_id, sort_order, status, temp }: any
-  ) {
+  async createUserTask({ commit, getters }: any, { title, project_id, sort_order, status, temp }: any) {
     const task = {
       ...createDefaultTask(),
       title,
@@ -131,33 +121,23 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       //if(!isNaN(task_user.id - parseFloat(task_user.id))) { //jQuery implementation of is_numeric: https://stackoverflow.com/a/21070520/193930
       if (!task_user.user_checked) {
         console.log('forget / delete from edit', task_user)
-        commit(
-          'DELETE',
-          { module: 'task_users', entity: task_user },
-          { root: true }
-        )
+        commit('DELETE', { module: 'task_users', entity: task_user }, { root: true })
       } else {
         console.log('upsert from edit', task_user)
-        commit(
-          'UPSERT',
-          { module: 'task_users', entity: task_user },
-          { root: true }
-        )
+        commit('UPSERT', { module: 'task_users', entity: task_user }, { root: true })
       }
       //}
     })
 
     // @ts-ignore
-    const response = await this._vm
-      .$http()
-      .post('/tasks/' + task.id, { task, task_users })
-    console.log(response)
+    const response = await this._vm.$http().post('/tasks/' + task.id, { task, task_users })
+    /*console.log(response)
     for (let uuid in response.new_task_user_ids) {
       if (response.new_task_user_ids.hasOwnProperty(uuid)) {
         let id = response.new_task_user_ids[uuid]
         commit('uuid_to_id', { module: 'task_users', id, uuid }, { root: true })
       }
-    }
+    }*/
   },
   async updateTask({ commit }: any, task: any) {
     // @ts-ignore
@@ -173,10 +153,10 @@ export const actions: ActionTree<IModuleState, IRootState> = {
    * @param { number[] } ids - list of tasks ids, where index is equal sort_order
    * @description: update tasks sort order
    */
-  updateSortOrder({ commit }, ids) {
+  updateSortOrders({ commit }, ids) {
     // Todo: @stephane - create endpoint to update project_sort_order for tasks
     // ToDo: hook up indexDB
-    commit('updateTasksSortOrder', ids)
+    commit('updateTasksSortOrders', ids)
     // @ts-ignore
     this._vm.$http().post('/tasks/sort_order', { ids: ids })
   }

@@ -53,7 +53,7 @@ export const mutations: MutationTree<IRootState> = {
     //@Mikhail is there a faster way to find the index? Can I search from the bottom of the array first?
     //@ts-ignore
     console.log(state[module][module])
-    state[module][module].forEach((item, key) => {
+    state[module][module].forEach((item: any, key: any) => {
       state[module].lookup[item.id] = key
     })
 
@@ -124,11 +124,7 @@ export const mutations: MutationTree<IRootState> = {
     let modulestate = state[module]
     let key = modulestate.lookup[entity.id]
     if (state[module][key]) {
-      console.log(
-        'UPDATE: entity not found in lookup',
-        entity.id,
-        modulestate.lookup
-      )
+      console.log('UPDATE: entity not found in lookup', entity.id, modulestate.lookup)
       return
     }
     if (modulestate[module][key].id !== entity.id) {
@@ -157,24 +153,10 @@ export const mutations: MutationTree<IRootState> = {
       this.commit(module + '/UPDATE', entities)
     }
   },
-
-  /**
-   * Updates entity attribute. Does not check if entity exists.
-   * @param {IRootState} state
-   * @param {any} module
-   * @param {any} number
-   * @param {any} string
-   * @param {any} value
-   * @constructor
-   */
-  UPDATE_ATTRIBUTE(
-    state: IRootState,
-    { module, id: number, attribute: string, value }
-  ) {
-    console.log('UPDATE_ATTRIBUTE')
+  UPDATE_ATTRIBUTE(state: IRootState, { module, id, attribute, value }) {
     if (!state[module]) return
     // @ts-ignore
-    state[module][state[module].lookup[id]][attribute] = value
+    state[module][module][state[module].lookup[id]][attribute] = value
   },
 
   /**

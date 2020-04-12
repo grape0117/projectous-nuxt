@@ -1,61 +1,21 @@
 <template>
-  <b-modal
-    :title="task.title"
-    id="task-modal"
-    class="modal fade"
-    role="dialog"
-    @ok="saveTask"
-  >
+  <b-modal :title="task.title" id="task-modal" class="modal fade" role="dialog" @ok="saveTask" @complete="completeTask">
     <form id="editTaskForm" class="form-horizontal">
-      <input
-        id="taskIDEdit"
-        class="form-control"
-        type="hidden"
-        name="id"
-        :value="task.id"
-      />
+      <input id="taskIDEdit" class="form-control" type="hidden" name="id" :value="task.id" />
       <div class="form-group">
         <label class="control-label col-sm-4" for="taskTitledit">Task: </label>
         <div class="col-sm-8">
-          <div
-            contenteditable="true"
-            style="height: auto;"
-            id="taskTitledit"
-            class="form-control"
-            type="text"
-            name="title"
-            placeholder="Task"
-            v-html="task.title"
-            @blur="setTitle"
-          ></div>
+          <div contenteditable="true" style="height: auto;" id="taskTitledit" class="form-control" type="text" name="title" placeholder="Task" v-html="task.title" @blur="setTitle"></div>
         </div>
       </div>
       <div class="form-group">
         <label class="control-label col-sm-4">Project: </label>
         <div class="col-sm-8">
-          <select
-            id="timer-modal-project-id"
-            class="form-control select2-select"
-            name="project_id"
-            v-on:change="isCreateProject()"
-            v-model="task.project_id"
-          >
+          <select id="timer-modal-project-id" class="form-control select2-select" name="project_id" v-on:change="isCreateProject()" v-model="task.project_id">
             <option value="">***** Select Project *****</option>
             <option v-if="isAdmin()" value="create">Create New Project </option>
-            <optgroup
-              :label="company_client.name"
-              v-bind:company_client="company_client"
-              v-for="company_client in company_clients"
-              :key="company_client.id"
-            >
-              <option
-                v-for="project in openprojects(company_client)"
-                :key="projects.id"
-                v-bind:company_client="company_client"
-                :value="project.id"
-              >
-                {{ client_name(project.client_id) }} - {{ project.name }}
-              </option>
+            <optgroup :label="company_client.name" v-bind:company_client="company_client" v-for="company_client in company_clients" :key="company_client.id">
+              <option v-for="project in openprojects(company_client)" :key="projects.id" v-bind:company_client="company_client" :value="project.id"> {{ client_name(project.client_id) }} - {{ project.name }} </option>
             </optgroup>
           </select>
         </div>
@@ -70,33 +30,27 @@
               </div>
           </div>-->
       <div class="form-group">
-        <label class="control-label col-sm-4" for="taskDueDate"
-          >Due Date:
-        </label>
+        <label class="control-label col-sm-4" for="taskDueDate">Due Date: </label>
         <div class="col-sm-8">
-          <input
-            id="taskDueDate"
-            class="form-control"
-            type="date"
-            name="due_at"
-            placeholder="Due Date"
-            v-model="task.due_date"
-          />
+          <input id="taskDueDate" class="form-control" type="date" name="due_at" placeholder="Due Date" v-model="task.due_date" />
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4" for="taskEditEstimate"
-          >Estimate:
-        </label>
+        <label class="control-label col-sm-4" for="taskEditEstimate">Estimate: </label>
         <div class="col-sm-8">
-          <input
-            id="taskEditEstimate"
-            class="form-control"
-            type="text"
-            name="estimate"
-            placeholder="Estimate"
-            v-model="task.estimate"
-          />
+          <input id="taskEditEstimate" class="form-control" type="text" name="estimate" placeholder="Estimate" v-model="task.estimate" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-4" for="taskEditEstimate">Status: </label>
+        <div class="col-sm-8">
+          <select class="form-control" v-model="task.status">
+            <option value="open">Open</option>
+            <option value="turned-in">Turned-In</option>
+            <option value="reviewed">Reviewed</option>
+            <option value="completed">Completed</option>
+            <option value="closed">Closed</option>
+          </select>
         </div>
       </div>
       <div class="row without-margin">
@@ -104,17 +58,13 @@
           Users:
         </p>
       </div>
-      <edit-task-modal-user
-        v-for="user in active_users()"
-        :key="user.id"
-        @toggle="toggleUser"
-        v-bind:task_user="task_user(user)"
-        v-bind:user="user"
-        v-bind:task="task"
-      />
+      <edit-task-modal-user v-for="user in active_users()" :key="user.id" @toggle="toggleUser" v-bind:task_user="task_user(user)" v-bind:user="user" v-bind:task="task" />
     </form>
     <template v-slot:modal-footer="{ ok, cancel }">
       <button style="float: left" class="btn btn-danger">Delete</button>
+      <button style="float: left" @click="complete()" class="btn btn-primary">
+        Complete
+      </button>
       <button class="btn btn-info" @click="ok()">Save</button>
       <button class="btn" @click="cancel()">Cancel</button>
     </template>
@@ -152,9 +102,7 @@ export default {
       return this.$store.state.task_types.task_types
     },
     company_clients: function() {
-      const company_clients = this.$store.getters[
-        'company_clients/getActiveCompanyClients'
-      ]
+      const company_clients = this.$store.getters['company_clients/getActiveCompanyClients']
       return company_clients
     },
     current_company: function() {
@@ -165,9 +113,7 @@ export default {
     },
     task_users: function() {
       let self = this
-      let task_users = this.$store.state.task_users.task_users.filter(
-        task_user => task_user.task_id === this.task.id
-      )
+      let task_users = this.$store.state.task_users.task_users.filter(task_user => task_user.task_id === this.task.id)
       // console.log('task_users', task_users)
       //console.log(this.$store.state.task_users.task_users.pop())
       return task_users
@@ -182,18 +128,15 @@ export default {
   methods: {
     toggleUser(user) {
       //only add each entry once into changed_task_users
-      const task_user_index = this.changed_task_users.findIndex(
-        changed_task_user => {
-          //TODO: figure out why no match
-          return changed_task_user.company_user_id === user.company_user_id
-        }
-      )
+      const task_user_index = this.changed_task_users.findIndex(changed_task_user => {
+        //TODO: figure out why no match
+        return changed_task_user.company_user_id === user.company_user_id
+      })
       if (task_user_index !== -1) {
         //update only things that can change
         this.changed_task_users[task_user_index].user_rate = user.user_rate
         this.changed_task_users[task_user_index].role = user.role
-        this.changed_task_users[task_user_index].user_checked =
-          user.user_checked
+        this.changed_task_users[task_user_index].user_checked = user.user_checked
       } else {
         //create
         this.changed_task_users.push(user)
@@ -205,9 +148,7 @@ export default {
     },
     task_user(company_user) {
       let self = this
-      let userTask = this.$store.state.task_users.task_users.find(function(
-        task_user
-      ) {
+      let userTask = this.$store.state.task_users.task_users.find(function(task_user) {
         if (task_user.task_id !== self.task.id) return false
         return task_user.company_user_id === company_user.id
       })
@@ -227,21 +168,20 @@ export default {
       return this.$store.getters['company_users/getActive']
     },
     clientName: function(client_id) {
-      let company_client = this.$store.getters[
-        'company_clients/getByClientCompanyId'
-      ](client_id)
+      let company_client = this.$store.getters['company_clients/getByClientCompanyId'](client_id)
       return company_client ? company_client.name : ''
     },
     openprojects: function(company) {
-      return this.$store.getters['projects/getOpenCompanyProjects'](
-        company.client_id
-      )
+      return this.$store.getters['projects/getOpenCompanyProjects'](company.client_id)
     },
     due_date: function() {
       if (this.task.due_date == '0000-00-00 00:00:00') {
         return ''
       }
       return '' //dateTimeToInput(this.task.due_date)
+    },
+    completeTask: function() {
+      alert('complete task! non-functional. Use the save instead')
     },
     saveTask: function(callback) {
       /*const task_users = this.changed_task_users.filter((task_user) => {
@@ -256,9 +196,7 @@ export default {
       this.$store.commit('settings/setCurrentEditTask', {})
     },
     client_name: function(client_id) {
-      let company_client = this.$store.getters[
-        'company_clients/getByClientCompanyId'
-      ](client_id)
+      let company_client = this.$store.getters['company_clients/getByClientCompanyId'](client_id)
       return company_client ? company_client.name : ''
     }
   }

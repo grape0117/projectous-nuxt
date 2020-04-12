@@ -1,62 +1,26 @@
 <template>
-  <div
-    class="list__wrapper"
-    :class="{ 'horizontal-alignment': !verticalAlignment }"
-  >
-    <div
-      v-for="(group, index) in listGroups"
-      :key="index"
-      class="list"
-      draggable="true"
-      @dragstart.self="dragStart($event, index)"
-      @dragend.self="dragEnd"
-      @dragenter="moveList(index)"
-    >
+  <div class="list__wrapper" :class="{ 'horizontal-alignment': !verticalAlignment }">
+    <div v-for="(group, index) in listGroups" :key="index" class="list" draggable="true" @dragstart.self="dragStart($event, index)" @dragend.self="dragEnd" @dragenter="moveList(index)">
       <div v-if="!verticalAlignment" class="list__group-title">
         {{ group.name }}
       </div>
-      <div
-        v-for="{ id, title, initiallyExpanded } in lists.filter(
-          list => list.group === group.name
-        )"
-        :key="id"
-        class="list__group"
-      >
+      <div v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id" class="list__group">
         <div
           class="list__group-subtitle"
           :style="{
-            background:
-              isListDragged && targetListIndex === index ? '#333333' : '#f0fbfc'
+            background: isListDragged && targetListIndex === index ? '#333333' : '#f0fbfc'
           }"
           v-if="verticalAlignment"
         >
-          <div
-            v-if="group.isDraggable"
-            class="dragzone__item-dragbox dragzone__item-dragbox--active list-group-dragbox"
-          >
+          <div v-if="group.isDraggable" class="dragzone__item-dragbox dragzone__item-dragbox--active list-group-dragbox">
             <span />
             <span />
             <span />
           </div>
           <div>{{ title }}</div>
         </div>
-        <pj-dragzone
-          :id="id"
-          :tasks="groupedData[id]"
-          :isListDragged="isListDragged"
-          :draggedItemId="draggedItemId"
-          :group="group"
-          :selectedCompanyUserId="selectedCompanyUserId"
-          :initiallyExpanded="initiallyExpanded"
-          @create="$emit('create', $event)"
-          @update="$emit('update', $event)"
-          @delete="$emit('delete', $event)"
-          @taskTimerToggled="$emit('taskTimerToggled', $event)"
-          @updateSorting="updateSorting"
-          @setDraggedItemId="draggedItemId = $event"
-          @updateOptions="$emit('updateOptions', $event)"
-          @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)"
-        />
+
+        <pj-dragzone :id="id" :tasks="groupedData[id]" :isListDragged="isListDragged" :draggedItemId="draggedItemId" :group="group" :selectedCompanyUserId="selectedCompanyUserId" :initiallyExpanded="initiallyExpanded" @update="$emit('update', $event)" @delete="$emit('delete', $event)" @taskTimerToggled="$emit('taskTimerToggled', $event)" @updateDataIndexes="updateDataIndexes" @setDraggedItemId="draggedItemId = $event" @updateSortOrders="$emit('updateSortOrders', $event)" @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)" />
       </div>
     </div>
   </div>
@@ -71,9 +35,7 @@ export default class Draggable extends Vue {
   @Prop({ required: true }) public data!: any
   @Prop({ required: true }) public lists!: any
   @Prop({ required: false, default: true }) public verticalAlignment!: boolean
-  @Prop({ required: false, default: null }) public selectedCompanyUserId!:
-    | number
-    | null
+  @Prop({ required: false, default: null }) public selectedCompanyUserId!: number | null
 
   private clonedData: any = cloneDeep(this.data)
   private listGroups: any = []
@@ -107,22 +69,26 @@ export default class Draggable extends Vue {
       })
   }
 
-  public updateSorting(item: any, position: number, idNewPosition: number) {
-    const index = Number(this.clonedDataIndexes[item.id])
-    const elementNewPosition = Number(this.clonedDataIndexes[idNewPosition])
-    this.clonedData[index] = item
-    this.clonedData.splice(
-      elementNewPosition,
-      0,
-      this.clonedData.splice(index, 1)[0]
-    )
+  /**
+   * Splices in item in place of dropped item
+   *
+   * @param item item that is being dragged
+   * @param {number} dropped_id item_id that is being replaced
+   */
+  public updateDataIndexes(item: any, dropped_id: number) {
+    //Update item TODO: not sure this is necessary since all data reloads
+    const itemIndex = Number(this.clonedDataIndexes[item.id])
+    this.clonedData[itemIndex] = item
+
+    const droppedIndex = Number(this.clonedDataIndexes[dropped_id])
+    this.clonedData.splice(droppedIndex, 0, this.clonedData.splice(itemIndex, 1)[0])
   }
 
   private dragStart(e: any, index: number) {
     // drag and drop will be available only if item contains node with this class
     const selector = e.target.querySelector('.list-group-dragbox')
     if (selector) {
-      e.dataTransfer.setData('application/node type', this)
+      e.dataTransfer.setData('application/node type', this) //@Mikhail, what is this for?
       this.isListDragged = true
       this.draggedListIndex = index
     } else {
@@ -150,6 +116,7 @@ export default class Draggable extends Vue {
   private moveList(targetElIndex: number) {
     this.targetListIndex = targetElIndex
 
+    //@Mikhail: not sure what this TODO means
     // TODO: bug if change position here because of different height
   }
 }
@@ -191,11 +158,9 @@ export default class Draggable extends Vue {
 }
 
 .list__group-subtitle > div {
+  white-space: nowrap;
   float: left;
-}
-
-.list__group-subtitle div {
+  height: 100px;
   writing-mode: vertical-rl;
-  text-align: center;
 }
 </style>

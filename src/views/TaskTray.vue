@@ -1,43 +1,14 @@
 <template>
-  <div
-    id="task-tray"
-    :class="trayClass()"
-    style="overflow-y: scroll; z-index: 1; height: 100vh;"
-  >
+  <div id="task-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh;">
     <select id="selectCompanyUser" v-model="selectedCompanyUserId">
-      <option
-        v-for="(companyUser, i) in sortedCompanyUsers"
-        :value="companyUser.id"
-        :id="'company_user-' + companyUser.id"
-        :key="`${companyUser.id}-${i}`"
-      >
+      <option v-for="(companyUser, i) in sortedCompanyUsers" :value="companyUser.id" :id="'company_user-' + companyUser.id" :key="`${companyUser.id}-${i}`">
         {{ companyUser.name }}
       </option>
     </select>
-    <pj-draggable
-      :listsBlockName="listsBlockNames.TASKS_USERS"
-      :data="tasksUsers"
-      :lists="lists"
-      @create="createTaskUser"
-      @update="updateTaskUser"
-      @delete="deleteTaskUser"
-      @taskTimerToggled="onTaskTimerToggled"
-      @updateOptions="updateTaskUserSortOrder"
-      @setCurrentListsBlockName="
-        currentListsBlockName = listsBlockNames.TASKS_USERS
-      "
-    />
-    <new-list-form
-      v-if="selectedCompanyUserId"
-      :user-id="selectedCompanyUserId"
-    />
+    <pj-draggable :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" />
+    <new-list-form v-if="selectedCompanyUserId" :user-id="selectedCompanyUserId" />
     <div :class="'chat-hide-btn ' + trayClass()">
-      <button
-        @click="trayToggle()"
-        type="button"
-        id="chat-tray-btn"
-        :class="'btn btn-purple ' + trayClass()"
-      >
+      <button @click="trayToggle()" type="button" id="chat-tray-btn" :class="'btn btn-purple ' + trayClass()">
         tasks
       </button>
     </div>
@@ -87,9 +58,7 @@ export default class Custom extends Vue {
   }
 
   get lists() {
-    return !this.selectedCompanyUserId
-      ? []
-      : this.getUserLists(this.selectedCompanyUserId)
+    return !this.selectedCompanyUserId ? [] : this.getUserLists(this.selectedCompanyUserId)
   }
   get tasksUsers() {
     if (!this.selectedCompanyUserId) return []
@@ -113,9 +82,7 @@ export default class Custom extends Vue {
 
   get projectsByClientId() {
     const projects: IProject[] = this.getUserProjects(null)
-    const listOfProjectsToDisplay = projects
-      .filter(pr => pr.status === 'open')
-      .sort((a, b) => a.client_id - b.client_id)
+    const listOfProjectsToDisplay = projects.filter(pr => pr.status === 'open').sort((a, b) => a.client_id - b.client_id)
     return groupBy(listOfProjectsToDisplay, 'client_id')
   }
   get taskDetailsDisplayed() {
@@ -145,10 +112,7 @@ export default class Custom extends Vue {
   }
   @Projects.Mutation('projects/SET_SELECTED_PROJECT') public setProjectId!: any
   @Projects.Action public pinProject!: any
-  @Projects.State(state => state.selectedProjectId) public selectedProjectId!:
-    | string
-    | number
-    | null
+  @Projects.State(state => state.selectedProjectId) public selectedProjectId!: string | number | null
   @Projects.State(state => state.pinnedProjects)
   public pinnedProjects!: number[]
   @TaskUsers.Getter('getById') private getTaskUserById!: any
@@ -182,15 +146,7 @@ export default class Custom extends Vue {
   public openClientProjects(client: any) {
     return this.$store.state.projects.projects
       .filter((project: any) => {
-        if (
-          this.project_search &&
-          (project.name
-            .toLowerCase()
-            .indexOf(this.project_search.toLowerCase()) === -1 &&
-            client.name
-              .toLowerCase()
-              .indexOf(this.project_search.toLowerCase()) === -1)
-        ) {
+        if (this.project_search && (project.name.toLowerCase().indexOf(this.project_search.toLowerCase()) === -1 && client.name.toLowerCase().indexOf(this.project_search.toLowerCase()) === -1)) {
           return false
         }
         if (project.status !== 'open') return false
@@ -203,9 +159,7 @@ export default class Custom extends Vue {
       })
   }
   public clientName(company_client_id: any) {
-    const company_client = this.$store.getters['company_clients/getById'](
-      company_client_id
-    )
+    const company_client = this.$store.getters['company_clients/getById'](company_client_id)
     return company_client ? company_client.name : ''
   }
   public async createTask({ title, listId = 'open', sort_order, temp }: any) {
@@ -241,9 +195,7 @@ export default class Custom extends Vue {
                   2) Figure out where in the list the new entry was added and use the same next_work_day (seems wrong though)
                    */
       const date = new Date()
-      next_work_day = formatDateToYYYY_MM_DD(
-        new Date(date.setMonth(date.getMonth() - 1))
-      )
+      next_work_day = formatDateToYYYY_MM_DD(new Date(date.setMonth(date.getMonth() - 1)))
       //If listId is a date, return that I think
     } else if (!!Date.parse(listId) && isNaN(listId)) {
       //TODO: check to see if we even need to convert it
@@ -274,9 +226,7 @@ export default class Custom extends Vue {
     if (listId === 'Past') {
       //TODO: see note on create function
       const date = new Date()
-      next_work_day = formatDateToYYYY_MM_DD(
-        new Date(date.setMonth(date.getMonth() - 1))
-      )
+      next_work_day = formatDateToYYYY_MM_DD(new Date(date.setMonth(date.getMonth() - 1)))
       user_task_list_id = null
     } else if (listId === 'Unmarked') {
       next_work_day = null
@@ -337,16 +287,12 @@ export default class Custom extends Vue {
 
   private updateTaskUserSortOrder(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.updateTaskUsersSortOrderVuex(
-      parsedTasks.map(({ id }: { id: number }) => id)
-    )
+    this.updateTaskUsersSortOrderVuex(parsedTasks.map(({ id }: { id: number }) => id))
   }
 
   private updateTaskSortOrder(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.updateTaskSortOrderVuex(
-      parsedTasks.map(({ id }: { id: number }) => id)
-    )
+    this.updateTaskSortOrderVuex(parsedTasks.map(({ id }: { id: number }) => id))
   }
 
   @Watch('selectedCompanyUserId')
@@ -360,8 +306,7 @@ export default class Custom extends Vue {
     const query = this.$route.query.user
     if (query) {
       const user = users.find(({ id }: any) => id === +query)
-      if (user && !this.selectedCompanyUserId)
-        this.selectedCompanyUserId = user.id
+      if (user && !this.selectedCompanyUserId) this.selectedCompanyUserId = user.id
     }
   }
 }

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { store } from './store'
+import store from './store'
 export default {
   install(vue, opts) {
     Vue.simpleSort = function(a, b) {
@@ -25,16 +25,10 @@ export default {
       return Vue.simpleSort(a.title.toLowerCase(), b.title.toLowerCase())
     }
     Vue.taskClientSort = function(a, b) {
-      let aClientName = a.project_id
-        ? store.getters['projects/project_client_name'](a.project_id)
-        : ''
-      let bClientName = b.project_id
-        ? store.getters['projects/project_client_name'](b.project_id)
-        : ''
-      if (aClientName.toLowerCase() < bClientName.toLowerCase())
-        return -1 * direction
-      if (aClientName.toLowerCase() > bClientName.toLowerCase())
-        return 1 * direction
+      let aClientName = a.project_id ? store.getters['projects/project_client_name'](a.project_id) : ''
+      let bClientName = b.project_id ? store.getters['projects/project_client_name'](b.project_id) : ''
+      if (aClientName.toLowerCase() < bClientName.toLowerCase()) return -1 * direction
+      if (aClientName.toLowerCase() > bClientName.toLowerCase()) return 1 * direction
       return 0
     }
     ;(Vue.timerSort = function(a, b) {
@@ -49,26 +43,16 @@ export default {
       (Vue.projectRelationSort = function(a, b) {
         //console.log(a.b)
         if (a.project_id && b.project_id) {
-          return Vue.projectSort(
-            store.getters['projects/getProjectById'](a.project_id),
-            store.getters['projects/getProjectById'](b.project_id)
-          )
+          return Vue.projectSort(store.getters['projects/getProjectById'](a.project_id), store.getters['projects/getProjectById'](b.project_id))
         }
       })
     Vue.projectSort = function(a, b) {
       try {
         if (a.client_id && b.client_id)
           if (a.client_id != b.client_id) {
-            let aclient = store.getters['company_clients/getByClientCompanyId'](
-              a.client_id
-            )
-            let bclient = store.getters['company_clients/getByClientCompanyId'](
-              b.client_id
-            )
-            return Vue.simpleSort(
-              aclient.name.toLowerCase(),
-              bclient.name.toLowerCase()
-            )
+            let aclient = store.getters['company_clients/getByClientCompanyId'](a.client_id)
+            let bclient = store.getters['company_clients/getByClientCompanyId'](b.client_id)
+            return Vue.simpleSort(aclient.name.toLowerCase(), bclient.name.toLowerCase())
           }
         if (a.owner_company_id == 44 && b.owner_company_id == 44) {
           //console.log(a.name,b.name);
