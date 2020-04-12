@@ -133,7 +133,7 @@ export default class Dragzone extends Vue {
   private editTask(task_id: any) {
     let task = this.$store.getters['tasks/getById'](task_id)
     console.log('editing task: ', task)
-    this.$store.state.settings.current_edit_task = task
+    this.$store.state.commit('settings/setCurrentEditTask', cloneDeep(task))
     this.$bvModal.show('task-modal')
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
@@ -152,7 +152,7 @@ export default class Dragzone extends Vue {
 
   /**
    * Triggers only on destination list
-   **/
+   */
   private drop() {
     //console.log('************* DROP *************')
     const item = JSON.parse(localStorage.getItem('item') as string)
@@ -170,7 +170,7 @@ export default class Dragzone extends Vue {
 
   /**
    * Triggers only on source list
-   **/
+   */
   private dragend(e: any) {
     this.$emit('setDraggedItemId', null)
 
@@ -183,7 +183,7 @@ export default class Dragzone extends Vue {
 
   /**
    * Dragover event
-   **/
+   */
   private moveItem(index: number, id: string) {
     localStorage.setItem('displaced_item_id', id) //TODO: should this be after the next line?
     if (this.isListDragged) return
@@ -206,7 +206,7 @@ export default class Dragzone extends Vue {
    *
    * - Quick return if a list is being dragged.
    * -TODO: why is it checking tasks.length? Aside from setting sort order, I don't see a reason yet
-   **/
+   */
   private moveToNewList() {
     this.$emit('setCurrentListsBlockName') //TODO: move after next line?
     if (this.isListDragged) return
