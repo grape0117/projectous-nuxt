@@ -1,5 +1,7 @@
 <template>
-  <b-modal :title="task.title" id="task-modal" class="modal fade" role="dialog" @ok="saveTask" @complete="completeTask">
+  <b-modal :title="task.title" id="task-modal" class="modal fade" role="dialog"
+   @ok="saveTask"
+   @complete="completeTask">
     <form id="editTaskForm" class="form-horizontal">
       <input id="taskIDEdit" class="form-control" type="hidden" name="id" :value="task.id" />
       <div class="form-group">

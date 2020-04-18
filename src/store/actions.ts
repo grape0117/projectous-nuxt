@@ -16,6 +16,8 @@ export const actions: ActionTree<IRootState, IRootState> = {
   },
   UPDATE_ATTRIBUTE({ commit }, { module, id, attribute, value }) {
     commit('UPDATE_ATTRIBUTE', { module, id, attribute, value })
+    // @ts-ignore
+    this._vm.$http().patch('/' + module + '/', id, { attribute, value })
   },
   DELETE({ commit }, { module, entity }) {
     commit('DELETE', { module, entity })

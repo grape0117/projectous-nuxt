@@ -17,6 +17,9 @@ export class Http extends BaseHttp implements IHttp {
   public async put(url: string, id: number | string, data: any) {
     return await this.provider.put(url, id, data)
   }
+  public async patch(url: string, id: number | string, data: any) {
+    return await this.provider.patch(url, id, data)
+  }
   public async delete(url: string, id: number | string) {
     return await this.provider.delete(url, id)
   }

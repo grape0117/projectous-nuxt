@@ -42,13 +42,9 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       return
     }
     try {
-      const { data: response } = await axios.post(
-        `${this.baseUrl}${url}`,
-        data,
-        {
-          headers: this.headers
-        }
-      )
+      const { data: response } = await axios.post(`${this.baseUrl}${url}`, data, {
+        headers: this.headers
+      })
       return response
     } catch (e) {
       console.log(e)
@@ -72,6 +68,26 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       console.log(e)
     }
   }
+
+  public async patch(url: string, id: number | string, data: any) {
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      return
+    }
+    try {
+      if (!url.endsWith('/')) {
+        this.noSlashEndError()
+        return
+      }
+      const response = await axios.patch(`${this.baseUrl}${url}${id}`, data, {
+        headers: this.headers
+      })
+      return response.data
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   public async delete(url: string, id: number | string) {
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)

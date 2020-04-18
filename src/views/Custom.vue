@@ -25,6 +25,7 @@
           </div>
         </b-col>
         <b-col v-if="selectedProjectId" cols="6">
+          <h4 v-if="selectedProjectId">{{ clientNameFromProject( selectedProjectId )}} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject( selectedProjectId )"></b-icon></h4>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
       </b-row>
@@ -175,10 +176,25 @@ export default class Custom extends Vue {
         return 0
       })
   }
+
+
+
   public clientName(company_client_id: any) {
     const company_client = this.$store.getters['company_clients/getById'](company_client_id)
     return company_client ? company_client.name : ''
   }
+
+  public clientNameFromProject(project_id: any) {
+      const project = this.$store.getters['projects/getById'](project_id)
+      const company_client = this.$store.getters['company_clients/getById'](project.client_id)
+    return company_client ? company_client.name : ''
+  }
+
+  public projectName(project_id: any) {
+      const project = this.$store.getters['projects/getById'](project_id)
+      return project ? project.name : ''
+  }
+
   public async createTask({ item, ids_of_items_to_shift_up }: any) {
     console.log('CREATE TASK CUSTOM')
     item.project_id = this.selectedProjectId
@@ -197,100 +213,12 @@ export default class Custom extends Vue {
     this.$store.dispatch('DELETE', { module: 'tasks', entity: task })
   }
 
-  public async createTaskUser({ item, ids_of_items_to_shift_up }: any) {
-    let next_work_day = null
-    let user_task_list_id = null
-    if (item.listId === 'Past') {
-      /*
-        TODO: This isn't clean. It shouldn't just be a month back. Seems like we have options:
-        1) When the list loads, resave all to have a specific listId like -1
-        2) Figure out where in the list the new entry was added and use the same next_work_day (seems wrong though)
-         */
-      const date = new Date()
-      next_work_day = formatDateToYYYY_MM_DD(new Date(date.setMonth(date.getMonth() - 1)))
-      //If listId is a date, return that I think
-    } else if (!!Date.parse(item.listId) && isNaN(item.listId)) {
-      //TODO: check to see if we even need to convert it
-      next_work_day = formatDateToYYYY_MM_DD(item.listId)
-      //If listId is a number, this is a user-created list
-    } else if (Number.isInteger(Number(item.listId))) {
-      //Only user-created lists have a listId set on task_user object
-      user_task_list_id = item.listId
-    }
 
-    const task_id = uuid.v4()
-    const task_user_id = uuid.v4()
-    const task = { id: task_id, title: item.title } //TODO: sort_order? maybe put at the top of the list?
-    //const { id: task_id } = await this.createTask(task)
-    const taskUser = {
-      id: task_user_id,
-      task_id,
-      next_work_day,
-      company_user_id: this.selectedCompanyUserId,
-      user_task_list_id,
-      sort_order: item.sort_order
+    //TODO: pass only ids instead of whole objects?
+    private updateTaskSortOrders(tasks: any): void {
+        const parsedTasks = JSON.parse(tasks)
+        this.$store.dispatch('tasks/updateSortOrders', parsedTasks.map(({ id }: { id: string }) => id))
     }
-    //await this.createTaskUserVuex(taskUser)
-    console.log(task, taskUser)
-    this.$store
-      .dispatch('task_users/createUserTask', {
-        taskUser,
-        task,
-        ids_of_taskUsers_to_shift_up: ids_of_items_to_shift_up
-      })
-      .then(function() {
-        // @ts-ignore
-        const elements = document.querySelectorAll('[data-id="' + task_user_id + '"]')
-        if (elements.length) {
-          // @ts-ignore
-          elements[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
-          // @ts-ignore
-          elements[0].focus()
-        } else {
-          console.log(elements)
-        }
-      })
-  }
-
-  public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
-    if (this.currentListsBlockName !== this.listsBlockNames.TASKS_USERS) return
-    const taskUser = cloneDeep(this.getTaskUserById(id)) //TODO: test this.$store.getters...
-    let next_work_day = null
-    let user_task_list_id = null
-    if (listId === 'Past') {
-      //TODO: see note on create function
-      const date = new Date()
-      next_work_day = formatDateToYYYY_MM_DD(new Date(date.setMonth(date.getMonth() - 1)))
-      user_task_list_id = null
-    } else if (listId === 'Unmarked') {
-      next_work_day = null
-      user_task_list_id = null
-      //If listId is a date, return that I think
-    } else if (!!Date.parse(listId) && isNaN(listId)) {
-      next_work_day = formatDateToYYYY_MM_DD(listId)
-      user_task_list_id = null
-      //If listId is a number, this is a user-created list
-    } else if (Number.isInteger(Number(listId))) {
-      //Only user-created lists have a listId set on task_user object
-      next_work_day = null
-      user_task_list_id = listId
-    }
-    taskUser.next_work_day = next_work_day
-    taskUser.user_task_list_id = user_task_list_id
-    taskUser.sort_order = sort_order
-    await this.updateTaskUserVuex(taskUser)
-    //TODO: why is updating a title mixed in with moving a task?
-    const task = cloneDeep(this.getTaskById(task_id))
-    if (task.title !== title) {
-      task.title = title
-      await this.updateTaskVuex(task)
-    }
-  }
-
-  public async deleteTaskUser(taskUser: any) {
-    await this.deleteTaskUserVuex(taskUser)
-    await this.deleteTask({ id: taskUser.task_id })
-  }
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {
     const { taskId, timerId } = payload
@@ -311,32 +239,19 @@ export default class Custom extends Vue {
     this.editedTaskTimerId = timerId
   }
 
-  //TODO: pass only ids instead of whole objects?
-  private updateTaskUserSortOrders(tasks: any): void {
-    const parsedTasks = JSON.parse(tasks)
-    this.updateTaskUsersSortOrdersVuex(parsedTasks.map(({ id }: { id: number }) => id))
-  }
-
-  //TODO: pass only ids instead of whole objects?
-  private updateTaskSortOrders(tasks: any): void {
-    const parsedTasks = JSON.parse(tasks)
-    this.updateTaskSortOrdersVuex(parsedTasks.map(({ id }: { id: number }) => id))
-  }
-
-  @Watch('selectedCompanyUserId')
-  private changeRouteQueryParams(value: any) {
-    if (value) {
-      this.$router.push({ query: { user: value } }).catch(e => {})
+    private editProject(project_id: any) {
+        console.log('edit project')
+        let project = this.$store.getters['projects/getById'](project_id)
+        this.$store.commit('settings/setCurrentEditProject', cloneDeep(project))
     }
-  }
-  @Watch('sortedCompanyUsers')
-  private onSortedCompanyUsersChanged(users: any) {
-    const query = this.$route.query.user
-    if (query) {
-      const user = users.find(({ id }: any) => id === +query)
-      if (user && !this.selectedCompanyUserId) this.selectedCompanyUserId = user.id
+
+    private editTask(task_id: any) {
+        let task = this.$store.getters['tasks/getById'](task_id)
+        console.log('editing task: ', task)
+        this.$store.commit('settings/setCurrentEditTask', cloneDeep(task))
+        //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
     }
-  }
+
 }
 </script>
 

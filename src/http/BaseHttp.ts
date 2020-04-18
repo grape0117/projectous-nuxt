@@ -23,6 +23,9 @@ export class BaseHttp implements IHttp {
   public async put(url: string, id: number | string, data: any): Promise<any> {
     this.throwError()
   }
+  public async patch(url: string, id: number | string, data: any): Promise<any> {
+    this.throwError()
+  }
   public async delete(url: string, id: number | string): Promise<any> {
     this.throwError()
   }

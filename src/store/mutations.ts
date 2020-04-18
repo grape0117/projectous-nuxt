@@ -123,8 +123,8 @@ export const mutations: MutationTree<IRootState> = {
     }
     let modulestate = state[module]
     let key = modulestate.lookup[entity.id]
-    if (modulestate[module][key]) {
-      console.log('UPDATE: entity not found in lookup', entity.id, modulestate.lookup)
+    if (!modulestate[module][key]) {
+      console.log('UPDATE: entity not found in '+module+' lookup', entity.id, modulestate.lookup)
       return
     }
     if (modulestate[module][key].id !== entity.id) {
@@ -155,6 +155,7 @@ export const mutations: MutationTree<IRootState> = {
   },
   UPDATE_ATTRIBUTE(state: IRootState, { module, id, attribute, value }) {
     if (!state[module]) return
+      console.log('lookup',id,state[module].lookup[id])
     // @ts-ignore
     state[module][module][state[module].lookup[id]][attribute] = value
   },

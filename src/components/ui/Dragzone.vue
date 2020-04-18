@@ -25,9 +25,10 @@
               <div class="dragzone__add-task dragzone__add-task--item" @click="createTempItem(index, item.id)">
                 +
               </div>
-              <div class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTask($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
+              <div class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
             </div>
             <div class="dragzone__task-users">
+              <small>sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small>
               <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
             </div>
           </div>
@@ -147,7 +148,7 @@ export default class Dragzone extends Vue {
   private editTask(task_id: any) {
     let task = this.$store.getters['tasks/getById'](task_id)
     console.log('editing task: ', task)
-    this.$store.state.commit('settings/setCurrentEditTask', cloneDeep(task))
+    this.$store.commit('settings/setCurrentEditTask', cloneDeep(task))
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
   private projectName(project_id: any) {
@@ -167,11 +168,11 @@ export default class Dragzone extends Vue {
    * Triggers only on destination list
    */
   private drop() {
-    //console.log('************* DROP *************')
+    console.log('************* DROP *************')
     const item = JSON.parse(localStorage.getItem('item') as string)
     if (item) {
       //DROP event triggers twice for some reason.
-      this.$emit('update', item)
+      this.$parent.$emit('update', item)
       localStorage.removeItem('item')
       const displaced_item_id = localStorage.getItem('displaced_item_id')
       this.$emit('updateDataIndexes', item, displaced_item_id)
@@ -185,6 +186,7 @@ export default class Dragzone extends Vue {
    * Triggers only on source list
    */
   private dragend(e: any) {
+    console.log('************* DRAGEND *************')
     this.$emit('setDraggedItemId', null)
 
     //Update Source List item.sort_order
@@ -278,6 +280,11 @@ export default class Dragzone extends Vue {
         console.log('[data-id="' + id + '"] Not Found')
       }
     })
+  }
+
+  private updateTaskTitle({ target: { innerHTML: name } }: any, item: any) {
+    const id = item.task_id ? item.task_id : item.id
+    this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'title', value: name })
   }
 
   private async updateTask({ target: { innerHTML: name } }: any, item: any) {

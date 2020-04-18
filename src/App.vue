@@ -2,6 +2,7 @@
   <div id="app">
     <task-tray />
     <main>
+      {{ current_edit_project ? current_edit_project.id : '' }} Project
       <nav-bar />
       <div class="container-fluid">
         <div class="row-no-padding">
@@ -13,6 +14,7 @@
     <task-modal />
     <edit-user-modal id="edit-user-modal" />
     <edit-timer-modal id="edit-timer-modal" />
+    <edit-project-modal id="edit-project-modal" />
     <div id="update-data-button" @click="storeDataInIndexedDb" />
   </div>
 </template>
@@ -22,6 +24,7 @@ import TimerTab from './views/TimerTab'
 import EditUserModal from './views/EditUserModal'
 import EditTaskModal from './views/EditTaskModal'
 import EditTimerModal from './views/EditTimerModal'
+import EditProjectModal from './views/EditProjectModal'
 import { createListsByDays, createUserLists, getCookie } from '@/utils/util-functions'
 import Vue from 'vue'
 import { idbKeyval, idbGetAll } from '@/plugins/idb.ts'
@@ -34,17 +37,30 @@ export default {
     TaskTray,
     EditUserModal,
     EditTaskModal,
-    EditTimerModal
+    EditTimerModal,
+    EditProjectModal
   },
   computed: {
     current_edit_task: function() {
       return this.$store.getters['settings/get_current_edit_task']
+    },
+    current_edit_project: function() {
+      console.log('cureent edit projec')
+      return this.$store.getters['settings/get_current_edit_project']
     }
   },
   watch: {
     current_edit_task: function(value) {
       alert('watched!')
       if (this.current_edit_task.id) {
+        this.$bvModal.show('timer-modal')
+      } else {
+        this.$bvModal.hide('timer-modal')
+      }
+    },
+    current_edit_project: function(value) {
+      alert('watched!')
+      if (this.current_edit_project.id) {
         this.$bvModal.show('timer-modal')
       } else {
         this.$bvModal.hide('timer-modal')
