@@ -9,7 +9,7 @@ const state = {
   project_users: [],
   lookup: {}
 }
-export const task_users: Module<IModuleState, IRootState> = {
+export const project_users: Module<IModuleState, IRootState> = {
   namespaced: true,
   state,
   actions,

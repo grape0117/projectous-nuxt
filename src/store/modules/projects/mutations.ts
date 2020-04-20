@@ -1,10 +1,7 @@
 import Vue from 'vue'
 import { MutationTree } from 'vuex'
 import { IModuleState, IProject } from '@/store/modules/projects/types'
-import {
-  SET_SELECTED_PROJECT,
-  PIN_PROJECT
-} from '@/store/modules/projects/mutations-types'
+import { SET_SELECTED_PROJECT, PIN_PROJECT } from '@/store/modules/projects/mutations-types'
 
 export const mutations: MutationTree<IModuleState> = {
   LOOKUP(state: IModuleState, projects: any) {
@@ -26,9 +23,13 @@ export const mutations: MutationTree<IModuleState> = {
     if (!state.pinnedProjects.find(project => project === id)) {
       state.pinnedProjects = [...state.pinnedProjects, id]
     } else {
-      state.pinnedProjects = state.pinnedProjects.filter(
-        project => project !== id
-      )
+      state.pinnedProjects = state.pinnedProjects.filter(project => project !== id)
     }
+  },
+  CASCADE_DELETE(state: IModuleState, project) {
+    // @ts-ignore
+    this.commit('project_users/DELETE', project)
+    // @ts-ignore
+    this.commit('tasks/DELETE', project)
   }
 }

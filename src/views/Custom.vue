@@ -25,7 +25,7 @@
           </div>
         </b-col>
         <b-col v-if="selectedProjectId" cols="6">
-          <h4 v-if="selectedProjectId">{{ clientNameFromProject( selectedProjectId )}} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject( selectedProjectId )"></b-icon></h4>
+          <h4 v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
       </b-row>
@@ -177,22 +177,20 @@ export default class Custom extends Vue {
       })
   }
 
-
-
   public clientName(company_client_id: any) {
     const company_client = this.$store.getters['company_clients/getById'](company_client_id)
     return company_client ? company_client.name : ''
   }
 
   public clientNameFromProject(project_id: any) {
-      const project = this.$store.getters['projects/getById'](project_id)
-      const company_client = this.$store.getters['company_clients/getById'](project.client_id)
+    const project = this.$store.getters['projects/getById'](project_id)
+    const company_client = this.$store.getters['company_clients/getById'](project.client_id)
     return company_client ? company_client.name : ''
   }
 
   public projectName(project_id: any) {
-      const project = this.$store.getters['projects/getById'](project_id)
-      return project ? project.name : ''
+    const project = this.$store.getters['projects/getById'](project_id)
+    return project ? project.name : ''
   }
 
   public async createTask({ item, ids_of_items_to_shift_up }: any) {
@@ -213,12 +211,14 @@ export default class Custom extends Vue {
     this.$store.dispatch('DELETE', { module: 'tasks', entity: task })
   }
 
-
-    //TODO: pass only ids instead of whole objects?
-    private updateTaskSortOrders(tasks: any): void {
-        const parsedTasks = JSON.parse(tasks)
-        this.$store.dispatch('tasks/updateSortOrders', parsedTasks.map(({ id }: { id: string }) => id))
-    }
+  //TODO: pass only ids instead of whole objects?
+  private updateTaskSortOrders(tasks: any): void {
+    const parsedTasks = JSON.parse(tasks)
+    this.$store.dispatch(
+      'tasks/updateSortOrders',
+      parsedTasks.map(({ id }: { id: string }) => id)
+    )
+  }
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {
     const { taskId, timerId } = payload
@@ -239,19 +239,18 @@ export default class Custom extends Vue {
     this.editedTaskTimerId = timerId
   }
 
-    private editProject(project_id: any) {
-        console.log('edit project')
-        let project = this.$store.getters['projects/getById'](project_id)
-        this.$store.commit('settings/setCurrentEditProject', cloneDeep(project))
-    }
+  private editProject(project_id: any) {
+    console.log('edit project')
+    let project = this.$store.getters['projects/getById'](project_id)
+    this.$store.commit('settings/setCurrentEditProject', cloneDeep(project))
+  }
 
-    private editTask(task_id: any) {
-        let task = this.$store.getters['tasks/getById'](task_id)
-        console.log('editing task: ', task)
-        this.$store.commit('settings/setCurrentEditTask', cloneDeep(task))
-        //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
-    }
-
+  private editTask(task_id: any) {
+    let task = this.$store.getters['tasks/getById'](task_id)
+    console.log('editing task: ', task)
+    this.$store.commit('settings/setCurrentEditTask', cloneDeep(task))
+    //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
+  }
 }
 </script>
 

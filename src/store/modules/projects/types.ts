@@ -9,7 +9,7 @@ export interface IModuleState {
 }
 
 export interface IProject {
-  id: number
+  id: string
   users: ICompanyUser[]
   first_task_id: number
   owner_company_id: number

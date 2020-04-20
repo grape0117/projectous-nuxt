@@ -44,7 +44,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   saveProject({ commit, state, rootState }: any, { project, project_users }: any) {
     // @ts-ignore
-    this._vm.$http().put('/projects/' + project.id, { project, project_users })
+    this._vm.$http().put('/projects/', project.id, { project, project_users })
 
     commit('UPSERT', { module: 'projects', entity: project }, { root: true })
 

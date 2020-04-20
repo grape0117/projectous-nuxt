@@ -5,7 +5,7 @@ import { REMOVE_TEMP_TASKS_USER } from '@/store/modules/task_users/mutations-typ
 import { generateUniqId } from '@/utils/util-functions'
 import uuid from 'uuid'
 
-function creteDefaultProjectUser(project_id: number): IProjectUser {
+function creteDefaultProjectUser(project_id: string): IProjectUser {
   return {
     id: uuid.v4(),
     company_user_id: null,

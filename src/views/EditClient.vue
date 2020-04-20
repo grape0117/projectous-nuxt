@@ -3,12 +3,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
           <h4 class="modal-title">Client Modal</h4>
@@ -17,67 +12,31 @@
           <form id="editClientForm" class="form-horizontal">
             <input type="hidden" name="company_client_id" :value="client.id" />
             <div class="form-group">
-              <label class="col-sm-3 control-label" for="inputClientName"
-                >Client Name:
-              </label>
+              <label class="col-sm-3 control-label" for="inputClientName">Client Name: </label>
               <div class="col-sm-9">
-                <input
-                  id="inputClientName"
-                  class="form-control"
-                  type="text"
-                  name="name"
-                  :value="client.name"
-                />
+                <input id="inputClientName" class="form-control" type="text" name="name" :value="client.name" />
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-3 control-label" for="companyAcronymInput"
-                >Acronym:</label
-              >
+              <label class="col-sm-3 control-label" for="companyAcronymInput">Acronym:</label>
               <div class="col-sm-9">
-                <input
-                  id="companyAcronymInput"
-                  class="form-control"
-                  type="text"
-                  size="5"
-                  name="acronym"
-                  :value="client.acronym"
-                />
+                <input id="companyAcronymInput" class="form-control" type="text" size="5" name="acronym" :value="client.acronym" />
               </div>
             </div>
             <div class="form-group">
-              <label class="control-label col-sm-3" for="companyClientSelect"
-                >Status:
-              </label>
+              <label class="control-label col-sm-3" for="companyClientSelect">Status: </label>
               <div class="col-sm-9">
-                <select
-                  class="form-control"
-                  id="client-modal-client-id"
-                  name="status"
-                >
-                  <option :selected="isStatus('active')" value="active"
-                    >Active</option
-                  >
-                  <option :selected="isStatus('inactive')" value="inactive"
-                    >Inactive</option
-                  >
-                  <option :selected="isStatus('archived')" value="archived"
-                    >Archived</option
-                  >
+                <select class="form-control" id="client-modal-client-id" name="status">
+                  <option :selected="isStatus('active')" value="active">Active</option>
+                  <option :selected="isStatus('inactive')" value="inactive">Inactive</option>
+                  <option :selected="isStatus('archived')" value="archived">Archived</option>
                 </select>
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-3 control-label" for="companyAcronymInput"
-                >Client Rate:</label
-              >
+              <label class="col-sm-3 control-label" for="companyAcronymInput">Client Rate:</label>
               <div class="col-sm-9">
-                <input
-                  class="form-control"
-                  type="text"
-                  name="default_client_rate"
-                  :value="client.default_client_rate"
-                />
+                <input class="form-control" type="text" name="default_client_rate" :value="client.default_client_rate" />
               </div>
             </div>
             <!--<div class="form-group">
@@ -99,79 +58,39 @@
                             </div>
                         </div>-->
             <div class="form-group">
-              <label class="col-sm-3 control-label" for="address1"
-                >Address 1:
-              </label>
+              <label class="col-sm-3 control-label" for="address1">Address 1: </label>
               <div class="col-sm-9">
-                <input
-                  id="address1"
-                  class="form-control"
-                  type="text"
-                  name="address1"
-                  :value="client.address1"
-                />
+                <input id="address1" class="form-control" type="text" name="address1" :value="client.address1" />
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-3 control-label" for="address2"
-                >Address 2:
-              </label>
+              <label class="col-sm-3 control-label" for="address2">Address 2: </label>
               <div class="col-sm-9">
-                <input
-                  id="address2"
-                  class="form-control"
-                  type="text"
-                  name="address2"
-                  :value="client.address2"
-                />
+                <input id="address2" class="form-control" type="text" name="address2" :value="client.address2" />
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 control-label" for="city">City: </label>
               <div class="col-sm-9">
-                <input
-                  id="city"
-                  class="form-control"
-                  type="text"
-                  name="city"
-                  :value="client.city"
-                />
+                <input id="city" class="form-control" type="text" name="city" :value="client.city" />
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 control-label" for="state">State: </label>
               <div class="col-sm-9">
-                <input
-                  id="state"
-                  class="form-control"
-                  type="text"
-                  name="state"
-                  :value="client.state"
-                />
+                <input id="state" class="form-control" type="text" name="state" :value="client.state" />
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 control-label" for="zip">Zip: </label>
               <div class="col-sm-9">
-                <input
-                  id="zip"
-                  class="form-control"
-                  type="text"
-                  name="zip"
-                  :value="client.zip"
-                />
+                <input id="zip" class="form-control" type="text" name="zip" :value="client.zip" />
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 control-label" for="phone">Phone: </label>
               <div class="col-sm-9">
-                <input
-                  id="phone"
-                  class="form-control"
-                  type="text"
-                  name="phone"
-                  :value="client.phone"
-                />
+                <input id="phone" class="form-control" type="text" name="phone" :value="client.phone" />
               </div>
             </div>
             <!--<div class="form-group checkbox">
@@ -182,34 +101,12 @@
             <div class="form-group" v-for="user in active_users">
               <label class="control-label col-sm-4">{{ user.name }}: </label>
               <div class="col-sm-8">
-                <input
-                  type="checkbox"
-                  :checked="userChecked(user.id)"
-                  :name="'user[' + user.id + ']'"
-                  value="1"
-                />
-                <input
-                  class=""
-                  type="text"
-                  :name="'default_user_rate[' + user.id + ']'"
-                  :value="userRate(user.id)"
-                />
+                <input type="checkbox" :checked="userChecked(user.id)" :name="'user[' + user.id + ']'" value="1" />
+                <input class="" type="text" :name="'default_user_rate[' + user.id + ']'" :value="userRate(user.id)" />
                 <select :name="'role[' + user.id + ']'">
-                  <option
-                    value="assigned"
-                    :selected="userSelected('assigned', user.id)"
-                    >Assigned
-                  </option>
-                  <option
-                    value="reviewer"
-                    :selected="userSelected('reviewer', user.id)"
-                    >Reviewer
-                  </option>
-                  <option
-                    value="manager"
-                    :selected="userSelected('manager', user.id)"
-                    >Manager
-                  </option>
+                  <option value="assigned" :selected="userSelected('assigned', user.id)">Assigned </option>
+                  <option value="reviewer" :selected="userSelected('reviewer', user.id)">Reviewer </option>
+                  <option value="manager" :selected="userSelected('manager', user.id)">Manager </option>
                 </select>
               </div>
             </div>
@@ -219,11 +116,7 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">
             Close
           </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            v-on:click="saveClient()"
-          >
+          <button type="button" class="btn btn-primary" v-on:click="saveClient()">
             Save Client
           </button>
         </div>
@@ -242,7 +135,7 @@ export default {
       return this.$store.state.settings.current_edit_company_client
     },
     active_users: function() {
-      return this.$store.getters['company_users/getActiveUsers']
+      return this.$store.getters['company_users/getActive']
     }
   },
   mounted: function() {

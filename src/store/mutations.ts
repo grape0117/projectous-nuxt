@@ -124,7 +124,7 @@ export const mutations: MutationTree<IRootState> = {
     let modulestate = state[module]
     let key = modulestate.lookup[entity.id]
     if (!modulestate[module][key]) {
-      console.log('UPDATE: entity not found in '+module+' lookup', entity.id, modulestate.lookup)
+      console.log('UPDATE: entity not found in ' + module + ' lookup', entity.id, modulestate.lookup)
       return
     }
     if (modulestate[module][key].id !== entity.id) {
@@ -155,7 +155,7 @@ export const mutations: MutationTree<IRootState> = {
   },
   UPDATE_ATTRIBUTE(state: IRootState, { module, id, attribute, value }) {
     if (!state[module]) return
-      console.log('lookup',id,state[module].lookup[id])
+    console.log('lookup', id, state[module].lookup[id])
     // @ts-ignore
     state[module][module][state[module].lookup[id]][attribute] = value
   },
@@ -188,6 +188,11 @@ export const mutations: MutationTree<IRootState> = {
     Vue.delete(state[module][module], state[module].lookup[entity.id])
     // @ts-ignore
     this.commit('LOOKUP', { module })
+    // @ts-ignore
+    if (this._mutations[module + '/CASCADE_DELETE']) {
+      // @ts-ignore
+      this.commit(module + '/CASCADE_DELETE', entity)
+    }
     //Vue.delete(state[module].lookup, entity.id)
     //TODO: what to do with project_tasks and project_users
 

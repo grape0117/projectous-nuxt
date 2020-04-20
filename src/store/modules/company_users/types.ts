@@ -4,13 +4,13 @@ export interface IModuleState {
 }
 
 export interface ICompanyUser {
-  id: number
-  parent_company_user_id: number
+  id: string
+  parent_company_user_id: string
   name: string
   fullname: string
-  company_id: number
-  user_id: number
-  partner_company_id: number
+  company_id: string
+  user_id: string
+  partner_company_id: string
   status: string
   user_type: string
   user_role: string

@@ -148,7 +148,7 @@ export default {
       return this.$store.state.settings.current_edit_expense
     },
     users: function() {
-      return this.$store.getters['company_users/getActiveUsers'] //TODO: include inactive user if user is on the expense? And a checkbox for showing inactive users?
+      return this.$store.getters['company_users/getActive'] //TODO: include inactive user if user is on the expense? And a checkbox for showing inactive users?
     },
     current_company_user: function() {
       return this.$store.state.settings.current_company_user

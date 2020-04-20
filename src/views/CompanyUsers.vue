@@ -14,12 +14,7 @@
             <td>Role</td>
             <td>Address</td>
           </tr>
-          <tr
-            v-for="user in filteredusers"
-            :key="user.id"
-            v-bind:user="user"
-            is="company-users-row"
-          />
+          <tr v-for="user in filteredusers" :key="user.id" v-bind:user="user" is="company-users-row" />
         </tbody>
       </table>
     </div>
@@ -43,7 +38,7 @@ export default {
     },
     filteredusers: function() {
       return this.company_users
-      return this.$store.getters['company_users/getActiveUsers']
+      return this.$store.getters['company_users/getActive']
     }
   },
   methods: {

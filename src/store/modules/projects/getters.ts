@@ -4,7 +4,7 @@ import { IRootState } from '@/store/types'
 import { IModuleState, IProject } from './types'
 
 export const getters: GetterTree<IModuleState, IRootState> = {
-  getById: (state: IModuleState) => (id: number) => {
+  getById: (state: IModuleState) => (id: string) => {
     let project
     // tslint:disable-next-line:no-conditional-assignment
     if ((project = state.projects[state.lookup[id]])) {
@@ -94,12 +94,12 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       return project.client_id == client_company_id
     })*/
   },
-  getUserProjects: (state: IModuleState) => (userId: number) => {
+  getUserProjects: (state: IModuleState) => (userId: string) => {
     if (!userId) {
       return state.projects
     }
 
-    let userProjects: number[] = []
+    let userProjects: string[] = []
 
     return state.projects.filter((project: IProject) => {
       let userMatch = false
@@ -128,7 +128,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     state: IModuleState,
     // tslint:disable-next-line:no-shadowed-variable
     _getters: any
-  ) => (project_id: number) => {
+  ) => (project_id: string) => {
     let project = _getters.getprojectById(project_id)
     if (project) {
       return project.name
@@ -141,7 +141,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     _getters: any,
     rootState: IRootState,
     rootGetters: any
-  ) => (project_id: number) => {
+  ) => (project_id: string) => {
     let project = _getters.getprojectById(project_id)
     if (!project) {
       return ''

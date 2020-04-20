@@ -5,8 +5,8 @@ export interface IModuleState {
 
 export interface IProjectUser {
   id?: string
-  project_id: number
-  company_user_id: number | null
+  project_id: string
+  company_user_id: number | string | null
   role: string
   user_rate: string
 }
