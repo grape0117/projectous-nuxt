@@ -15,6 +15,7 @@ export const mutations: MutationTree<IRootState> = {
   ADD_MANY(state: IRootState, { module, entities }: any) {
     console.log('ADD_MANY ' + module)
     if (!state[module]) return
+    console.log(module, entities)
     //@ts-ignore
     entities.forEach((value, key) => {
       //@ts-ignore
@@ -137,7 +138,7 @@ export const mutations: MutationTree<IRootState> = {
         if (entity.hasOwnProperty(property)) {
           //TODO likely unneeded
           if (!has(modulestate[module][key], property)) {
-            console.log('Error: Property not found: ' + property, entity)
+            console.log('Error: Property not found: ' + property, modulestate[module][key])
             continue
           }
           // @ts-ignore

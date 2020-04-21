@@ -203,6 +203,8 @@ export default class Custom extends Vue {
 
   //TODO: rename as move project task
   public updateTask(task: any) {
+    console.log('************* Custom updateTask *************', task)
+    task.status = task.listId
     if (this.currentListsBlockName !== this.listsBlockNames.PROJECTS) return
     this.$store.dispatch('UPDATE', { module: 'tasks', entity: task })
   }
