@@ -2,6 +2,7 @@ import { MutationTree } from 'vuex'
 import { IRootState } from './types'
 import Vue from 'vue'
 import { idbKeyval } from '@/plugins/idb'
+import { has } from 'lodash'
 
 export const mutations: MutationTree<IRootState> = {
   /**
@@ -12,7 +13,7 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   ADD_MANY(state: IRootState, { module, entities }: any) {
-    console.log('ADD_MANY')
+    console.log('ADD_MANY ' + module)
     if (!state[module]) return
     //@ts-ignore
     entities.forEach((value, key) => {
@@ -134,8 +135,9 @@ export const mutations: MutationTree<IRootState> = {
     if (key >= 0) {
       for (let property in entity) {
         if (entity.hasOwnProperty(property)) {
-          if (!modulestate[module][key][property]) {
-            console.log(entity, property)
+          //TODO likely unneeded
+          if (!has(modulestate[module][key], property)) {
+            console.log('Error: Property not found: ' + property, entity)
             continue
           }
           // @ts-ignore

@@ -66,7 +66,6 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       .reduce(function(result: any, project_id: any) {
         let project = _getters['getById'](project_id)
         if (!project) {
-          console.log(project_id)
           return result
         }
         if (project.status != 'open') {
@@ -75,14 +74,11 @@ export const getters: GetterTree<IModuleState, IRootState> = {
         if (!result) {
           result = []
         }
-        // @ts-ignore
-        console.log(result)
 
         result.push(project)
         return result
-      })
+      }, [])
       .sort(function(a: IProject, b: IProject) {
-        console.log(a, b)
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
         if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
         return 0

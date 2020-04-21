@@ -6,7 +6,7 @@
     <div class="dragzone__content">
       <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
-          <div style="width: 100%; height: 20px" @dragover="moveItem(index, item.id)" />
+          <div style="width: 100%; height: 20px" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
               <div v-if="true || editedItemId === item.id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
@@ -28,7 +28,7 @@
               <div class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
             </div>
             <div class="dragzone__task-users">
-              <small>sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small>
+              <small>list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small>
               <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
             </div>
           </div>
@@ -200,20 +200,11 @@ export default class Dragzone extends Vue {
    * Dragover event
    */
   private moveItem(index: number, id: string) {
+    console.log('************* DRAGOVER ' + this.id + ' ' + this.group + ' *************')
     localStorage.setItem('displaced_item_id', id) //TODO: should this be after the next line?
     if (this.isListDragged) return
 
-    try {
-      const item = JSON.parse(localStorage.getItem('item') as string)
-      item.listId = this.id
-      item.user_task_list_id = this.group === 'User Lists' ? this.id : null
-      item.sort_order = index
-      this.$emit('updateDataIndexes', item, id)
-      localStorage.setItem('item', JSON.stringify(item))
-    } catch (e) {
-      alert('moveItem error check console')
-      console.log(e)
-    }
+    this.updateDraggedLocalStorageItem(index, id)
   }
 
   /**
@@ -223,6 +214,7 @@ export default class Dragzone extends Vue {
    * -TODO: why is it checking tasks.length? Aside from setting sort order, I don't see a reason yet
    */
   private moveToNewList() {
+    console.log('************* DRAGENTER ' + this.id + ' ' + this.group + ' *************')
     this.$emit('setCurrentListsBlockName') //TODO: move after next line?
     if (this.isListDragged) return
 
@@ -234,13 +226,13 @@ export default class Dragzone extends Vue {
 
   private updateDraggedLocalStorageItem(sort_order: number, dropped_id: string) {
     try {
+      console.log('group', this.group)
       const item = JSON.parse(localStorage.getItem('item') as string)
       //TODO: listId should be a uuid and user_task_list_id should also be that so we don't need diff ids?
       item.listId = this.id
-      item.user_task_list_id = this.group === 'User Lists' ? this.id : null
-      item.user_task_list_id = this.group === 'User Lists' ? this.id : null
+      item.user_task_list_id = this.id ? this.id : null
       item.sort_order = sort_order
-      this.$emit('updateDataIndexes', item, dropped_id)
+      this.$emit('updateDataIndexes', item, dropped_id) //TODO this somehow governs the drop area grey div
       localStorage.setItem('item', JSON.stringify(item))
     } catch (e) {
       console.log(e)
