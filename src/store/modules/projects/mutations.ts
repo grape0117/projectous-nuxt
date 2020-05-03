@@ -8,12 +8,12 @@ export const mutations: MutationTree<IModuleState> = {
     //@ts-ignore
     projects.forEach(function(project, key) {
       //@ts-ignore
-      if (!state.lookup_by_client_company_id[project.client_id]) {
+      if (!state.lookup_by_client_company_id[project.client_company_id]) {
         // @ts-ignore
-        state.lookup_by_client_company_id[project.client_id] = []
+        state.lookup_by_client_company_id[project.client_company_id] = []
       }
       // @ts-ignore
-      state.lookup_by_client_company_id[project.client_id].push(key)
+      state.lookup_by_client_company_id[project.client_company_id].push(key)
     })
   },
   [SET_SELECTED_PROJECT](state: IModuleState, id: string | number | null) {

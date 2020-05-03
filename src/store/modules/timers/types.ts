@@ -13,7 +13,7 @@ export interface ITimer {
   user_id: any
   project_id: any
   parent_id: any
-  company_client_id: any
+  client_id: any
   task_id: any
   report_at: any
   duration: any

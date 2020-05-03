@@ -12,6 +12,7 @@
     </main>
     <timer-tab />
     <task-modal />
+    <edit-client-modal id="edit-client-modal" />
     <edit-user-modal id="edit-user-modal" />
     <edit-timer-modal id="edit-timer-modal" />
     <edit-project-modal id="edit-project-modal" />
@@ -21,6 +22,7 @@
 
 <script>
 import TimerTab from './views/TimerTab'
+import EditClientModal from './views/EditClientModal.vue'
 import EditUserModal from './views/EditUserModal'
 import EditTaskModal from './views/EditTaskModal'
 import EditTimerModal from './views/EditTimerModal'
@@ -35,6 +37,7 @@ export default {
   components: {
     TimerTab,
     TaskTray,
+    EditClientModal,
     EditUserModal,
     EditTaskModal,
     EditTimerModal,
@@ -53,17 +56,25 @@ export default {
     current_edit_task: function(value) {
       alert('watched!')
       if (this.current_edit_task.id) {
-        this.$bvModal.show('timer-modal')
+        this.$bvModal.show('task-modal')
       } else {
-        this.$bvModal.hide('timer-modal')
+        this.$bvModal.hide('task-modal')
       }
     },
     current_edit_project: function(value) {
       alert('watched!')
       if (this.current_edit_project.id) {
-        this.$bvModal.show('timer-modal')
+        this.$bvModal.show('project-modal')
       } else {
-        this.$bvModal.hide('timer-modal')
+        this.$bvModal.hide('project-modal')
+      }
+    },
+    current_edit_client: function(value) {
+      alert('watched!')
+      if (this.current_edit_project.id) {
+        this.$bvModal.show('client-modal')
+      } else {
+        this.$bvModal.hide('client-modal')
       }
     },
     '$route.path': {
@@ -103,6 +114,7 @@ export default {
 
       const dataValidation = await this.checkDataInIndexDB()
       let data = {}
+      //TODO: find out why adding a table breaks
       if (indexDBExists && dataValidation) {
         for (let propertyName of modulesNamesList) {
           const allEntities = await idbGetAll(propertyName)
@@ -132,19 +144,20 @@ export default {
       }
       return valid
     },
-    async setAppData({ company_clients, company_users, task_users, tasks, projects, project_users, user_task_lists, current_company_id, current_company_user_id, timers, user_id }) {
+    async setAppData({ client_users, clients, company_users, task_users, tasks, projects, project_users, user_task_lists, current_company_id, current_company_user_id, timers, user_id }) {
       // this.$bvModal.show('edit-user-modal')
       Vue.set(this.$store.state.settings, 'current_user_id', user_id)
       Vue.set(this.$store.state.settings, 'current_company_user_id', current_company_user_id)
       Vue.set(this.$store.state.settings, 'current_company_id', current_company_id)
 
+      this.$store.commit('ADD_MANY', { module: 'client_users', entities: client_users }, { root: true })
       this.$store.commit('ADD_MANY', { module: 'task_users', entities: task_users }, { root: true })
       this.$store.commit('ADD_MANY', { module: 'tasks', entities: tasks }, { root: true })
       this.$store.commit('ADD_MANY', { module: 'timers', entities: timers }, { root: true })
       this.$store.commit('ADD_MANY', { module: 'projects', entities: projects }, { root: true })
       this.$store.commit('ADD_MANY', { module: 'project_users', entities: project_users }, { root: true })
       this.$store.commit('ADD_MANY', { module: 'company_users', entities: company_users }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'company_clients', entities: company_clients }, { root: true })
+      this.$store.commit('ADD_MANY', { module: 'clients', entities: clients }, { root: true })
       const userLists = createUserLists(user_task_lists)
       this.$store.commit('lists/lists/CREATE_LISTS', {
         listName: 'userLists',

@@ -50,8 +50,8 @@ export default {
       try {
         if (a.client_id && b.client_id)
           if (a.client_id != b.client_id) {
-            let aclient = store.getters['company_clients/getByClientCompanyId'](a.client_id)
-            let bclient = store.getters['company_clients/getByClientCompanyId'](b.client_id)
+            let aclient = store.getters['clients/getByClientCompanyId'](a.client_id)
+            let bclient = store.getters['clients/getByClientCompanyId'](b.client_id)
             return Vue.simpleSort(aclient.name.toLowerCase(), bclient.name.toLowerCase())
           }
         if (a.owner_company_id == 44 && b.owner_company_id == 44) {

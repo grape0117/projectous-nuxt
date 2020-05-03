@@ -27,8 +27,14 @@ export const mutations: MutationTree<IModuleState> = {
   setCurrentEditCompanyUser(state, company_user) {
     state.current_edit_company_user = JSON.parse(JSON.stringify(company_user))
   },
-  setCurrentEditCompanyClient(state, company_client) {
-    state.current_edit_company_client = JSON.parse(JSON.stringify(company_client))
+  setCurrentEditCompanyClient(state, client) {
+    console.log('open client modal', client)
+    state.current_edit_client = client
+    if (client.id) {
+      state.bvModal.show('client-modal')
+    } else {
+      state.bvModal.hide('client-modal')
+    }
   },
   setCurrentEditProject(state, project) {
     console.log('open project modal')

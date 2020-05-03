@@ -1,13 +1,6 @@
 <template id="mytimer-sidebar-template">
   <div style="background: white;">
-    <sidebar-timer
-      v-bind:running_timers="running_timers"
-      v-bind:projects="projects"
-      v-bind:users="users"
-      v-for="timer in mytimers()"
-      v-bind:timer="timer"
-      :key="'sidebar-' + timer.id"
-    ></sidebar-timer>
+    <sidebar-timer v-bind:running_timers="running_timers" v-bind:projects="projects" v-bind:users="users" v-for="timer in mytimers()" v-bind:timer="timer" :key="'sidebar-' + timer.id"></sidebar-timer>
   </div>
 </template>
 
@@ -29,8 +22,8 @@ export default {
     users: function() {
       return this.$store.state.company_users.company_users
     },
-    company_clients: function() {
-      return this.$store.state.company_clients.company_clients
+    clients: function() {
+      return this.$store.state.clients.clients
     },
     current_company: function() {
       return this.$store.state.settings.current_company
@@ -51,17 +44,10 @@ export default {
         //TODO: different sort for Chad
         return this.timers
           .filter(function(timer) {
-            if (
-              self.$store.getters['company_clients/getCompanyClientById'](
-                timer.company_client_id
-              ).status != 'active'
-            ) {
+            if (self.$store.getters['clients/getCompanyClientById'](timer.client_id).status != 'active') {
               return false
             }
-            if (
-              self.$store.getters['projects/getById'](timer.project_id)
-                .status == 'closed'
-            ) {
+            if (self.$store.getters['projects/getById'](timer.project_id).status == 'closed') {
               return false
             }
             return timer.user_id == self.$store.state.settings.current_user_id //TODO: company_user_id
@@ -75,38 +61,22 @@ export default {
             let bProjectKey = ''
             let aProjectName = ''
             let bProjectName = ''
-            if (!a.company_client_id || !a.project_id) {
+            if (!a.client_id || !a.project_id) {
               return -1
             }
-            if (!b.company_client_id || !b.project_id) {
+            if (!b.client_id || !b.project_id) {
               return 1
             }
-            if (a.company_client_id != b.company_client_id) {
-              aClientName = self.$store.getters[
-                'company_clients/getCompanyClientById'
-              ](a.company_client_id)
-                ? self.$store.getters['company_clients/getCompanyClientById'](
-                    a.company_client_id
-                  ).name.toLowerCase()
-                : ''
-              bClientName = self.$store.getters[
-                'company_clients/getCompanyClientById'
-              ](b.company_client_id)
-                ? self.$store.getters['company_clients/getCompanyClientById'](
-                    b.company_client_id
-                  ).name.toLowerCase()
-                : ''
+            if (a.client_id != b.client_id) {
+              aClientName = self.$store.getters['clients/getCompanyClientById'](a.client_id) ? self.$store.getters['clients/getCompanyClientById'](a.client_id).name.toLowerCase() : ''
+              bClientName = self.$store.getters['clients/getCompanyClientById'](b.client_id) ? self.$store.getters['clients/getCompanyClientById'](b.client_id).name.toLowerCase() : ''
               if (aClientName > bClientName) {
                 return 1
               }
               return -1
             } else {
-              aProjectName = self.$store.getters['projects/getById'](
-                a.project_id
-              ).name.toLowerCase()
-              bProjectName = self.$store.getters['projects/getById'](
-                b.project_id
-              ).name.toLowerCase()
+              aProjectName = self.$store.getters['projects/getById'](a.project_id).name.toLowerCase()
+              bProjectName = self.$store.getters['projects/getById'](b.project_id).name.toLowerCase()
               if (aProjectName === bProjectName) {
                 return 0 //TODO: check report_at?
               }
@@ -121,10 +91,7 @@ export default {
       return this.timers
         .filter(function(timer) {
           return true
-          return (
-            timer.company_user_id ===
-            self.$store.state.settings.current_company_user.id
-          )
+          return timer.company_user_id === self.$store.state.settings.current_company_user.id
         })
         .sort(function(a, b) {
           let aDate = new Date(a.report_at)

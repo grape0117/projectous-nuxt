@@ -17,11 +17,11 @@
       <div class="form-group">
         <label class="control-label col-sm-4" for="companyClientSelect">Client: </label>
         <div class="col-sm-6">
-          <select class="form-control" id="client-modal-client-id" name="client_id" v-model="project.client_id" v-on:change="isCreateClient()">
+          <select class="form-control" id="client-modal-client-id" name="client_id" v-model="project.client_company_id" v-on:change="isCreateClient()">
             <option>***** Choose Client *****</option>
             <option value="create">Create New Client</option>
-            <option v-for="company_client in sorted_company_clients" v-bind:value="company_client.client_id" v-bind:company_client="company_client">
-              {{ company_client.name }}
+            <option v-for="client in sorted_clients" v-bind:value="client.client_company_id" v-bind:client="client">
+              {{ client.name }}
             </option>
           </select>
         </div>
@@ -76,7 +76,7 @@
       <div v-if="isAdmin()" class="form-group">
         <label class="control-label col-sm-4" for="projectEditDescription">Users: </label>
         <div class="col-sm-8">
-          <edit-project-modal-user v-for="user in users" :key="user.id" @toggle="toggleUser" v-bind:project="project" v-bind:project_user="projectUser(project.id, user.id)" v-bind:user="user" />
+          <edit-project-modal-user v-for="user in users" :key="user.id" @toggle="toggleUser" v-bind:client_user="projectClientUser(user.id)" v-bind:project="project" v-bind:project_user="projectUser(project.id, user.id)" v-bind:user="user" />
 
           <!--<table class="row without-margin" v-if="isAdmin()">
                         <tr>
@@ -111,14 +111,14 @@ export default {
     }
   },
   computed: {
-    sorted_company_clients: function() {
-      return this.$store.getters['company_clients/getActiveCompanyClients']
+    sorted_clients: function() {
+      return this.$store.getters['clients/getActiveCompanyClients']
     },
     project: function() {
       return this.$store.getters['settings/getCurrentEditProject']
     },
-    company_clients: function() {
-      return this.$store.state.company_clients.company_clients
+    clients: function() {
+      return this.$store.state.clients.clients
     },
     users: function() {
       return this.$store.getters['company_users/getActive']
@@ -159,6 +159,10 @@ export default {
     }
   },
   methods: {
+    projectClientUser(company_user_id) {
+      const client = this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
+      return client ? this.$store.getters['client_users/getByClientIdAndCompanyUserId']({ client_id: client.id, company_user_id }) : null
+    },
     toggleUser(user) {
       //only add each entry once into changed_project_users
       const project_user_index = this.changed_project_users.findIndex(changed_project_user => {
@@ -176,7 +180,7 @@ export default {
       }
     },
     projectUser(project_id, company_user_id) {
-      return this.$store.getters['project_users/getByProjectIdAndUserId']({ project_id, company_user_id })
+      return this.$store.getters['project_users/getByProjectIdAndCompanyUserId']({ project_id, company_user_id })
     },
     closeProject() {
       this.$store.dispatch('projects/closeProject', this.project)
@@ -194,20 +198,20 @@ export default {
       return this.$store.getters['settings/isAdmin']
     },
     clientClientRate: function() {
-      return this.$store.getters['company_clients/clientRate'](this.project.client_id)
+      return this.$store.getters['clients/clientRate'](this.project.client_company_id)
     },
     clientUserRate: function() {
-      return this.$store.getters['company_clients/userRate'](this.project.client_id)
+      return this.$store.getters['clients/userRate'](this.project.client_company_id)
     },
     due_date: function() {
       return '' //dateTimeToInput(this.project.due_at)
     },
     isProjectClient: function(client_id) {
-      return this.project.client_id === client_id
+      return this.project.client_company_id === client_id
     },
     isCreateClient: function() {
       if (document.getElementById('client-modal-client-id').value === 'create') {
-        this.$store.dispatch('company_clients/createClient')
+        this.$store.dispatch('clients/createClient')
       }
     },
     editClient: function() {
@@ -217,10 +221,10 @@ export default {
         pop: false,
         push: true
       })
-      this.$store.dispatch('company_clients/editClient', this.projectClient())
+      this.$store.dispatch('clients/editClient', this.projectClient())
     },
     projectClient: function() {
-      return this.$store.getters['company_clients/getByClientCompanyId'](this.project.client_id)
+      return this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
     },
     saveProject: function(callback) {
       this.$store.dispatch('projects/saveProject', { project: this.project, project_users: this.changed_project_users })

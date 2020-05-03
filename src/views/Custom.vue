@@ -1,27 +1,22 @@
 <template>
   <div>
-    Project Filter: <input v-model="project_search" />
+    Project Filter: <input v-model="project_search" /> <input type="checkbox" v-model="show_all_active_projects" /> Show all active projects
     <hr />
     <b-container fluid>
       <b-row>
-        <b-col cols="3" class="scroll-col">
-          <div class="text-center">
-            Projects
-          </div>
-          <div v-for="client in activeClients">
+        <b-col cols="5" class="scroll-col">
+          <div v-if="clientVisible(client)" v-for="client in activeClients">
             <!--            Todo: change client id to client name-->
-            {{ client.name }}
-            <ul>
-              <li v-for="{ name, id } in openClientProjects(client)">
-                <div @click="setPinnedProject(id)" class="project-item__status">
-                  <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
-                  <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
-                </div>
-                <div class="project-item__name" @click="setProjectId(id)">
-                  {{ name }}
-                </div>
-              </li>
-            </ul>
+            <div style="background: #666666; color: white; padding-left: 5px; text-transform: uppercase">{{ client.name }} <b-icon icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
+            <div v-for="{ name, id } in openClientProjects(client)">
+              <div @click="setPinnedProject(id)" class="project-item__status">
+                <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
+                <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
+              </div>
+              <div class="project-item__name" @click="setProjectId(id)">
+                {{ name }}
+              </div>
+            </div>
           </div>
         </b-col>
         <b-col v-if="selectedProjectId" cols="6">
@@ -45,7 +40,7 @@ import NewListForm from '@/components/draggable/NewListForm.vue'
 import TimerTab from './TimerTab.vue'
 import uuid from 'uuid'
 
-const CompanyClients = namespace('company_clients')
+const CompanyClients = namespace('clients')
 const CompanyUsers = namespace('company_users')
 const TaskUsers = namespace('task_users')
 const Tasks = namespace('tasks')
@@ -88,7 +83,7 @@ export default class Custom extends Vue {
   }
 
   get activeClients() {
-    return this.$store.state.company_clients.company_clients
+    return this.$store.state.clients.clients
       .filter((client: any) => {
         return client.status === 'active'
       })
@@ -106,6 +101,10 @@ export default class Custom extends Vue {
   }
   get taskDetailsDisplayed() {
     return this.editedTaskId && this.editedTaskTimerId
+  }
+
+  get current_company_user_id() {
+    return this.$store.state.settings.current_company_user_id
   }
   get selectedProjectTasksForStatusesColumns() {
     const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
@@ -150,6 +149,7 @@ export default class Custom extends Vue {
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
 
+  private show_all_active_projects: boolean = false
   private editedTaskTimerId: number | string | null = null
   private editedTaskId: number | string | null = null
   private currentListsBlockName: string | null = null
@@ -168,7 +168,12 @@ export default class Custom extends Vue {
           return false
         }
         if (project.status !== 'open') return false
-        return project.client_id === client.client_id
+        if (project.client_company_id !== client.client_company_id) return false
+        if (!this.show_all_active_projects) {
+          let project_user = this.$store.getters['project_users/getByProjectIdAndUserId'](project.id, this.current_company_user_id)
+          return project_user !== 'undefined'
+        }
+        return true
       })
       .sort((a: any, b: any) => {
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
@@ -177,15 +182,15 @@ export default class Custom extends Vue {
       })
   }
 
-  public clientName(company_client_id: any) {
-    const company_client = this.$store.getters['company_clients/getById'](company_client_id)
-    return company_client ? company_client.name : ''
+  public clientName(client_id: any) {
+    const client = this.$store.getters['clients/getById'](client_id)
+    return client ? client.name : ''
   }
 
   public clientNameFromProject(project_id: any) {
     const project = this.$store.getters['projects/getById'](project_id)
-    const company_client = this.$store.getters['company_clients/getById'](project.client_id)
-    return company_client ? company_client.name : ''
+    const client = this.$store.getters['clients/getById'](project.client_id)
+    return client ? client.name : ''
   }
 
   public projectName(project_id: any) {
@@ -213,6 +218,11 @@ export default class Custom extends Vue {
     this.$store.dispatch('DELETE', { module: 'tasks', entity: task })
   }
 
+  private clientVisible(client: any) {
+    const client_user = this.$store.getters['client_users/getByClientIdAndCompanyUserId']({ client_id: client.id, company_user_id: this.current_company_user_id })
+    console.log(client_user)
+    return true
+  }
   //TODO: pass only ids instead of whole objects?
   private updateTaskSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
@@ -245,6 +255,12 @@ export default class Custom extends Vue {
     console.log('edit project')
     let project = this.$store.getters['projects/getById'](project_id)
     this.$store.commit('settings/setCurrentEditProject', cloneDeep(project))
+  }
+
+  private editClient(client_id: any) {
+    console.log('edit client')
+    let client = this.$store.getters['clients/getById'](client_id)
+    this.$store.commit('settings/setCurrentEditCompanyClient', cloneDeep(client))
   }
 
   private editTask(task_id: any) {

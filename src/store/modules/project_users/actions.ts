@@ -11,7 +11,7 @@ function creteDefaultProjectUser(project_id: string): IProjectUser {
     company_user_id: null,
     role: '',
     project_id,
-    user_rate: '0.00'
+    default_user_rate: null
   }
 }
 

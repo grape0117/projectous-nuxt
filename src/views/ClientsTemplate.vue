@@ -32,11 +32,7 @@
               <tr class="row-date">
                 <td>Client</td>
               </tr>
-              <tr
-                v-bind:client="client"
-                v-for="client in filteredclients('active')"
-                is="clients-row"
-              ></tr>
+              <tr v-bind:client="client" v-for="client in filteredclients('active')" is="clients-row"></tr>
             </tbody>
           </table>
         </div>
@@ -48,11 +44,7 @@
               <tr class="row-date">
                 <td>Client</td>
               </tr>
-              <tr
-                v-bind:client="client"
-                v-for="client in filteredclients('inactive')"
-                is="clients-row"
-              ></tr>
+              <tr v-bind:client="client" v-for="client in filteredclients('inactive')" is="clients-row"></tr>
             </tbody>
           </table>
         </div>
@@ -64,11 +56,7 @@
               <tr class="row-date">
                 <td>Client</td>
               </tr>
-              <tr
-                v-bind:client="client"
-                v-for="client in filteredclients('archived')"
-                is="clients-row"
-              ></tr>
+              <tr v-bind:client="client" v-for="client in filteredclients('archived')" is="clients-row"></tr>
             </tbody>
           </table>
         </div>
@@ -82,7 +70,7 @@ export default {
   name: 'clients-template',
   computed: {
     clients: function() {
-      return this.$store.state.company_clients.company_clients
+      return this.$store.state.clients.clients
     },
     current_company: function() {
       return this.$store.state.settings.current_company
@@ -110,10 +98,10 @@ export default {
       return clients
     },
     createClient: function() {
-      this.$store.dispatch('company_clients/createClient')
+      this.$store.dispatch('clients/createClient')
     },
     editClient: function(client) {
-      this.$store.dispatch('company_clients/editClient', client)
+      this.$store.dispatch('clients/editClient', client)
     }
   }
 }

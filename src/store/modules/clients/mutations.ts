@@ -5,17 +5,17 @@ import { IRootState } from '@/store/types'
 
 export const mutations: MutationTree<IModuleState> = {
   /**
-   * Creates additional lookup for company_clients
+   * Creates additional lookup for clients
    * NOTE: do not call this directly. Call LOOKUP from root store
    * @param {IModuleState} state
-   * @param company_clients
+   * @param clients
    * @constructor
    */
-  LOOKUP(state: IModuleState, company_clients: any) {
+  LOOKUP(state: IModuleState, clients: any) {
     //@ts-ignore
-    company_clients.forEach(function(company_client, key) {
+    clients.forEach(function(client, key) {
       //@ts-ignore
-      Vue.set(state.lookup_by_client_company_id, company_client.client_id, key) //TODO: risk of having more than one client with the same company id?
+      Vue.set(state.lookup_by_client_company_id, client.client_company_id, key) //TODO: risk of having more than one client with the same company id?
     })
   }
 }

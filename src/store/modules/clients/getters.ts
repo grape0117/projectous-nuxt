@@ -4,15 +4,17 @@ import { IModuleState } from './types'
 
 export const getters: GetterTree<IModuleState, IRootState> = {
   getById: (state: IModuleState) => (id: any) => {
-    return state.company_clients[state.lookup[id]]
+    return state.clients[state.lookup[id]]
   },
   getByClientCompanyId: (state: IModuleState) => (client_company_id: any) => {
-    return state.company_clients[state.lookup_by_client_company_id[client_company_id]]
+    const client = state.clients[state.lookup_by_client_company_id[client_company_id]]
+    //console.log('client', client, 'client_company_id', client_company_id, 'key', state.lookup_by_client_company_id[client_company_id])
+    return client
   },
   getActiveCompanyClients: (state: IModuleState) => {
-    return state.company_clients
-      .filter(company_client => {
-        return company_client.status == 'active'
+    return state.clients
+      .filter(client => {
+        return client.status == 'active'
       })
       .sort((a, b) => {
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1

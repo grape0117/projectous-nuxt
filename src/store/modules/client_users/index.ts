@@ -6,11 +6,10 @@ import { mutations } from './mutations'
 import { IModuleState } from './types'
 
 const state = {
-  company_clients: [],
-  lookup: {},
-  lookup_by_client_company_id: {}
+  client_users: [],
+  lookup: {}
 }
-export const company_clients: Module<IModuleState, IRootState> = {
+export const client_users: Module<IModuleState, IRootState> = {
   namespaced: true,
   state,
   actions,

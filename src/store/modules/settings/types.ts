@@ -17,7 +17,7 @@ export interface IModuleState {
   current_module_settings: {}
   current_edit_project: IProject
   current_edit_company_user: ICompanyUser
-  current_edit_company_client: { id: null }
+  current_edit_client: { id: null }
   current_edit_task: ITask
   current_edit_timer: any // TODO
   current_edit_task_type: {} // TODO

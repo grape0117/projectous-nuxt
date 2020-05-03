@@ -11,18 +11,9 @@ right: 0;"
       <button @click="startTimer()">Start New</button>
     </div>
 
-    <my-sidebar-timer
-      :class="getSidebarClass()"
-      style="text-align: left; overflow-y: scroll; border: solid 1px #cccccc;"
-      v-bind:only_hidden="false"
-      v-bind:timer_filter="timer_filter"
-    ></my-sidebar-timer>
+    <my-sidebar-timer :class="getSidebarClass()" style="text-align: left; overflow-y: scroll; border: solid 1px #cccccc;" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
     <div :class="'chat-hide-btn ' + trayClass()">
-      <button
-        @click="trayToggle()"
-        type="button"
-        :class="'btn btn-purple ' + trayClass()"
-      >
+      <button @click="trayToggle()" type="button" :class="'btn btn-purple ' + trayClass()">
         timers
       </button>
     </div>
@@ -60,7 +51,7 @@ export default {
     startTimer: function() {
       this.$store.dispatch('timers/startTimer', {
         current_company_id: this.$store.state.settings.current_company.id,
-        company_client_id: '',
+        client_id: '',
         project_id: '',
         task_id: '',
         is_billable: 1,

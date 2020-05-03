@@ -16,7 +16,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   getOpenProjectsSortedByClient: function(state: IModuleState, _getters, rootState, rootGetters) {
     let self = this
     //console.log('openprojects')
-    let active_clients = rootGetters['company_clients/getActiveCompanyClients']
+    let active_clients = rootGetters['clients/getActiveCompanyClients']
     // @ts-ignore
     let projects = []
     if (!active_clients) {
@@ -27,12 +27,12 @@ export const getters: GetterTree<IModuleState, IRootState> = {
 
     //console.log(state.lookup_by_client_company_id)
     // @ts-ignore
-    active_clients.forEach(function(company_client) {
-      //console.log(company_client)
+    active_clients.forEach(function(client) {
+      //console.log(client)
       client_projects = []
       // @ts-ignore
       // @ts-ignore
-      let client_project_keys = state.lookup_by_client_company_id[company_client.client_id]
+      let client_project_keys = state.lookup_by_client_company_id[client.client_company_id]
       // @ts-ignore
       client_project_keys.forEach(function(key) {
         //console.log(project_id)
@@ -61,33 +61,30 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     return projects
   },
   getOpenCompanyProjects: (state: IModuleState, _getters) => (client_company_id: any) => {
+    let openCompanyProjects: any = []
     // @ts-ignore
-    return state.lookup_by_client_company_id[client_company_id]
-      .reduce(function(result: any, project_id: any) {
-        let project = _getters['getById'](project_id)
-        if (!project) {
-          return result
-        }
-        if (project.status != 'open') {
-          return result
-        }
-        if (!result) {
-          result = []
-        }
+    state.lookup_by_client_company_id[client_company_id].forEach(function(projectKey: any) {
+      let project = state.projects[projectKey]
+      if (!project) {
+        return
+      }
+      if (project.status != 'open') {
+        return
+      }
 
-        result.push(project)
-        return result
-      }, [])
-      .sort(function(a: IProject, b: IProject) {
-        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
-        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
-        return 0
-      })
+      openCompanyProjects.push(project)
+    })
+
+    return openCompanyProjects.sort(function(a: IProject, b: IProject) {
+      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+      return 0
+    })
     /*return state.projects.filter(project => {
       if (project.status != 'open') {
         return false
       }
-      return project.client_id == client_company_id
+      return project.client_company_id == client_company_id
     })*/
   },
   getUserProjects: (state: IModuleState) => (userId: string) => {
@@ -141,8 +138,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     let project = _getters.getprojectById(project_id)
     if (!project) {
       return ''
-    } else if (project.client_id) {
-      let client = rootGetters['clients/getClientById'](project.client_id)
+    } else if (project.client_company_id) {
+      let client = rootGetters['clients/getClientById'](project.client_company_id)
       if (client) {
         return client.name
       }
@@ -157,8 +154,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       if (project.status != 'open') {
         return false
       }
-      let company_client = rootGetters['company_clients/getByClientCompanyId'](project.client_id)
-      if (company_client && company_client.status != 'active') {
+      let client = rootGetters['clients/getByClientCompanyId'](project.client_company_id)
+      if (client && client.status != 'active') {
         return false
       }
 
@@ -189,14 +186,14 @@ export const getters: GetterTree<IModuleState, IRootState> = {
               .replace(' ', '.*') +
             ')'
         )
-        let companyClientKey = rootState.company_clients.lookup_by_client_id[project.client_id]
+        let companyClientKey = rootState.clients.lookup_by_client_id[project.client_company_id]
         if (typeof companyClientKey !== 'undefined') {
-          if (!(rootState.company_clients.company_clients[companyClientKey].name + ' ' + project.name).toLowerCase().match(regex)) {
+          if (!(rootState.clients.clients[companyClientKey].name + ' ' + project.name).toLowerCase().match(regex)) {
             //return false;
           }
         } else {
           //TODO uncomment to find projects without a client
-          //console.log(project.name, project.client_id, rootState.company_clients.lookup_by_client_id[project.client_id])
+          //console.log(project.name, project.client_company_id, rootState.clients.lookup_by_client_id[project.client_company_id])
           //return false;
         }
       }
@@ -214,8 +211,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       if (project.status != 'open') {
         return false
       }
-      let company_client = rootGetters['company_clients/getByClientCompanyId'](project.client_id)
-      if (company_client && company_client.status != 'active') {
+      let client = rootGetters['clients/getByClientCompanyId'](project.client_company_id)
+      if (client && client.status != 'active') {
         return false
       }
 
@@ -246,14 +243,14 @@ export const getters: GetterTree<IModuleState, IRootState> = {
               .replace(' ', '.*') +
             ')'
         )
-        let companyClientKey = rootState.company_clients.lookup_by_client_id[project.client_id]
+        let companyClientKey = rootState.clients.lookup_by_client_id[project.client_company_id]
         if (typeof companyClientKey !== 'undefined') {
-          if (!(rootState.company_clients.company_clients[companyClientKey].name + ' ' + project.name).toLowerCase().match(regex)) {
+          if (!(rootState.clients.clients[companyClientKey].name + ' ' + project.name).toLowerCase().match(regex)) {
             //return false;
           }
         } else {
           //TODO uncomment to find projects without a client
-          //console.log(project.name, project.client_id, rootState.company_clients.lookup_by_client_id[project.client_id])
+          //console.log(project.name, project.client_company_id, rootState.clients.lookup_by_client_id[project.client_company_id])
           //return false;
         }
       }

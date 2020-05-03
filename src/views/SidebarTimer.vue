@@ -158,8 +158,8 @@ export default {
       }
       const project = this.$store.getters['projects/getById'](this.timer.project_id)
       if (project) {
-        const company_client = this.$store.getters['company_clients/getByClientCompanyId'](project.client_id)
-        return company_client ? company_client.name : ''
+        const client = this.$store.getters['clients/getByClientCompanyId'](project.client_id)
+        return client ? client.name : ''
       }
     },
     incrementDuration: function() {

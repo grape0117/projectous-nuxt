@@ -1,6 +1,8 @@
 export interface IModuleState {
   project_users: IProjectUser[]
   lookup: any
+  lookup_by_project_id: any
+  lookup_by_company_user_id: any
 }
 
 export interface IProjectUser {
@@ -8,5 +10,5 @@ export interface IProjectUser {
   project_id: string
   company_user_id: number | string | null
   role: string
-  user_rate: string
+  default_user_rate: string | null
 }

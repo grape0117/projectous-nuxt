@@ -1,14 +1,14 @@
 export interface IModuleState {
-  company_clients: ICompanyClient[]
+  clients: IClient[]
   lookup: any
   lookup_by_client_company_id: any
 }
 
-export interface ICompanyClient {
+export interface IClient {
   id?: number
   visibility: string
   status: string
-  parent_company_client_id?: number | null
+  parent_client_id?: number | null
   company_id?: number | null
   client_company_id?: number
   name: string
@@ -34,4 +34,5 @@ export interface ICompanyClient {
   invoice_max_amount: number
   email: string
   accounting_email: string
+  history: []
 }

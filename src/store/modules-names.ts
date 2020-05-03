@@ -1,7 +1,8 @@
 export const modulesNames: object = {
   TASKS: 'tasks',
   TASK_USERS: 'task_users',
-  COMPANY_CLIENTS: 'company_clients',
+  CLIENTS: 'clients',
+  CLIENT_USERS: 'client_users',
   COMPANY_USERS: 'company_users',
   PROJECTS: 'projects',
   PROJECT_USERS: 'project_users',

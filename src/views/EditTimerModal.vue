@@ -213,9 +213,9 @@ export default {
     my_companies: function() {
       return this.$store.state.companies.companies //TODO
     },
-    company_clients: function() {
-      const company_clients = this.$store.getters['company_clients/getActiveCompanyClients']
-      return company_clients
+    clients: function() {
+      const clients = this.$store.getters['clients/getActiveCompanyClients']
+      return clients
     }
   },
   data: function() {
@@ -355,12 +355,12 @@ export default {
         pop: false,
         push: true
       })
-      this.$store.dispatch('company_clients/editClient', this.timerClient())
+      this.$store.dispatch('clients/editClient', this.timerClient())
       this.$store.commit('settings/setCheckActionStack', true)
     },
     timerClient: function() {
       let timerProject = this.timerProject()
-      return this.$store.getters['company_clients/getByClientCompanyId'](timerProject.client_id)
+      return this.$store.getters['clients/getByClientCompanyId'](timerProject.client_id)
     },
     timerProject: function() {
       return this.$store.getters['projects/getById'](this.timer.project_id)
@@ -398,9 +398,9 @@ export default {
       if (this.timer.project_id) {
         let project = this.$store.getters['projects/getById'](this.timer.project_id)
         if (project) {
-          let company_client = this.$store.getters['company_clients/getByClientCompanyId']()
-          if (company_client) {
-            this.timer.company_client_id = company_client.id
+          let client = this.$store.getters['clients/getByClientCompanyId']()
+          if (client) {
+            this.timer.client_id = client.id
           }
         }
       }
@@ -408,8 +408,8 @@ export default {
       this.$store.dispatch('timers/saveTimer', this.timer)
     },
     client_name: function(client_id) {
-      let company_client = this.$store.getters['company_clients/getByClientCompanyId'](client_id)
-      return company_client ? company_client.name : ''
+      let client = this.$store.getters['clients/getByClientCompanyId'](client_id)
+      return client ? client.name : ''
     }
   }
 }

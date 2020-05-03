@@ -58,7 +58,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     if (!data)
       data = {
         current_company_id: context.rootState.settings.current_company.id,
-        company_client_id: '',
+        client_id: '',
         project_id: '',
         task_id: '',
         is_billable: 1,

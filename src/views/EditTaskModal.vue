@@ -1,7 +1,5 @@
 <template>
-  <b-modal :title="task.title" id="task-modal" class="modal fade" role="dialog"
-   @ok="saveTask"
-   @complete="completeTask">
+  <b-modal :title="task.title" id="task-modal" class="modal fade" role="dialog" @ok="saveTask" @complete="completeTask">
     <form id="editTaskForm" class="form-horizontal">
       <input id="taskIDEdit" class="form-control" type="hidden" name="id" :value="task.id" />
       <div class="form-group">
@@ -16,8 +14,8 @@
           <select id="timer-modal-project-id" class="form-control select2-select" name="project_id" v-on:change="isCreateProject()" v-model="task.project_id">
             <option value="">***** Select Project *****</option>
             <option v-if="isAdmin()" value="create">Create New Project </option>
-            <optgroup :label="company_client.name" v-bind:company_client="company_client" v-for="company_client in company_clients" :key="company_client.id">
-              <option v-for="project in openprojects(company_client)" :key="projects.id" v-bind:company_client="company_client" :value="project.id"> {{ client_name(project.client_id) }} - {{ project.name }} </option>
+            <optgroup :label="client.name" v-bind:client="client" v-for="client in clients" :key="client.id">
+              <option v-for="project in openprojects(client)" :key="projects.id" v-bind:client="client" :value="project.id"> {{ client_name(project.client_id) }} - {{ project.name }} </option>
             </optgroup>
           </select>
         </div>
@@ -103,9 +101,9 @@ export default {
     task_types: function() {
       return this.$store.state.task_types.task_types
     },
-    company_clients: function() {
-      const company_clients = this.$store.getters['company_clients/getActiveCompanyClients']
-      return company_clients
+    clients: function() {
+      const clients = this.$store.getters['clients/getActiveCompanyClients']
+      return clients
     },
     current_company: function() {
       return this.$store.state.settings.current_company
@@ -170,11 +168,11 @@ export default {
       return this.$store.getters['company_users/getActive']
     },
     clientName: function(client_id) {
-      let company_client = this.$store.getters['company_clients/getByClientCompanyId'](client_id)
-      return company_client ? company_client.name : ''
+      let client = this.$store.getters['clients/getById'](client_id)
+      return client ? client.name : ''
     },
-    openprojects: function(company) {
-      return this.$store.getters['projects/getOpenCompanyProjects'](company.client_id)
+    openprojects: function(client) {
+      return this.$store.getters['projects/getOpenCompanyProjects'](client.client_company_id)
     },
     due_date: function() {
       if (this.task.due_date == '0000-00-00 00:00:00') {
@@ -198,8 +196,8 @@ export default {
       this.$store.commit('settings/setCurrentEditTask', {})
     },
     client_name: function(client_id) {
-      let company_client = this.$store.getters['company_clients/getByClientCompanyId'](client_id)
-      return company_client ? company_client.name : ''
+      let client = this.$store.getters['clients/getByClientCompanyId'](client_id)
+      return client ? client.name : ''
     }
   }
 }

@@ -13,8 +13,8 @@ export interface IProject {
   users: ICompanyUser[]
   first_task_id: number
   owner_company_id: number
-  company_client_id: number
   client_id: number
+  client_company_id: number
   due_at: string
   parent_project_id: number
   name: string

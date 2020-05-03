@@ -6,7 +6,7 @@
     <div class="dragzone__content">
       <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
-          <div style="width: 100%; height: 20px" @dragover="moveItem(index, item.id)"></div>
+          <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
               <div v-if="true || editedItemId === item.id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
@@ -28,7 +28,7 @@
               <div class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
             </div>
             <div class="dragzone__task-users">
-              <small>list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small>
+              <small v-if="show_debug()">list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small>
               <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
             </div>
           </div>
@@ -119,6 +119,9 @@ export default class Dragzone extends Vue {
     }
   }
 
+  private show_debug() {
+    return process.env.VUE_APP_SHOW_DEBUG === 'on'
+  }
   private project_url(item: any) {
     if (!item.project_id) {
       return false
@@ -319,6 +322,10 @@ export default class Dragzone extends Vue {
   /*width: calc(100% - 121px);*/
   min-height: 40px;
   height: auto;
+}
+.dragzone_dragover {
+  width: 100%;
+  height: 5px;
 }
 .dragzone__content {
   /*  max-height: 350px;

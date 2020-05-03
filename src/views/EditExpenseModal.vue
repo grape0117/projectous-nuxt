@@ -248,12 +248,12 @@ export default {
         pop: false,
         push: true
       })
-      this.$store.dispatch('company_clients/editClient', this.expenseClient())
+      this.$store.dispatch('clients/editClient', this.expenseClient())
       this.$store.commit('settings/setCheckActionStack', true)
     },
     expenseClient: function() {
       let expenseProject = this.expenseProject()
-      return this.$store.getters['company_clients/getByClientCompanyId'](expenseProject.client_id)
+      return this.$store.getters['clients/getByClientCompanyId'](expenseProject.client_id)
     },
     expenseProject: function() {
       return this.$store.getters['projects/getProjectById'](this.expense.project_id)
@@ -297,8 +297,8 @@ export default {
       let project = self.$store.getters['projects/getProjectById']($('#editExpenseForm select[name=project_id]').val())
       if (project) {
         //TODO: checktypeof projectKey == 'number') {
-        let company_client = self.$store.getters['company_clients/getByClientCompanyId'](project.client_id)
-        formData = formData + '&company_client_id=' + company_client.id
+        let client = self.$store.getters['clients/getByClientCompanyId'](project.client_id)
+        formData = formData + '&client_id=' + client.id
       } else {
         formData = formData
       }
@@ -322,8 +322,8 @@ export default {
       this.$store.dispatch('expenses/saveExpense', formData) //TODO: .then()
     },
     client_name: function(client_id) {
-      let company_client = this.$store.getters['company_clients/getByClientCompanyId'](client_id)
-      return company_client ? company_client.name : ''
+      let client = this.$store.getters['clients/getByClientCompanyId'](client_id)
+      return client ? client.name : ''
     }
   }
 }

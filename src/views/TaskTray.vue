@@ -67,7 +67,7 @@ export default class Custom extends Vue {
   }
 
   get activeClients() {
-    return this.$store.state.company_clients.company_clients
+    return this.$store.state.clients.clients
       .filter((client: any) => {
         return client.status === 'active'
       })

@@ -8,8 +8,32 @@ export const actions: ActionTree<IRootState, IRootState> = {
   ADD_ONE({ commit }, { module, entity }) {
     commit('ADD_ONE', { module, entity })
   },
-  UPSERT({ commit }, { module, entity }: any) {
-    commit('UPSERT', { module, entity })
+  UPSERT({ commit, state }, { module, entity }: any) {
+    console.log('UPSERT ACTION', module, entity)
+    if (!state[module]) return
+    // @ts-ignore
+    let key = state[module].lookup[entity.id]
+    console.log('key', key, state[module][module][key])
+    if (state[module][module][key]) {
+      commit('UPDATE', { module: module, entity: entity })
+      // @ts-ignore
+      this._vm
+        .$http()
+        .put('/' + module + '/', entity.id, entity)
+        .then(response => {
+          console.log('UPDATE API RETURN', response)
+        })
+    } else {
+      commit('ADD_ONE', { module: module, entity: entity })
+      // @ts-ignore
+      this._vm
+        .$http()
+        .post('/' + module, entity)
+        .then(response => {
+          console.log('CREATE API RETURN', response)
+        })
+      //TODO: merge data from backend?
+    }
   },
   UPDATE({ commit }, { module, entity }) {
     commit('UPDATE', { module, entity })
