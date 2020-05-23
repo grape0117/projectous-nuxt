@@ -14,7 +14,6 @@ const Lists = namespace('lists')
 @Component
 export default class NewListForm extends Vue {
   @Prop({ required: true }) public userId!: number
-  @Lists.Action('createList') public createListVuex!: any
   private title: string = ''
   private createNewList() {
     const list = {
@@ -23,7 +22,7 @@ export default class NewListForm extends Vue {
       title: this.title,
       userId: this.userId
     }
-    this.createListVuex(list)
+    this.$store.dispatch('ADD_ONE', { module: 'lists', entity: list })
     this.title = ''
   }
 }

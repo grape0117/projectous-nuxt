@@ -54,20 +54,12 @@ export const mutations: MutationTree<IModuleState> = {
     }
   },
   setCurrentEditTimer(state, timer) {
-    /**
-     * Without this bit of code, the modal will sometimes keep notes from previous timers.
-     * It appears to be an issue with v-html but that's not definitive.
-     *
-     * Also, because we're using jQuery, there's no reactivity to setting the html.
-     * If we don't do an id check, the modal notes fields get cleared out and Vue won't know to put the right data back.
-     */
-    console.log('setting defaults')
-    if (timer.id != state.current_edit_timer.id) {
-      alert('check values in modal')
+    state.current_edit_timer = timer
+    if (timer.id) {
+      state.bvModal.show('timer-modal')
+    } else {
+      state.bvModal.hide('timer-modal')
     }
-    Object.keys(timer).map(function(timerKey, index) {
-      state.current_edit_timer.timerKey = timer[timerKey] ? timer[timerKey] : ''
-    })
   },
   setCurrentEditTimerHistory: function(state, history) {
     state.current_edit_timer.histories = history

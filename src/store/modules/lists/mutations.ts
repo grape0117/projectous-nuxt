@@ -9,10 +9,10 @@ export const mutations: MutationTree<IListsState> = {
     state[listName] = lists
   },
   [ADD_NEW_LIST](state: IListsState, newList: IList) {
-    if (!!state.userLists.find(({ title }) => title === newList.title)) {
-      state.userLists = state.userLists.filter(({ title }) => title !== newList.title)
+    if (!!state.lists.find(({ title }) => title === newList.title)) {
+      state.lists = state.lists.filter(({ title }) => title !== newList.title)
     } else {
-      state.userLists = [...state.userLists, newList]
+      state.lists = [...state.lists, newList]
     }
   },
   createListsByDays(state: IListsState) {
@@ -28,7 +28,7 @@ export const mutations: MutationTree<IListsState> = {
       title: getUserTaskListFormattedDate(today),
       group: 'Current Tasks'
     })
-    for (let day = 1; day < 7; day++) {
+    for (let day = 1; day < 10; day++) {
       const date = setToMidnight(new Date())
       date.setDate(setToMidnight(new Date()).getDate() + day)
       lists.push({

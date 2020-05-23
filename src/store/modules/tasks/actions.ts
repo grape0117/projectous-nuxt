@@ -5,6 +5,8 @@ import { IRootState } from '@/store/types'
 // @ts-ignore
 import { generateUUID } from '@/utils/util-functions'
 import uuid from 'uuid'
+import { IProject } from '@/store/modules/projects/types'
+import { ITaskUser } from '@/store/modules/task_users/types'
 
 function createDefaultTask(): ITask {
   return {
@@ -139,14 +141,62 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       }
     }*/
   },
+  async UPDATE_TITLE({ rootGetters, dispatch, rootState }, { id, title }) {
+    const task = rootGetters['tasks/getById'](id)
+    console.log('update title', id, task, title)
+
+    //TODO: Check for @mention
+
+    //Check for ABC:
+    const projectRegex = /^([A-Z]+):\s*/ //TODO: fix the :[:space] not being captured
+    const acronym_match = title.match(projectRegex)
+    console.log(acronym_match)
+
+    // We have an acronym. Look for a matching project
+    if (acronym_match && acronym_match[1]) {
+      const projects_by_acronym = rootState.projects.projects.filter((project: IProject) => project.acronym === acronym_match[1])
+      if (projects_by_acronym.length === 1) {
+        //TODO: update history
+        dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
+        console.log('match found: ', projects_by_acronym[0].name)
+        title = title.replace(acronym_match[0], '')
+      }
+    }
+    //TODO: only get assigned projects
+
+    /*      const initialRegex = /.*!/
+      let regexString = ".*"
+      acronym_match[1].split("").forEach( (char: string) => {
+        regexString += '('+char + ").*"
+      })
+      console.log(regexString)
+      const regex = new RegExp(regexString, "g");
+      let match_by_initial
+      const projects_by_initial = rootState.projects.projects.filter((project: IProject) => {
+          match_by_initial = project.name.match(regex)
+          console.log('match_by_initial', match_by_initial)
+          return match_by_initial ? match_by_initial.length == acronym_match[1].length : false
+      })
+
+      if(projects_by_initial.length === 1){
+          console.log('deep match found: ', projects_by_initial[0].name)
+      }*/
+    //TODO: remove ABC: string
+    dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'title', value: title }, { root: true })
+  },
   async updateTask({ commit }: any, task: any) {
     // @ts-ignore
     await this._vm.$http().post('/tasks/' + task.id, { task })
     // TODO @stephane send task to server
     commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
   },
-  async deleteTask({ commit }: any, task: any) {
-    commit('DELETE', { module: 'tasks', entity: task }, { root: true })
+  async CASCADE_DELETE({ rootState, commit }, task) {
+    rootState.task_users.task_users.forEach((task_user: ITaskUser) => {
+      if (task_user.task_id === task.id) {
+        // @ts-ignore
+        this.commit('DELETE', { module: 'task_users', entity: task_user }, { root: true })
+      }
+    })
   },
   /**
    * @param commit - vuex mutation

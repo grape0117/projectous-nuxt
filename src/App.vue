@@ -129,7 +129,16 @@ export default {
       } else {
         data = await this.storeDataInIndexedDb()
       }
-      this.setAppData(data)
+      //this.setAppData(data)
+      this.$store.dispatch('PROCESS_INCOMING_DATA', data)
+      //TODO
+      const userLists = createUserLists(data.lists)
+      this.$store.commit('lists/lists/CREATE_LISTS', {
+        listName: 'userLists',
+        lists: userLists
+      })
+      this.dateInterval()
+      setInterval(this.dateInterval, 1800000)
     },
     async checkDataInIndexDB() {
       let valid = true
@@ -163,18 +172,28 @@ export default {
         listName: 'userLists',
         lists: userLists
       })
-      this.dateInterval()
-      setInterval(this.dateInterval, 1800000)
+      /*      this.dateInterval()
+      setInterval(this.dateInterval, 1800000)*/
 
       //TODO: companies
     },
     async storeDataInIndexedDb() {
       const appData = await this.getAppDataFromApi()
-      console.log(appData)
+      console.log('appData', appData)
       for (let key in appData) {
         if (Array.isArray(appData[key])) {
           appData[key].forEach(async entity => {
-            await idbKeyval.set(entity.id, entity, key)
+            try {
+              if (key === 'lists') {
+                key = 'user_task_lists' //TODO: fix name
+              }
+              await idbKeyval.set(entity.id, entity, key)
+            } catch (e) {
+              console.error('---------------------')
+              console.error(e)
+              console.error(entity)
+              console.error('---------------------')
+            }
           })
         } else {
           await idbKeyval.set(key, appData[key], 'properties')

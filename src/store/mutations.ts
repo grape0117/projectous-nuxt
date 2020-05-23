@@ -18,13 +18,17 @@ export const mutations: MutationTree<IRootState> = {
     console.log(module, entities)
     //@ts-ignore
     entities.forEach((value, key) => {
-      //@ts-ignore
-      if (!state[module].lookup[entities[key].id]) {
+      try {
         //@ts-ignore
-        state[module][module].push(value)
-      } else {
-        //@ts-ignore
-        state[module][module][state[module].lookup[entities[key].id]] = value
+        if (!state[module].lookup[entities[key].id]) {
+          //@ts-ignore
+          state[module][module].push(value)
+        } else {
+          //@ts-ignore
+          state[module][module][state[module].lookup[entities[key].id]] = value
+        }
+      } catch (e) {
+        console.error(e, module, key, value)
       }
     })
 
@@ -186,6 +190,14 @@ export const mutations: MutationTree<IRootState> = {
     /*state.task_users = state.task_users.filter(
             ({ id }: any) => id !== task_user.id
         )*/
+
+    // CASCADE delete first
+    // @ts-ignore
+    if (this._mutations[module + '/DELETE']) {
+      // @ts-ignore
+      this.commit(module + '/DELETE', entity)
+    }
+
     if (!state[module].lookup[entity.id]) return
     // @ts-ignore
     Vue.delete(state[module][module], state[module].lookup[entity.id])
@@ -200,12 +212,6 @@ export const mutations: MutationTree<IRootState> = {
     //TODO: what to do with project_tasks and project_users
 
     // @ts-ignore
-    if (this._mutations[module + '/DELETE']) {
-      // @ts-ignore
-      this.commit(module + '/DELETE', entity)
-    }
-
-    // @ts-ignore
     this.commit('deleteIndexDBEntity', { module, id: entity.id })
   },
 
@@ -216,7 +222,7 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   LOOKUP(state: IRootState, { module }) {
-    state[module].lookup = []
+    state[module].lookup = {}
     state[module][module].forEach((item: any, key: any) => {
       // @ts-ignore
       state[module].lookup[item.id] = key
@@ -235,7 +241,16 @@ export const mutations: MutationTree<IRootState> = {
     //TODO: do we need to delete from lookup? Doesn't seem to matter
   },
   async updateCreateIndexDBEntity(state: IRootState, { module, entity }) {
-    await idbKeyval.set(entity.id, entity, module)
+    try {
+      if (module === 'lists') {
+        module = 'user_task_lists' //TODO: fix name
+      }
+      await idbKeyval.set(entity.id, entity, module)
+    } catch (e) {
+      console.log('+++++++++++++++++++')
+      console.error(e, entity)
+      console.log('+++++++++++++++++++')
+    }
   },
   async deleteIndexDBEntity(state: IRootState, { module, id }) {
     await idbKeyval.delete(id, module)

@@ -61,7 +61,7 @@
       <edit-task-modal-user v-for="user in active_users()" :key="user.id" @toggle="toggleUser" v-bind:task_user="task_user(user)" v-bind:user="user" v-bind:task="task" />
     </form>
     <template v-slot:modal-footer="{ ok, cancel }">
-      <button style="float: left" class="btn btn-danger">Delete</button>
+      <button style="float: left" class="btn btn-danger" @click="deleteTask">Delete</button>
       <button style="float: left" @click="complete()" class="btn btn-primary">
         Complete
       </button>
@@ -95,14 +95,15 @@ export default {
       return this.$store.state.company_users.company_users
     },
     projects: function() {
-      const projects = this.$store.state.projects.projects
+      let projects = this.$store.state.projects.projects
       return projects
     },
     task_types: function() {
       return this.$store.state.task_types.task_types
     },
     clients: function() {
-      const clients = this.$store.getters['clients/getActiveCompanyClients']
+      let clients = this.$store.getters['clients/getActiveCompanyClients']
+      //console.log('clients', clients)
       return clients
     },
     current_company: function() {
@@ -126,6 +127,10 @@ export default {
     //})
   },
   methods: {
+    deleteTask() {
+      this.$store.dispatch('DELETE', { module: 'tasks', entity: this.task })
+      this.$store.commit('settings/setCurrentEditTask', {})
+    },
     toggleUser(user) {
       //only add each entry once into changed_task_users
       const task_user_index = this.changed_task_users.findIndex(changed_task_user => {
@@ -172,6 +177,7 @@ export default {
       return client ? client.name : ''
     },
     openprojects: function(client) {
+      //console.log('client', client)
       return this.$store.getters['projects/getOpenCompanyProjects'](client.client_company_id)
     },
     due_date: function() {

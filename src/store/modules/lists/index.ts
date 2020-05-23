@@ -7,7 +7,8 @@ import { IListsState } from './types'
 
 const state = {
   generalLists: [],
-  userLists: []
+  lists: [],
+  lookup: {}
 }
 export const lists: Module<IListsState, IRootState> = {
   namespaced: true,

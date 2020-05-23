@@ -161,6 +161,7 @@ export default class Custom extends Vue {
     }
     //await this.createTaskUserVuex(taskUser)
     console.log(task, taskUser)
+    this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: task })
     this.$store
       .dispatch('task_users/createUserTask', {
         taskUser,
@@ -185,32 +186,32 @@ export default class Custom extends Vue {
     console.log('************* TaskTray updateTaskUser *************')
     if (this.currentListsBlockName !== this.listsBlockNames.TASKS_USERS) return
     const taskUser = cloneDeep(this.getTaskUserById(id)) //TODO: test this.$store.getters...
-    let next_work_day = null
-    let user_task_list_id = null
+
+    taskUser.next_work_day = null
+    taskUser.user_task_list_id = null
+
     if (listId === 'Past') {
       console.log('Past')
       //TODO: see note on create function
       const date = new Date()
-      next_work_day = formatDateToYYYY_MM_DD(new Date(date.setMonth(date.getMonth() - 1)))
-      user_task_list_id = null
+      taskUser.next_work_day = formatDateToYYYY_MM_DD(new Date(date.setMonth(date.getMonth() - 1)))
+
+      //If listId is 'Unmarked' keep everything null
     } else if (listId === 'Unmarked') {
       console.log('Unmarked')
-      next_work_day = null
-      user_task_list_id = null
-      //If listId is a date, return that I think
+
+      //If listId is a date, set next_work_day
     } else if (!!Date.parse(listId) && isNaN(listId)) {
       console.log('Date!')
-      next_work_day = formatDateToYYYY_MM_DD(listId)
-      user_task_list_id = null
+      taskUser.next_work_day = formatDateToYYYY_MM_DD(listId)
+
       //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {
       console.log('Custom list!')
       //Only user-created lists have a listId set on task_user object
-      next_work_day = null
-      user_task_list_id = listId
+      taskUser.user_task_list_id = listId
     }
-    taskUser.next_work_day = next_work_day
-    taskUser.user_task_list_id = user_task_list_id
+
     taskUser.sort_order = sort_order
     console.log('taskUser', taskUser)
     await this.$store.dispatch('UPDATE', { module: 'task_users', entity: taskUser })

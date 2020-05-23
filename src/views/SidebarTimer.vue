@@ -1,10 +1,10 @@
 <template id="timer-row-template">
-  <li :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at">
-    {{ timer.status }}
+  <li v-if="isCurrentUser()" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at">
     <div class="hover-tab project-details" @click="editTimer()">
       <p class="title-project-client-name">{{ client_name() }}</p>
-      <p class="title-project-project-name">{{ project.name }}</p>
-      <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>
+      <p v-if="project.id" class="title-project-project-name">{{ project.name }}</p>
+      <p v-else="" class="title-project-project-name" style="color: red;">{{ project.name }}</p>
+      <!-- <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>-->
     </div>
     <div v-if="isCurrentUser()">
       <b-button v-if="timer.status === 'running'" v-on:click="pauseTimer" class="btn btn-default" style="float: left; margin-right: 5px;margin-top:2px;">
@@ -21,11 +21,11 @@
       {{ durationDisplay() }}
     </div>
     <div style="float: left; clear: right;">{{ reportAt() }}</div>
-    <div v-if="isCurrentUser()">
+    <div v-if="timer.notes">
       <div placeholder="Notes..." v-bind:class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
     </div>
     <div v-else>
-      <div placeholder="Notes..." v-bind:class="'timer-task ' + notesClass()" contenteditable="false" v-html="timer.notes"></div>
+      <div placeholder="Notes..." v-bind:class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: pink"></div>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
     <small>{{ timer.id }}</small>
@@ -158,7 +158,7 @@ export default {
       }
       const project = this.$store.getters['projects/getById'](this.timer.project_id)
       if (project) {
-        const client = this.$store.getters['clients/getByClientCompanyId'](project.client_id)
+        const client = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
         return client ? client.name : ''
       }
     },

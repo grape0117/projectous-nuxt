@@ -2,49 +2,106 @@ import { IRootState } from '@/store/types'
 import { ActionTree } from 'vuex'
 
 export const actions: ActionTree<IRootState, IRootState> = {
-  ADD_MANY({ commit }, { module, entities }: any) {
+  ADD_MANY({ commit, dispatch }, { module, entities }: any) {
+    //TODO: rename to load?
     commit('ADD_MANY', { module, entities })
   },
-  ADD_ONE({ commit }, { module, entity }) {
+  ADD_ONE({ commit, dispatch }, { module, entity }) {
+    //TODO: rename to create?
     commit('ADD_ONE', { module, entity })
+
+    let data = {}
+    // @ts-ignore
+    data[module] = entity
+    // @ts-ignore
+    this._vm
+      .$http()
+      .post('/' + module, data)
+      .then((response: any) => {
+        dispatch('PROCESS_INCOMING_DATA', response)
+      })
   },
-  UPSERT({ commit, state }, { module, entity }: any) {
+  UPSERT({ dispatch, commit, state }, { module, entity }: any) {
     console.log('UPSERT ACTION', module, entity)
-    if (!state[module]) return
+
+    if (!state[module]) {
+      console.error('Module ' + module + ' not found.')
+      return
+    }
+
     // @ts-ignore
     let key = state[module].lookup[entity.id]
     console.log('key', key, state[module][module][key])
+
     if (state[module][module][key]) {
-      commit('UPDATE', { module: module, entity: entity })
-      // @ts-ignore
-      this._vm
-        .$http()
-        .put('/' + module + '/', entity.id, entity)
-        .then(response => {
-          console.log('UPDATE API RETURN', response)
-        })
+      dispatch('UPDATE', { module, entity })
     } else {
-      commit('ADD_ONE', { module: module, entity: entity })
-      // @ts-ignore
-      this._vm
-        .$http()
-        .post('/' + module, entity)
-        .then(response => {
-          console.log('CREATE API RETURN', response)
-        })
-      //TODO: merge data from backend?
+      dispatch('ADD_ONE', { module, entity })
     }
   },
-  UPDATE({ commit }, { module, entity }) {
+  UPDATE({ commit, dispatch }, { module, entity }) {
     commit('UPDATE', { module, entity })
-  },
-  UPDATE_ATTRIBUTE({ commit }, { module, id, attribute, value }) {
-    commit('UPDATE_ATTRIBUTE', { module, id, attribute, value })
     // @ts-ignore
-    this._vm.$http().patch('/' + module + '/', id, { attribute, value })
+    this._vm
+      .$http()
+      .put('/' + module + '/', entity.id, entity)
+      .then((response: any) => {
+        dispatch('PROCESS_INCOMING_DATA', response.data)
+      })
   },
-  DELETE({ commit }, { module, entity }) {
+  UPDATE_ATTRIBUTE({ commit, dispatch }, { module, id, attribute, value }) {
+    commit('UPDATE_ATTRIBUTE', { module: module, id: id, attribute: attribute, value: value })
+    // @ts-ignore
+    this._vm
+      .$http()
+      .patch('/' + module + '/', id, { attribute, value })
+      .then((response: any) => {
+        dispatch('PROCESS_INCOMING_DATA', response)
+      })
+  },
+
+  /**
+   * Dispatch cascade deletes, commit delete then send delete to backend
+   */
+  DELETE({ dispatch, commit }, { module, entity }) {
+    // @ts-ignore
+    if (this._actions[module + '/CASCADE_DELETE']) {
+      // @ts-ignore
+      dispatch(module + '/CASCADE_DELETE', entity)
+    }
+
     commit('DELETE', { module, entity })
-    //TODO: what to do with project_tasks and project_users
+
+    // @ts-ignore
+    this._vm.$http().delete('/' + module + '/', entity.id)
+  },
+  PROCESS_INCOMING_DATA({ commit, rootState }, data) {
+    console.log('PROCESS_INCOMING_DATA', data)
+    // @ts-ignore
+    for (const module in data) {
+      if (rootState[module]) {
+        console.log(module)
+        if (Array.isArray(data[module])) {
+          commit('ADD_MANY', { module, entities: data[module] })
+        } else {
+          commit('UPSERT', { module: module, entity: data[module] })
+        }
+      } else {
+        switch (module) {
+          //TODO: store in IndexedDB
+          case 'current_company_id':
+            rootState.settings.current_company_id = data[module]
+            break
+          case 'user_id':
+            rootState.settings.current_user_id = data[module]
+            break
+          case 'current_company_user_id':
+            rootState.settings.current_company_user_id = data[module]
+            break
+          default:
+            console.error('Incoming data not being loaded: ', module, data[module])
+        }
+      }
+    }
   }
 }

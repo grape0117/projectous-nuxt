@@ -74,6 +74,7 @@ export default {
         this.$emit('change', { message: this.user.name + ' given role of ' + role + ' by current user' })
         this.$store.dispatch('UPSERT', { module: 'project_users', entity: project_user }, { root: true })
       } else {
+        console.log('deleting project user')
         this.$emit('change', { message: this.user.name + ' removed from project by current user' })
         this.$store.dispatch('DELETE', { module: 'project_users', entity: project_user }, { root: true })
       }

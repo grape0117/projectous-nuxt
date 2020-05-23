@@ -5,8 +5,9 @@ import Vue from 'vue'
 import { IRootState } from '@/store/types'
 
 export const mutations: MutationTree<IModuleState> = {
-  DELETE(state: IModuleState, { entity: task }) {
-    console.log('task deleted, but are task_users and other task tables getting updated?')
+  CASCADE_DELETE(state: IModuleState, entity) {
+    // @ts-ignore
+    this.commit('task_users/deleteByTaskId', entity.id) //TODO: handle here?
   },
   removeTempTasks(state: IModuleState) {
     state.tasks = state.tasks.filter(({ temp }) => !temp)

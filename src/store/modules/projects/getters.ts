@@ -19,12 +19,13 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     let active_clients = rootGetters['clients/getActiveCompanyClients']
     // @ts-ignore
     let projects = []
-    if (!active_clients) {
+    if (!active_clients.length) {
       return
     }
     // @ts-ignore
     let client_projects = []
-
+    //console.log('active_clients', active_clients)
+    //console.log('lookup_by_client_company_id', state.lookup_by_client_company_id)
     //console.log(state.lookup_by_client_company_id)
     // @ts-ignore
     active_clients.forEach(function(client) {
@@ -33,6 +34,10 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       // @ts-ignore
       // @ts-ignore
       let client_project_keys = state.lookup_by_client_company_id[client.client_company_id]
+      if (!client_project_keys) {
+        console.log('project not found', client)
+        return
+      }
       // @ts-ignore
       client_project_keys.forEach(function(key) {
         //console.log(project_id)
@@ -63,17 +68,19 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   getOpenCompanyProjects: (state: IModuleState, _getters) => (client_company_id: any) => {
     let openCompanyProjects: any = []
     // @ts-ignore
-    state.lookup_by_client_company_id[client_company_id].forEach(function(projectKey: any) {
-      let project = state.projects[projectKey]
-      if (!project) {
-        return
-      }
-      if (project.status != 'open') {
-        return
-      }
+    const projects = state.lookup_by_client_company_id[client_company_id]
+    if (projects)
+      projects.forEach(function(projectKey: any) {
+        let project = state.projects[projectKey]
+        if (!project) {
+          return
+        }
+        if (project.status != 'open') {
+          return
+        }
 
-      openCompanyProjects.push(project)
-    })
+        openCompanyProjects.push(project)
+      })
 
     return openCompanyProjects.sort(function(a: IProject, b: IProject) {
       if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
@@ -154,6 +161,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       if (project.status != 'open') {
         return false
       }
+      console.log('project', project)
       let client = rootGetters['clients/getByClientCompanyId'](project.client_company_id)
       if (client && client.status != 'active') {
         return false

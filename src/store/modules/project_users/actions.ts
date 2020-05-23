@@ -16,13 +16,12 @@ function creteDefaultProjectUser(project_id: string): IProjectUser {
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
-  createTaskUser({ commit }, { project_id, company_user_id }: IProjectUser) {
+  createTaskUser({ dispatch }, { project_id, company_user_id }: IProjectUser) {
     const project_user = {
       ...creteDefaultProjectUser(project_id),
       company_user_id
     }
     // @ts-ignore
-    this._vm.$http().post('/project-users', project_user)
-    commit('ADD_ONE', { module: 'project_users', entity: project_user }, { root: true })
+    dispatch('ADD_ONE', { module: 'project_users', entity: project_user })
   }
 }

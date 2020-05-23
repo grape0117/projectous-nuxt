@@ -9,7 +9,7 @@
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
-              <div v-if="true || editedItemId === item.id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
+              <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
                 <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
                 <span v-else class="dragzone__item-tracker-icon-triangle" />
               </div>
@@ -279,7 +279,8 @@ export default class Dragzone extends Vue {
 
   private updateTaskTitle({ target: { innerHTML: name } }: any, item: any) {
     const id = item.task_id ? item.task_id : item.id
-    this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'title', value: name })
+    console.log('update title', item, id)
+    this.$store.dispatch('tasks/UPDATE_TITLE', { id, title: name })
   }
 
   private async updateTask({ target: { innerHTML: name } }: any, item: any) {
@@ -485,8 +486,8 @@ export default class Dragzone extends Vue {
 }
 .dragzone__add-task--item {
   float: left;
-  clear: left;
-  margin-left: 10px;
+  margin-left: -35px;
+  margin-top: 7px;
   cursor: pointer;
   line-height: 8px;
   visibility: hidden;

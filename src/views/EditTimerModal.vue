@@ -25,7 +25,7 @@
                 <option>***** Select Project *****</option>
                 <option value="create">Create New Project</option>
                 <option v-for="project in openprojects()" v-bind:project="project" :value="project.id">
-                  {{ client_name(project.client_id) }} -
+                  {{ client_name(project.client_company_id) }} -
                   {{ project.name }}
                 </option>
               </select>
@@ -171,7 +171,7 @@
       </div>
     </div>
     <template v-slot:modal-footer="{ ok, cancel }">
-      <button style="float: left" class="btn btn-danger">Delete</button>
+      <button style="float: left" class="btn btn-danger" @click="deleteTimer">Delete</button>
       <button class="btn btn-info" @click="ok()">Save</button>
       <button class="btn" @click="cancel()">Cancel</button>
     </template>
@@ -318,8 +318,8 @@ export default {
       return this.$store.getters['settings/isCurrentUserOrAdmin'](this.timer.user_id)
     },
     deleteTimer: function() {
-      console.log(this.timer)
-      this.$store.dispatch('timers/deleteTimer', this.timer)
+      this.$store.dispatch('DELETE', { module: 'timers', entity: this.timer })
+      this.$store.commit('settings/setCurrentEditTimer', {})
     },
     durationHours: function() {
       if (typeof this.timer.duration != 'number') {
@@ -407,8 +407,8 @@ export default {
 
       this.$store.dispatch('timers/saveTimer', this.timer)
     },
-    client_name: function(client_id) {
-      let client = this.$store.getters['clients/getByClientCompanyId'](client_id)
+    client_name: function(client_company_id) {
+      let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
       return client ? client.name : ''
     }
   }

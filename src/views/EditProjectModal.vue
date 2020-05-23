@@ -227,7 +227,8 @@ export default {
       return this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
     },
     saveProject: function(callback) {
-      this.$store.dispatch('projects/saveProject', { project: this.project, project_users: this.changed_project_users })
+      this.$store.dispatch('UPSERT', { module: 'projects', entity: this.project })
+      //this.$store.dispatch('projects/saveProject', { project: this.project, project_users: this.changed_project_users })
     }
   }
 }

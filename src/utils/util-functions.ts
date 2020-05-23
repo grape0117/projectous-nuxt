@@ -47,7 +47,7 @@ export function createUserLists(lists: any) {
     return {
       id: list.id,
       userId: list.userId || list.company_user_id,
-      title: list.title || list.label,
+      title: list.title,
       group: 'User Lists'
     }
   })

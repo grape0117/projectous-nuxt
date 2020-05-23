@@ -7,7 +7,7 @@
         <b-col cols="5" class="scroll-col">
           <div v-if="clientVisible(client)" v-for="client in activeClients">
             <!--            Todo: change client id to client name-->
-            <div style="background: #666666; color: white; padding-left: 5px; text-transform: uppercase">{{ client.name }} <b-icon icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
+            <div style="background: #666666; color: white; padding-left: 5px; text-transform: uppercase">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
             <div v-for="{ name, id } in openClientProjects(client)">
               <div @click="setPinnedProject(id)" class="project-item__status">
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
@@ -69,6 +69,9 @@ enum listsBlockNames {
 export default class Custom extends Vue {
   get listsBlockNames() {
     return listsBlockNames
+  }
+  get isAdmin() {
+    return this.$store.getters['settings/isAdmin']
   }
 
   get lists() {
@@ -137,12 +140,10 @@ export default class Custom extends Vue {
   @TaskUsers.Getter private sortedByDays!: any
   @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
   @TaskUsers.Action('updateTaskUser') private updateTaskUserVuex!: any
-  @TaskUsers.Action('deleteTaskUser') private deleteTaskUserVuex!: any
   @TaskUsers.Action('updateSortOrders')
   private updateTaskUsersSortOrdersVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
   @Tasks.Action('updateTask') private updateTaskVuex!: any
-  @Tasks.Action('deleteTask') private deleteTaskVuex!: any
   @Tasks.Action('updateSortOrders') private updateTaskSortOrdersVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
   @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
@@ -210,6 +211,8 @@ export default class Custom extends Vue {
   public updateTask(task: any) {
     console.log('************* Custom updateTask *************', task)
     task.status = task.listId
+    delete task.listId
+    delete task.user_task_list_id
     if (this.currentListsBlockName !== this.listsBlockNames.PROJECTS) return
     this.$store.dispatch('UPDATE', { module: 'tasks', entity: task })
   }
@@ -220,7 +223,7 @@ export default class Custom extends Vue {
 
   private clientVisible(client: any) {
     const client_user = this.$store.getters['client_users/getByClientIdAndCompanyUserId']({ client_id: client.id, company_user_id: this.current_company_user_id })
-    console.log(client_user)
+    //console.log(client_user)
     return true
   }
   //TODO: pass only ids instead of whole objects?

@@ -81,9 +81,16 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // @ts-ignore
     const task_user = await this._vm.$http().put('/task-users/', taskUser.id, { task_user: taskUser })
   },
-  async deleteTaskUser({ commit }, taskUser: ITaskUser) {
+  /*  async deleteTaskUser({ commit }, taskUser: ITaskUser) {
     commit('DELETE', { module: 'task_users', entity: taskUser }, { root: true })
-  },
+  },*/
+  /*  deleteByTaskId({state, dispatch}, id: any) {
+    state.task_users.forEach(function(task_user: any) {
+      if(task_user.task_id === id) {
+          dispatch('DELETE', {module: 'task_users', entity: task_user}, { root: true })
+      }
+    })
+  },*/
   updateSortOrders({ commit }, ids) {
     // Todo: @stephane - create endpoint to update sort_order for tasks
     // ToDo: hook up indexDB

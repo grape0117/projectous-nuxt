@@ -1,6 +1,6 @@
 export interface IListsState {
   generalLists: IList[]
-  userLists: IList[]
+  lists: IList[]
 }
 
 export interface IList {
