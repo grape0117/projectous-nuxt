@@ -7,6 +7,18 @@ export const mutations: MutationTree<IModuleState> = {
   [REMOVE_TEMP_TASKS_USER](state: IModuleState) {
     state.task_users = state.task_users.filter(({ temp }) => !temp)
   },
+  LOOKUP(state: IModuleState, task_users: any) {
+    //@ts-ignore
+    task_users.forEach(function(task_user, key) {
+      //@ts-ignore
+      if (!state.lookup_by_task_id[task_user.task_id]) {
+        // @ts-ignore
+        state.lookup_by_task_id[task_user.task_id] = []
+      }
+      // @ts-ignore
+      state.lookup_by_task_id[task_user.task_id].push(key)
+    })
+  },
   deleteByTaskId(state: IModuleState, task_id) {
     state.task_users.forEach(task_user => {
       if (task_user.task_id === task_id) {
@@ -17,11 +29,8 @@ export const mutations: MutationTree<IModuleState> = {
   },
   updateTaskUsersSortOrders(state: IModuleState, ids: number[]) {
     ids.forEach((id, index) => {
-      const taskUser = state.task_users[state.lookup[id]]
-      //console.log('updateTaskUsersSortOrders: updating sort order for taskUser to '+index, taskUser.id)
-      if (taskUser) {
-        Vue.set(taskUser, 'sort_order', index)
-      }
+      // @ts-ignore
+      this.commit('UPDATE_ATTRIBUTE', { module: 'task_users', id, attribute: 'sort_order', value: index })
     })
   }
 }

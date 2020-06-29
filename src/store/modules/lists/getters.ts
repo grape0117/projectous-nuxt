@@ -3,15 +3,16 @@ import { IRootState } from '@/store/types'
 import { IListsState } from './types'
 
 export const getters: GetterTree<IListsState, IRootState> = {
-  getUserLists: (state: IListsState) => (id: any) => {
+  getUserLists: (state: IListsState) => (company_user_id: any) => {
     const generalLists = state.generalLists
     const undraggableListsNames = ['Past Tasks', 'Current Tasks']
     const userLists = state.lists
-      .filter(({ userId }) => (userId as number) === id)
+      .filter(list => (list.company_user_id as number) === company_user_id)
       .map(list => {
         list.group = list.title
         return list
       })
+    console.log('LISTS@@@', userLists, state.lists, company_user_id, state.generalLists, undraggableListsNames)
     return [...generalLists, ...userLists].map(list => {
       if (undraggableListsNames.includes(list.group)) {
         list.group = 'undraggable'

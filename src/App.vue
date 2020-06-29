@@ -2,6 +2,7 @@
   <div id="app">
     <task-tray />
     <main>
+      <router-link to="/Reports">Reports</router-link>
       {{ current_edit_project ? current_edit_project.id : '' }} Project
       <nav-bar />
       <div class="container-fluid">
@@ -32,6 +33,7 @@ import Vue from 'vue'
 import { idbKeyval, idbGetAll } from '@/plugins/idb.ts'
 import { modulesNames, modulesNamesList } from './store/modules-names'
 import TaskTray from './views/TaskTray'
+import uuid from 'uuid'
 
 export default {
   components: {
@@ -87,14 +89,24 @@ export default {
     }
   },
   async mounted() {
+    this.$store.state.settings.instance_id = uuid.v4()
     this.registerModals()
     if (getCookie('auth_token')) {
       await this.getAppData()
+      setInterval(this.getNewData, 3000)
     }
+    //TODO: set timeout for polling data from backend
   },
   methods: {
     registerModals() {
       this.$store.commit('settings/registerModals', this.$bvModal)
+    },
+    getNewData() {
+      this.$http()
+        .get('/get-new-data/' + window.sessionStorage.last_poll_timestamp)
+        .then(response => {
+          this.$store.dispatch('PROCESS_INCOMING_DATA', response)
+        })
     },
     async getAppDataFromApi() {
       try {

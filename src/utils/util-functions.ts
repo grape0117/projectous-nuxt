@@ -46,7 +46,7 @@ export function createUserLists(lists: any) {
   return lists.map((list: any) => {
     return {
       id: list.id,
-      userId: list.userId || list.company_user_id,
+      company_user_id: list.userId || list.company_user_id,
       title: list.title,
       group: 'User Lists'
     }

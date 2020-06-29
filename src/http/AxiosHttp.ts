@@ -47,6 +47,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       })
       return response
     } catch (e) {
+      alert('An error occured. Your previous action may not have completed successfully.')
       console.log(e)
     }
   }
@@ -65,6 +66,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       })
       return response.data
     } catch (e) {
+      alert('An error occured. Your previous action may not have completed successfully.')
       console.log(e)
     }
   }
@@ -84,6 +86,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       })
       return response.data
     } catch (e) {
+      alert('An error occured. Your previous action may not have completed successfully.')
       console.log(e)
     }
   }
@@ -102,6 +105,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
         headers: this.headers
       })
     } catch (e) {
+      alert('An error occured. Your previous action may not have completed successfully.')
       console.log(e)
     }
   }

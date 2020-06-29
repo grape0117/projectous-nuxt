@@ -1,6 +1,7 @@
 export interface IModuleState {
   task_users: ITaskUser[]
   lookup: any
+  lookup_by_task_id: any
 }
 
 export interface ITaskUser {

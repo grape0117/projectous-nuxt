@@ -9,6 +9,7 @@ right: 0;"
     <div style="position: sticky; height: 30px; top: 0">
       <button @click="addTimer()">Modal</button>
       <button @click="startTimer()">Start New</button>
+      {{ total_time_today }}
     </div>
 
     <my-sidebar-timer :class="getSidebarClass()" style="text-align: left; overflow-y: scroll; border: solid 1px #cccccc;" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
@@ -27,6 +28,31 @@ export default {
     return {
       tray_expanded: true,
       timer_filter: ''
+    }
+  },
+  computed: {
+    total_time_today: function() {
+      let self = this
+      let total_time_today = 0
+      let midnight = new Date(new Date().setHours(0, 0, 0, 0))
+      let timers = this.$store.state.timers.timers.filter(function(timer) {
+        if (timer.company_user_id === self.$store.state.settings.current_user_id) {
+          let timertime = new Date(timer.report_at)
+          //console.log(timertime)
+          //console.log(midnight)
+          /*if(timertime > midnight){
+              console.log('greater')
+          } else {
+              console.log('less than')
+          }*/
+
+          if (new Date(timer.report_at) > midnight) {
+            total_time_today += timer.duration
+          }
+        }
+      })
+
+      return ('00' + Math.floor(total_time_today / 3600)).slice(-2) + ':' + ('00' + Math.floor((total_time_today % 3600) / 60)).slice(-2)
     }
   },
   components: {

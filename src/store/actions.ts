@@ -80,11 +80,14 @@ export const actions: ActionTree<IRootState, IRootState> = {
     // @ts-ignore
     for (const module in data) {
       if (rootState[module]) {
-        console.log(module)
         if (Array.isArray(data[module])) {
-          commit('ADD_MANY', { module, entities: data[module] })
+          if (data[module].length) {
+            commit('ADD_MANY', { module, entities: data[module] })
+          }
+        } else if (data[module].deleted_at === null) {
+          commit('UPSERT', { module, entity: data[module] })
         } else {
-          commit('UPSERT', { module: module, entity: data[module] })
+          commit('DELETE', { module, entity: data[module] })
         }
       } else {
         switch (module) {
@@ -98,8 +101,11 @@ export const actions: ActionTree<IRootState, IRootState> = {
           case 'current_company_user_id':
             rootState.settings.current_company_user_id = data[module]
             break
+          case 'last_poll_timestamp':
+            window.sessionStorage.last_poll_timestamp = data[module]
+            break
           default:
-            console.error('Incoming data not being loaded: ', module, data[module])
+          //console.error('Incoming data not being loaded: ', module, data[module])
         }
       }
     }

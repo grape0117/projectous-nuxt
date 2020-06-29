@@ -5,7 +5,7 @@ export interface IListsState {
 
 export interface IList {
   id: number | string
-  userId?: number
+  company_user_id?: number
   title: string
   group: string
 }

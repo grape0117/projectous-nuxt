@@ -102,23 +102,15 @@
               <input name="report_at" type="datetime" id="report_at" class="form-control" v-modal="timer.report_at" />
             </div>
           </div>
-          <div v-if="isIHI()" class="form-group">
+          <!--          <div v-if="isIHI()" class="form-group">
             <label class="control-label col-sm-4" for="timerUserTime">Date: </label>
             <div class="col-sm-8">
               <input type="date" id="timerUserDate" class="form-control" :value="timerDate()" />
             </div>
-          </div>
-          <timer-modal-time-standard v-if="!isIHI()" v-bind:status="timer.status" v-bind:hours="durationHours()" v-bind:minutes="durationMinutes()" v-bind:seconds="durationSeconds()"></timer-modal-time-standard>
-          <div class="form-group" v-if="timer.status != 'running' && !isIHI() && isAdmin()">
-            <label class="control-label col-sm-4" for="timerDuration">Invoice Duration: </label>
-            <div class="col-sm-6">
-              <div id="timerDuration" class="form-control-static">
-                <input name="invoice_duration_hours" placeholder="00" style="display:inline; width: 15%;" :value="invoiceDurationHours()" />:<input name="invoice_duration_minutes" style="display:inline; width: 15%;" placeholder="00" :value="invoiceDurationMinutes()" />:<input class="btn-xs" name="invoice_duration_seconds" style="display:inline; width: 15%;" placeholder="00" :value="invoiceDurationSeconds()" />
-                (hours : minutes)
-              </div>
-            </div>
-          </div>
-          <div v-if="isIHI()" class="form-group row">
+          </div>-->
+          <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard>
+
+          <!--<div v-if="isIHI()" class="form-group row">
             <label for="projectName" class="control-label labelLeft col-sm-4" style="line-height:46px;">Start: </label>
             <div class="col-sm-8 fieldRight">
               <div id="timesSliderStart" class="carousel timesSlider slide" data-ride="carousel" data-interval="false">
@@ -153,7 +145,7 @@
                 </a>
               </div>
             </div>
-          </div>
+          </div>-->
         </form>
       </div>
       <div role="tabpanel" class="tab-pane" id="timerTableTab">

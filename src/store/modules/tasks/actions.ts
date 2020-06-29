@@ -35,7 +35,8 @@ function createDefaultTask(): ITask {
     status: 'open',
     title: '',
     users: [],
-    workflowy_id: null
+    workflowy_id: null,
+    settings: {}
   }
 }
 

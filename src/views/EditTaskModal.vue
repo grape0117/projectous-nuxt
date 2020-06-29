@@ -1,11 +1,17 @@
 <template>
-  <b-modal :title="task.title" id="task-modal" class="modal fade" role="dialog" @ok="saveTask" @complete="completeTask">
+  <b-modal :title="task.title" id="task-modal" class="modal fade" role="dialog" @ok="saveTask">
     <form id="editTaskForm" class="form-horizontal">
       <input id="taskIDEdit" class="form-control" type="hidden" name="id" :value="task.id" />
       <div class="form-group">
         <label class="control-label col-sm-4" for="taskTitledit">Task: </label>
         <div class="col-sm-8">
           <div contenteditable="true" style="height: auto;" id="taskTitledit" class="form-control" type="text" name="title" placeholder="Task" v-html="task.title" @blur="setTitle"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-4" for="taskNoteEdit">Details: </label>
+        <div class="col-sm-8">
+          <div contenteditable="true" style="height: auto; min-height: 150px;" id="taskNoteEdit" class="form-control" type="text" name="note" placeholder="" v-html="task.note" @blur="setNote"></div>
         </div>
       </div>
       <div class="form-group">
@@ -20,6 +26,19 @@
           </select>
         </div>
       </div>
+      <div class="form-group">
+        <label class="control-label col-sm-4">Task Type: </label>
+        <div class="col-sm-8">
+          <select class="form-control select2-select" name="project_id" :value="task.settings && task.settings.task_type ? task.settings.task_type : ''" @input="e => (task['settings']['task_type'] = e.target.value)">
+            <option value="">***** Select Task Type *****</option>
+            <option>Habit</option>
+            <option>Appointment</option>
+            <option>Recurring</option>
+            <option>Meeting</option>
+          </select>
+        </div>
+      </div>
+      <div v-if="task.settings && task.settings.task_type === 'Habit'"></div>
       <!--<div class="form-group">
               <label  class="control-label col-sm-4" >Task Type: </label>
               <div class="col-sm-8">
@@ -62,9 +81,9 @@
     </form>
     <template v-slot:modal-footer="{ ok, cancel }">
       <button style="float: left" class="btn btn-danger" @click="deleteTask">Delete</button>
-      <button style="float: left" @click="complete()" class="btn btn-primary">
-        Complete
-      </button>
+      <button v-if="nextStatus() === 'turned-in'" style="float: left" @click="updateStatus('turned-in')" class="btn btn-primary">Turn In</button>
+      <button v-else-if="nextStatus() === 'completed'" style="float: left" @click="updateStatus('completed')" class="btn btn-primary">Complete</button>
+      <button v-else-if="nextStatus() === 'closed'" style="float: left" @click="updateStatus('closed')" class="btn btn-primary">Archive</button>
       <button class="btn btn-info" @click="ok()">Save</button>
       <button class="btn" @click="cancel()">Cancel</button>
     </template>
@@ -127,6 +146,34 @@ export default {
     //})
   },
   methods: {
+    nextStatus() {
+      switch (this.task.status) {
+        case 'open':
+        case 'in-progress':
+          if (!this.task.project_id) {
+            return 'completed'
+          } else {
+            return 'turned-in'
+          }
+          break
+        case 'turned-in':
+          if (this.isAdmin()) {
+            return 'completed'
+          }
+          break
+        case 'completed':
+          if (this.isAdmin()) {
+            return 'closed'
+          }
+          break
+        default:
+          return
+      }
+    },
+    setSetting(key, value) {
+      console.log(value)
+      this.task['settings']['task_type'] = value
+    },
     deleteTask() {
       this.$store.dispatch('DELETE', { module: 'tasks', entity: this.task })
       this.$store.commit('settings/setCurrentEditTask', {})
@@ -148,8 +195,10 @@ export default {
       }
     },
     setTitle(e) {
-      let title = e.target.innerHTML
-      this.task.title = title
+      this.task.title = e.target.innerHTML
+    },
+    setNote(e) {
+      this.task.note = e.target.innerHTML
     },
     task_user(company_user) {
       let self = this
@@ -186,19 +235,13 @@ export default {
       }
       return '' //dateTimeToInput(this.task.due_date)
     },
-    completeTask: function() {
-      alert('complete task! non-functional. Use the save instead')
+    updateStatus(status) {
+      this.task.status = status
+      this.saveTask()
     },
-    saveTask: function(callback) {
-      /*const task_users = this.changed_task_users.filter((task_user) => {
-          return task_user.user_checked === true
-        })
-        console.log('const task_users', task_users)*/
-      this.$store.dispatch('tasks/saveTask', {
-        task: this.task,
-        task_users: this.changed_task_users
-      })
-
+    saveTask() {
+      console.log('saveTask', this.task)
+      this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
       this.$store.commit('settings/setCurrentEditTask', {})
     },
     client_name: function(client_id) {

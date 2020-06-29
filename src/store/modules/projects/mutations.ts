@@ -28,8 +28,8 @@ export const mutations: MutationTree<IModuleState> = {
   },
   CASCADE_DELETE(state: IModuleState, project) {
     // @ts-ignore
-    this.commit('project_users/DELETE', project)
+    this.commit('project_users/deleteByProjectId', project.id)
     // @ts-ignore
-    this.commit('tasks/DELETE', project)
+    this.commit('tasks/deleteByProjectId', project.id)
   }
 }

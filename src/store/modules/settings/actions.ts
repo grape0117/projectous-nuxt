@@ -24,7 +24,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       sort_order
     })
     //@ts-ignore
-    const { task_user, task }: any = await this._vm.$http().post('users/' + company_user_id + '/tasks', {
+    const { task_user, task }: any = await this._vm.$http().post('/users/' + company_user_id + '/tasks', {
       list: list,
       sort_order: sort_order
     })

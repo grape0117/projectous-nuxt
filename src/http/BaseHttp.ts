@@ -1,9 +1,11 @@
 import { IHttp } from '@/http/types'
 import { getCookie } from '@/utils/util-functions'
+import store from '@/store'
 
 export class BaseHttp implements IHttp {
   protected baseUrl: any = process.env.VUE_APP_API_URL
   protected headers: any = {
+    InstanceID: store.state.settings.instance_id,
     Authorization: 'Bearer ' + getCookie('auth_token')
   }
   protected offlineMode: boolean = false

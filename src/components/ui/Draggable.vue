@@ -161,7 +161,7 @@ export default class Draggable extends Vue {
 .list__group-subtitle > div {
   white-space: nowrap;
   float: left;
-  height: 100px;
+  /*height: 100px;*/
   writing-mode: vertical-rl;
 }
 </style>

@@ -21,6 +21,8 @@ export const settings = {
     current_edit_task: {},
     current_edit_timer: {},
     current_edit_task_type: {},
+    instance_id: '',
+    last_poll_timestamp: null,
     last_seen_at: new Date().toISOString().replace(/([^T]+)T([^.]+).*/g, '$1 $2'),
     notes: '',
     timer_watch: 1

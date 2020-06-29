@@ -22,5 +22,13 @@ export const mutations: MutationTree<IModuleState> = {
       // @ts-ignore
       state.lookup_by_company_user_id[project_user.company_user_id].push(key)
     })
+  },
+  deleteByProjectId(state: IModuleState, project_id) {
+    state.project_users.forEach(project_user => {
+      if (project_user.project_id === project_id) {
+        // @ts-ignore
+        this.commit('DELETE', { module: 'task', entity: project_user }, { root: true })
+      }
+    })
   }
 }

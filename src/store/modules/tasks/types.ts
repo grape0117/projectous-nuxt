@@ -49,4 +49,5 @@ export interface ITask {
   users: number[]
   workflowy_id: number | null
   temp?: boolean
+  settings: object
 }

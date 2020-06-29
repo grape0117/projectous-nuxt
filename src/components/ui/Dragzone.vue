@@ -28,7 +28,9 @@
               <div class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
             </div>
             <div class="dragzone__task-users">
-              <small v-if="show_debug()">list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small>
+              <small v-if="show_debug()"
+                ><span style="color: red;">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small
+              >
               <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
             </div>
           </div>
@@ -93,7 +95,7 @@ export default class Dragzone extends Vue {
 
   private current_company_user_id: any = this.$store.state.settings.current_company_user_id
   private expandedList: boolean = this.initiallyExpanded
-  private numberOfExpandedItems: number = 8
+  private numberOfExpandedItems: number = 20
   private newItem: any = null
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
@@ -146,6 +148,11 @@ export default class Dragzone extends Vue {
   private getTaskDueDate(task_id: any) {
     let task = this.$store.getters['tasks/getById'](task_id)
     return task.due_date ? task.due_date : null
+  }
+
+  private getTaskType(task_id: any) {
+    let task = this.$store.getters['tasks/getById'](task_id)
+    return task.settings ? task.settings.task_type : null
   }
 
   private editTask(task_id: any) {

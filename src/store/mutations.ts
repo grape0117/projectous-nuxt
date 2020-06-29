@@ -14,21 +14,39 @@ export const mutations: MutationTree<IRootState> = {
    */
   ADD_MANY(state: IRootState, { module, entities }: any) {
     console.log('ADD_MANY ' + module)
-    if (!state[module]) return
+    if (!state[module]) {
+      console.error('Module ' + module + ' does not exist.')
+      return
+    }
     console.log(module, entities)
     //@ts-ignore
-    entities.forEach((value, key) => {
+    entities.forEach((entity, index) => {
       try {
-        //@ts-ignore
-        if (!state[module].lookup[entities[key].id]) {
+        if (entity.deleted_at == null) {
           //@ts-ignore
-          state[module][module].push(value)
+          if (!state[module].lookup[entities[index].id]) {
+            //@ts-ignore
+            state[module][module].push(entity)
+          } else {
+            console.log('ADD_MANY entity found', state[module].lookup[entities[index].id], entity)
+            //@ts-ignore
+            let key = state[module].lookup[entities[index].id]
+            for (let property in entity) {
+              if (entity.hasOwnProperty(property)) {
+                // @ts-ignore
+                Vue.set(state[module][module][key], property, entity[property])
+              }
+            }
+          }
+
+          // @ts-ignore
+          this.commit('updateCreateIndexDBEntity', { module, entity })
         } else {
-          //@ts-ignore
-          state[module][module][state[module].lookup[entities[key].id]] = value
+          // @ts-ignore
+          this.commit('DELETE', { module, entity })
         }
       } catch (e) {
-        console.error(e, module, key, value)
+        console.error(e, module, index, entity)
       }
     })
 
@@ -165,6 +183,9 @@ export const mutations: MutationTree<IRootState> = {
     console.log('lookup', id, state[module].lookup[id])
     // @ts-ignore
     state[module][module][state[module].lookup[id]][attribute] = value
+
+    // @ts-ignore
+    this.commit('updateCreateIndexDBEntity', { module, entity: state[module][module][state[module].lookup[id]] })
   },
 
   /**
@@ -234,12 +255,12 @@ export const mutations: MutationTree<IRootState> = {
       this.commit(module + '/LOOKUP', state[module][module])
     }
   },
-  uuid_to_id(state: IRootState, { module, uuid, id }) {
+  /*  uuid_to_id(state: IRootState, { module, uuid, id }) {
     let index = state[module].lookup[uuid]
     state[module][module][index].id = id
     state[module].lookup[id] = state[module].lookup[uuid]
     //TODO: do we need to delete from lookup? Doesn't seem to matter
-  },
+  },*/
   async updateCreateIndexDBEntity(state: IRootState, { module, entity }) {
     try {
       if (module === 'lists') {

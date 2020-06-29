@@ -50,8 +50,6 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       task,
       ids_of_taskUsers_to_shift_up
     })
-
-    //TODO: I would like a common data handler for http returns
   },
   async createTaskUser({ commit }, { task_id, next_work_day, company_user_id, user_task_list_id, sort_order, temp }: ITaskUser) {
     const taskUser = {

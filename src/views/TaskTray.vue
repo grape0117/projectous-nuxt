@@ -31,8 +31,6 @@ const TaskUsers = namespace('task_users')
 const Lists = namespace('lists')
 const Projects = namespace('projects')
 
-const taskStatuses = ['open', 'in-progress', 'turned-in', 'completed', 'closed']
-
 interface ITaskTimerToggle {
   taskId: number | string
   timerId: number | string | null
@@ -100,14 +98,6 @@ export default class Custom extends Vue {
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
   }
 
-  get taskPerStatusLists() {
-    return taskStatuses.map(status => ({
-      title: status,
-      id: status,
-      group: status,
-      initiallyExpanded: true
-    }))
-  }
   @Projects.Mutation('projects/SET_SELECTED_PROJECT') public setProjectId!: any
   @Projects.Action public pinProject!: any
   @Projects.State(state => state.selectedProjectId) public selectedProjectId!: string | number | null
@@ -161,7 +151,7 @@ export default class Custom extends Vue {
     }
     //await this.createTaskUserVuex(taskUser)
     console.log(task, taskUser)
-    this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: task })
+    //this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: task })
     this.$store
       .dispatch('task_users/createUserTask', {
         taskUser,

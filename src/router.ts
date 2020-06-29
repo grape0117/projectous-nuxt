@@ -5,8 +5,10 @@ import Custom from './views/Custom.vue'
 import CompanyUsers from './views/CompanyUsers.vue'
 import Login from '@/views/Login.vue'
 import checkAuth from '@/middlewares/checkAuth'
+import InvoiceableTemplate from './views/InvoiceableTemplate.vue'
 
 Vue.use(Router)
+//TODO: lazy load https://blog.logrocket.com/lazy-loading-in-vue-js/
 
 const router = new Router({
   routes: [
@@ -34,6 +36,11 @@ const router = new Router({
       path: '/users',
       name: 'Company Users',
       component: CompanyUsers
+    },
+    {
+      path: '/reports',
+      name: 'Reports',
+      component: InvoiceableTemplate
     }
   ]
 })
