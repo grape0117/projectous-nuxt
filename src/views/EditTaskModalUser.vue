@@ -11,6 +11,12 @@
         <b-form-input type="number" :class="userRateClass()" :placeholder="userRatePlaceholder()" v-model="user_rate"></b-form-input>
       </b-input-group>
     </b-input-group>
+    <div class="form-group">
+      <label class="control-label col-sm-4" for="taskWorkDate">Next Work Day: {{ next_work_day }} </label>
+      <div class="col-sm-8">
+        <input id="taskWorkDate" class="form-control" type="date" name="next_work_day" placeholder="Next Work Day" v-model="next_work_day" />
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -27,7 +33,8 @@ export default {
       id: this.task_user ? this.task_user.id : uuid.v4(),
       user_checked: !!this.task_user,
       user_rate: this.task_user ? this.task_user.user_rate : null,
-      role: this.task_user ? this.task_user.role : ''
+      role: this.task_user ? this.task_user.role : '',
+      next_work_day: this.task_user ? this.task_user.next_work_day : null
     }
   },
   computed: {
@@ -38,7 +45,8 @@ export default {
       return this.project ? this.$store.getters['project_users/getByProjectIdAndCompanyUserId']({ project_id: this.project.id, company_user_id: this.user.id }) : null
     },
     client() {
-      const client = this.project.client_company_id ? this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id) : null
+      if (!this.task.project_id) return ''
+      const client = this.project.client_id ? this.$store.getters['clients/getByClientCompanyId'](this.project.client_id) : null
       console.log(this.user.name + ' client', client)
       return client
     },

@@ -376,7 +376,7 @@ export default {
     },
     setNotes(e) {
       let notes = e.target.innerHTML
-      this.task.notes = notes
+      this.timer.notes = notes
     },
     setInvoiceNotes(e) {
       let invoiceNotes = e.target.innerHTML
