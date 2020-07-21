@@ -1,5 +1,5 @@
 <template id="mytimer-sidebar-template">
-  <div style="background: white;">
+  <div>
     <sidebar-timer v-bind:running_timers="running_timers" v-bind:projects="projects" v-bind:users="users" v-for="timer in mytimers()" v-bind:timer="timer" :key="'sidebar-' + timer.id"></sidebar-timer>
   </div>
 </template>

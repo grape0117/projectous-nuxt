@@ -1,20 +1,15 @@
 <template>
-  <div
-    id="timer-tray"
-    :class="trayClass()"
-    style="overflow-y: scroll; z-index: 1; height: 100vh; position: fixed;
-
-right: 0;"
-  >
-    <div style="position: sticky; height: 30px; top: 0">
-      <button @click="addTimer()">Modal</button>
-      <button @click="startTimer()">Start New</button>
+  <div id="timer-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh; position: fixed;">
+    <div class="trayTopBtn">
+      <button class="closebtn" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button>
+      <button class="makeBtn" @click="addTimer()" style="margin-left: 30px;">Modal</button>
+      <button class="makeBtn" @click="startTimer()" style="margin-left: 10px;">Start New</button>
       {{ total_time_today }}
     </div>
 
-    <my-sidebar-timer :class="getSidebarClass()" style="text-align: left; overflow-y: scroll; border: solid 1px #cccccc;" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
+    <my-sidebar-timer :class="getSidebarClass()" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
     <div :class="'chat-hide-btn ' + trayClass()">
-      <button @click="trayToggle()" type="button" :class="'btn btn-purple ' + trayClass()">
+      <button @click="trayToggle()" type="button" :class="'btn btn-gray ' + trayClass()">
         timers
       </button>
     </div>
@@ -90,11 +85,14 @@ export default {
 
 <style lang="scss">
 #timer-tray {
-  width: 0;
+  width: 300px;
   -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
   transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
+  background-color: #e5e5e5;
+  transition: 0.5s;
+  right: -300px;
   &.expanded {
-    width: 300px;
+    right: 0;
   }
   button.btn.btn-purple {
     color: #ffffff !important;
@@ -111,6 +109,53 @@ export default {
     z-index: 999;
     -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
     transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
+  }
+  button.btn.btn-gray {
+    color: #ffffff !important;
+    background-color: #999999;
+    color: white;
+    position: fixed;
+    bottom: 31px;
+    right: -31px;
+    transform: rotate(-90deg);
+    font-size: 16px;
+    text-transform: uppercase;
+    padding: 8px 25px;
+    border-radius: 0 5px 0 0;
+    z-index: 999;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+  }
+  button.btn.btn-gray:active {
+    box-shadow: none;
+  }
+  .closebtn {
+    font-size: 30px;
+    background: transparent;
+    color: #7e7e7e;
+    cursor: pointer;
+    border: none;
+    position: absolute;
+    left: 0;
+    top: -3px;
+    outline: none;
+  }
+  .trayTopBtn {
+    position: sticky;
+    top: 0px;
+    padding: 10px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    background: #e5e5e5;
+    z-index: 100;
+
+    .makeBtn {
+      border: 1px solid #333;
+      border-radius: 5px;
+      color: #333;
+      font-size: 14px;
+      outline: none;
+    }
   }
   @media (max-width 800px) {
     position: absolute;
