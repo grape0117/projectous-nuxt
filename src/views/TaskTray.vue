@@ -1,10 +1,14 @@
 <template>
   <div id="task-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh;">
-    <select id="selectCompanyUser" v-model="selectedCompanyUserId">
-      <option v-for="(companyUser, i) in sortedCompanyUsers" :value="companyUser.id" :id="'company_user-' + companyUser.id" :key="`${companyUser.id}-${i}`">
-        {{ companyUser.name }}
-      </option>
-    </select>
+    <div class="topSelectionBox">
+      <select id="selectCompanyUser" v-model="selectedCompanyUserId">
+        <option v-for="(companyUser, i) in sortedCompanyUsers" :value="companyUser.id" :id="'company_user-' + companyUser.id" :key="`${companyUser.id}-${i}`">
+          {{ companyUser.name }}
+        </option>
+      </select>
+      <button class="closebtnLeft" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button>
+    </div>
+
     <pj-draggable :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" />
     <new-list-form v-if="selectedCompanyUserId" :user-id="selectedCompanyUserId" />
     <div :class="'chat-hide-btn ' + trayClass()">
@@ -249,10 +253,7 @@ export default class Custom extends Vue {
   //TODO: pass only ids instead of whole objects?
   private updateTaskUserSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.$store.dispatch(
-      'task_users/updateSortOrders',
-      parsedTasks.map(({ id }: { id: number }) => id)
-    )
+    this.$store.dispatch('task_users/updateSortOrders', parsedTasks.map(({ id }: { id: number }) => id))
   }
 
   @Watch('selectedCompanyUserId')
@@ -275,18 +276,45 @@ export default class Custom extends Vue {
 <style lang="scss">
 #task-tray {
   width: 0;
+  background: #e5e5e5;
+  -webkit-transition: all 0.5s ease-in;
+  -o-transition: all 0.5s ease-in;
+  -moz-transition: all 0.5s ease-in;
+  transition: all 0.5s ease-in;
   &.expanded {
-    min-width: 300px;
-    -webkit-transition: all 600ms cubic-bezier(0.19, 1, 0.22, 1);
-    transition: all 600ms cubic-bezier(0.19, 1, 0.22, 1);
+    width: 300px;
   }
   @media (max-width 800px) {
     position: absolute;
     top: 0;
     left: 0;
   }
+  .topSelectionBox {
+    padding: 10px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+    z-index: 100;
+    select {
+      padding: 3px 10px;
+      border-radius: 5px;
+      border: 1px solid #333;
+      color: #333;
+    }
+  }
 }
-
+.closebtnLeft {
+  font-size: 30px;
+  background: transparent;
+  color: #7e7e7e;
+  cursor: pointer;
+  border: none;
+  position: absolute;
+  right: 0;
+  top: -3px;
+  outline: none;
+}
 .chat-hide-btn {
   margin-left: 0;
 }
@@ -313,19 +341,21 @@ export default class Custom extends Vue {
 }
 #task-tray button.btn.btn-purple {
   color: #ffffff !important;
-  background-color: #993399;
-  border-color: #993399;
+  background-color: #999999;
+  border-color: #999999;
   position: fixed;
   bottom: 26px;
   left: -29px;
   transform: rotate(-90deg);
-  font-size: 20px;
+  font-size: 16px;
   text-transform: uppercase;
   padding: 8px 25px;
   border-radius: 0 0 5px 0;
   z-index: 999;
-  -webkit-transition: all 600ms cubic-bezier(0.19, 1, 0.22, 1);
-  transition: all 600ms cubic-bezier(0.19, 1, 0.22, 1);
+  -webkit-transition: all 0.5s ease-in;
+  -o-transition: all 0.5s ease-in;
+  -moz-transition: all 0.5s ease-in;
+  transition: all 0.5s ease-in;
 }
 .chat-hide-btn {
   position: relative;

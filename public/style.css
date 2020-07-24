@@ -2,46 +2,32 @@
  * Base structure
  */
 
-
 /* Move down content because we have a fixed navbar that is 50px tall */
-
 body {
     /*padding-top: 50px;*/
 }
-
-
 /*
  * Global add-ons
  */
-
 .sub-header {
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
-
-
 /*
  * Top navigation
  * Hide default border to remove 1px line.
  */
-
 .navbar-fixed-top {
     border: 0;
 }
-
-
 /*
  * Sidebar
  */
-
-
 /* Hide for mobile, show later */
-
 .sidebar {
     display: none;
     z-index: 1;
 }
-
 @media (min-width: 768px) {
     .sidebar {
         position: fixed;
@@ -58,116 +44,87 @@ body {
         border-right: 1px solid #eee;
     }
 }
-
-
 /* Sidebar navigation */
-
 .nav-sidebar {
     /*margin-right: -21px;*/
     /* 20px padding + 1px border */
     /*margin-bottom: 20px;*/
     /*margin-left: -20px;*/
 }
-
 .nav-sidebar>li>a {
     padding-right: 20px;
     padding-left: 20px;
 }
-
 .nav-sidebar>.active>a,
 .nav-sidebar>.active>a:hover,
 .nav-sidebar>.active>a:focus {
     color: #fff;
     background-color: #428bca;
 }
-
-
 /*
  * Main content
  */
-
 .main {
     padding: 20px;
 }
-
 @media (min-width: 768px) {
     .main {
         /*padding-right: 40px;*/
         /*padding-left: 40px;*/
     }
 }
-
 .main .page-header {
     margin-top: 0;
 }
-
-
 /*---------- MAIN AREA Style ----------*/
-
 @media (min-width: 768px) {
     .main {
         padding: 0;
     }
 }
-
 @media (max-width: 768px) {
     .table-responsive td {
         display: block;
     }
 }
-
 .table-responsive {
     /*display: none;*/
 }
-
-
 /*
  * Placeholder dashboard ideas
  */
-
 .placeholders {
     margin-bottom: 30px;
     text-align: center;
 }
-
 .placeholders h4 {
     margin-bottom: 0;
 }
-
 .placeholder {
     margin-bottom: 20px;
 }
-
 .placeholder img {
     display: inline-block;
     border-radius: 50%;
 }
-
 .client {
     display: inline-block;
     padding: 3px;
     color: white;
     background: #666699;
 }
-
 .filecard {
     background-color: #eeeeee;
     margin-right: 10px;
     padding: 10px;
     border: solid 1px #dddddd;
 }
-
 .project-area .tab-content {
     display: block;
     background: #fff;
 }
-
-
 /*START SAM STYLE*/
-
-
 /*TAB SIDEBARS MAIN */
-
 .sidebar ul.tabs,
 ul.tabs2 {
     margin: 0px;
@@ -177,17 +134,14 @@ ul.tabs2 {
     z-index: 1041;
     top: 80px;
 }
-
 ul.tabs-timer,
 ul.tabs2 {
     background-color: #666666;
 }
-
 ul.tabs-timer,
 ul.tabs {
     background-color: #fff;
 }
-
 ul.tabs-timer li,
 ul.tabs li {
     background: none;
@@ -200,12 +154,10 @@ ul.tabs li {
     padding: 0px 5px;
     border-bottom: 1px solid #fff;
 }
-
 ul.tabs-timer li.current,
 ul.tabs li.current {
     border-bottom: 0px solid transparent;
 }
-
 ul.tabs2 li {
     background: #666;
     color: #fff;
@@ -223,21 +175,16 @@ ul.tabs2 li {
     letter-spacing: 1px;
     border-bottom: 1px solid #fff;*/
 }
-
-
 /*ul.tabs2 li:first-child, ul.tabs2 li:nth-child(2){ width: 40%; }
 ul.tabs2 li:last-child { width: 20%; }*/
-
 ul.tabs-timer li,
 ul.tabs li,
 ul.tabs2 li {
     width: 33.33%;
 }
-
 ul.tabs2 li. .current {
     border-bottom: 0px solid transparent;
 }
-
 @media (min-width: 992px) {
     ul.tabs2,
     ul.tabs,
@@ -245,7 +192,6 @@ ul.tabs2 li. .current {
         width: 16.6%;
     }
 }
-
 @media screen and (max-width: 991px) and (min-width: 768px) {
     ul.tabs-timer,
     ul.tabs2,
@@ -254,62 +200,45 @@ ul.tabs2 li. .current {
         width: 25%;
     }
 }
-
 ul.tabs-timer li.current,
 ul.tabs li.current {
     background: #ededed;
     color: #222;
 }
-
 ul.tabs-timer li.current,
 ul.tabs2 li.current {
     background: #919191;
     color: #222;
 }
-
 #first-sidebar .tabbed-content {
     background: #919191;
     padding: 15px;
 }
-
 #first-sidebar .tabbed-content.current {
     background: #919191;
 }
-
 .tabbed-content {
     display: none;
     background: #ededed;
     height: 100%;
 }
-
 .tabbed-content.current {
     display: inherit;
     height: 100%;
 }
-
-
 /*SIDEBAR POSITIONING*/
-
 #first-sidebar,
 #second-sidebar,
 #third-sidebar {
     position: relative;
     top: 75px;
 }
-
 #first-sidebar #tab-2 ul li>div {
     padding: 5px 20px 5px 45px;
 }
-
-
 /*#first-sidebar #tab-2 ul li > div:first-child{*/
-
-
 /*padding-top: 25px!important;*/
-
-
 /*}*/
-
 #first-sidebar {
     background: #919191;
 }
@@ -341,8 +270,6 @@ ul.tabs2 li.current {
 .title-project-name {
     text-transform: uppercase;
 }
-
-
 /*
 .hover-tab .div-on-hover-show{
     display: none;
@@ -359,12 +286,10 @@ ul.tabs2 li.current {
     display: block;
 }
 */
-
 #myprojects .nav-sidebar>li:first-child>a {
     display: inline-block !important;
     margin: auto;
 }
-
 .project-details {
     cursor: pointer;
     clear: both;
@@ -374,7 +299,6 @@ li.task-item {
     list-style-type: none;
     font-size: 11px;
 }
-
 .due_at {
     text-align: center;
     background: #666666;
@@ -382,12 +306,9 @@ li.task-item {
     font-size: 12px;
     font-weight: bold;
 }
-
 #first-sidebar input {
     width: 100%;
 }
-
-
 /*
 .past_due {
   color: #ca0d0d;
@@ -402,7 +323,6 @@ li.task-item {
 .due_this_week {
   color: green;
 }*/
-
 .title-project-project-name {
     /*white-space: nowrap;*/
     width: 100%;
@@ -411,25 +331,20 @@ li.task-item {
     text-overflow: clip;
     padding-right: 2px;*/
 }
-
-
 /*.hover-tab > p:first-child:hover{
     overflow: visible;
     text-overflow: inherit;
     background-color: #919191;
 }*/
-
 #first-sidebar .nav-sidebar>li {
     padding-top: 5px;
     clear: both;
 }
-
 .title-project-client-name {
     text-transform: uppercase;
     margin-bottom: 0px;
     font-size: 10px;
 }
-
 .title-project-project-name {
     /*color: #124a54;
     z-index: 1040;*/
@@ -437,22 +352,18 @@ li.task-item {
     line-height: 17px;
     margin-bottom: 0;
 }
-
 .project-sidebar-tasks {
     padding-left: 0;
     /*clear: both;*/
 }
-
 .projects-tt {
     color: #f5f5f5;
     background-color: #666666;
 }
-
 .timers-tt {
     background-color: #fff;
     color: #000;
 }
-
 .tab-title {
     text-transform: uppercase;
     text-align: center;
@@ -462,7 +373,6 @@ li.task-item {
     position: fixed;
     z-index: 1044;
 }
-
 .project-item.timer-running {
     background-color: #ddffe0;
 }
@@ -517,11 +427,7 @@ li.task-item {
 #timer-sidebar ul li:first-child {
     padding-top: 30px;
 }
-
-
 /*----  TIMER MODAL ---*/
-
-
 /*#timer-modal input, #timer-modal select{
     width: 32%;
 }
@@ -533,7 +439,6 @@ li.task-item {
     text-transform: uppercase;
 }
 */
-
 .row.without-margin {
     margin: 0;
 }
