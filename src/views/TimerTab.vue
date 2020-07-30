@@ -94,6 +94,19 @@ export default {
   &.expanded {
     right: 0;
   }
+  .project-item {
+    list-style-type: none;
+    padding: 10px 15px;
+    background: #fff;
+    width: 260px;
+    min-height: 130px;
+    margin: 0 auto;
+    border-radius: 5px;
+    margin: 10px;
+    -webkit-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+  }
   button.btn.btn-purple {
     color: #ffffff !important;
     background-color: #993399;
