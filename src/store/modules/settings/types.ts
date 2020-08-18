@@ -3,10 +3,10 @@ import { ICompanyUser } from '@/store/modules/company_users/types'
 import { ITask } from '@/store/modules/tasks/types'
 
 export interface IModuleState {
-  action_stack: []
+  modal_stack: string[]
   modules: []
   bvModal: any
-  check_action_stack: boolean
+  check_modal_stack: boolean
   current_company_user_id: string
   current_company_user: {}
   current_company_id: string

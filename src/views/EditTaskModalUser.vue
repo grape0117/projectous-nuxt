@@ -12,9 +12,9 @@
       </b-input-group>
     </b-input-group>
     <div class="form-group">
-      <label class="control-label col-sm-4" for="taskWorkDate">Next Work Day: {{ next_work_day }} </label>
+      <label class="control-label col-sm-4" :for="'taskWorkDate' + user.id">Next Work Day: {{ next_work_day }} </label>
       <div class="col-sm-8">
-        <input id="taskWorkDate" class="form-control" type="date" name="next_work_day" placeholder="Next Work Day" v-model="next_work_day" />
+        <input :id="'taskWorkDate' + user.id" class="form-control" type="date" name="next_work_day" placeholder="Next Work Day" v-model="next_work_day" />
       </div>
     </div>
   </div>
@@ -71,6 +71,7 @@ export default {
         id: this.id,
         task_id: this.task.id,
         company_user_id: this.user.id,
+        next_work_day: this.next_work_day,
         user_checked: this.user_checked,
         user_rate: this.user_rate,
         role: role
@@ -84,6 +85,9 @@ export default {
         this.$store.dispatch('DELETE', { module: 'task_users', entity: task_user }, { root: true })
       }
       //this.toggleUser()
+    },
+    next_work_day(next_work_day) {
+      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: this.id, attribute: 'next_work_day', value: next_work_day }, { root: true })
     }
   },
   methods: {

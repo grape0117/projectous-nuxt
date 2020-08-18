@@ -4,11 +4,11 @@
       <div v-if="!verticalAlignment" class="list__group-title">
         {{ group.name }}
       </div>
-      <div v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id" class="list__group">
+      <div :class="title.replace(/[^a-zA-Z0-9]/, '-')" v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id" class="list__group">
         <div
-          class="list__group-subtitle"
+          :class="'list__group-subtitle ' + title.replace(/[^a-zA-Z0-9]/, '-')"
           :style="{
-            background: isListDragged && targetListIndex === index ? '#333333' : '#f0fbfc'
+            // background: isListDragged && targetListIndex === index ? '#333333' : 'initial'
           }"
           v-if="verticalAlignment"
         >
@@ -150,12 +150,22 @@ export default class Draggable extends Vue {
 .list__group-subtitle {
   width: 40px;
   padding: 0.5rem;
-  border-right: 1px solid #f6f6f6;
-  /*background: #f0fbfc;*/
+  /*border-right: 1px solid #f6f6f6;*/
+  background: #f0fbfc;
   flex: none;
   text-transform: uppercase;
   color: #85868a;
   font-weight: bold;
+}
+.list__group-subtitle.Today {
+  background-color: rgb(153 51 153);
+  color: white;
+}
+.Today .dragzone {
+  background-color: #99339938;
+}
+.list__group-subtitle.Today .dragzone__item-dragbox--active span {
+  color: #a9a6a6;
 }
 
 .list__group-subtitle > div {

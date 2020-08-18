@@ -9,9 +9,15 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4" for="projectAcronymEdit">Project Name: </label>
+        <label class="control-label col-sm-4" for="projectAcronymEdit">Project Acronym: </label>
         <div class="col-sm-8">
           <input id="projectAcronymEdit" class="form-control" type="text" name="acronym" placeholder="Project Acronym" v-model="project.acronym" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-4" for="projectAcronymEdit">Project Url: </label>
+        <div class="col-sm-8">
+          <input id="projectAcronymEdit" class="form-control" type="text" name="url" placeholder="Project Acronym" v-model="project.url" />
         </div>
       </div>
       <div class="form-group">
@@ -65,32 +71,11 @@
                                 </div>
                             </div>
                         </div>-->
-      <h4 v-if="project.id">Tasks</h4>
-      <project-modal-task v-if="project.id" v-for="task in projecttasks()" v-bind:project="project" v-bind:task_types="task_types" v-bind:task="task"></project-modal-task>
-      <div v-if="project.id" class="row without-margin">
-        <div class="col-sm-8 col-sm-offset-4">
-          <a @click="addTask()">Add Task</a>
-        </div>
-      </div>
 
       <div v-if="isAdmin()" class="form-group">
         <label class="control-label col-sm-4" for="projectEditDescription">Users: </label>
         <div class="col-sm-8">
           <edit-project-modal-user v-for="user in users" :key="user.id" @toggle="toggleUser" v-bind:client_user="projectClientUser(user.id)" v-bind:project="project" v-bind:project_user="projectUser(project.id, user.id)" v-bind:user="user" />
-
-          <!--<table class="row without-margin" v-if="isAdmin()">
-                        <tr>
-                            <th>Name</th>
-                            <th>Project Rate</th>
-                            <th>Role</th>
-                        </tr>
-                        <tr
-                                v-for="user in users"
-                                v-bind:user="user"
-                                v-bind:project="project"
-                                is="user-project-row"
-                        ></tr>
-                    </table>-->
         </div>
       </div>
     </form>
@@ -115,7 +100,7 @@ export default {
       return this.$store.getters['clients/getActiveCompanyClients']
     },
     project: function() {
-      return this.$store.getters['settings/getCurrentEditProject']
+      return this.$store.state.settings.current_edit_project
     },
     clients: function() {
       return this.$store.state.clients.clients
@@ -139,12 +124,6 @@ export default {
       return this.$store.state.settings.current_company_user
     }
   },
-  mounted() {
-    /* let self = this
-      $('#project-modal').on('hidden.bs.modal', function() {
-        self.$store.dispatch('settings/closedModal')
-      })*/
-  },
   watch: {
     'project.client_id': function() {
       if (this.project.client_id === 'create') {
@@ -154,7 +133,7 @@ export default {
           pop: false,
           push: true
         })
-        this.$store.dispatch('projects/createClient')
+        this.$store.dispatch('clients/createClient')
       }
     }
   },
@@ -182,9 +161,6 @@ export default {
     projectUser(project_id, company_user_id) {
       return this.$store.getters['project_users/getByProjectIdAndCompanyUserId']({ project_id, company_user_id })
     },
-    closeProject() {
-      this.$store.dispatch('projects/closeProject', this.project)
-    },
     projecttasks() {
       if (!this.project_id) {
         return []
@@ -205,14 +181,6 @@ export default {
     },
     due_date: function() {
       return '' //dateTimeToInput(this.project.due_at)
-    },
-    isProjectClient: function(client_id) {
-      return this.project.client_company_id === client_id
-    },
-    isCreateClient: function() {
-      if (document.getElementById('client-modal-client-id').value === 'create') {
-        this.$store.dispatch('clients/createClient')
-      }
     },
     editClient: function() {
       this.$store.dispatch('settings/closeModal', {

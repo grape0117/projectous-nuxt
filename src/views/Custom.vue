@@ -88,7 +88,7 @@ export default class Custom extends Vue {
   get activeClients() {
     return this.$store.state.clients.clients
       .filter((client: any) => {
-        return client.status === 'active'
+        return client.status === 'lead' || client.status === 'new' || client.status === 'active'
       })
       .sort((a: any, b: any) => {
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
@@ -229,10 +229,7 @@ export default class Custom extends Vue {
   //TODO: pass only ids instead of whole objects?
   private updateTaskSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.$store.dispatch(
-      'tasks/updateSortOrders',
-      parsedTasks.map(({ id }: { id: string }) => id)
-    )
+    this.$store.dispatch('tasks/updateSortOrders', parsedTasks.map(({ id }: { id: string }) => id))
   }
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {

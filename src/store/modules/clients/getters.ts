@@ -14,7 +14,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   getActiveCompanyClients: (state: IModuleState) => {
     return state.clients
       .filter(client => {
-        return client.status == 'active'
+        return client.status === 'lead' || client.status === 'new' || client.status === 'active'
       })
       .sort((a, b) => {
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1

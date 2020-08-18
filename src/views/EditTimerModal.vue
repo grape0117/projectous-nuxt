@@ -348,7 +348,7 @@ export default {
         push: true
       })
       this.$store.dispatch('clients/editClient', this.timerClient())
-      this.$store.commit('settings/setCheckActionStack', true)
+      this.$store.commit('settings/setCheckModalStack', true)
     },
     timerClient: function() {
       let timerProject = this.timerProject()

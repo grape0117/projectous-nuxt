@@ -14,7 +14,7 @@
             <td>Role</td>
             <td>Address</td>
           </tr>
-          <tr v-for="user in filteredusers" :key="user.id" v-bind:user="user" is="company-users-row" />
+          <tr v-bind:user="user" v-for="user in filteredusers" is="user-row"></tr>
         </tbody>
       </table>
     </div>
@@ -22,23 +22,21 @@
 </template>
 
 <script>
-import CompanyUsersRow from './CompanyUsersRow.vue'
+import UserRow from './UserRow.vue'
 export default {
   name: 'users-template',
   components: {
-    CompanyUsersRow
+    'user-row': UserRow
   },
   computed: {
     isAdmin: function() {
-      return true
       return this.$store.getters['settings/isAdmin']
     },
-    company_users: function() {
+    users: function() {
       return this.$store.state.company_users.company_users
     },
     filteredusers: function() {
-      return this.company_users
-      return this.$store.getters['company_users/getActive']
+      return this.$store.getters['company_users/getActiveUsers']
     }
   },
   methods: {

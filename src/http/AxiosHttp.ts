@@ -52,6 +52,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
     }
   }
   public async put(url: string, id: number | string, data: any) {
+    console.log('put', data)
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)
       return

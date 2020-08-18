@@ -3,10 +3,10 @@ import { actions } from './actions'
 export const settings = {
   namespaced: true,
   state: {
-    action_stack: [],
+    modal_stack: [],
     modules: [],
     bvModal: null,
-    check_action_stack: true,
+    check_modal_stack: true,
     current_company_user_id: null, //TODO remove?
     current_company_user: {}, //TODO remove?
     current_company_id: null,

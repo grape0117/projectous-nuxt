@@ -11,6 +11,7 @@ import NavBar from './views/NavBar.vue'
 // @ts-ignore
 import ProjectousPlugin from './projectous.js'
 Vue.use(ProjectousPlugin)
+Vue.use(require('vue-moment'))
 
 Vue.component('nav-bar', NavBar)
 Vue.component('task-modal', EditTaskModal)
@@ -20,7 +21,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.config.productionTip = false
 
-new Vue({
+export let app = new Vue({
   router,
   store,
   render: h => h(App)

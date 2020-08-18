@@ -5,10 +5,10 @@ export interface IModuleState {
 }
 
 export interface IClient {
-  id?: number
+  id?: string
   visibility: string
   status: string
-  parent_client_id?: number | null
+  parent_client_id?: string | null
   company_id?: number | null
   client_company_id?: number
   name: string

@@ -10,7 +10,7 @@ export default {
   props: ['client'],
   methods: {
     editClient: function() {
-      this.$store.dispatch('clients/editClient', this.client)
+      this.$store.dispatch('clients/editClient', this.client.id)
     }
   }
 }

@@ -157,9 +157,9 @@ export default class Dragzone extends Vue {
 
   private editTask(task_id: any) {
     let task = this.$store.getters['tasks/getById'](task_id)
-    console.log('editing task: ', task)
-    this.$store.commit('settings/setCurrentEditTask', cloneDeep(task))
-    //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
+    console.log('edit task', task)
+    this.$store.state.settings.current_edit_task = cloneDeep(task)
+    this.$store.dispatch('settings/openModal', 'task')
   }
   private projectName(project_id: any) {
     const project = this.$store.getters['projects/getById'](project_id)

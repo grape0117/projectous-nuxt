@@ -2,9 +2,6 @@
   <div id="app">
     <task-tray />
     <main>
-      <router-link to="/Reports">Reports</router-link>
-      {{ current_edit_project ? current_edit_project.id : '' }} Project
-      <nav-bar />
       <div class="container-fluid">
         <div class="row-no-padding">
           <router-view />
@@ -15,9 +12,19 @@
     <task-modal />
     <edit-client-modal id="edit-client-modal" />
     <edit-user-modal id="edit-user-modal" />
+    <invite-user-modal id="invite-user-modal" />
     <edit-timer-modal id="edit-timer-modal" />
     <edit-project-modal id="edit-project-modal" />
     <div id="update-data-button" @click="storeDataInIndexedDb" />
+    <b-nav vertical>
+      <b-navbar-brand to="/">Projectous</b-navbar-brand>
+      <b-nav-item to="/tasks">Tasks</b-nav-item>
+      <b-nav-item to="/projects">Projects</b-nav-item>
+      <b-nav-item to="/clients">Clients</b-nav-item>
+      <b-nav-item to="/users">Users</b-nav-item>
+      <b-nav-item to="/profile">Profile</b-nav-item>
+      <b-nav-item to="/logout">Log Out</b-nav-item>
+    </b-nav>
   </div>
 </template>
 
@@ -25,6 +32,7 @@
 import TimerTab from './views/TimerTab'
 import EditClientModal from './views/EditClientModal.vue'
 import EditUserModal from './views/EditUserModal'
+import InviteUserModal from './views/InviteUserModal'
 import EditTaskModal from './views/EditTaskModal'
 import EditTimerModal from './views/EditTimerModal'
 import EditProjectModal from './views/EditProjectModal'
@@ -34,13 +42,16 @@ import { idbKeyval, idbGetAll } from '@/plugins/idb.ts'
 import { modulesNames, modulesNamesList } from './store/modules-names'
 import TaskTray from './views/TaskTray'
 import uuid from 'uuid'
+import AllTaskFilipTemplate from './views/AllTaskFilipTemplate'
 
 export default {
   components: {
+    AllTaskFilipTemplate,
     TimerTab,
     TaskTray,
     EditClientModal,
     EditUserModal,
+    InviteUserModal,
     EditTaskModal,
     EditTimerModal,
     EditProjectModal
@@ -89,18 +100,30 @@ export default {
     }
   },
   async mounted() {
+    /**
+     * We want every modal hide to check to see if another modal should be displayed.
+     */
+    //Make bvModal available in vuex store -- complaint department is =>
+    window.$_app = this
+    //Add trigger on modal hidden
+    this.$root.$on('bv::modal::hidden', () => {
+      this.$store.dispatch('settings/closedModal')
+    })
+
+    /**
+     * Each tab / instance needs a unique indentifier
+     */
     this.$store.state.settings.instance_id = uuid.v4()
-    this.registerModals()
+
+    /**
+     * Polling for new data TODO: long polling or websocket. If websocket, make sure it resumes easily.
+     */
     if (getCookie('auth_token')) {
       await this.getAppData()
       setInterval(this.getNewData, 3000)
     }
-    //TODO: set timeout for polling data from backend
   },
   methods: {
-    registerModals() {
-      this.$store.commit('settings/registerModals', this.$bvModal)
-    },
     getNewData() {
       this.$http()
         .get('/get-new-data/' + window.sessionStorage.last_poll_timestamp)
@@ -223,6 +246,7 @@ export default {
 <style lang="scss">
 #app {
   display: flex;
+  margin-bottom: 60px;
 }
 #update-data-button {
   position: absolute;

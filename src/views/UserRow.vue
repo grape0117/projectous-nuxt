@@ -8,11 +8,13 @@
 
 <script>
 export default {
-  name: 'company-users-row',
+  name: 'users-row',
   props: ['user'],
   methods: {
     editCompanyUser: function() {
-      this.$store.dispatch('company_users/editUser', this.user)
+      this.$store.commit('settings/setCurrentEditCompanyUser', this.user)
+      this.$store.dispatch('settings/setRemovableStatusOfCurrentEditUser')
+      this.$store.dispatch('company_users/editUser')
     }
   }
 }

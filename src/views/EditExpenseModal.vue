@@ -249,7 +249,7 @@ export default {
         push: true
       })
       this.$store.dispatch('clients/editClient', this.expenseClient())
-      this.$store.commit('settings/setCheckActionStack', true)
+      this.$store.commit('settings/setCheckModalStack', true)
     },
     expenseClient: function() {
       let expenseProject = this.expenseProject()

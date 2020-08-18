@@ -6,6 +6,12 @@ import CompanyUsers from './views/CompanyUsers.vue'
 import Login from '@/views/Login.vue'
 import checkAuth from '@/middlewares/checkAuth'
 import InvoiceableTemplate from './views/InvoiceableTemplate.vue'
+import InvoicesTemplate from './views/InvoicesTemplate.vue'
+import ClientsTemplate from './views/ClientsTemplate.vue'
+import Tasks from './views/AllTaskFilipTemplate.vue'
+import UsersTemplate from './views/UsersTemplate.vue'
+import AcceptInvite from './views/AcceptInvite.vue'
+import store from 'vuex'
 
 Vue.use(Router)
 //TODO: lazy load https://blog.logrocket.com/lazy-loading-in-vue-js/
@@ -23,9 +29,19 @@ const router = new Router({
       component: Login
     },
     {
+      path: '/accept-invite',
+      name: 'AcceptInvite',
+      component: AcceptInvite
+    },
+    {
+      path: '/tasks',
+      name: 'Tasks',
+      component: Tasks
+    },
+    {
       path: '/projects',
       name: 'Projects',
-      component: Projects
+      component: Custom
     },
     {
       path: '/custom',
@@ -38,17 +54,32 @@ const router = new Router({
       component: CompanyUsers
     },
     {
+      path: '/clients',
+      name: 'Clients',
+      component: ClientsTemplate
+    },
+    {
+      path: '/users',
+      name: 'Users',
+      component: UsersTemplate
+    },
+    {
       path: '/reports',
       name: 'Reports',
       component: InvoiceableTemplate
+    },
+    {
+      path: '/invoices',
+      name: 'Invoices',
+      component: InvoicesTemplate
     }
   ]
 })
 
-const guardedRoutes = ['Projects', 'Custom', 'Company Users']
+const unGuardedRoutes = ['Login', 'AcceptInvite', 'Register']
 
 router.beforeEach((to, from, next) => {
-  const guardedRoute = !!guardedRoutes.find(route => route === to.name)
+  const guardedRoute = !unGuardedRoutes.find(route => route === to.name)
   checkAuth(guardedRoute, next)
 })
 

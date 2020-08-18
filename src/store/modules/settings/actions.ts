@@ -2,7 +2,7 @@ import { ActionTree } from 'vuex'
 import { IModuleState } from './types'
 import { IRootState } from '@/store/types'
 import { ICompanyUser } from '@/store/modules/company_users/types.ts'
-
+import { app } from '@/main.ts'
 const company_user_id: number = 1
 
 const UUID = () => {
@@ -32,46 +32,96 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('tasks/UPDATE', task)
     commit('task_users/UPDATE', task_user)
   },
-  openModal(context, { modal }) {
+  openModal(context, modal) {
     // @ts-ignore
-    this.bvModal.show(modal + '-modal')
-    //$('#'+modal+'-modal').modal({});
+    console.log(modal + '-modal')
+    // @ts-ignore
+    window.$_app.$bvModal.show(modal + '-modal')
   },
+  /**
+   * When opening a modal from another modal we need to turn off the modal_stack system,
+   * add the current modal into the stack, hide the current modal (which calls closedModal without effect),
+   * and open the desired modal.
+   * TODO: Any data can be passed between the modals as needed with some modification to this action.
+   * Data could also be passed from the originating modal component.
+   * @param context
+   * @param {any} currentModal
+   * @param {any} newModal
+   */
+  openModalFromModal(context, { currentModal, nextModal }) {
+    //1. Make sure the modal we want will open, not something from the stack
+    context.state.check_modal_stack = false
+
+    //2. Add the current modal to the stack so it comes back when the next modal is closed.
+    context.state.modal_stack.push(currentModal)
+
+    //3. Close the current modal. This will cause closedModal action to fire, but it should not do anything.
+    // @ts-ignore
+    window.$_app.$bvModal.hide(currentModal)
+
+    //4. Open the next modal
+    // @ts-ignore
+    window.$_app.$bvModal.show(nextModal)
+  },
+  /**
+   * This action fires when a bootstrap modal closes. If permitted (check_modal_stack === true),
+   * it checks to see if another modal should be displayed and displays that modal. This will
+   * typically happen when a user open a modal from another modal and dismisses it. The original modal
+   * will be displayed again.
+   *
+   * @param context
+   */
   closedModal(context) {
     console.log('closedModal')
-    console.log('check_action_stack', context.state.check_action_stack)
-    console.log('action_stack', context.state.action_stack)
-    if (context.state.check_action_stack) {
-      let next_action = context.state.action_stack.pop()
-      console.log('next_action', next_action)
+    console.log('check_modal_stack', context.state.check_modal_stack)
+    console.log('modal_stack', context.state.modal_stack)
+    if (context.state.check_modal_stack) {
+      let next_modal = context.state.modal_stack.pop()
+      console.log('next_modal', next_modal)
       // @ts-ignore
-      this.bvModal.show(next_action + '-modal')
+      window.$_app.$bvModal.show(next_modal + '-modal')
     }
     console.log('setting check to true')
-    context.commit('setCheckActionStack', true)
+    context.commit('setCheckModalStack', true)
   },
-  closeModal(context, { modal, object, pop, push }) {
-    //We want to manually open modal
-    context.commit('setCheckActionStack', false)
+  /**
+   * This is used when we need to insert values into the next modal in the stack
+   * instead of just letting the closedModal event fire.
+   * Setting check_modal_stack to false will prevent the closedModal action
+   * from opening the next modal without the data from the other modal.
+   * @param context
+   * @param {string} modal
+   * @param {any} entity
+   * @param {boolean} pop
+   * @param {boolean} push
+   */
+  closeModal(context, { modal, entity, pop, push }) {
+    //1. We want to make sure we are manually opening the next modal in the stack
+    context.commit('setCheckModalStack', false)
     console.log('closing ' + modal)
-    // @ts-ignore
-    this.bvModal.hide(modal + '-modal')
 
+    //2. Hide the current modal
+    // @ts-ignore
+    window.$_app.$bvModal.hide(modal + '-modal')
+
+    //3. Optionally add current modal to stack TODO: should this be after the pop?
     if (push) {
-      context.commit('pushActionStack', modal)
+      context.commit('pushModalStack', modal)
     }
 
-    if (pop) {
-      let next_action = context.state.action_stack.pop() //TODO: does this work properly?
-      console.log(next_action)
-      if (modal === 'client' && next_action === 'project') {
-        console.log('client', object)
-        context.commit('settings/setCurrentEditProjectCompanyClient', object, {
+    //4. Get the next modal with relevant data if needed from closing modal TODO: why not always pop if something exists in the stack?
+    if (true || pop) {
+      let next_modal = context.state.modal_stack.pop() //TODO: does this work properly?
+      if (modal === 'client' && next_modal === 'project') {
+        console.log('client', entity)
+        context.commit('settings/setCurrentEditProjectClient', entity, {
           root: true
         })
       }
+
+      //5. Open the next modal
       // @ts-ignore
-      this.bvModal.show(next_action + '-modal').modal()
+      window.$_app.$bvModal.show(next_modal + '-modal').modal()
     }
   },
   checkForRunningTimers(context) {

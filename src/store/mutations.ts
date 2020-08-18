@@ -28,7 +28,7 @@ export const mutations: MutationTree<IRootState> = {
             //@ts-ignore
             state[module][module].push(entity)
           } else {
-            console.log('ADD_MANY entity found', state[module].lookup[entities[index].id], entity)
+            //console.log('ADD_MANY entity found', state[module].lookup[entities[index].id], entity)
             //@ts-ignore
             let key = state[module].lookup[entities[index].id]
             for (let property in entity) {

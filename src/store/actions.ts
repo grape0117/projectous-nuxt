@@ -2,11 +2,11 @@ import { IRootState } from '@/store/types'
 import { ActionTree } from 'vuex'
 
 export const actions: ActionTree<IRootState, IRootState> = {
-  ADD_MANY({ commit, dispatch }, { module, entities }: any) {
+  ADD_MANY({ commit, dispatch }, { module, entities }) {
     //TODO: rename to load?
     commit('ADD_MANY', { module, entities })
   },
-  ADD_ONE({ commit, dispatch }, { module, entity }) {
+  ADD_ONE({ commit, dispatch }, { module, entity }: { module: string; entity: any }) {
     //TODO: rename to create?
     commit('ADD_ONE', { module, entity })
 
@@ -40,6 +40,7 @@ export const actions: ActionTree<IRootState, IRootState> = {
     }
   },
   UPDATE({ commit, dispatch }, { module, entity }) {
+    console.log('update entity', entity)
     commit('UPDATE', { module, entity })
     // @ts-ignore
     this._vm

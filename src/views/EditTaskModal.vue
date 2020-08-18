@@ -108,7 +108,9 @@ export default {
   },
   computed: {
     task: function() {
-      return this.$store.state.settings.current_edit_task
+      let task = this.$store.state.settings.current_edit_task
+      console.log('modal task', task)
+      return task
     },
     users: function() {
       return this.$store.state.company_users.company_users
