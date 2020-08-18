@@ -32,8 +32,10 @@ export const mutations: MutationTree<IModuleState> = {
     console.log('open client modal', client)
     state.current_edit_client = client
     if (client.id) {
+      // @ts-ignore
       window.$_app.$bvModal.show('client-modal')
     } else {
+      // @ts-ignore
       window.$_app.$bvModal.hide('client-modal')
     }
   },
@@ -41,24 +43,30 @@ export const mutations: MutationTree<IModuleState> = {
     console.log('open project modal')
     state.current_edit_project = project
     if (project.id) {
+      // @ts-ignore
       window.$_app.$bvModal.show('project-modal')
     } else {
+      // @ts-ignore
       window.$_app.$bvModal.hide('project-modal')
     }
   },
   setCurrentEditTask(state, task) {
     state.current_edit_task = JSON.parse(JSON.stringify(task))
     if (task.id) {
+      // @ts-ignore
       window.$_app.$bvModal.show('task-modal')
     } else {
+      // @ts-ignore
       window.$_app.$bvModal.hide('task-modal')
     }
   },
   setCurrentEditTimer(state, timer) {
     state.current_edit_timer = timer
     if (timer.id) {
+      // @ts-ignore
       window.$_app.$bvModal.show('timer-modal')
     } else {
+      // @ts-ignore
       window.$_app.$bvModal.hide('timer-modal')
     }
   },
