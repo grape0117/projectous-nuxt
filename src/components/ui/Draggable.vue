@@ -138,7 +138,7 @@ export default class Draggable extends Vue {
 .list__group {
   width: 100%;
   display: flex;
-  border: 1px solid #f6f6f6;
+  /*border: 1px solid #f6f6f6;*/
 }
 .list__group-title {
   font-size: 0.8rem;
@@ -150,18 +150,24 @@ export default class Draggable extends Vue {
 .list__group-subtitle {
   width: 40px;
   padding: 0.5rem;
+  padding-left: 5px;
   /*border-right: 1px solid #f6f6f6;*/
-  background: #f0fbfc;
+  /*background: #f0fbfc;*/
   flex: none;
   text-transform: uppercase;
   color: #85868a;
   font-weight: bold;
 }
+.list__group-subtitle,
 .list__group-subtitle.Today {
-  background-color: rgb(153 51 153);
-  color: white;
+  background-color: rgb(101 45 101);
+  color: lightgrey;
+  border-left: solid 8px #993399;
+  border-top: solid 8px #993399;
 }
+.dragzone,
 .Today .dragzone {
+  border-top: solid 8px rgb(153 51 153);
   background-color: #99339938;
 }
 .list__group-subtitle.Today .dragzone__item-dragbox--active span {
