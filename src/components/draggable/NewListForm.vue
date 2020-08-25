@@ -1,7 +1,9 @@
 <template>
   <div>
-    <h6>Add new list</h6>
-    <input v-model="title" type="text" @keyup.prevent.enter="createNewList" />
+    <div class="newListAdd">
+      <h6>Add new list</h6>
+      <input v-model="title" type="text" @keyup.prevent.enter="createNewList" />
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -27,3 +29,14 @@ export default class NewListForm extends Vue {
   }
 }
 </script>
+<style lang="scss">
+.newListAdd {
+  text-align: center;
+  padding: 10px;
+  input {
+    border-radius: 5px;
+    border: 1px solid #333;
+    color: #333;
+  }
+}
+</style>

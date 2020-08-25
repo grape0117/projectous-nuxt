@@ -136,10 +136,21 @@ export default class Draggable extends Vue {
   width: 100%;
 }
 .list__group {
-  width: 100%;
+  width: 275px;
   display: flex;
-  /*border: 1px solid #f6f6f6;*/
+  background: #fff;
+  border: 1px solid #f6f6f6;
+  margin-bottom: 10px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  -webkit-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+  box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
 }
+.list__group:first-child {
+  margin-top: 15px;
+}
+
 .list__group-title {
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -157,6 +168,7 @@ export default class Draggable extends Vue {
   text-transform: uppercase;
   color: #85868a;
   font-weight: bold;
+  font-size: 14px;
 }
 .list__group-subtitle,
 .list__group-subtitle.Today {
