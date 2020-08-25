@@ -38,5 +38,8 @@ export default class NewListForm extends Vue {
     border: 1px solid #333;
     color: #333;
   }
+  h6 {
+    color: #ffffff;
+  }
 }
 </style>

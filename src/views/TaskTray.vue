@@ -275,7 +275,7 @@ export default class Custom extends Vue {
 <style lang="scss">
 #task-tray {
   width: 0;
-  background: #e5e5e5;
+  background: #993399;
   -webkit-transition: all 0.5s ease-in;
   -o-transition: all 0.5s ease-in;
   -moz-transition: all 0.5s ease-in;
@@ -305,7 +305,7 @@ export default class Custom extends Vue {
     text-align: center;
     position: sticky;
     top: 0;
-    background: #f5f5f5;
+    background: #993399;
     z-index: 100;
     select {
       padding: 3px 10px;
@@ -318,7 +318,7 @@ export default class Custom extends Vue {
 .closebtnLeft {
   font-size: 30px;
   background: transparent;
-  color: #7e7e7e;
+  color: #ffffff;
   cursor: pointer;
   border: none;
   position: absolute;
@@ -352,8 +352,8 @@ export default class Custom extends Vue {
 }
 #task-tray button.btn.btn-purple {
   color: #ffffff !important;
-  background-color: #999999;
-  border-color: #999999;
+  background-color: #993399;
+  border-color: #993399;
   position: fixed;
   bottom: 26px;
   left: -32px;

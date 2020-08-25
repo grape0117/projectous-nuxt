@@ -88,7 +88,7 @@ export default {
   width: 300px;
   -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
   transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
-  background-color: #e5e5e5;
+  background-color: #993399;
   transition: 0.5s;
   right: -300px;
   &.expanded {
@@ -97,7 +97,7 @@ export default {
   .project-item {
     list-style-type: none;
     padding: 10px 15px;
-    background: #fff;
+    background: #e9d2e9;
     width: 260px;
     min-height: 130px;
     margin: 0 auto;
@@ -106,6 +106,9 @@ export default {
     -webkit-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
     box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+  }
+  .timer-task {
+    background-color: #e9d2e9;
   }
   button.btn.btn-purple {
     color: #ffffff !important;
@@ -125,7 +128,7 @@ export default {
   }
   button.btn.btn-gray {
     color: #ffffff !important;
-    background-color: #999999;
+    background-color: #993399;
     color: white;
     position: fixed;
     bottom: 31px;
@@ -145,7 +148,7 @@ export default {
   .closebtn {
     font-size: 30px;
     background: transparent;
-    color: #7e7e7e;
+    color: #ffffff;
     cursor: pointer;
     border: none;
     position: absolute;
@@ -159,15 +162,17 @@ export default {
     padding: 10px;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-    background: #e5e5e5;
+    background: #993399;
     z-index: 100;
+    color: #fff;
 
     .makeBtn {
-      border: 1px solid #333;
+      border: 1px solid #652d65;
       border-radius: 5px;
-      color: #333;
+      color: #fff;
       font-size: 14px;
       outline: none;
+      background: #652d65;
     }
   }
   @media (max-width 800px) {

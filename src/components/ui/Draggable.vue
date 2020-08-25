@@ -139,7 +139,6 @@ export default class Draggable extends Vue {
   width: 275px;
   display: flex;
   background: #fff;
-  border: 1px solid #f6f6f6;
   margin-bottom: 10px;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
@@ -175,11 +174,9 @@ export default class Draggable extends Vue {
   background-color: rgb(101 45 101);
   color: lightgrey;
   border-left: solid 8px #993399;
-  border-top: solid 8px #993399;
 }
 .dragzone,
 .Today .dragzone {
-  border-top: solid 8px rgb(153 51 153);
   background-color: #99339938;
 }
 .list__group-subtitle.Today .dragzone__item-dragbox--active span {
@@ -187,6 +184,11 @@ export default class Draggable extends Vue {
 }
 
 .list__group-subtitle > div {
+  white-space: nowrap;
+  float: left;
+  /*height: 100px;*/
+  writing-mode: vertical-rl;
+
   white-space: nowrap;
   float: left;
   /*height: 100px;*/
