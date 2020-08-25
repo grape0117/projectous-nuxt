@@ -18,6 +18,14 @@
         </tbody>
       </table>
     </div>
+    Invited Users
+    <div class="row table-responsive">
+      <table class="table timer-table">
+        <tbody>
+          <tr v-bind:user="user" v-for="user in filteredusers" is="user-row"></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -27,6 +35,11 @@ export default {
   name: 'users-template',
   components: {
     'user-row': UserRow
+  },
+  data() {
+    return {
+      invited: []
+    }
   },
   computed: {
     isAdmin: function() {
@@ -38,6 +51,9 @@ export default {
     filteredusers: function() {
       return this.$store.getters['company_users/getActiveUsers']
     }
+  },
+  mounted() {
+    //TODO: api call to get invites
   },
   methods: {
     inviteUser: function() {

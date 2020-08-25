@@ -1,5 +1,5 @@
 <template>
-  <div id="task-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh;">
+  <div id="task-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; max-height: 100vh; text-align: center">
     <select id="selectCompanyUser" v-model="selectedCompanyUserId">
       <option v-for="(companyUser, i) in sortedCompanyUsers" :value="companyUser.id" :id="'company_user-' + companyUser.id" :key="`${companyUser.id}-${i}`">
         {{ companyUser.name }}
@@ -249,10 +249,7 @@ export default class Custom extends Vue {
   //TODO: pass only ids instead of whole objects?
   private updateTaskUserSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.$store.dispatch(
-      'task_users/updateSortOrders',
-      parsedTasks.map(({ id }: { id: number }) => id)
-    )
+    this.$store.dispatch('task_users/updateSortOrders', parsedTasks.map(({ id }: { id: number }) => id))
   }
 
   @Watch('selectedCompanyUserId')
@@ -284,6 +281,18 @@ export default class Custom extends Vue {
     position: absolute;
     top: 0;
     left: 0;
+  }
+  &::-webkit-scrollbar {
+    background-color: red;
+    width: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: #993399;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: white;
+    outline: 1px solid slategrey;
   }
 }
 
@@ -317,7 +326,7 @@ export default class Custom extends Vue {
   border-color: #993399;
   position: fixed;
   bottom: 26px;
-  left: -29px;
+  left: -32px;
   transform: rotate(-90deg);
   font-size: 20px;
   text-transform: uppercase;

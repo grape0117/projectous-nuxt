@@ -56,6 +56,14 @@
             </optgroup>
           </select>
         </div>
+        <div class="form-section">
+          Assigned to:
+          <select id="task-user" class="form-control select2-select" name="task_user" v-on:change="switchAssignedUser">
+            <option value="" selected>***** Select User *****</option>
+            <option v-for="company_user in company_users" :key="company_user.id" v-bind:company_user="company_user" :value="company_user.id"> {{ company_user.name }} </option>
+          </select>
+        </div>
+        <b-button variant="primary" @click="completeTask()">Complete</b-button> <b-button variant="warning" @click="deleteTask">Delete</b-button>
       </div>
       <div style="width: calc(100vw - 300px)">
         <div>{{ selected_resource.name }} ({{ selected_resource.href }})</div>
@@ -83,17 +91,22 @@ export default {
     'task-card': TaskCard
   },
   computed: {
-    clients: function() {
+    clients() {
       let clients = this.$store.getters['clients/getActiveCompanyClients']
       //console.log('clients', clients)
       return clients.sort((a, b) => {
         return Vue.simpleSort(a.name.toLowerCase(), b.name.toLowerCase())
       })
     },
-
-    lead_client_tasks: function() {
+    company_users() {
+      return this.$store.state.company_users.company_users
+    },
+    lead_client_tasks() {
       let self = this
       return this.tasks.filter(function(task) {
+        if (task.status === 'completed') {
+          return false
+        }
         if (task.project_id) {
           let project = self.$store.getters['projects/getById'](task.project_id)
           if (!project || (self.project_sort != '' && task.project_id != self.project_sort)) {
@@ -109,6 +122,9 @@ export default {
     new_client_tasks: function() {
       let self = this
       return this.tasks.filter(function(task) {
+        if (task.status === 'completed') {
+          return false
+        }
         if (task.project_id) {
           let project = self.$store.getters['projects/getById'](task.project_id)
           if (!project || (self.project_sort != '' && task.project_id != self.project_sort)) {
@@ -124,6 +140,9 @@ export default {
     active_client_tasks: function() {
       let self = this
       return this.tasks.filter(function(task) {
+        if (task.status === 'completed') {
+          return false
+        }
         if (task.project_id) {
           let project = self.$store.getters['projects/getById'](task.project_id)
           if (!project || (self.project_sort != '' && task.project_id != self.project_sort)) {
@@ -147,6 +166,44 @@ export default {
     })
   },
   methods: {
+    switchAssignedUser(company_user_id) {
+      const task_user = {
+        id: uuid.v4(), //TODO: check for existing record?
+        task_id: this.show_task.id,
+        company_user_id: company_user_id,
+        role: 'assigned'
+      }
+      //
+      // if (role) {
+      //   this.$emit('change', { message: this.user.name + ' given role of ' + role + ' by current user' })
+      //   this.$store.dispatch('UPSERT', { module: 'task_users', entity: task_user }, { root: true })
+      // } else {
+      //   this.$emit('change', { message: this.user.name + ' removed from task by current user' })
+      //   this.$store.dispatch('DELETE', { module: 'task_users', entity: task_user }, { root: true })
+      // }
+
+      let self = this
+      const task_users = this.$store.getters['task_users/getByTaskId'](this.show_task.id)
+      task_users.forEach(function(task_user) {
+        console.log(task_user)
+        self.$store.dispatch('DELETE', { module: 'task_users', entity: task_user }, { root: true })
+      })
+
+      this.$store.dispatch('UPSERT', { module: 'task_users', entity: task_user }, { root: true })
+    },
+    getTaskUser() {
+      const task_users = this.$store.getters['task_users/getByTaskId'](this.show_task.id)
+      if (task_users.length) return task_users[0]
+    },
+    completeTask() {
+      this.show_task.status = 'completed'
+      this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.show_task })
+      this.show_task = false
+    },
+    deleteTask() {
+      this.$store.dispatch('DELETE', { module: 'tasks', id: this.show_task.id })
+      this.show_task = false
+    },
     clientProjects(client) {
       return this.$store.getters['projects/getOpenCompanyProjects'](client.client_company_id)
     },
@@ -174,7 +231,7 @@ export default {
 
     addResource() {
       console.log(this.show_task)
-      if (!this.show_task.resources) {
+      if (!this.show_task.settings.resources) {
         Vue.set(this.show_task.settings, 'resources', [])
       }
       this.show_task.settings.resources.push({ name: document.getElementById('add-resource-name').value, href: document.getElementById('add-resource-href').value })

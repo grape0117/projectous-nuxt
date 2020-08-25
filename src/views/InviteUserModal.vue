@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import uuid from 'uuid'
 export default {
   name: 'invite-user-modal',
   data() {
@@ -61,12 +62,11 @@ export default {
   },
   methods: {
     inviteUser: function() {
-      let self = this
+      const token = uuid.v4()
       this.$http()
-        .post('/invite', { name: this.name, user_role: this.user_role, email: this.email })
+        .post('/invite', { token, name: this.name, user_role: this.user_role, email: this.email })
         .then(response => {
-          alert('invited!')
-          alert('invited!')
+          //TODO: add to invites?
         })
     }
   }

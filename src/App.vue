@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <task-tray />
-    <main>
+    <main style="flex-grow: 1">
       <div class="container-fluid">
         <div class="row-no-padding">
           <router-view />

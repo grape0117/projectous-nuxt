@@ -4,7 +4,7 @@
     <hr />
     <b-container fluid>
       <b-row>
-        <b-col cols="5" class="scroll-col">
+        <b-col cols="2" class="scroll-col">
           <div v-if="clientVisible(client)" v-for="client in activeClients">
             <!--            Todo: change client id to client name-->
             <div style="background: #666666; color: white; padding-left: 5px; text-transform: uppercase">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
@@ -19,7 +19,7 @@
             </div>
           </div>
         </b-col>
-        <b-col v-if="selectedProjectId" cols="6">
+        <b-col v-if="selectedProjectId" style="flex-grow: 1">
           <h4 v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>

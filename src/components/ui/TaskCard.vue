@@ -3,7 +3,7 @@
     <img :src="'//www.projectous.com/api/projects/' + task.project_id + '/favicon.png'" />
     <div v-if="!project.acronym">{{ project.name }}</div>
     <div>
-      <span v-f="project.acronym">{{ project.acronym }}</span> {{ task.title }}
+      <span v-if="project.acronym">{{ project.acronym }}</span> {{ task.title }}
     </div>
     <div><small>(s) assigned 3 days ago</small></div>
   </div>
