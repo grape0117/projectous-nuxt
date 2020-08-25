@@ -95,6 +95,12 @@
         </draggable>
         <!-- Tab content -->
         <div v-for="resource in getResources" class="tabcontent" :id="resource.name">
+          <label
+              style="width: calc(100% - 280px); white-space: nowrap; overflow: hidden; margin-top: 8px; padding-left: 10px;">{{resource.href}}</label>
+            <div style="float: right; display: inline-block; margin-bottom: 8px; margin-top: 5px;" v-if="resource.href != ''">
+              <b-button @click="copyURL(resource.href)" style="margin-right: 10px;">Copy URL</b-button>
+              <b-button @click="openURL(resource.href)">Open in a new tab</b-button>
+            </div>
           <iframe :src="resource.href" style="height: 100vh; width: 100%"></iframe>
         </div>
        
@@ -440,16 +446,16 @@
 
   /* Create an active/current tablink class */
   .tab button.active {
-    color: #333;
+    color: #2323ff;
     border-color: #ddd;
     outline: 0;
-    background: #ddd;
+    height: 45px;
+    border-bottom: 0.175em solid #fff;
   }
 
   /* Style the tab content */
   .tabcontent {
     display: none;
-    border: 1px solid #ccc;
     border-top: none;
   }
 </style>
