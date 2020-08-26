@@ -87,8 +87,18 @@
         <b-button variant="primary" @click="completeTask()">Complete</b-button>
         <b-button variant="warning" @click="deleteTask">Delete</b-button>
       </div>
-      <div style="width: calc(100vw - 380px)">
-        <b-tabs content-class="mt-3" v-model="tabIndex">
+      <div style="width: calc(100vw - 380px); margin-top: 10px;">
+        <draggable class="tab">
+          <button class="tablinks active" v-for="resource in getResources" @click="openTab(resource.name)">
+            {{ resource.name }}
+          </button>
+        </draggable>
+        <!-- Tab content -->
+        <div v-for="resource in getResources" class="tabcontent" :id="resource.name">
+          <iframe :src="resource.href" style="height: 100vh; width: 100%"></iframe>
+        </div>
+       
+        <!-- <b-tabs content-class="mt-3" v-model="tabIndex">
           <b-tab v-for="resource in getResources" :title="resource.name">
             <label
               style="width: calc(100% - 280px); white-space: nowrap; overflow: hidden; margin-top: 8px;">{{resource.href}}</label>
@@ -98,7 +108,7 @@
             </div>
             <iframe :src="resource.href" style="height: 100vh; width: 100%"></iframe>
           </b-tab>
-        </b-tabs>
+          </b-tabs> -->
       </div>
     </div>
   </div>
@@ -108,6 +118,8 @@
   import TaskCard from '../components/ui/TaskCard.vue'
   import uuid from 'uuid'
   import moment from 'moment'
+  import draggable from 'vuedraggable'
+
   export default {
     name: 'all-task-filip-template',
     data: function () {
@@ -121,7 +133,8 @@
       }
     },
     components: {
-      'task-card': TaskCard
+      'task-card': TaskCard,
+      draggable
     },
     computed: {
       clients() {
@@ -312,13 +325,7 @@
           return item == resource
         })
         if (index != -1) this.show_task.settings.resources.splice(index)
-      },
-      openTab(resourceName) {
-        let index = this.show_task.settings.resources.findIndex(function (item, i) {
-          return item.name == resourceName
-        })
-        this.tabIndex = index
-      },
+      },      
       copyURL(url) {
         let el = document.createElement('textarea')
         el.value = url
@@ -331,6 +338,27 @@
       },
       openURL(url) {
         window.open(url, '_blank')
+      },
+      openTab(resourceName) {
+        let i;
+        // Get all elements with class="tabcontent" and hide them
+        let tabcontent = document.getElementsByClassName('tabcontent')
+        for (i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = 'none'
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        let tablinks = document.getElementsByClassName('tablinks')
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(' active', '')
+          console.log(tablinks[i].innerHTML.trim(), resourceName)
+          if ( tablinks[i].innerHTML.trim() == resourceName ) {
+            tablinks[i].className += " active";
+          }
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(resourceName).style.display = 'block'
       }
     },
     watch: {
@@ -364,5 +392,64 @@
 
   .resource-title {
     display: inline-block;
+  }
+
+  /* Style the tab */
+  .tab {
+    list-style: none;
+    border-bottom: 1px solid #bbb;
+    padding-left: 5px;
+    overflow: hidden;
+    /* border: 1px solid #ccc; */
+    /* background-color: #f1f1f1; */
+  }
+
+  /* Style the buttons that are used to open the tab content */
+  
+
+  button.tablinks {
+    display: inline-block;
+    height: 38px;
+    padding: 0 30px;
+    color: #555;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1rem;
+    background-color: transparent;
+    border-radius: 4px;
+    border: 1px solid #bbb;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .tab button {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: -1px;
+    border-bottom: none;
+    margin-right: 5px;
+
+    /* background-color: inherit;
+    /* float: left; */
+  }
+  /* Change background color of buttons on hover */
+  .tab button:hover {
+    background-color: #ddd;
+  }
+
+  /* Create an active/current tablink class */
+  .tab button.active {
+    color: #333;
+    border-color: #ddd;
+    outline: 0;
+    background: #ddd;
+  }
+
+  /* Style the tab content */
+  .tabcontent {
+    display: none;
+    border: 1px solid #ccc;
+    border-top: none;
   }
 </style>
