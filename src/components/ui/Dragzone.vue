@@ -34,6 +34,7 @@
               <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
             </div>
           </div>
+          <div v-if="index == tasks.length - 1" class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <!-- <div
             v-if="true || editedItemId === item.id"
             class="dragzone__item-tracker"
@@ -210,7 +211,7 @@ export default class Dragzone extends Vue {
    * Dragover event
    */
   private moveItem(index: number, id: string) {
-    console.log('************* DRAGOVER ' + this.id + ' ' + this.group + ' *************')
+    console.log('************* DRAGOVER ' + this.id, this.group, ' *************')
     localStorage.setItem('displaced_item_id', id) //TODO: should this be after the next line?
     if (this.isListDragged) return
 
@@ -363,6 +364,8 @@ export default class Dragzone extends Vue {
 .dragzone__item--dragged {
   color: rgba(0, 0, 0, 0.3);
 }
+
+/* http://prntscr.com/u6e55s */
 .dragzone__item--dragged:after {
   position: absolute;
   top: 0;
