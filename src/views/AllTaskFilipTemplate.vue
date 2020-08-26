@@ -117,7 +117,7 @@
         selected_resource: '',
         project_sort: '',
         isEditResource: null,
-        tabIndex: 0,
+        tabIndex: 0
       }
     },
     components: {
@@ -273,8 +273,8 @@
           let me = this
           let index = this.show_task.settings.resources.findIndex(function (item, i) {
             return item == me.selected_resource
-          });
-          if (index != -1) this.show_task.settings.resources[index] = { name: document.getElementById('add-resource-name').value, href: document.getElementById('add-resource-href').value };
+          })
+          if (index != -1) this.show_task.settings.resources[index] = { name: document.getElementById('add-resource-name').value, href: document.getElementById('add-resource-href').value }
         }
         console.log(this.show_task)
       },
@@ -305,13 +305,13 @@
         this.openTab(resource.name)
       },
       onAddNewResource() {
-        this.isEditResource = false;
+        this.isEditResource = false
       },
       onDeleteResource(resource) {
         let index = this.show_task.settings.resources.findIndex(function (item, i) {
           return item == resource
-        });
-        if (index != -1) this.show_task.settings.resources.splice(index);
+        })
+        if (index != -1) this.show_task.settings.resources.splice(index)
       },
       openTab(resourceName) {
         let index = this.show_task.settings.resources.findIndex(function (item, i) {
@@ -320,17 +320,17 @@
         this.tabIndex = index
       },
       copyURL(url) {
-        var el = document.createElement('textarea');
-        el.value = url;
-        el.setAttribute('readonly', '');
-        el.style = { position: 'absolute', left: '-9999px' };
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
+        let el = document.createElement('textarea')
+        el.value = url
+        el.setAttribute('readonly', '')
+        el.style = { position: 'absolute', left: '-9999px' }
+        document.body.appendChild(el)
+        el.select()
+        document.execCommand('copy')
+        document.body.removeChild(el)
       },
       openURL(url) {
-        window.open(url, '_blank');
+        window.open(url, '_blank')
       }
     },
     watch: {
