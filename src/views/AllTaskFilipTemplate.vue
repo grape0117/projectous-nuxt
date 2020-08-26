@@ -87,9 +87,18 @@
         <b-button variant="primary" @click="completeTask()">Complete</b-button>
         <b-button variant="warning" @click="deleteTask">Delete</b-button>
       </div>
-      <div style="width: calc(100vw - 300px)">
-        <div>{{ selected_resource.name }} ({{ selected_resource.href }})</div>
-        <iframe :src="selected_resource.href" style="height: 100vh; width: 100%"></iframe>
+      <div style="width: calc(100vw - 380px)">
+        <b-tabs content-class="mt-3" v-model="tabIndex">
+          <b-tab v-for="resource in getResources" :title="resource.name">
+            <label
+              style="width: calc(100% - 280px); white-space: nowrap; overflow: hidden; margin-top: 8px;">{{resource.href}}</label>
+            <div style="float: right; display: inline-block; margin-bottom: 10px;" v-if="resource.href != ''">
+              <b-button @click="copyURL(resource.href)" style="margin-right: 10px;">Copy URL</b-button>
+              <b-button @click="openURL(resource.href)">Open in a new tab</b-button>
+            </div>
+            <iframe :src="resource.href" style="height: 100vh; width: 100%"></iframe>
+          </b-tab>
+        </b-tabs>
       </div>
     </div>
   </div>
@@ -108,6 +117,7 @@
         selected_resource: '',
         project_sort: '',
         isEditResource: null,
+        tabIndex: 0,
       }
     },
     components: {
@@ -292,6 +302,7 @@
         this.isEditResource = true
         document.getElementById('add-resource-name').value = resource.name
         document.getElementById('add-resource-href').value = resource.href
+        this.openTab(resource.name)
       },
       onAddNewResource() {
         this.isEditResource = false;
@@ -301,6 +312,25 @@
           return item == resource
         });
         if (index != -1) this.show_task.settings.resources.splice(index);
+      },
+      openTab(resourceName) {
+        let index = this.show_task.settings.resources.findIndex(function (item, i) {
+          return item.name == resourceName
+        })
+        this.tabIndex = index
+      },
+      copyURL(url) {
+        var el = document.createElement('textarea');
+        el.value = url;
+        el.setAttribute('readonly', '');
+        el.style = { position: 'absolute', left: '-9999px' };
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+      },
+      openURL(url) {
+        window.open(url, '_blank');
       }
     },
     watch: {
