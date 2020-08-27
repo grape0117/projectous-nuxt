@@ -135,9 +135,10 @@
         selected_resource: '',
         project_sort: '',
         isEditResource: null,
-        tabIndex: 0
+        // tabIndex: 0,
       }
     },
+    props: ['task_id'],
     components: {
       'task-card': TaskCard,
       draggable
@@ -278,6 +279,7 @@
         console.log(this.show_task)
         this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.show_task })
         this.show_task = false
+        this.$router.push({ name: 'Tasks'});
       },
       addResource() { // add or update action
         console.log(this.show_task)
@@ -311,16 +313,21 @@
         this.$bvModal.show('client-modal')
       },
       showTask(task) {
+        console.log('show task!');
+
         //pop modal
         this.show_task = task
+        this.t_update()
+        this.$router.push({ name: 'Task_Detail', params: { task_id: task.id}})
+      },
+      t_update() { // function to use after this.show_task = task
         if (!this.show_task.settings) this.show_task.settings = []
-
+        
         // open first resource in right side
         if ( this.show_task.settings.resources && this.show_task.settings.resources.length ) {
           let me = this
           setTimeout(function() {me.openTab(me.show_task.settings.resources[0].name)}, 200)
         }
-        console.log('task!')
       },
       onSelectResource(resource) {
         this.selected_resource = resource
@@ -363,7 +370,6 @@
         let tablinks = document.getElementsByClassName('tablinks')
         for (i = 0; i < tablinks.length; i++) {
           tablinks[i].className = tablinks[i].className.replace(' active', '')
-          console.log(tablinks[i].innerHTML.trim(), resourceName)
           if ( tablinks[i].innerHTML.trim() == resourceName ) {
             tablinks[i].className += " active";
           }
@@ -379,7 +385,24 @@
           document.getElementById('add-resource-name').value = ''
           document.getElementById('add-resource-href').value = ''
         }
-      }
+      },
+      tasks(list) {
+        // after load the task list and if current page is task detail page
+        if ( this.task_id ) {
+          let me = this
+          let task = list.filter(item => {
+            return item.id = me.task_id
+          })
+          console.log('filter task', task);
+          if ( task ) {
+            this.show_task = task
+            this.t_update()
+          }
+        }
+      },
+      // $route(to, from) {
+      //   console.log(to);
+      // }
     }
   }
 </script>

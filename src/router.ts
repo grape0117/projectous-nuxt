@@ -39,6 +39,12 @@ const router = new Router({
       component: Tasks
     },
     {
+      path: '/task/:task_id',
+      name: 'Task_Detail',
+      component: Tasks,
+      props: true
+    },
+    {
       path: '/projects',
       name: 'Projects',
       component: Custom
