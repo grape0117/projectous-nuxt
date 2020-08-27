@@ -314,6 +314,12 @@
         //pop modal
         this.show_task = task
         if (!this.show_task.settings) this.show_task.settings = []
+
+        // open first resource in right side
+        if ( this.show_task.settings.resources && this.show_task.settings.resources.length ) {
+          let me = this
+          setTimeout(function() {me.openTab(me.show_task.settings.resources[0].name)}, 200)
+        }
         console.log('task!')
       },
       onSelectResource(resource) {
@@ -435,7 +441,7 @@
     margin-bottom: -1px;
     border-bottom: none;
     margin-right: 5px;
-
+    background: #ddd;
     /* background-color: inherit;
     /* float: left; */
   }
@@ -449,8 +455,10 @@
     color: #2323ff;
     border-color: #ddd;
     outline: 0;
-    height: 45px;
-    border-bottom: 0.175em solid #fff;
+    background: white;
+    /* height: 45px; */
+    /* border-bottom: 0.175em solid #fff; */
+    
   }
 
   /* Style the tab content */
