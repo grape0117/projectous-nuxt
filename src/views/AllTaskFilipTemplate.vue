@@ -35,57 +35,82 @@
       </b-row>
     </div>
     <div v-else class="task-full-screen">
-      <div style="max-width: 300px; padding-right: 15px;">
+      <div style="width: 300px; padding-right: 15px; padding-top: 10px;">
         <button @click="saveTask">Close (ESC)</button>
-        <b-form-group label="Task">
-          <b-form-textarea type="text" v-model="show_task.title" placeholder="Task Title" rows="2" max-rows="4">
-          </b-form-textarea>
-        </b-form-group>
-        <b-form-group label="Resources">
-          <div @click="onSelectResource(resource)" v-for="resource in getResources" :href="resource.href">
-            <div class="resource-title">
-              <span>{{ resource.name }}</span>
+        <b-tabs content-class="mt-3" style="margin-top: 10px;">
+          <b-tab title="Details" active>
+            <b-form-group label="Task">
+              <b-form-textarea type="text" v-model="show_task.title" placeholder="Task Title" rows="2" max-rows="4">
+              </b-form-textarea>
+            </b-form-group>
+            <b-form-group label="Resources">
+              <div @click="onSelectResource(resource)" v-for="resource in getResources" :href="resource.href">
+                <div class="resource-title">
+                  <span>{{ resource.name }}</span>
+                </div>
+                <div class="resource-action" style="float: right">
+                  <a href="#" @click="onDeleteResource(resource)">delete</a>
+                </div>
+              </div>
+              <b-button style="float: right" variant="primary" @click="onAddNewResource()">Add new</b-button>
+              <b-input-group>
+                <b-form-input placeholder="Label" type="text" id="add-resource-name"></b-form-input>
+                <b-form-input placeholder="https://" type="text" id="add-resource-href"></b-form-input>
+                <b-input-group-append>
+                  <b-button variant="primary" @click="addResource()">
+                    <span v-if="!isEditResource">Add</span>
+                    <span v-else>Update</span>
+                  </b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <div class="form-section">
+              Project:
+              <select id="timer-modal-project-id" class="form-control select2-select" name="project_id"
+                v-on:change="isCreateProject()" v-model="show_task.project_id">{{
+                  show_task.project_id
+                }}
+                <option value="" selected>***** Select Project *****</option>
+                <option value="create">Create New Project </option>
+                <optgroup :label="client.name" v-bind:client="client" v-for="client in clients" :key="client.id">
+                  <option v-for="project in openprojects(client)" :key="project.id" v-bind:client="client"
+                    :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
+                </optgroup>
+              </select>
             </div>
-            <div class="resource-action" style="float: right">
-              <a href="#" @click="onDeleteResource(resource)">delete</a>
+            <div class="form-section">
+              Assigned to:
+              <select id="task-user" class="form-control select2-select" name="task_user" v-on:change="switchAssignedUser">
+                <option value="" selected>***** Select User *****</option>
+                <option v-for="company_user in company_users" :key="company_user.id" v-bind:company_user="company_user"
+                  :value="company_user.id"> {{ company_user.name }} </option>
+              </select>
             </div>
-          </div>
-          <b-button style="float: right" variant="primary" @click="onAddNewResource()">Add new</b-button>
-          <b-input-group>
-            <b-form-input placeholder="Label" type="text" id="add-resource-name"></b-form-input>
-            <b-form-input placeholder="https://" type="text" id="add-resource-href"></b-form-input>
-            <b-input-group-append>
-              <b-button variant="primary" @click="addResource()">
-                <span v-if="!isEditResource">Add</span>
-                <span v-else>Update</span>
-              </b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-        <div class="form-section">
-          Project:
-          <select id="timer-modal-project-id" class="form-control select2-select" name="project_id"
-            v-on:change="isCreateProject()" v-model="show_task.project_id">{{
-              show_task.project_id
-            }}
-            <option value="" selected>***** Select Project *****</option>
-            <option value="create">Create New Project </option>
-            <optgroup :label="client.name" v-bind:client="client" v-for="client in clients" :key="client.id">
-              <option v-for="project in openprojects(client)" :key="project.id" v-bind:client="client"
-                :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
-            </optgroup>
-          </select>
-        </div>
-        <div class="form-section">
-          Assigned to:
-          <select id="task-user" class="form-control select2-select" name="task_user" v-on:change="switchAssignedUser">
-            <option value="" selected>***** Select User *****</option>
-            <option v-for="company_user in company_users" :key="company_user.id" v-bind:company_user="company_user"
-              :value="company_user.id"> {{ company_user.name }} </option>
-          </select>
-        </div>
-        <b-button variant="primary" @click="completeTask()">Complete</b-button>
-        <b-button variant="warning" @click="deleteTask">Delete</b-button>
+            <b-button variant="primary" @click="completeTask()">Complete</b-button>
+            <b-button variant="warning" @click="deleteTask">Delete</b-button>
+          </b-tab>
+          <b-tab title="Chat">
+            <div class="message-panel">
+              <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="2" max-rows="4">
+              </b-form-textarea>
+              <b-button pill variant="primary" @click="saveMessage()" style='margin-top: 5px; margin-left: 210px;'>Save</b-button>
+              <b-list-group style="max-height:500px; overflow-y: auto;">
+                <b-list-group-item v-for="message in getMessages">
+                  <div class="msg-header">
+                    <span>{{ getUserNameWithCompanyUserId(message.company_user_id) }}</span> / <span>{{ formatTime(message.timestamp) }}</span>
+                  </div>
+                  <label class="msg-content">{{ message.message }}</label>
+                  <div class="msg-action" v-if="current_company_user_id == message.company_user_id">
+                    <b-button variant="primary" @click="editMessage(message)">Edit</b-button>
+                    <b-button variant="warning" @click="deleteMessage(message)">Delete</b-button>
+                  </div>
+                </b-list-group-item>
+              </b-list-group>
+            </div>
+            </b-form-group>
+          </b-tab>
+        </b-tabs>
+        
       </div>
       <div style="width: calc(100vw - 380px); margin-top: 10px;">
         <draggable class="tab">
@@ -135,7 +160,7 @@
         selected_resource: '',
         project_sort: '',
         isEditResource: null,
-        // tabIndex: 0,
+        s_message: '',
       }
     },
     props: ['task_id'],
@@ -214,6 +239,16 @@
         } else {
           return []
         }
+      },
+      getMessages() {
+        if (this.show_task && this.show_task.settings && this.show_task.settings.messages && this.show_task.settings.messages.length) {
+          return this.show_task.settings.messages
+        } else {
+          return []
+        }
+      },
+      current_company_user_id() {
+        return this.$store.state.settings.current_company_user_id
       }
     },
     mounted() {
@@ -313,7 +348,7 @@
         this.$bvModal.show('client-modal')
       },
       showTask(task) {
-        console.log('show task!');
+        console.log('show task!', task)
 
         //pop modal
         this.show_task = task
@@ -344,7 +379,7 @@
           return item == resource
         })
         if (index != -1) this.show_task.settings.resources.splice(index)
-      },      
+      },
       copyURL(url) {
         let el = document.createElement('textarea')
         el.value = url
@@ -359,7 +394,7 @@
         window.open(url, '_blank')
       },
       openTab(resourceName) {
-        let i;
+        let i
         // Get all elements with class="tabcontent" and hide them
         let tabcontent = document.getElementsByClassName('tabcontent')
         for (i = 0; i < tabcontent.length; i++) {
@@ -371,12 +406,47 @@
         for (i = 0; i < tablinks.length; i++) {
           tablinks[i].className = tablinks[i].className.replace(' active', '')
           if ( tablinks[i].innerHTML.trim() == resourceName ) {
-            tablinks[i].className += " active";
+            tablinks[i].className += ' active'
           }
         }
 
         // Show the current tab, and add an "active" class to the button that opened the tab
         document.getElementById(resourceName).style.display = 'block'
+      },
+      saveMessage() {
+        if (!this.show_task.settings.messages) {
+          Vue.set(this.show_task.settings, 'messages', [])
+        }
+        this.show_task.settings.messages.push({
+          company_user_id: this.current_company_user_id,
+          message: this.s_message,
+          timestamp: moment()
+        })
+        this.s_message = ''
+        console.log(this.show_task.settings.messages)
+        // if (!this.isEditResource) { // if add new resource
+        //   this.show_task.settings.resources.push({ name: document.getElementById('add-resource-name').value, href: document.getElementById('add-resource-href').value })
+        //   document.getElementById('add-resource-name').value = ''
+        //   document.getElementById('add-resource-href').value = ''
+        // } else { // if edit resource
+        //   let me = this
+        //   let index = this.show_task.settings.resources.findIndex(function (item, i) {
+        //     return item == me.selected_resource
+        //   })
+        //   if (index != -1) this.show_task.settings.resources[index] = { name: document.getElementById('add-resource-name').value, href: document.getElementById('add-resource-href').value }
+        // }
+      },
+      formatTime(datetime) {
+        return moment(datetime).format('MM-DD HH:mm:ss')
+      },
+      getUserNameWithCompanyUserId(company_user_id) {
+        return this.$store.state.company_users.company_users[this.$store.state.company_users.lookup[company_user_id]].name
+      },
+      editMessage(message) {
+
+      },
+      deleteMessage(message) {
+        
       }
     },
     watch: {
@@ -393,20 +463,29 @@
           let task = list.filter(item => {
             return item.id = me.task_id
           })
-          console.log('filter task', task);
+          console.log('filter task', task)
           if ( task ) {
             this.show_task = task
             this.t_update()
           }
         }
-      },
-      // $route(to, from) {
-      //   console.log(to);
-      // }
+      }
     }
   }
 </script>
-
+<style scoped>
+  .list-group-item  {
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0;
+  }
+  .msg-content {
+    padding: 8px 12px;
+    border: solid 1px grey;
+    border-radius: 8px;
+    margin-top: 5px;
+  }
+</style>
 <style>
   .form-section {
     margin-bottom: 20px;

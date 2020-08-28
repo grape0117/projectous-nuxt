@@ -1,11 +1,14 @@
 <template>
   <div @click="$emit('showTask', task)" class="task-card" :style="'background-color: ' + backgroundColor">
-    <img :src="'//www.projectous.com/api/projects/' + task.project_id + '/favicon.png'" />
+    <!-- <img :src="'//www.projectous.com/api/projects/' + task.project_id + '/favicon.png'" /> -->
+    <img src="https://dummyimage.com/30x30/000/fff" />
     <div v-if="!project.acronym">{{ project.name }}</div>
     <div>
       <span v-if="project.acronym">{{ project.acronym }}</span> {{ task.title }}
     </div>
-    <div><small>(s) assigned 3 days ago</small></div>
+    <div>
+      <small>{{ getDiffAssignedDate }}</small>
+    </div>
   </div>
 </template>
 <script>
@@ -25,7 +28,7 @@ export default {
       //due tomorrow: yellow
       //due today: orange
       //due yesterday or before: red
-      console.log(this.task.due_date)
+      // console.log(this.task.due_date)
       if (this.task.due_date) {
         if ((moment().isBefore(this.task.due_date), 'day')) {
           return 'red'
@@ -51,6 +54,23 @@ export default {
         return 'lightgrey'
       }
       return 'lightblue'
+    },
+    getDiffAssignedDate() {
+      const task_users = this.$store.getters['task_users/getByTaskId'](this.task.id)
+      if (task_users.length) {
+        let today = moment()
+        let assigned_at = moment(task_users[0].created_at)
+        let diff = today.diff(assigned_at, 'days')
+        if (diff == 0) return 'assigned today'
+        else if (diff == 1) return 'assigned yesterday'
+        else return 'assigned ' + diff + ' day(s) ago'
+      } else {
+        return 'not assigned yet'
+      }
+    },
+    taskUsers() {
+      let u = this.$store.getters['task_users/getByTaskId'](this.task.id)
+      return this.$store.getters['task_users/getByTaskId'](this.task.id)
     }
   }
 }
@@ -77,5 +97,9 @@ export default {
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
+}
+
+.task-card {
+  padding: 10px;
 }
 </style>
