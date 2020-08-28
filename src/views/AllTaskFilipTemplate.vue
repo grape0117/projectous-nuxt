@@ -16,10 +16,10 @@
         </select>
         <button @click="project_sort = ''">Reset</button>
       </b-row>
-      <b-row></b-row>
-      <div style="width: 100%">Leads</div>
-      <task-card @showTask="showTask(task)" v-bind:task="task" v-for="task in lead_client_tasks" class="task-card">
-      </task-card>
+      <b-row>
+        <div style="width: 100%">Leads</div>
+        <task-card @showTask="showTask(task)" v-bind:task="task" v-for="task in lead_client_tasks" class="task-card">
+        </task-card>
       </b-row>
 
       <b-row>
@@ -423,7 +423,6 @@
           timestamp: moment()
         })
         this.s_message = ''
-        console.log(this.show_task.settings.messages)
         // if (!this.isEditResource) { // if add new resource
         //   this.show_task.settings.resources.push({ name: document.getElementById('add-resource-name').value, href: document.getElementById('add-resource-href').value })
         //   document.getElementById('add-resource-name').value = ''
@@ -440,6 +439,7 @@
         return moment(datetime).format('MM-DD HH:mm:ss')
       },
       getUserNameWithCompanyUserId(company_user_id) {
+        console.log(this.$store.state.company_users.lookup)
         return this.$store.state.company_users.company_users[this.$store.state.company_users.lookup[company_user_id]].name
       },
       editMessage(message) {

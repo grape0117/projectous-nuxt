@@ -1,14 +1,51 @@
+<style scoped>
+.task-img {
+  width: 40px;
+  display: inline-block;
+  vertical-align: top;
+}
+.task-detail {
+  display: inline-block;
+  width: calc(100% - 50px);
+}
+.task-title {
+  height: 40px;
+  /* max-height: 60px; */
+  text-overflow: ellipsis;
+  overflow-y: hidden;
+}
+
+.project-title {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+</style>
 <template>
   <div @click="$emit('showTask', task)" class="task-card" :style="'background-color: ' + backgroundColor">
     <!-- <img :src="'//www.projectous.com/api/projects/' + task.project_id + '/favicon.png'" /> -->
-    <img src="https://dummyimage.com/30x30/000/fff" />
-    <div v-if="!project.acronym">{{ project.name }}</div>
-    <div>
-      <span v-if="project.acronym">{{ project.acronym }}</span> {{ task.title }}
+    <!-- <img src="https://dummyimage.com/30x30/000/fff" /> -->
+    <div class="task-img">
+      <b-avatar v-if="project.avatar" variant="primary" text="BV" class="mr-3"></b-avatar>
+      <b-avatar v-if="project.acronym" variant="primary" :text="project.acronym" class="mr-3"></b-avatar>
+      <b-avatar v-else variant="primary" text="P" class="mr-3"></b-avatar>
     </div>
-    <div>
-      <small>{{ getDiffAssignedDate }}</small>
+    <div class="task-detail">
+      <div class="project-title" v-if="!project.acronym">
+        <strong>{{ project.name }}</strong>
+      </div>
+      <div class="task-title">
+        <span v-if="project.acronym"
+          ><strong>{{ project.acronym }}</strong></span
+        >
+        {{ task.title }}
+      </div>
+      <div class="assigned-users">
+        <b-avatar v-for="user in taskUsers" v-if="user.name" :text="user.abbr" class="mr-3" v-b-tooltip.hover :title="user.name" size="25px" style="margin-right: 5px;"> </b-avatar>
+      </div>
+      <div></div>
     </div>
+    <small>{{ getDiffAssignedDate }}</small>
   </div>
 </template>
 <script>
@@ -69,8 +106,28 @@ export default {
       }
     },
     taskUsers() {
-      let u = this.$store.getters['task_users/getByTaskId'](this.task.id)
-      return this.$store.getters['task_users/getByTaskId'](this.task.id)
+      let me = this
+      let task_users = this.$store.getters['task_users/getByTaskId'](this.task.id)
+      if (!task_users.length) return []
+      let r_users = []
+
+      task_users.forEach(function(user) {
+        if (!user.company_user_id) user.name = ''
+        else {
+          let c_user = me.$store.state.company_users.company_users[user.company_user_id]
+          user.name = c_user ? c_user.name : ''
+        }
+        user.abbr = me.abbrName(user.name)
+        r_users.push(user)
+      })
+      return task_users
+    }
+  },
+  methods: {
+    abbrName(name) {
+      if (name == '') return name
+      if (name.includes(' ')) return name.charAt(0).toUpperCase()
+      else return name.charAt(0).toUpperCase() + name.charAt(1).toUpperCase()
     }
   }
 }
@@ -89,17 +146,18 @@ export default {
 }
 .task-card.coming-up {
 }
-.task-card div,
 .task-card {
   cursor: pointer;
   font-size: small;
   width: 200px;
-  white-space: nowrap;
+  /* white-space: nowrap; */
   overflow-x: hidden;
   text-overflow: ellipsis;
+  min-height: 120px;
+  max-height: 120px;
 }
 
 .task-card {
-  padding: 10px;
+  padding: 6px;
 }
 </style>
