@@ -101,7 +101,7 @@
                   </div>
                   <label class="msg-content">{{ message.message }}</label>
                   <div class="msg-action" v-if="current_company_user_id == message.company_user_id">
-                    <b-button variant="primary" @click="editMessage(message)">Edit</b-button>
+                    <b-button variant="primary" @click="editMessage(message)" style="margin-right: 10px;">Edit</b-button>
                     <b-button variant="warning" @click="deleteMessage(message)">Delete</b-button>
                   </div>
                 </b-list-group-item>
@@ -161,6 +161,7 @@
         project_sort: '',
         isEditResource: null,
         s_message: '',
+        selected_message: null,
       }
     },
     props: ['task_id'],
@@ -242,6 +243,7 @@
       },
       getMessages() {
         if (this.show_task && this.show_task.settings && this.show_task.settings.messages && this.show_task.settings.messages.length) {
+          console.log(this.show_task.settings.messages)
           return this.show_task.settings.messages
         } else {
           return []
@@ -310,11 +312,16 @@
         //console.log('client', client)
         return this.$store.getters['projects/getOpenCompanyProjects'](client.client_company_id)
       },
-      saveTask() {
+      saveTask(isRedirect = true) {
         console.log(this.show_task)
         this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.show_task })
-        this.show_task = false
-        this.$router.push({ name: 'Tasks'});
+        if ( isRedirect ) {
+          this.show_task = false
+          this.s_message = ''
+          this.selected_message = null
+          this.isEditResource = null
+          this.$router.push({ name: 'Tasks'})
+        }
       },
       addResource() { // add or update action
         console.log(this.show_task)
@@ -325,6 +332,7 @@
           this.show_task.settings.resources.push({ name: document.getElementById('add-resource-name').value, href: document.getElementById('add-resource-href').value })
           document.getElementById('add-resource-name').value = ''
           document.getElementById('add-resource-href').value = ''
+          this.saveTask(false)
         } else { // if edit resource
           let me = this
           let index = this.show_task.settings.resources.findIndex(function (item, i) {
@@ -378,7 +386,7 @@
         let index = this.show_task.settings.resources.findIndex(function (item, i) {
           return item == resource
         })
-        if (index != -1) this.show_task.settings.resources.splice(index)
+        if (index != -1) this.show_task.settings.resources.splice(index, 1)
       },
       copyURL(url) {
         let el = document.createElement('textarea')
@@ -417,12 +425,22 @@
         if (!this.show_task.settings.messages) {
           Vue.set(this.show_task.settings, 'messages', [])
         }
-        this.show_task.settings.messages.push({
-          company_user_id: this.current_company_user_id,
-          message: this.s_message,
-          timestamp: moment()
-        })
-        this.s_message = ''
+        if ( !this.selected_message ) {
+          this.show_task.settings.messages.push({
+            id: uuid.v4(),
+            company_user_id: this.current_company_user_id,
+            message: this.s_message,
+            timestamp: moment()
+          })
+          this.s_message = ''
+        } else {
+          let me = this
+          let index = this.show_task.settings.messages.findIndex(function (item, i) {
+            return item.id == me.selected_message.id
+          })
+          this.show_task.settings.messages[index].message = this.s_message
+        }
+        this.saveTask(false)
         // if (!this.isEditResource) { // if add new resource
         //   this.show_task.settings.resources.push({ name: document.getElementById('add-resource-name').value, href: document.getElementById('add-resource-href').value })
         //   document.getElementById('add-resource-name').value = ''
@@ -439,14 +457,21 @@
         return moment(datetime).format('MM-DD HH:mm:ss')
       },
       getUserNameWithCompanyUserId(company_user_id) {
-        console.log(this.$store.state.company_users.lookup)
         return this.$store.state.company_users.company_users[this.$store.state.company_users.lookup[company_user_id]].name
       },
       editMessage(message) {
-
+        this.selected_message = message
+        this.s_message = message.message;
       },
       deleteMessage(message) {
-        
+        if(confirm('Are you sure to delete this message?')) {
+          let index = this.show_task.settings.messages.findIndex(function (item, i) {
+            return item.id == message.id
+          })
+          if (index != -1) this.show_task.settings.messages.splice(index, 1)
+          this.selected_message = null
+          this.saveTask(false)
+        }
       }
     },
     watch: {
