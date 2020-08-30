@@ -1,16 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-// import Projects from './views/Projects.vue'
-import Custom from './views/Custom.vue'
-// import CompanyUsers from './views/CompanyUsers.vue'
-// import Login from '@/views/Login.vue'
 import checkAuth from '@/middlewares/checkAuth'
-import InvoiceableTemplate from './views/InvoiceableTemplate.vue'
-import InvoicesTemplate from './views/InvoicesTemplate.vue'
-import ClientsTemplate from './views/ClientsTemplate.vue'
-// import Tasks from './views/AllTaskFilipTemplate.vue'
-import UsersTemplate from './views/UsersTemplate.vue'
-// import AcceptInvite from './views/AcceptInvite.vue'
 import store from 'vuex'
 
 Vue.use(Router)
