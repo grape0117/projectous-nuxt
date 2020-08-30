@@ -5,10 +5,10 @@
     <b-container fluid>
       <b-row>
         <b-col cols="2" class="scroll-col">
-          <div v-if="clientVisible(client)" v-for="client in activeClients">
+          <div v-if="clientVisible(client)" v-for="(client, index) in activeClients" :key="index">
             <!--            Todo: change client id to client name-->
-            <div style="background: #666666; color: white; padding-left: 5px; text-transform: uppercase">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
-            <div v-for="{ name, id } in openClientProjects(client)">
+            <div class="client-name">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
+            <div v-for="{ name, id } in openClientProjects(client)" :key="id" class="client-project-name">
               <div @click="setPinnedProject(id)" class="project-item__status">
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
                 <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
@@ -19,7 +19,7 @@
             </div>
           </div>
         </b-col>
-        <b-col v-if="selectedProjectId" style="flex-grow: 1">
+        <b-col v-if="selectedProjectId" style="flex-grow: 1" class="custom-width">
           <h4 v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
@@ -290,5 +290,23 @@ export default class Custom extends Vue {
 .scroll-col {
   height: calc(100vh - 170px);
   overflow-y: scroll;
+}
+</style>
+
+<style scoped>
+.custom-width {
+  width: 50% !important;
+}
+.client-name {
+  background: #e5e5e5;
+  font-weight: bold;
+  font-size: 15px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+}
+.client-project-name {
+  margin: 10px 0;
+  font-size: 14px;
+  font-weight: 500;
 }
 </style>
