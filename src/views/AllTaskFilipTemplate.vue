@@ -1,20 +1,20 @@
 <template>
   <div>
-    <div v-if="!show_task">
-      <b-row>
-        <b-col>
-          <b-button @click="addTask()">Add Task</b-button>
-          <b-button @click="addProject()">Add Project</b-button>
-          <b-button @click="addClient()">Add Client</b-button>
-          <!--<b-button>Add Team Member</b-button>-->
-        </b-col>
-        <select v-model="project_sort">
+    <div v-if="!show_task" style="padding: 20px;">
+      <b-row style="margin-bottom: 10px;">
+        <select v-model="project_sort" style="width: 400px;">
           <option value="">All Projects</option>
           <optgroup :label="client.name" v-for="client in clients">
             <option :value="project.id" v-for="project in clientProjects(client)">{{ project.name }}</option>
           </optgroup>
         </select>
         <button @click="project_sort = ''">Reset</button>
+        <b-col class="t-btn-panel">
+          <b-button variant="primary" @click="addClient()">Add Client</b-button>
+          <b-button variant="primary" @click="addProject()">Add Project</b-button>
+          <b-button variant="primary" @click="addTask()">Add Task</b-button>
+          <!--<b-button>Add Team Member</b-button>-->
+        </b-col>
       </b-row>
       <b-row>
         <div style="width: 100%">Leads</div>
@@ -509,6 +509,11 @@
     border: solid 1px grey;
     border-radius: 8px;
     margin-top: 5px;
+  }
+  .t-btn-panel button {
+    margin-right: 10px;
+    text-transform: uppercase;
+    float: right;
   }
 </style>
 <style>
