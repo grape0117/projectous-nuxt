@@ -84,7 +84,7 @@
             <b-button variant="warning" @click="deleteTask">Delete</b-button>
           </b-tab>
           <b-tab title="Chat">
-            <task-message v-bind:task="show_task"> </task-message>
+            <task-message v-bind:task_id="show_task.id"> </task-message>
           </b-tab>
         </b-tabs>
       </div>

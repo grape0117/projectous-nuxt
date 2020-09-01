@@ -36,15 +36,18 @@ import moment from 'moment'
 export default {
   data() {
     return {
-      s_message: ''
+      s_message: '',
+      selected_message: null
     }
   },
-  props: ['task'],
+  props: ['task_id'],
   /* Load surveys and questionnaired on page load. */
-  created() {},
+  created() {
+    console.log(this.task_id)
+  },
   computed: {
     getMessages() {
-      // this.$store.state.task_messages.task_messages[this.$store.state.task_messages.lookup[task_id]];
+      return this.$store.getters['task_messages/getByTaskId'](this.task_id)
     },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
@@ -64,26 +67,28 @@ export default {
     },
     deleteMessage(message) {
       if (confirm('Are you sure to delete this message?')) {
-        let index = this.show_task.settings.messages.findIndex(function(item, i) {
-          return item.id == message.id
-        })
-        if (index != -1) this.show_task.settings.messages.splice(index, 1)
-        this.selected_message = null
-        this.saveTask(false)
+        this.$store.dispatch('DELETE', { module: 'task_messages', entity: message }, { root: true })
       }
     },
     saveMessage() {
-      let task_id = this.task.id
+      let task_id = this.task_id
       let company_user_id = this.current_company_user_id
       console.log(task_id, company_user_id)
       let message = this.s_message
-      this.$store
-        .dispatch('task_messages/createTaskMessage', {
-          task_id,
-          company_user_id,
-          message
-        })
-        .then(res => {})
+      if (this.selected_message == null) {
+        this.$store
+          .dispatch('task_messages/createTaskMessage', {
+            task_id,
+            company_user_id,
+            message
+          })
+          .then(res => {})
+      } else {
+        this.selected_message.message = this.s_message
+        this.$store.dispatch('UPDATE', { module: 'task_messages', entity: this.selected_message }, { root: true })
+        this.selected_message = null
+        this.s_message = ''
+      }
     }
   }
 }

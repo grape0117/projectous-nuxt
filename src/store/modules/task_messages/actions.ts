@@ -1,8 +1,6 @@
 import { ActionTree } from 'vuex'
 import { IModuleState, ITaskMessages } from './types'
 import { IRootState } from '@/store/types'
-import { REMOVE_TEMP_TASKS_USER } from '@/store/modules/task_users/mutations-types'
-import { generateUniqId } from '@/utils/util-functions'
 import uuid from 'uuid'
 import moment from 'moment'
 
