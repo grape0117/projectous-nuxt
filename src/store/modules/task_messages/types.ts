@@ -9,5 +9,5 @@ export interface ITaskMessages {
   task_id: number
   company_user_id: number | null
   message: string | null
-  timestamp: string | null
+  created_at: string | null
 }
