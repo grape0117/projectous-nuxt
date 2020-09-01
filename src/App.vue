@@ -188,7 +188,7 @@ export default {
       }
       return valid
     },
-    async setAppData({ client_users, clients, company_users, task_users, tasks, projects, project_users, user_task_lists, current_company_id, current_company_user_id, timers, user_id }) {
+    async setAppData({ client_users, clients, company_users, task_users, tasks, projects, project_users, user_task_lists, current_company_id, current_company_user_id, timers, user_id, task_messages }) {
       // this.$bvModal.show('edit-user-modal')
       Vue.set(this.$store.state.settings, 'current_user_id', user_id)
       Vue.set(this.$store.state.settings, 'current_company_user_id', current_company_user_id)
@@ -202,6 +202,7 @@ export default {
       this.$store.commit('ADD_MANY', { module: 'project_users', entities: project_users }, { root: true })
       this.$store.commit('ADD_MANY', { module: 'company_users', entities: company_users }, { root: true })
       this.$store.commit('ADD_MANY', { module: 'clients', entities: clients }, { root: true })
+      this.$store.commit('ADD_MANY', { module: 'task_messages', entities: task_messages }, { root: true })
       const userLists = createUserLists(user_task_lists)
       this.$store.commit('lists/lists/CREATE_LISTS', {
         listName: 'userLists',
