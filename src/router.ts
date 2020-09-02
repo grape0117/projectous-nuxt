@@ -11,6 +11,7 @@ import ClientsTemplate from './views/ClientsTemplate.vue'
 import Tasks from './views/AllTaskFilipTemplate.vue'
 import UsersTemplate from './views/UsersTemplate.vue'
 import AcceptInvite from './views/AcceptInvite.vue'
+import MessageSideBar from './views/TaskSideBar.vue'
 import store from 'vuex'
 
 Vue.use(Router)
@@ -43,6 +44,12 @@ const router = new Router({
       name: 'Task_Detail',
       component: Tasks,
       props: true
+    },
+    {
+      // for test
+      path: '/message',
+      name: 'MessageSideBar',
+      component: MessageSideBar
     },
     {
       path: '/projects',
