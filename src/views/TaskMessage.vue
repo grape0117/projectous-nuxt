@@ -76,13 +76,23 @@ export default {
       console.log(task_id, company_user_id)
       let message = this.s_message
       if (this.selected_message == null) {
+        // let message = {
+        //   id: uuid.v4(),
+        //   task_id: this.task_id,
+        //   company_user_id: this.current_company_user_id,
+        //   message: this.s_message,
+        //   created_at: moment().format('YYYY-MM-DD HH:mm:ss')
+        // }
+        // this.$store.dispatch('ADD_ONE', { module: 'task_messages', entity: [message] }, { root: true })
         this.$store
           .dispatch('task_messages/createTaskMessage', {
             task_id,
             company_user_id,
             message
           })
-          .then(res => {})
+          .then(res => {
+            this.s_message = ''
+          })
       } else {
         this.selected_message.message = this.s_message
         this.$store.dispatch('UPDATE', { module: 'task_messages', entity: this.selected_message }, { root: true })
