@@ -56,7 +56,9 @@ export default {
   mounted() {},
   methods: {
     getUserNameWithCompanyUserId(company_user_id) {
-      return this.$store.state.company_users.company_users[this.$store.state.company_users.lookup[company_user_id]].name
+      let company_user = this.$store.state.company_users.company_users[this.$store.state.company_users.lookup[company_user_id]]
+      if (company_user) return company_user.name
+      else return ''
     },
     formatTime(datetime) {
       return moment(datetime).format('MM-DD HH:mm:ss')

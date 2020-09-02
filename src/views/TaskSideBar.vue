@@ -62,34 +62,45 @@ html {
     height: 1rem;
     background: white;
   } */
+
 .list-group-item label {
 }
 </style>
 <template>
-  <div class="message-sidebar">
-    <b-list-group>
-      <b-list-group-item v-for="task in tasks">
-        <b-avatar class="mr-2 project-avatar"></b-avatar>
-        <div class="message-item">
-          <div class="message-item-header">
-            <label class="task-title mr-auto">{{ task.title }}</label>
-            <span class="task-time">{{ messageTime(task.messages[0].created_at) }}</span>
+  <div style="padding: 20px;">
+    <div class="message-sidebar" v-if="!active_task.id">
+      <b-list-group>
+        <b-list-group-item v-for="task in tasks" :class="[task.id == active_task.id ? 'active' : '']" @click="onSelectTask(task)">
+          <b-avatar class="mr-2 project-avatar"></b-avatar>
+          <div class="message-item">
+            <div class="message-item-header">
+              <label class="task-title mr-auto">{{ task.title }}</label>
+              <span class="task-time">{{ messageTime(task.messages[0].created_at) }}</span>
+            </div>
+            <div class="message-item-content">
+              <label for="">{{ task.messages[0].message }}</label>
+            </div>
           </div>
-          <div class="message-item-content">
-            <label for="">{{ task.messages[0].message }}</label>
-          </div>
-        </div>
-      </b-list-group-item>
-    </b-list-group>
+        </b-list-group-item>
+      </b-list-group>
+    </div>
+    <div v-else class="message-detail">
+      <b-button variant="dark" @click="onBack()" style="margin-bottom: 10px;"><- Back</b-button>
+      <task-message v-bind:task_id="active_task.id"> </task-message>
+    </div>
   </div>
 </template>
 
 <script>
 import uuid from 'uuid'
 import moment from 'moment'
+import TaskMessage from './TaskMessage.vue'
+
 export default {
   data() {
-    return {}
+    return {
+      active_task: {}
+    }
   },
   /* Load surveys and questionnaired on page load. */
   created() {},
@@ -115,7 +126,17 @@ export default {
       if (diff == 0) return 'Today'
       else if (diff == 1) return 'Yesterday'
       else return msgTime.format('d/MM/YY')
+    },
+    onSelectTask(task) {
+      this.active_task = task
+    },
+    onBack() {
+      this.active_task = {}
     }
+  },
+  watch: {},
+  components: {
+    'task-message': TaskMessage
   }
 }
 </script>
