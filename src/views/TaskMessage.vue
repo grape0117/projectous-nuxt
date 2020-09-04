@@ -42,9 +42,7 @@ export default {
   },
   props: ['task_id'],
   /* Load surveys and questionnaired on page load. */
-  created() {
-    console.log(this.task_id)
-  },
+  created() {},
   computed: {
     getMessages() {
       return this.$store.getters['task_messages/getByTaskId'](this.task_id)
@@ -75,7 +73,6 @@ export default {
     saveMessage() {
       let task_id = this.task_id
       let company_user_id = this.current_company_user_id
-      console.log(task_id, company_user_id)
       let message = this.s_message
       if (this.selected_message == null) {
         // let message = {

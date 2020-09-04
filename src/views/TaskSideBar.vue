@@ -95,6 +95,7 @@ html {
 import uuid from 'uuid'
 import moment from 'moment'
 import TaskMessage from './TaskMessage.vue'
+import { chain, groupBy } from 'lodash'
 
 export default {
   data() {
@@ -102,16 +103,25 @@ export default {
       active_task: {}
     }
   },
-  /* Load surveys and questionnaired on page load. */
-  created() {},
   computed: {
     tasks() {
-      let tasks = this.$store.state.tasks.tasks
-        .filter(item => {
-          return item.messages.length > 0
+      let task_messages = this.$store.state.task_messages.task_messages
+      if (!task_messages.length) return []
+      let g_tasks = chain(task_messages)
+        .groupBy('task_id')
+        .sortBy(function(item) {
+          return item[0].updated_at
         })
-        .slice(0, 50)
-      return tasks
+        .reverse()
+        .value()
+      let r_tasks = []
+      for (let key in g_tasks) {
+        let task_id = g_tasks[key][0].task_id
+        let task = this.$store.getters['tasks/getById'](task_id)
+        task.messages = g_tasks[key]
+        r_tasks.push(task)
+      }
+      return r_tasks.splice(0, 50)
     },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
