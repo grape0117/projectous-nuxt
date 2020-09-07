@@ -1,19 +1,19 @@
 <template>
-  <div>
-    Project Filter: <input v-model="project_search" /> <input type="checkbox" v-model="show_all_active_projects" /> Show all active projects
-    <hr />
+  <div class="custom-page">
+    <!-- Project Filter: <input v-model="project_search" /> <input type="checkbox" v-model="show_all_active_projects" /> Show all active projects
+    <hr /> -->
     <b-container fluid>
       <b-row>
-        <b-col cols="2" class="scroll-col">
+        <b-col class="client-section scroll-col">
           <div v-if="clientVisible(client)" v-for="(client, index) in activeClients" :key="index">
             <!--            Todo: change client id to client name-->
             <div class="client-name">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
-            <div v-for="{ name, id } in openClientProjects(client)" :key="id" class="client-project-name">
-              <div @click="setPinnedProject(id)" class="project-item__status">
+            <div class="client-project-name" v-for="{ name, id } in openClientProjects(client)" :key="id">
+              <div @click="setPinnedProject(id)" class="project-item-status">
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
                 <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
               </div>
-              <div class="project-item__name" @click="setProjectId(id)">
+              <div class="client-project-name__name" @click="setProjectId(id)">
                 {{ name }}
               </div>
             </div>
@@ -272,41 +272,45 @@ export default class Custom extends Vue {
 }
 </script>
 
-<style>
-.project-item__name {
-  cursor: pointer;
+<style scoped>
+.custom-page {
+  background-color: #7d7d7d;
 }
-
-.project-item__name:hover {
-  color: blue;
+.client-section {
+  flex-grow: 0 !important;
+  flex-basis: 260px !important;
+  margin-top: 20px;
 }
-.project-item__status {
-  float: left;
-  clear: both;
-  padding-right: 1rem;
-  cursor: pointer;
-  text-align: right;
+.project-item-status {
 }
 .scroll-col {
   height: calc(100vh - 170px);
   overflow-y: scroll;
 }
-</style>
-
-<style scoped>
 .custom-width {
   width: 50% !important;
 }
 .client-name {
-  background: #e5e5e5;
   font-weight: bold;
   font-size: 15px;
-  padding: 5px 10px;
   text-transform: uppercase;
+  color: white;
 }
 .client-project-name {
-  margin: 10px 0;
   font-size: 14px;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+.client-project-name:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  color: white;
+}
+.client-project-name__name {
+  padding: 5px 0 5px 8px;
+  width: 100%;
+  height: 100%;
+  color: white;
 }
 </style>

@@ -77,7 +77,7 @@ export const actions: ActionTree<IRootState, IRootState> = {
     this._vm.$http().delete('/' + module + '/', entity.id)
   },
   PROCESS_INCOMING_DATA({ commit, rootState }, data) {
-    console.log('PROCESS_INCOMING_DATA', data)
+    // console.log('PROCESS_INCOMING_DATA', data)
     // @ts-ignore
     for (const module in data) {
       if (rootState[module]) {

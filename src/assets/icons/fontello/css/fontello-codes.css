@@ -1,0 +1,27 @@
+.icon-arrow_back_ios:before {
+  content: '\e800';
+} /* '' */
+.icon-arrow_forward_ios:before {
+  content: '\e801';
+} /* '' */
+.icon-chat:before {
+  content: '\e802';
+} /* '' */
+.icon-keyboard_arrow_down:before {
+  content: '\e803';
+} /* '' */
+.icon-keyboard_arrow_left:before {
+  content: '\e804';
+} /* '' */
+.icon-keyboard_arrow_right:before {
+  content: '\e805';
+} /* '' */
+.icon-keyboard_arrow_up:before {
+  content: '\e806';
+} /* '' */
+.icon-library_books:before {
+  content: '\e807';
+} /* '' */
+.icon-timer:before {
+  content: '\e808';
+} /* '' */

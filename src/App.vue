@@ -1,34 +1,43 @@
 <template>
-  <div id="app">
-    <task-tray />
+  <div id="app" style="position: relative">
     <main style="flex-grow: 1">
-      <div class="container-fluid">
-        <div class="row-no-padding">
-          <router-view />
-        </div>
+      <div class="row-no-padding">
+        <Header />
+        <router-view />
       </div>
     </main>
-    <timer-tab />
+
+    <div class="right-fixed">
+      <task-tray v-show="showTask" />
+      <timer-tab v-show="showTimer" />
+    </div>
+
     <task-modal />
     <edit-client-modal id="edit-client-modal" />
     <edit-user-modal id="edit-user-modal" />
     <invite-user-modal id="invite-user-modal" />
     <edit-timer-modal id="edit-timer-modal" />
     <edit-project-modal id="edit-project-modal" />
+
     <div id="update-data-button" @click="storeDataInIndexedDb" />
-    <b-nav vertical>
-      <b-navbar-brand to="/">Projectous</b-navbar-brand>
-      <b-nav-item to="/tasks">Tasks</b-nav-item>
-      <b-nav-item to="/projects">Projects</b-nav-item>
-      <b-nav-item to="/clients">Clients</b-nav-item>
-      <b-nav-item to="/users">Users</b-nav-item>
-      <b-nav-item to="/profile">Profile</b-nav-item>
-      <b-nav-item to="/logout">Log Out</b-nav-item>
-    </b-nav>
+
+    <!-- <b-nav vertical>
+        <b-navbar-brand to="/">Projectous</b-navbar-brand>
+        <b-nav-item to="/tasks">Tasks</b-nav-item>
+        <b-nav-item to="/projects">Projects</b-nav-item>
+        <b-nav-item to="/clients">Clients</b-nav-item>
+        <b-nav-item to="/users">Users</b-nav-item>
+        <b-nav-item to="/profile">Profile</b-nav-item>
+        <b-nav-item to="/logout">Log Out</b-nav-item>
+      </b-nav> -->
   </div>
 </template>
 
 <script>
+import '@/assets/icons/fontello/css/fontello.css'
+
+import Header from '@/components/Header.vue'
+
 import TimerTab from './views/TimerTab'
 import EditClientModal from './views/EditClientModal.vue'
 import EditUserModal from './views/EditUserModal'
@@ -43,9 +52,11 @@ import { modulesNames, modulesNamesList } from './store/modules-names'
 import TaskTray from './views/TaskTray'
 import uuid from 'uuid'
 import AllTaskFilipTemplate from './views/AllTaskFilipTemplate'
+import { EventBus } from '@/components/event-bus'
 
 export default {
   components: {
+    Header,
     AllTaskFilipTemplate,
     TimerTab,
     TaskTray,
@@ -55,6 +66,12 @@ export default {
     EditTaskModal,
     EditTimerModal,
     EditProjectModal
+  },
+  data() {
+    return {
+      showTask: true,
+      showTimer: true
+    }
   },
   computed: {
     current_edit_task: function() {
@@ -239,6 +256,14 @@ export default {
     dateInterval() {
       this.$store.commit('lists/createListsByDays')
     }
+  },
+  created() {
+    EventBus.$on('toggle_tasks', () => {
+      this.showTask = !this.showTask
+    })
+    EventBus.$on('toggle_timers', () => {
+      this.showTimer = !this.showTimer
+    })
   }
 }
 </script>
@@ -256,5 +281,15 @@ export default {
   height: 30px;
   cursor: pointer;
   background: url('assets/icons/refresh-icon.svg');
+}
+.right-fixed {
+  position: fixed;
+  z-index: 9999;
+  top: 145px;
+  right: 0;
+  // width: 800px;
+  height: calc(100vh - 145px);
+  // border: 1px solid red;
+  display: flex;
 }
 </style>

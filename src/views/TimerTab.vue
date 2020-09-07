@@ -1,18 +1,20 @@
 <template>
-  <div id="timer-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh; position: fixed;">
+  <!-- <div id="timer-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh; position: fixed;"> -->
+  <div id="timer-tray">
+    <span>TIMERS</span>
     <div class="trayTopBtn">
-      <button class="closebtn" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button>
+      <!-- <button class="closebtn" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
       <button class="makeBtn" @click="addTimer()" style="margin-left: 30px;">Modal</button>
       <button class="makeBtn" @click="startTimer()" style="margin-left: 10px;">Start New</button>
       {{ total_time_today }}
     </div>
 
     <my-sidebar-timer :class="getSidebarClass()" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
-    <div :class="'chat-hide-btn ' + trayClass()">
+    <!-- <div :class="'chat-hide-btn ' + trayClass()">
       <button @click="trayToggle()" type="button" :class="'btn btn-gray ' + trayClass()">
         timers
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
@@ -85,118 +87,128 @@ export default {
 
 <style lang="scss">
 #timer-tray {
+  height: 100%;
   width: 300px;
-  -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
-  transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
-  background-color: #993399;
-  transition: 0.5s;
-  right: -300px;
-  &.expanded {
-    right: 0;
-  }
-  .project-item {
-    list-style-type: none;
-    padding: 10px 15px;
-    background: #e9d2e9;
-    width: 260px;
-    min-height: 130px;
-    margin: 0 auto;
-    border-radius: 5px;
-    margin: 10px;
-    -webkit-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
-    box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
-  }
-  .timer-task {
-    background-color: #e9d2e9;
-  }
-  button.btn.btn-purple {
-    color: #ffffff !important;
-    background-color: #993399;
-    border-color: #993399;
-    position: fixed;
-    bottom: 37px;
-    right: -38px;
-    transform: rotate(-90deg);
-    font-size: 20px;
-    text-transform: uppercase;
-    padding: 8px 25px;
-    border-radius: 0 5px 0 0;
-    z-index: 999;
-    -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
-    transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
-  }
-  button.btn.btn-gray {
-    color: #ffffff !important;
-    background-color: #993399;
-    color: white;
-    position: fixed;
-    bottom: 31px;
-    right: -31px;
-    transform: rotate(-90deg);
-    font-size: 16px;
-    text-transform: uppercase;
-    padding: 8px 25px;
-    border-radius: 0 5px 0 0;
-    z-index: 999;
-    -webkit-transition: 0.5s;
-    transition: 0.5s;
-  }
-  button.btn.btn-gray:active {
-    box-shadow: none;
-  }
-  .closebtn {
-    font-size: 30px;
-    background: transparent;
-    color: #ffffff;
-    cursor: pointer;
-    border: none;
-    position: absolute;
-    left: 0;
-    top: -3px;
-    outline: none;
-  }
-  .trayTopBtn {
-    position: sticky;
-    top: 0px;
-    padding: 10px;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    background: #993399;
-    z-index: 100;
-    color: #fff;
-
-    .makeBtn {
-      border: 1px solid #652d65;
-      border-radius: 5px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      background: #652d65;
-    }
-  }
-  @media (max-width 800px) {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
+  // border: 5px solid red;
+  background-color: white;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
 }
 
-.chat-hide-btn {
-  margin-right: 0;
-}
-.chat-hide-btn .expanded {
-  margin-right: 300px;
-}
+// #timer-tray {
+//   width: 300px;
+//   -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
+//   transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
+//   background-color: #993399;
+//   transition: 0.5s;
+//   right: -300px;
+//   &.expanded {
+//     right: 0;
+//   }
+//   .project-item {
+//     list-style-type: none;
+//     padding: 10px 15px;
+//     background: #e9d2e9;
+//     width: 260px;
+//     min-height: 130px;
+//     margin: 0 auto;
+//     border-radius: 5px;
+//     margin: 10px;
+//     -webkit-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+//     -moz-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+//     box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+//   }
+//   .timer-task {
+//     background-color: #e9d2e9;
+//   }
+//   button.btn.btn-purple {
+//     color: #ffffff !important;
+//     background-color: #993399;
+//     border-color: #993399;
+//     position: fixed;
+//     bottom: 37px;
+//     right: -38px;
+//     transform: rotate(-90deg);
+//     font-size: 20px;
+//     text-transform: uppercase;
+//     padding: 8px 25px;
+//     border-radius: 0 5px 0 0;
+//     z-index: 999;
+//     -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
+//     transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
+//   }
+//   button.btn.btn-gray {
+//     color: #ffffff !important;
+//     background-color: #993399;
+//     color: white;
+//     position: fixed;
+//     bottom: 31px;
+//     right: -31px;
+//     transform: rotate(-90deg);
+//     font-size: 16px;
+//     text-transform: uppercase;
+//     padding: 8px 25px;
+//     border-radius: 0 5px 0 0;
+//     z-index: 999;
+//     -webkit-transition: 0.5s;
+//     transition: 0.5s;
+//   }
+//   button.btn.btn-gray:active {
+//     box-shadow: none;
+//   }
+//   .closebtn {
+//     font-size: 30px;
+//     background: transparent;
+//     color: #ffffff;
+//     cursor: pointer;
+//     border: none;
+//     position: absolute;
+//     left: 0;
+//     top: -3px;
+//     outline: none;
+//   }
+//   .trayTopBtn {
+//     position: sticky;
+//     top: 0px;
+//     padding: 10px;
+//     border-bottom-left-radius: 5px;
+//     border-bottom-right-radius: 5px;
+//     background: #993399;
+//     z-index: 100;
+//     color: #fff;
 
-.timer-tab {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  min-height: 150px;
-  min-width: 100px;
-  max-width: 200px;
-  opacity: 0.99;
-  z-index: 1;
-}
+//     .makeBtn {
+//       border: 1px solid #652d65;
+//       border-radius: 5px;
+//       color: #fff;
+//       font-size: 14px;
+//       outline: none;
+//       background: #652d65;
+//     }
+//   }
+//   @media (max-width 800px) {
+//     position: absolute;
+//     top: 0;
+//     right: 0;
+//   }
+// }
+
+// .chat-hide-btn {
+//   margin-right: 0;
+// }
+// .chat-hide-btn .expanded {
+//   margin-right: 300px;
+// }
+
+// .timer-tab {
+//   position: fixed;
+//   bottom: 0;
+//   right: 0;
+//   min-height: 150px;
+//   min-width: 100px;
+//   max-width: 200px;
+//   opacity: 0.99;
+//   z-index: 1;
+// }
 </style>

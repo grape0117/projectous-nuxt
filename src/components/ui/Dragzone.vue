@@ -1,10 +1,10 @@
 <template>
-  <div class="dragzone" @dragover.prevent @dragenter="moveToNewList" @drop="drop($event)">
+  <div class="dragzone" @dragover.prevent @dragenter="moveToNewList($event)" @drop="drop($event)">
     <div v-if="isListExpandable" @click="expandedList = !expandedList" class="dragzone__item-icon">
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
     <div class="dragzone__content">
-      <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
+      <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
@@ -380,8 +380,13 @@ export default class Dragzone extends Vue {
 }
 .dragzone__item-block-content {
   /*display: flex;*/
+  padding: 10px 0;
   align-items: center;
   clear: both;
+  color: white;
+  margin-bottom: 5px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
 }
 .dragzone__item-block-content-text {
   flex-grow: 1;
@@ -413,16 +418,17 @@ export default class Dragzone extends Vue {
   flex-grow: 1;
   min-height: 1.459em;
   font-size: 0.9rem;
-  color: #595b60;
+  color: white;
 }
 .dragzone__item-subtext {
   margin-left: 30px;
   width: calc(100% - 30px);
-  margin-bottom: -0.1rem;
+  /* margin-top: 10rem; */
+  margin-bottom: 0.5rem;
   line-height: 0.8rem;
   font-size: 0.7rem;
   font-weight: lighter;
-  color: #949598;
+  color: white;
 }
 .dragzone__item-tracker-icon {
   float: right;

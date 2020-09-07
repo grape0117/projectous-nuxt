@@ -1,20 +1,24 @@
 <template>
-  <div id="task-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh;">
-    <div class="topSelectionBox">
-      <select id="selectCompanyUser" v-model="selectedCompanyUserId">
-        <option v-for="(companyUser, i) in sortedCompanyUsers" :value="companyUser.id" :id="'company_user-' + companyUser.id" :key="`${companyUser.id}-${i}`">
-          {{ companyUser.name }}
-        </option>
-      </select>
-      <button class="closebtnLeft" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button>
+  <div id="task-tray">
+    <div class="task-tray-title">TASKS</div>
+    <div class="task-tray-wrapper">
+      <div class="topSelectionBox">
+        <select id="selectCompanyUser" v-model="selectedCompanyUserId">
+          <option v-for="(companyUser, i) in sortedCompanyUsers" :value="companyUser.id" :id="'company_user-' + companyUser.id" :key="`${companyUser.id}-${i}`">
+            {{ companyUser.name }}
+          </option>
+        </select>
+        <!-- <button class="closebtnLeft" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
+      </div>
+      <pj-draggable :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" />
+      <new-list-form v-if="selectedCompanyUserId" :user-id="selectedCompanyUserId" />
     </div>
-    <pj-draggable :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" />
-    <new-list-form v-if="selectedCompanyUserId" :user-id="selectedCompanyUserId" />
-    <div :class="'chat-hide-btn ' + trayClass()">
+    <!-- <div
+    :class="'chat-hide-btn ' + trayClass()">
       <button @click="trayToggle()" type="button" id="chat-tray-btn" :class="'btn btn-purple ' + trayClass()">
         tasks
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
 <script lang="ts">
@@ -118,6 +122,7 @@ export default class Custom extends Vue {
   private tray_expanded: boolean = false
 
   private selectedCompanyUserId: any = null
+  // private selectedCompanyUserId = 345
 
   public async createTaskUser({ item, ids_of_items_to_shift_up }: any) {
     let next_work_day = null
@@ -274,101 +279,120 @@ export default class Custom extends Vue {
 
 <style lang="scss">
 #task-tray {
-  width: 0;
-  background: #993399;
-  -webkit-transition: all 0.5s ease-in;
-  -o-transition: all 0.5s ease-in;
-  -moz-transition: all 0.5s ease-in;
-  transition: all 0.5s ease-in;
-  &.expanded {
-    width: 300px;
-  }
-  @media (max-width 800px) {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-  &::-webkit-scrollbar {
-    background-color: red;
-    width: 5px;
-  }
-  &::-webkit-scrollbar-track {
-    background-color: #993399;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: white;
-    outline: 1px solid slategrey;
-  }
-  .topSelectionBox {
-    padding: 10px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    background: #993399;
-    z-index: 100;
-    select {
-      padding: 3px 10px;
-      border-radius: 5px;
-      border: 1px solid #333;
-      color: #333;
-    }
-  }
+  width: 330px;
+  height: 100%;
+  // border: 5px solid red;
+  overflow-y: scroll;
+  background-color: #616161;
 }
-.closebtnLeft {
-  font-size: 30px;
-  background: transparent;
-  color: #ffffff;
-  cursor: pointer;
-  border: none;
-  position: absolute;
-  right: 0;
-  top: -3px;
-  outline: none;
+.task-tray-title {
+  margin-top: 10px;
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
 }
-.chat-hide-btn {
-  margin-left: 0;
-}
-.chat-hide-btn .expanded {
-  margin-left: 300px;
-}
-.project-item__name {
-  cursor: pointer;
+.task-tray-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.project-item__name:hover {
-  color: blue;
-}
-.project-item__status {
-  float: left;
-  clear: both;
-  padding-right: 1rem;
-  cursor: pointer;
-  text-align: right;
-}
-.scroll-col {
-  height: calc(100vh - 170px);
-  overflow-y: scroll;
-}
-#task-tray button.btn.btn-purple {
-  color: #ffffff !important;
-  background-color: #993399;
-  border-color: #993399;
-  position: fixed;
-  bottom: 26px;
-  left: -32px;
-  transform: rotate(-90deg);
-  font-size: 16px;
-  text-transform: uppercase;
-  padding: 8px 25px;
-  border-radius: 0 0 5px 0;
-  z-index: 999;
-  -webkit-transition: all 0.5s ease-in;
-  -o-transition: all 0.5s ease-in;
-  -moz-transition: all 0.5s ease-in;
-  transition: all 0.5s ease-in;
-}
-.chat-hide-btn {
-  position: relative;
-}
+// #task-tray {
+//   width: 0;
+//   background: #993399;
+//   -webkit-transition: all 0.5s ease-in;
+//   -o-transition: all 0.5s ease-in;
+//   -moz-transition: all 0.5s ease-in;
+//   transition: all 0.5s ease-in;
+//   &.expanded {
+//     width: 300px;
+//   }
+//   @media (max-width 800px) {
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//   }
+//   &::-webkit-scrollbar {
+//     background-color: red;
+//     width: 5px;
+//   }
+//   &::-webkit-scrollbar-track {
+//     background-color: #993399;
+//     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+//   }
+//   &::-webkit-scrollbar-thumb {
+//     background-color: white;
+//     outline: 1px solid slategrey;
+//   }
+//   .topSelectionBox {
+//     padding: 10px;
+//     text-align: center;
+//     position: sticky;
+//     top: 0;
+//     background: #993399;
+//     z-index: 100;
+//     select {
+//       padding: 3px 10px;
+//       border-radius: 5px;
+//       border: 1px solid #333;
+//       color: #333;
+//     }
+//   }
+// }
+// .closebtnLeft {
+//   font-size: 30px;
+//   background: transparent;
+//   color: #ffffff;
+//   cursor: pointer;
+//   border: none;
+//   position: absolute;
+//   right: 0;
+//   top: -3px;
+//   outline: none;
+// }
+// .chat-hide-btn {
+//   margin-left: 0;
+// }
+// .chat-hide-btn .expanded {
+//   margin-left: 300px;
+// }
+// .project-item__name {
+//   cursor: pointer;
+// }
+
+// .project-item__name:hover {
+//   color: blue;
+// }
+// .project-item__status {
+//   float: left;
+//   clear: both;
+//   padding-right: 1rem;
+//   cursor: pointer;
+//   text-align: right;
+// }
+// .scroll-col {
+//   height: calc(100vh - 170px);
+//   overflow-y: scroll;
+// }
+// #task-tray button.btn.btn-purple {
+//   color: #ffffff !important;
+//   background-color: #993399;
+//   border-color: #993399;
+//   position: fixed;
+//   bottom: 26px;
+//   left: -32px;
+//   transform: rotate(-90deg);
+//   font-size: 16px;
+//   text-transform: uppercase;
+//   padding: 8px 25px;
+//   border-radius: 0 0 5px 0;
+//   z-index: 999;
+//   -webkit-transition: all 0.5s ease-in;
+//   -o-transition: all 0.5s ease-in;
+//   -moz-transition: all 0.5s ease-in;
+//   transition: all 0.5s ease-in;
+// }
+// .chat-hide-btn {
+//   position: relative;
+// }
 </style>
