@@ -23,14 +23,16 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }
 
     // @ts-ignore
-    this._vm
+    let task_message = this._vm
       .$http()
       .post('/task_messages', { task_message: taskMessage })
       .then(res => {
-        console.log(res)
+        // console.log(res.task_messages)
         commit('ADD_ONE', { module: 'task_messages', entity: res.task_messages }, { root: true })
-      }) //.task_messages
-
+        // return res.task_messages
+      }).task_messages
+    console.log(task_message)
+    return task_message
     // commit(REMOVE_TEMP_TASKS_MESSAGE)
     //return task_message
   },
