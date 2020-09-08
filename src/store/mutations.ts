@@ -77,6 +77,7 @@ export const mutations: MutationTree<IRootState> = {
     //@Mikhail is there a faster way to find the index? Can I search from the bottom of the array first?
     //@ts-ignore
     console.log(state[module][module])
+    //TODO: call LOOKUP
     state[module][module].forEach((item: any, key: any) => {
       state[module].lookup[item.id] = key
     })

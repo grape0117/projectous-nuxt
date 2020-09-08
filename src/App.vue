@@ -181,7 +181,6 @@ export default {
       } else {
         data = await this.storeDataInIndexedDb()
       }
-      //this.setAppData(data)
       this.$store.dispatch('PROCESS_INCOMING_DATA', data)
       //TODO
       const userLists = createUserLists(data.lists)
@@ -204,30 +203,6 @@ export default {
         }
       }
       return valid
-    },
-    async setAppData({ client_users, clients, company_users, task_users, tasks, projects, project_users, user_task_lists, current_company_id, current_company_user_id, timers, user_id }) {
-      // this.$bvModal.show('edit-user-modal')
-      Vue.set(this.$store.state.settings, 'current_user_id', user_id)
-      Vue.set(this.$store.state.settings, 'current_company_user_id', current_company_user_id)
-      Vue.set(this.$store.state.settings, 'current_company_id', current_company_id)
-
-      this.$store.commit('ADD_MANY', { module: 'client_users', entities: client_users }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'task_users', entities: task_users }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'tasks', entities: tasks }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'timers', entities: timers }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'projects', entities: projects }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'project_users', entities: project_users }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'company_users', entities: company_users }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'clients', entities: clients }, { root: true })
-      const userLists = createUserLists(user_task_lists)
-      this.$store.commit('lists/lists/CREATE_LISTS', {
-        listName: 'userLists',
-        lists: userLists
-      })
-      /*      this.dateInterval()
-      setInterval(this.dateInterval, 1800000)*/
-
-      //TODO: companies
     },
     async storeDataInIndexedDb() {
       const appData = await this.getAppDataFromApi()

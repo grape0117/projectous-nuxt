@@ -203,7 +203,7 @@ export default class Custom extends Vue {
     console.log('CREATE TASK CUSTOM')
     item.project_id = this.selectedProjectId
 
-    console.log(item)
+    console.log('createTask', item)
     this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: item })
   }
 
@@ -229,7 +229,10 @@ export default class Custom extends Vue {
   //TODO: pass only ids instead of whole objects?
   private updateTaskSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.$store.dispatch('tasks/updateSortOrders', parsedTasks.map(({ id }: { id: string }) => id))
+    this.$store.dispatch(
+      'tasks/updateSortOrders',
+      parsedTasks.map(({ id }: { id: string }) => id)
+    )
   }
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {

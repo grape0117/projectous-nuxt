@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import checkAuth from '@/middlewares/checkAuth'
 import store from 'vuex'
+import TaskDetails from '@/components/draggable/TaskDetails.vue'
 
 Vue.use(Router)
 //TODO: lazy load https://blog.logrocket.com/lazy-loading-in-vue-js/
@@ -24,6 +25,12 @@ const router = new Router({
       path: '/tasks',
       name: 'Tasks',
       component: () => import(/* webpackChunkName: "Tasks" */ '@/views/AllTaskFilipTemplate.vue')
+    },
+    {
+      path: '/task/:task_id',
+      name: 'Task_Detail',
+      props: true,
+      component: TaskDetails
     },
     {
       path: '/projects',
