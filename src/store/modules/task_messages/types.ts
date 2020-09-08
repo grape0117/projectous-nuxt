@@ -15,11 +15,11 @@ export interface ITaskMessage {
 }
 
 export class TaskMessage implements ITaskMessage {
-  id?: string
-  task_id: string = ''
-  company_user_id: number | null = null
-  message: string | null = ''
-  created_at: string | null = ''
+  public id?: string
+  public task_id: string = ''
+  public company_user_id: number | null = null
+  public message: string | null = ''
+  public created_at: string | null = ''
   // save() {
   //   //window._actions[module + '/CASCADE_DELETE']
   // }

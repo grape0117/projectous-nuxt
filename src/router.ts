@@ -31,7 +31,7 @@ const router = new Router({
     },
     {
       path: '/tasks',
-      name: 'Tasks',
+      name: 'Task Cloud',
       component: () => import(/* webpackChunkName: "Tasks" */ '@/views/AllTaskFilipTemplate.vue')
     },
     {
@@ -46,15 +46,15 @@ const router = new Router({
       name: 'MessageSideBar',
       component: MessageSideBar
     },
+    // {
+    //   path: '/projects',
+    //   name: 'Projects',
+    //   component: () => import(/* webpackChunkName: "Tasks" */ '@/views/Projects.vue')
+    // },
     {
-      path: '/projects',
-      name: 'Projects',
-      component: () => import(/* webpackChunkName: "Tasks" */ '@/views/Projects.vue')
-    },
-    {
-      path: '/custom',
-      name: 'Custom',
-      component: () => import(/* webpackChunkName: "Custom" */ '@/views/Custom.vue')
+      path: '/kanban',
+      name: 'Kanban',
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/Kanban.vue')
     },
     {
       path: '/users',
