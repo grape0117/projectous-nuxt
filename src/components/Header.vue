@@ -52,12 +52,16 @@ export default Vue.extend({
       projectName: 'projectous',
       navLinks: [
         {
-          name: 'clients',
-          path: '/clients'
+          name: 'tasks',
+          path: '/tasks'
         },
         {
           name: 'projects',
           path: '/projects'
+        },
+        {
+          name: 'clients',
+          path: '/clients'
         },
         {
           name: 'users',
