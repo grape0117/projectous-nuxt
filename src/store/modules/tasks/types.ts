@@ -50,6 +50,6 @@ export interface ITask {
   workflowy_id: number | null
   temp?: boolean
   settings: object
-  last_task_message_id: string | null
-  last_task_message_created_at: string | null
+  last_task_message_id?: string | null
+  last_task_message_created_at?: string | null
 }

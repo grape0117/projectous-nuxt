@@ -1,6 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import checkAuth from '@/middlewares/checkAuth'
+
+import InvoiceableTemplate from './views/InvoiceableTemplate.vue'
+import InvoicesTemplate from './views/InvoicesTemplate.vue'
+import ClientsTemplate from './views/ClientsTemplate.vue'
+import Tasks from './views/AllTaskFilipTemplate.vue'
+import UsersTemplate from './views/UsersTemplate.vue'
+import AcceptInvite from './views/AcceptInvite.vue'
+import MessageSideBar from './views/TaskSideBar.vue'
 import store from 'vuex'
 import TaskDetails from '@/components/draggable/TaskDetails.vue'
 
@@ -31,6 +39,12 @@ const router = new Router({
       name: 'Task_Detail',
       props: true,
       component: TaskDetails
+    },
+    {
+      // for test
+      path: '/message',
+      name: 'MessageSideBar',
+      component: MessageSideBar
     },
     {
       path: '/projects',

@@ -7,6 +7,7 @@ export const modulesNames: object = {
   PROJECTS: 'projects',
   PROJECT_USERS: 'project_users',
   USER_TASKS_LIST: 'user_task_lists',
+  TASK_MESSAGES: 'task_messages',
   TIMERS: 'timers',
   PROPERTIES: 'properties'
 }

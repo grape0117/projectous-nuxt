@@ -36,15 +36,16 @@ import moment from 'moment'
 export default {
   data() {
     return {
-      s_message: ''
+      s_message: '',
+      selected_message: null
     }
   },
-  props: ['task'],
+  props: ['task_id'],
   /* Load surveys and questionnaired on page load. */
   created() {},
   computed: {
     getMessages() {
-      // this.$store.state.task_messages.task_messages[this.$store.state.task_messages.lookup[task_id]];
+      return this.$store.getters['task_messages/getByTaskId'](this.task_id)
     },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
@@ -53,7 +54,9 @@ export default {
   mounted() {},
   methods: {
     getUserNameWithCompanyUserId(company_user_id) {
-      return this.$store.state.company_users.company_users[this.$store.state.company_users.lookup[company_user_id]].name
+      let company_user = this.$store.state.company_users.company_users[this.$store.state.company_users.lookup[company_user_id]]
+      if (company_user) return company_user.name
+      else return ''
     },
     formatTime(datetime) {
       return moment(datetime).format('MM-DD HH:mm:ss')
@@ -64,26 +67,45 @@ export default {
     },
     deleteMessage(message) {
       if (confirm('Are you sure to delete this message?')) {
-        let index = this.show_task.settings.messages.findIndex(function(item, i) {
-          return item.id == message.id
-        })
-        if (index != -1) this.show_task.settings.messages.splice(index, 1)
-        this.selected_message = null
-        this.saveTask(false)
+        this.$store.dispatch('DELETE', { module: 'task_messages', entity: message }, { root: true })
       }
     },
     saveMessage() {
-      let task_id = this.task.id
+      let task_id = this.task_id
       let company_user_id = this.current_company_user_id
-      console.log(task_id, company_user_id)
       let message = this.s_message
-      this.$store
-        .dispatch('task_messages/createTaskMessage', {
-          task_id,
-          company_user_id,
-          message
-        })
-        .then(res => {})
+      if (this.selected_message == null) {
+        // let message = {
+        //   id: uuid.v4(),
+        //   task_id: this.task_id,
+        //   company_user_id: this.current_company_user_id,
+        //   message: this.s_message,
+        //   created_at: moment().format('YYYY-MM-DD HH:mm:ss')
+        // }
+        // this.$store.dispatch('ADD_ONE', { module: 'task_messages', entity: [message] }, { root: true })
+        this.$store
+          .dispatch('task_messages/createTaskMessage', {
+            task_id,
+            company_user_id,
+            message
+          })
+          .then(res => {
+            this.s_message = ''
+            let task = this.$store.getters['task/getById'](task_id)
+            task.last_task_message_id = res.data.id
+            task.last_task_message_created_at = moment().format('YYYY-MM-DD HH:mm:ss')
+            this.$store.dispatch('UPDATE', { module: 'task', entity: task }, { root: true })
+          })
+      } else {
+        this.selected_message.message = this.s_message
+        this.$store.dispatch('UPDATE', { module: 'task_messages', entity: this.selected_message }, { root: true })
+        let task = this.$store.getters['task/getById'](this.selected_message.id)
+        task.last_task_message_id = this.selected_message.id
+        task.last_task_message_created_at = moment().format('YYYY-MM-DD HH:mm:ss')
+        this.$store.dispatch('UPDATE', { module: 'task', entity: task }, { root: true })
+        this.selected_message = null
+        this.s_message = ''
+      }
     }
   }
 }
