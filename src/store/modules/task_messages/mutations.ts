@@ -1,6 +1,6 @@
 import { MutationTree } from 'vuex'
 import Vue from 'vue'
-import { IModuleState, ITaskMessages } from './types'
+import { IModuleState, ITaskMessage } from './types'
 
 export const mutations: MutationTree<IModuleState> = {
   LOOKUP(state: IModuleState, task_messages: any) {

@@ -203,7 +203,7 @@ export default class Custom extends Vue {
     console.log('CREATE TASK CUSTOM')
     item.project_id = this.selectedProjectId
 
-    console.log(item)
+    console.log('createTask', item)
     this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: item })
   }
 
