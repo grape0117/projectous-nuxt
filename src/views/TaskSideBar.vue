@@ -6,6 +6,7 @@
 html {
   line-height: var(--1h);
 }
+
 .message-sidebar {
   width: 350px;
 }
@@ -17,6 +18,7 @@ html {
 .project-avatar {
   vertical-align: top;
 }
+
 .message-sidebar .task-title {
   font-size: 14px;
   font-weight: bold;
@@ -31,6 +33,7 @@ html {
   display: inline-block;
   width: calc(100% - 60px);
 }
+
 .message-sidebar .task-time {
   float: right;
 }
@@ -45,6 +48,7 @@ html {
   position: relative;
   max-height: 48px;
   overflow: hidden;
+  cursor: inherit;
 }
 
 /* .message-item-content label:before {
@@ -62,9 +66,6 @@ html {
     height: 1rem;
     background: white;
   } */
-
-.list-group-item label {
-}
 </style>
 <template>
   <div style="padding: 20px;">
@@ -75,17 +76,17 @@ html {
           <div class="message-item">
             <div class="message-item-header">
               <label class="task-title mr-auto">{{ task.title }}</label>
-              <span class="task-time">{{ messageTime(task.messages[0].created_at) }}</span>
+              <span class="task-time">{{ messageTime(task.last_task_message_created_at) }}</span>
             </div>
             <div class="message-item-content">
-              <label for="">{{ task.messages[0].message }}</label>
+              <label for="">{{ getLastMessage(task) }}</label>
             </div>
           </div>
         </b-list-group-item>
       </b-list-group>
     </div>
     <div v-else class="message-detail">
-      <b-button variant="dark" @click="onBack()" style="margin-bottom: 10px;"><- Back</b-button>
+      <b-button variant="dark" @click="onBack()" style="margin-bottom: 10px;"> <- Back</b-button>
       <task-message v-bind:task_id="active_task.id"> </task-message>
     </div>
   </div>
@@ -105,23 +106,22 @@ export default {
   },
   computed: {
     tasks() {
-      let task_messages = this.$store.state.task_messages.task_messages
-      if (!task_messages.length) return []
-      let g_tasks = chain(task_messages)
-        .groupBy('task_id')
-        .sortBy(function(item) {
-          return item[0].updated_at
+      let tasks = this.$store.state.tasks.tasks
+      let r_tasks = chain(tasks)
+        .filter(function(item) {
+          return item.last_task_message_created_at
         })
+        .sortBy('last_task_message_created_at')
         .reverse()
         .value()
-      let r_tasks = []
-      for (let key in g_tasks) {
-        let task_id = g_tasks[key][0].task_id
-        let task = this.$store.getters['tasks/getById'](task_id)
-        task.messages = g_tasks[key]
-        r_tasks.push(task)
+        .slice(0, 50)
+      console.log(r_tasks)
+      for (let key in r_tasks) {
+        let task_id = r_tasks[key].id
+        let task_messages = this.$store.getters['task_messages/getByTaskId'](task_id)
+        r_tasks[key].messages = task_messages
       }
-      return r_tasks.splice(0, 50)
+      return r_tasks
     },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
@@ -136,6 +136,10 @@ export default {
       if (diff == 0) return 'Today'
       else if (diff == 1) return 'Yesterday'
       else return msgTime.format('d/MM/YY')
+    },
+    getLastMessage(task) {
+      if (task.last_task_message_id == '') return ''
+      else return this.$store.getters['task_messages/getById'](task.last_task_message_id).message
     },
     onSelectTask(task) {
       this.active_task = task
