@@ -135,7 +135,8 @@ export default {
       show_task: false,
       selected_resource: '',
       project_sort: '',
-      isEditResource: null
+      isEditResource: null,
+      scrollTop: 0
     }
   },
   props: ['task_id'],
@@ -325,7 +326,7 @@ export default {
     },
     showTask(task) {
       console.log('show task!', task)
-
+      this.scrollTop = document.documentElement.scrollTop
       //pop modal
       this.show_task = task
       this.t_update()
@@ -413,6 +414,16 @@ export default {
           this.t_update()
         }
       }
+    },
+    $route(to, from) {
+      if (to.name == 'Task_Detail' && from.name == 'Tasks') {
+        document.documentElement.scrollTop = 0
+      } else if (to.name == 'Tasks' && from.name == 'Task_Detail') {
+        let me = this
+        setTimeout(function() {
+          document.documentElement.scrollTop = me.scrollTop
+        }, 100)
+      }
     }
   }
 }
@@ -423,12 +434,14 @@ export default {
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0;
 }
+
 .msg-content {
   padding: 8px 12px;
   border: solid 1px grey;
   border-radius: 8px;
   margin-top: 5px;
 }
+
 .t-btn-panel button {
   margin-right: 10px;
   text-transform: uppercase;
@@ -495,6 +508,7 @@ button.tablinks {
   /* background-color: inherit;
     /* float: left; */
 }
+
 /* Change background color of buttons on hover */
 .tab button:hover {
   background-color: #ddd;
