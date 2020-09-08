@@ -33,6 +33,8 @@
 <script>
 import uuid from 'uuid'
 import moment from 'moment'
+import { chain, groupBy } from 'lodash'
+
 export default {
   data() {
     return {
@@ -67,14 +69,33 @@ export default {
     },
     deleteMessage(message) {
       if (confirm('Are you sure to delete this message?')) {
+        let task = this.$store.getters['tasks/getById'](message.task_id)
         this.$store.dispatch('DELETE', { module: 'task_messages', entity: message }, { root: true })
+        let task_messages = this.getMessages
+        if (task_messages.length == 0) {
+          task.last_task_message_created_at = null
+          task.last_task_message_id = null
+        } else {
+          // get the last message by updated_at
+          let last_message = chain(task_messages)
+            .sortBy(function(item) {
+              return item.updated_at
+            })
+            .reverse()
+            .value()[0]
+          task.last_task_message_id = last_message.id
+          task.last_task_message_created_at = last_message.updated_at
+        }
+        this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
       }
     },
     async saveMessage() {
       let task_id = this.task_id
       let company_user_id = this.current_company_user_id
       let message = this.s_message
+      let task
       if (this.selected_message == null) {
+        // create
         // let message = {
         //   id: uuid.v4(),
         //   task_id: this.task_id,
@@ -94,20 +115,24 @@ export default {
         console.log(task_message.task_messages)
         return
         this.s_message = ''
-        let task = this.$store.getters['tasks/getById'](task_id)
+        task = this.$store.getters['tasks/getById'](task_id)
         task.last_task_message_id = task_message.task_messages.id
         task.last_task_message_created_at = moment().format('YYYY-MM-DD HH:mm:ss')
-        this.$store.dispatch('UPDATE', { module: 'task', entity: task }, { root: true })
       } else {
+        // update
+        // update task_message
         this.selected_message.message = this.s_message
         this.$store.dispatch('UPDATE', { module: 'task_messages', entity: this.selected_message }, { root: true })
-        let task = this.$store.getters['tasks/getById'](this.selected_message.task_id)
+        // update task
+        task = this.$store.getters['tasks/getById'](this.selected_message.task_id)
         task.last_task_message_id = this.selected_message.id
         task.last_task_message_created_at = moment().format('YYYY-MM-DD HH:mm:ss')
-        this.$store.dispatch('UPDATE', { module: 'task', entity: task }, { root: true })
+        this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
+        // initialize
         this.selected_message = null
         this.s_message = ''
       }
+      this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
     }
   }
 }
