@@ -91,10 +91,18 @@ export default {
           })
           .then(res => {
             this.s_message = ''
+            let task = this.$store.getters['task/getById'](task_id)
+            task.last_task_message_id = res.data.id
+            task.last_task_message_created_at = moment().format('YYYY-MM-DD HH:mm:ss')
+            this.$store.dispatch('UPDATE', { module: 'task', entity: task }, { root: true })
           })
       } else {
         this.selected_message.message = this.s_message
         this.$store.dispatch('UPDATE', { module: 'task_messages', entity: this.selected_message }, { root: true })
+        let task = this.$store.getters['task/getById'](this.selected_message.id)
+        task.last_task_message_id = this.selected_message.id
+        task.last_task_message_created_at = moment().format('YYYY-MM-DD HH:mm:ss')
+        this.$store.dispatch('UPDATE', { module: 'task', entity: task }, { root: true })
         this.selected_message = null
         this.s_message = ''
       }
