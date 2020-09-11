@@ -4,9 +4,9 @@
       <div v-if="!verticalAlignment" class="list__group-title">
         {{ group.name }}
       </div>
-      <div :class="title.replace(/[^a-zA-Z0-9]/, '-')" v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id" class="list__group">
+      <div class="list__group" :class="title.replace(/[^a-zA-Z0-9]/, '-')" v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id">
         <div
-          :class="'list__group-subtitle ' + title.replace(/[^a-zA-Z0-9]/, '-')"
+          :class="'list__group-subtitle-title' + title.replace(/[^a-zA-Z0-9]/, '-')"
           :style="{
             // background: isListDragged && targetListIndex === index ? '#333333' : 'initial'
           }"
@@ -17,7 +17,7 @@
             <span />
             <span />
           </div>
-          <div>{{ title }}</div>
+          <div class="list__group-subtitle-title">{{ title }}</div>
         </div>
 
         <pj-dragzone :id="id" :tasks="groupedData[id]" :isListDragged="isListDragged" :draggedItemId="draggedItemId" :group="group" :selectedCompanyUserId="selectedCompanyUserId" :initiallyExpanded="initiallyExpanded" @delete="$emit('delete', $event)" @taskTimerToggled="$emit('taskTimerToggled', $event)" @updateDataIndexes="updateDataIndexes" @setDraggedItemId="draggedItemId = $event" @updateSortOrders="$emit('updateSortOrders', $event)" @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)" />
@@ -125,7 +125,7 @@ export default class Draggable extends Vue {
 <style>
 .list {
   width: 100%;
-  max-width: 600px;
+  max-width: 300px;
   cursor: pointer;
   text-transform: none;
 }
@@ -136,7 +136,8 @@ export default class Draggable extends Vue {
   width: 100%;
 }
 .list__group {
-  width: 275px;
+  width: 200px;
+  padding: 0 10px;
   display: flex;
   /* background: #fff; */
   margin-bottom: 10px;
@@ -154,10 +155,10 @@ export default class Draggable extends Vue {
   font-size: 0.8rem;
   text-transform: uppercase;
   font-weight: bold;
-  color: #707070;
+  color: white;
   text-align: center;
 }
-.list__group-subtitle {
+.list__group-subtitle-title {
   width: 40px;
   padding: 0.5rem;
   padding-left: 5px;
@@ -169,7 +170,7 @@ export default class Draggable extends Vue {
   font-weight: bold;
   font-size: 14px;
 }
-.list__group-subtitle,
+.list__group-subtitle-title,
 .list__group-subtitle.Today {
   /* background-color: rgb(101 45 101); */
   color: white;
@@ -184,15 +185,9 @@ export default class Draggable extends Vue {
   color: #a9a6a6;
 }
 
-.list__group-subtitle > div {
+.list__group-subtitle-title {
   white-space: nowrap;
   float: left;
-  /*height: 100px;*/
-  writing-mode: vertical-rl;
-
-  white-space: nowrap;
-  float: left;
-  /*height: 100px;*/
   writing-mode: vertical-rl;
 }
 </style>

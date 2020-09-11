@@ -10,7 +10,7 @@
         </select>
         <!-- <button class="closebtnLeft" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
       </div>
-      <pj-draggable :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" />
+      <pj-draggable class="task-tray-draggable" :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" />
       <new-list-form v-if="selectedCompanyUserId" :user-id="selectedCompanyUserId" />
     </div>
     <!-- <div
@@ -279,11 +279,18 @@ export default class Custom extends Vue {
 
 <style lang="scss">
 #task-tray {
-  width: 330px;
+  width: 300px;
   height: 100%;
-  // border: 5px solid red;
+  // border: 1px solid red;
   overflow-y: scroll;
   background-color: #616161;
+}
+.task-tray-draggable {
+  width: 87%;
+}
+.task-tray-draggable .list__group {
+  width: auto !important;
+  padding: 0;
 }
 .task-tray-title {
   margin-top: 10px;

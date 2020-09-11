@@ -90,7 +90,7 @@ export default {
   height: 100%;
   width: 300px;
   // border: 5px solid red;
-  background-color: white;
+  background-color: #616161;
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
