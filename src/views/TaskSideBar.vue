@@ -1,77 +1,8 @@
-<style scoped>
-:root {
-  --h: 1.4rem;
-}
-
-html {
-  line-height: var(--1h);
-}
-
-.message-sidebar {
-  width: 350px;
-}
-
-.list-group-item {
-  padding-right: 5px;
-}
-
-.project-avatar {
-  vertical-align: top;
-}
-
-.message-sidebar .task-title {
-  font-size: 14px;
-  font-weight: bold;
-  max-width: 170px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  margin-bottom: 0px;
-}
-
-.message-item {
-  display: inline-block;
-  width: calc(100% - 60px);
-}
-
-.message-sidebar .task-time {
-  float: right;
-}
-
-.list-group-item {
-  cursor: pointer;
-}
-
-.message-item-content label {
-  padding-right: 10px;
-  --max-lines: 2;
-  position: relative;
-  max-height: 48px;
-  overflow: hidden;
-  cursor: inherit;
-}
-
-/* .message-item-content label:before {
-    content: '...';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-  }
-
-  .message-item-content label:after {
-    content: '';
-    position: absolute;
-    right: 0;
-    width: 1rem;
-    height: 1rem;
-    background: white;
-  } */
-</style>
 <template>
-  <div style="padding: 20px;">
+  <div class="task-side-bar" style="padding: 20px;">
     <div class="message-sidebar" v-if="!active_task.id">
       <b-list-group>
-        <b-list-group-item v-for="task in tasks" :class="[task.id == active_task.id ? 'active' : '']" @click="onSelectTask(task)">
+        <b-list-group-item v-for="(task, index) in tasks" :key="index" :class="[task.id == active_task.id ? 'active' : '']" @click="onSelectTask(task)">
           <b-avatar class="mr-2 project-avatar"></b-avatar>
           <div class="message-item">
             <div class="message-item-header">
@@ -154,3 +85,76 @@ export default {
   }
 }
 </script>
+<style scoped>
+:root {
+  --h: 1.4rem;
+}
+
+html {
+  line-height: var(--1h);
+}
+.task-side-bar {
+  background-color: #616161;
+}
+.message-sidebar {
+  width: 300px;
+}
+.message-panel {
+  width: 298px;
+}
+.list-group-item {
+  padding-right: 5px;
+}
+
+.project-avatar {
+  vertical-align: top;
+}
+
+.message-sidebar .task-title {
+  font-size: 14px;
+  font-weight: bold;
+  max-width: 170px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin-bottom: 0px;
+}
+
+.message-item {
+  display: inline-block;
+  width: calc(100% - 60px);
+}
+
+.message-sidebar .task-time {
+  float: right;
+}
+
+.list-group-item {
+  cursor: pointer;
+}
+
+.message-item-content label {
+  padding-right: 10px;
+  --max-lines: 2;
+  position: relative;
+  max-height: 48px;
+  overflow: hidden;
+  cursor: inherit;
+}
+
+/* .message-item-content label:before {
+    content: '...';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+
+  .message-item-content label:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    width: 1rem;
+    height: 1rem;
+    background: white;
+  } */
+</style>

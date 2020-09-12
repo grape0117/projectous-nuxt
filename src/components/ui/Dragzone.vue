@@ -328,6 +328,7 @@ export default class Dragzone extends Vue {
 <style>
 .dragzone {
   width: 100%;
+  /* border: 5px solid red; */
   /*width: calc(100% - 121px);*/
   min-height: 40px;
   height: auto;

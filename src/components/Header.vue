@@ -44,24 +44,6 @@ export default Vue.extend({
     return {
       projectName: 'P',
       navLinks: [{ name: 'Task Cloud', path: '/tasks' }, { name: 'Kanban', path: '/kanban' }, { name: 'clients', path: '/clients' }, { name: 'users', path: '/users' }],
-      navLinks: [
-        {
-          name: 'Task Cloud',
-          path: '/tasks'
-        },
-        {
-          name: 'Kanban',
-          path: '/kanban'
-        },
-        {
-          name: 'clients',
-          path: '/clients'
-        },
-        {
-          name: 'users',
-          path: '/users'
-        }
-      ],
       colors: {
         backgroundColor: ['0', '0', '0'],
         logo: { name: '#FFFFFF' }

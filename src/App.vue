@@ -227,21 +227,12 @@ export default {
       this.$store.commit('lists/createListsByDays')
     }
   }
-  // created() {
-  //   EventBus.$on('toggle_tasks', () => {
-  //     this.showTask = !this.showTask
-  //   })
-  //   EventBus.$on('toggle_timers', () => {
-  //     this.showTimer = !this.showTimer
-  //   })
-  // }
 }
 </script>
 
 <style lang="scss">
 #app {
   display: flex;
-  margin-bottom: 60px;
 }
 #update-data-button {
   position: absolute;

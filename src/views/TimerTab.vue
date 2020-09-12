@@ -89,7 +89,8 @@ export default {
 #timer-tray {
   height: 100%;
   width: 300px;
-  // border: 5px solid red;
+  height: calc(100vh - 50px);
+  overflow-y: scroll;
   background-color: #616161;
   overflow-y: scroll;
   display: flex;

@@ -1,9 +1,9 @@
 <template>
-  <div class="custom-page">
+  <div class="kanban-page">
     <!-- Project Filter: <input v-model="project_search" /> <input type="checkbox" v-model="show_all_active_projects" /> Show all active projects
     <hr /> -->
     <b-container fluid>
-      <b-row>
+      <b-row class="kanban-page-innerwrapper">
         <b-col class="client-section scroll-col">
           <div v-if="clientVisible(client)" v-for="(client, index) in activeClients" :key="index">
             <!--            Todo: change client id to client name-->
@@ -20,12 +20,13 @@
           </div>
         </b-col>
 
-        <b-col v-if="selectedProjectId" style="flex: 1" class="custom-width">
-          <h4 class="custom-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
+        <b-col v-if="selectedProjectId" class="kanban-draggable custom-width">
+          <h4 class="kanban-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
         <div class="right-fixed">
           <task-tray v-show="showTask" />
+          <task-side-bar v-show="showChat" />
           <timer-tab v-show="showTimer" />
         </div>
       </b-row>
@@ -44,6 +45,7 @@ import { ITask } from '@/store/modules/tasks/types'
 import NewListForm from '@/components/draggable/NewListForm.vue'
 import TaskTray from './TaskTray.vue'
 import TimerTab from './TimerTab.vue'
+import TaskSideBar from './TaskSideBar.vue'
 import uuid from 'uuid'
 import { EventBus } from '@/components/event-bus'
 
@@ -71,12 +73,14 @@ enum listsBlockNames {
     NewListForm,
     TaskDetails,
     TimerTab,
-    TaskTray
+    TaskTray,
+    TaskSideBar
   }
 })
 export default class Custom extends Vue {
   private showTask: boolean = true
   private showTimer: boolean = true
+  private showChat: boolean = false
 
   get listsBlockNames() {
     return listsBlockNames
@@ -288,12 +292,25 @@ export default class Custom extends Vue {
     EventBus.$on('toggle_timers', () => {
       this.showTimer = !this.showTimer
     })
+    EventBus.$on('toggle_chat', () => {
+      this.showChat = !this.showChat
+    })
   }
 }
 </script>
 <style>
-.custom-page {
+.kanban-page {
   background-color: #7d7d7d;
+}
+.kanban-draggable {
+  width: 100px;
+  height: calc(100vh - 50px);
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+.kanban-page-innerwrapper {
+  display: flex;
+  justify-content: space-between;
 }
 </style>
 
@@ -302,6 +319,8 @@ export default class Custom extends Vue {
   flex-grow: 0 !important;
   flex-basis: 260px !important;
   margin-top: 20px;
+  overflow-y: scroll;
+  height: calc(100vh - 70px) !important;
 }
 .project-item-status {
 }
@@ -312,7 +331,7 @@ export default class Custom extends Vue {
 .custom-width {
   width: 50% !important;
 }
-.custom-page-title {
+.kanban-page-title {
   color: white;
 }
 .client-name {

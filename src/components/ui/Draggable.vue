@@ -128,15 +128,23 @@ export default class Draggable extends Vue {
   max-width: 300px;
   cursor: pointer;
   text-transform: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .list__wrapper.horizontal-alignment {
   display: flex;
+  /* justify-content: center; */
+  /* border: 5px solid red; */
 }
 .list__wrapper.horizontal-alignment .dragzone {
   width: 100%;
 }
 .list__group {
-  width: 200px;
+  max-width: 200px;
+  height: calc(100vh - 105px);
+  overflow-y: scroll;
+  width: 100%;
   padding: 0 10px;
   display: flex;
   /* background: #fff; */
@@ -150,7 +158,9 @@ export default class Draggable extends Vue {
 .list__group:first-child {
   margin-top: 15px;
 }
-
+.dragzone__content {
+  padding-bottom: 10px;
+}
 .list__group-title {
   font-size: 0.8rem;
   text-transform: uppercase;

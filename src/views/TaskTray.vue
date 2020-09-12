@@ -280,8 +280,7 @@ export default class Custom extends Vue {
 <style lang="scss">
 #task-tray {
   width: 300px;
-  height: 100%;
-  // border: 1px solid red;
+  height: calc(100vh - 50px);
   overflow-y: scroll;
   background-color: #616161;
 }
@@ -304,102 +303,13 @@ export default class Custom extends Vue {
   align-items: center;
 }
 
-// #task-tray {
-//   width: 0;
-//   background: #993399;
-//   -webkit-transition: all 0.5s ease-in;
-//   -o-transition: all 0.5s ease-in;
-//   -moz-transition: all 0.5s ease-in;
-//   transition: all 0.5s ease-in;
-//   &.expanded {
-//     width: 300px;
-//   }
-//   @media (max-width 800px) {
-//     position: absolute;
-//     top: 0;
-//     left: 0;
-//   }
-//   &::-webkit-scrollbar {
-//     background-color: red;
-//     width: 5px;
-//   }
-//   &::-webkit-scrollbar-track {
-//     background-color: #993399;
-//     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-//   }
-//   &::-webkit-scrollbar-thumb {
-//     background-color: white;
-//     outline: 1px solid slategrey;
-//   }
-//   .topSelectionBox {
-//     padding: 10px;
-//     text-align: center;
-//     position: sticky;
-//     top: 0;
-//     background: #993399;
-//     z-index: 100;
-//     select {
-//       padding: 3px 10px;
-//       border-radius: 5px;
-//       border: 1px solid #333;
-//       color: #333;
-//     }
-//   }
-// }
-// .closebtnLeft {
-//   font-size: 30px;
-//   background: transparent;
-//   color: #ffffff;
-//   cursor: pointer;
-//   border: none;
-//   position: absolute;
-//   right: 0;
-//   top: -3px;
-//   outline: none;
-// }
-// .chat-hide-btn {
-//   margin-left: 0;
-// }
-// .chat-hide-btn .expanded {
-//   margin-left: 300px;
-// }
-// .project-item__name {
-//   cursor: pointer;
-// }
+.task-tray-wrapper .list__wrapper > .list > .list__group {
+  max-width: 100% !important;
+  padding-right: 10px;
+  justify-content: flex-start;
+}
 
-// .project-item__name:hover {
-//   color: blue;
-// }
-// .project-item__status {
-//   float: left;
-//   clear: both;
-//   padding-right: 1rem;
-//   cursor: pointer;
-//   text-align: right;
-// }
-// .scroll-col {
-//   height: calc(100vh - 170px);
-//   overflow-y: scroll;
-// }
-// #task-tray button.btn.btn-purple {
-//   color: #ffffff !important;
-//   background-color: #993399;
-//   border-color: #993399;
-//   position: fixed;
-//   bottom: 26px;
-//   left: -32px;
-//   transform: rotate(-90deg);
-//   font-size: 16px;
-//   text-transform: uppercase;
-//   padding: 8px 25px;
-//   border-radius: 0 0 5px 0;
-//   z-index: 999;
-//   -webkit-transition: all 0.5s ease-in;
-//   -o-transition: all 0.5s ease-in;
-//   -moz-transition: all 0.5s ease-in;
-//   transition: all 0.5s ease-in;
-// }
-// .chat-hide-btn {
-//   position: relative;
-// }
+.task-tray-wrapper .list__wrapper .list {
+  align-items: inherit !important;
+}
 </style>
