@@ -7,11 +7,6 @@
       </div>
     </main>
 
-    <div class="right-fixed">
-      <task-tray v-show="showTask" />
-      <timer-tab v-show="showTimer" />
-    </div>
-
     <task-modal />
     <edit-client-modal id="edit-client-modal" />
     <edit-user-modal id="edit-user-modal" />
@@ -231,15 +226,15 @@ export default {
     dateInterval() {
       this.$store.commit('lists/createListsByDays')
     }
-  },
-  created() {
-    EventBus.$on('toggle_tasks', () => {
-      this.showTask = !this.showTask
-    })
-    EventBus.$on('toggle_timers', () => {
-      this.showTimer = !this.showTimer
-    })
   }
+  // created() {
+  //   EventBus.$on('toggle_tasks', () => {
+  //     this.showTask = !this.showTask
+  //   })
+  //   EventBus.$on('toggle_timers', () => {
+  //     this.showTimer = !this.showTimer
+  //   })
+  // }
 }
 </script>
 
@@ -256,15 +251,5 @@ export default {
   height: 30px;
   cursor: pointer;
   background: url('assets/icons/refresh-icon.svg');
-}
-.right-fixed {
-  position: fixed;
-  z-index: 9999;
-  top: 145px;
-  right: 0;
-  // width: 800px;
-  height: calc(100vh - 145px);
-  // border: 1px solid red;
-  display: flex;
 }
 </style>

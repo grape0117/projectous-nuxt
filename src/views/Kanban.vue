@@ -19,10 +19,15 @@
             </div>
           </div>
         </b-col>
-        <b-col v-if="selectedProjectId" style="flex-grow: 1" class="custom-width">
-          <h4 v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
+
+        <b-col v-if="selectedProjectId" style="flex: 1" class="custom-width">
+          <h4 class="custom-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
+        <div class="right-fixed">
+          <task-tray v-show="showTask" />
+          <timer-tab v-show="showTimer" />
+        </div>
       </b-row>
     </b-container>
     <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
@@ -37,8 +42,10 @@ import TaskDetails from '@/components/draggable/TaskDetails.vue'
 import { IProject } from '@/store/modules/projects/types'
 import { ITask } from '@/store/modules/tasks/types'
 import NewListForm from '@/components/draggable/NewListForm.vue'
+import TaskTray from './TaskTray.vue'
 import TimerTab from './TimerTab.vue'
 import uuid from 'uuid'
+import { EventBus } from '@/components/event-bus'
 
 const CompanyClients = namespace('clients')
 const CompanyUsers = namespace('company_users')
@@ -63,10 +70,14 @@ enum listsBlockNames {
   components: {
     NewListForm,
     TaskDetails,
-    TimerTab
+    TimerTab,
+    TaskTray
   }
 })
 export default class Custom extends Vue {
+  private showTask: boolean = true
+  private showTimer: boolean = true
+
   get listsBlockNames() {
     return listsBlockNames
   }
@@ -229,10 +240,7 @@ export default class Custom extends Vue {
   //TODO: pass only ids instead of whole objects?
   private updateTaskSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.$store.dispatch(
-      'tasks/updateSortOrders',
-      parsedTasks.map(({ id }: { id: string }) => id)
-    )
+    this.$store.dispatch('tasks/updateSortOrders', parsedTasks.map(({ id }: { id: string }) => id))
   }
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {
@@ -272,13 +280,24 @@ export default class Custom extends Vue {
     this.$store.commit('settings/setCurrentEditTask', cloneDeep(task))
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
+
+  created() {
+    EventBus.$on('toggle_tasks', () => {
+      this.showTask = !this.showTask
+    })
+    EventBus.$on('toggle_timers', () => {
+      this.showTimer = !this.showTimer
+    })
+  }
 }
 </script>
-
-<style scoped>
+<style>
 .custom-page {
   background-color: #7d7d7d;
 }
+</style>
+
+<style scoped>
 .client-section {
   flex-grow: 0 !important;
   flex-basis: 260px !important;
@@ -287,11 +306,14 @@ export default class Custom extends Vue {
 .project-item-status {
 }
 .scroll-col {
-  height: calc(100vh - 170px);
+  height: calc(100vh - 40px);
   overflow-y: scroll;
 }
 .custom-width {
   width: 50% !important;
+}
+.custom-page-title {
+  color: white;
 }
 .client-name {
   font-weight: bold;
@@ -315,5 +337,8 @@ export default class Custom extends Vue {
   width: 100%;
   height: 100%;
   color: white;
+}
+.right-fixed {
+  display: flex;
 }
 </style>

@@ -2,15 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import checkAuth from '@/middlewares/checkAuth'
 
-import InvoiceableTemplate from './views/InvoiceableTemplate.vue'
-import InvoicesTemplate from './views/InvoicesTemplate.vue'
-import ClientsTemplate from './views/ClientsTemplate.vue'
-import Tasks from './views/AllTaskFilipTemplate.vue'
-import UsersTemplate from './views/UsersTemplate.vue'
-import AcceptInvite from './views/AcceptInvite.vue'
-import MessageSideBar from './views/TaskSideBar.vue'
 import store from 'vuex'
-import TaskDetails from '@/components/draggable/TaskDetails.vue'
 
 Vue.use(Router)
 //TODO: lazy load https://blog.logrocket.com/lazy-loading-in-vue-js/
@@ -18,7 +10,7 @@ Vue.use(Router)
 const router = new Router({
   mode: 'history',
   routes: [
-    { path: '/', name: 'home', redirect: '/custom' },
+    { path: '/', name: 'home', redirect: '/kanban' },
     {
       path: '/login',
       name: 'Login',
@@ -38,13 +30,13 @@ const router = new Router({
       path: '/task/:task_id',
       name: 'Task_Detail',
       props: true,
-      component: TaskDetails
+      component: () => import(/* webpackChunkName: "Tasks-detail" */ '@/components/draggable/TaskDetails.vue')
     },
     {
       // for test
       path: '/message',
       name: 'MessageSideBar',
-      component: MessageSideBar
+      component: () => import(/* webpackChunkName: "Message-sidebar" */ '@/views/TaskSideBar.vue')
     },
     // {
     //   path: '/projects',

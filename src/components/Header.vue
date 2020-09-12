@@ -1,18 +1,10 @@
 <template>
   <div class="header">
-    <!-- top -->
-    <div class="header-top" :style="`background-image: linear-gradient(to right, rgba(${headerBgColor},0.2), rgba(${headerBgColor},0.9), rgba(${headerBgColor},1));`">
-      <div class="logo" :style="`background-color: rgb(${headerBgColor})`">
-        <router-link class="logo-name" to="/">
-          {{ projectName | toUpperCase }}
-        </router-link>
-      </div>
-
-      <div class="profile-icon"></div>
-    </div>
-
-    <!-- bottom -->
-    <div class="header-bottom">
+    <!-- <div class="header-top" :style="`background-image: linear-gradient(to right, rgba(${headerBgColor},0.2), rgba(${headerBgColor},0.9), rgba(${headerBgColor},1));`"> -->
+    <div class="header-nav">
+      <router-link class="logo-name" to="/">
+        {{ projectName | toUpperCase }}
+      </router-link>
       <div class="nav-buttons">
         <!-- <b-nav horizntal>
           <b-navbar-brand to="/">Projectous</b-navbar-brand>
@@ -27,17 +19,18 @@
           {{ button.name | toUpperCase }}
         </router-link>
       </div>
-
+    </div>
+    <div class="header-bottom">
       <div class="nav-icons">
-        <i class="nav-icon icon-arrow_forward_ios"></i>
-        <div class="nav-icon" v-for="(icon, index) in icons" :key="index" @click="toggle(icon.name)">
-          <!-- {{ icon.icon }} -->
+        <i class="nav-icon icon-arrow_forward_ios nav-icons-active"></i>
+        <div class="nav-icon" :class="toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index" @click="toggle(icon.name)">
           <i class="nav-icon__icon" :class="icon.icon"></i>
           <span class="nav-icon__name">
             {{ icon.name | toUpperCase }}
           </span>
         </div>
       </div>
+      <div class="profile-icon border"></div>
     </div>
   </div>
 </template>
@@ -49,7 +42,8 @@ import { EventBus } from '@/components/event-bus'
 export default Vue.extend({
   data() {
     return {
-      projectName: 'projectous',
+      projectName: 'P',
+      navLinks: [{ name: 'Task Cloud', path: '/tasks' }, { name: 'Kanban', path: '/kanban' }, { name: 'clients', path: '/clients' }, { name: 'users', path: '/users' }],
       navLinks: [
         {
           name: 'Task Cloud',
@@ -69,27 +63,15 @@ export default Vue.extend({
         }
       ],
       colors: {
-        // backgroundGradient: ['#03A1EC', '#003C7D', '#020D58'],
         backgroundColor: ['0', '0', '0'],
-        logo: {
-          background: '#2C63A4',
-          name: '#FFFFFF'
-        }
+        logo: { name: '#FFFFFF' }
       },
-      icons: [
-        {
-          name: 'tasks',
-          icon: 'icon-library_books'
-        },
-        {
-          name: 'chat',
-          icon: 'icon-chat'
-        },
-        {
-          name: 'timers',
-          icon: 'icon-timer'
-        }
-      ]
+      icons: [{ name: 'tasks', icon: 'icon-library_books' }, { name: 'chat', icon: 'icon-chat' }, { name: 'timers', icon: 'icon-timer' }],
+      toggles: {
+        tasks: true,
+        chat: false,
+        timers: true
+      }
     }
   },
   computed: {
@@ -103,6 +85,7 @@ export default Vue.extend({
       alert('no function yet')
     },
     async toggle(iconName) {
+      this.toggles[iconName] = !this.toggles[iconName]
       await EventBus.$emit(`toggle_${iconName}`)
     }
   },
@@ -115,26 +98,26 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+/* .header { */
+/* display: flex; */
+/* flex-direction: column; */
+/* height: 147px; */
+
+/* } */
 .header {
-  display: flex;
-  flex-direction: column;
-  height: 147px;
-  border-bottom: 2px solid #3884a5;
-}
-.header-top {
   width: 100%;
-  height: 90px;
+  height: 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-right: 30px;
+  border-bottom: 2px solid white;
+  background-color: #616161;
 }
-.logo {
-  width: 330px;
-  height: 100%;
+.header-nav {
   display: flex;
   align-items: center;
-  padding-left: 30px;
+  padding-left: 20px;
 }
 .logo-name {
   font-weight: bold;
@@ -146,10 +129,11 @@ export default Vue.extend({
   cursor: pointer;
 }
 .profile-icon {
-  width: 48px;
-  height: 48px;
+  width: 35px;
+  height: 35px;
   background-color: gray;
   border-radius: 50%;
+  cursor: pointer;
 }
 .header-bottom {
   height: 100%;
@@ -158,12 +142,13 @@ export default Vue.extend({
   align-items: center;
 }
 .nav-buttons {
-  padding-left: 27px;
+  margin-left: 27px;
 }
 .nav-buttons__button {
-  font-size: 17px;
+  /* font-size: 17px; */
   margin-right: 20px;
-  color: black;
+  color: white;
+  font-weight: 500;
   text-decoration: none;
 }
 .nav-buttons__button:hover {
@@ -173,6 +158,10 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   padding-right: 30px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.nav-icons-active {
+  color: white;
 }
 .nav-icon {
   display: flex;
@@ -181,6 +170,7 @@ export default Vue.extend({
   align-items: center;
   padding-left: 15px;
 }
+
 .nav-icon:hover {
   cursor: pointer;
 }
