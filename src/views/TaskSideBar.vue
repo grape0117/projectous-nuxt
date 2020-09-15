@@ -2,14 +2,14 @@
   <div class="task-side-bar">
     <div class="message-sidebar">
       <b-list-group>
-        <b-list-group-item :class="[task.id == active_task.id ? 'active' : '']" v-for="(task, index) in tasks" :key="index" @click="onSelectTask(task)">
+        <task-sidebar-item v-for="(task, index) in tasks" :key="index" :task="task" />
+        <!-- <b-list-group-item :class="[task.id == active_task.id ? 'active' : '']" v-for="(task, index) in tasks" :key="index" @click="onSelectTask(task)">
           <div class="">
             <span class="ml-2">{{ messageTime(task.last_task_message_created_at) }}</span>
             <div class="d-flex align-items-center">
               <div class="message-avatar">
                 <i class="icon-person icon-class"></i>
               </div>
-              <!-- <b-avatar class="mr-2 project-avatar"></b-avatar> -->
               <div>
                 <span class="task-sidebar-title">{{ task.title }}</span>
               </div>
@@ -20,12 +20,12 @@
             <div class="task-sidebar-last-message">
               <span class="">{{ getLastMessage(task) }}</span>
             </div>
-            <div v-if="active_task.id" class="task-sidebar-message-detail">
+            <div class="task-sidebar-message-detail">
               <b-button variant="dark" @click="onBack()" style="margin-bottom: 10px;"> <- Back</b-button>
-              <task-message v-bind:task_id="active_task.id"> </task-message>
+              <task-message v-bind:task_id="task.id"> </task-message>
             </div>
           </div>
-        </b-list-group-item>
+        </b-list-group-item> -->
       </b-list-group>
     </div>
   </div>
@@ -89,7 +89,8 @@ export default {
   },
   watch: {},
   components: {
-    'task-message': () => import('./TaskMessage.vue')
+    'task-message': () => import('./TaskMessage.vue'),
+    'task-sidebar-item': () => import('./TaskSideBarItem.vue')
   }
 }
 </script>
@@ -104,8 +105,10 @@ export default {
 .task-side-bar .icon-class {
   font-size: 25px;
 }
-.task-side-bar .list-group-item {
+.message-panel .list-group .list-group-item {
   /* display: flex; */
+  background-color: #616161;
+  width: 87%;
   /* border: 5px solid red; */
 }
 .task-sidebar-last-message {
