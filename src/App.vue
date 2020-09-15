@@ -14,7 +14,7 @@
     <edit-timer-modal id="edit-timer-modal" />
     <edit-project-modal id="edit-project-modal" />
 
-    <div id="update-data-button" @click="storeDataInIndexedDb" />
+    <!-- <div id="update-data-button" @click="storeDataInIndexedDb" /> -->
 
     <!-- <b-nav vertical>
         <b-navbar-brand to="/">Projectous</b-navbar-brand>

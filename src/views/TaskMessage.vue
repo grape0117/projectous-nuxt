@@ -1,19 +1,7 @@
-<style scoped>
-.message-panel {
-  width: 100%;
-}
-
-.msg-content {
-  padding: 8px 12px;
-  border: solid 1px grey;
-  border-radius: 8px;
-  margin-top: 5px;
-}
-</style>
 <template>
   <div class="message-panel">
     <b-list-group style="max-height:500px; overflow-y: auto;">
-      <b-list-group-item v-for="message in getMessages">
+      <b-list-group-item v-for="(message, index) in getMessages" :key="index">
         <div class="msg-header">
           <span>{{ getUserNameWithCompanyUserId(message.company_user_id) }}</span> /
           <span>{{ formatTime(message.timestamp) }}</span>
@@ -137,3 +125,16 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.message-panel {
+  width: 100%;
+}
+
+.msg-content {
+  padding: 8px 12px;
+  border: solid 1px grey;
+  border-radius: 8px;
+  margin-top: 5px;
+}
+</style>

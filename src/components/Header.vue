@@ -24,11 +24,12 @@
       <div class="nav-icons">
         <i class="nav-icon icon-arrow_forward_ios nav-icons-active"></i>
         <div class="nav-icon" :class="toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index" @click="toggle(icon.name)">
-          <i class="nav-icon__icon" :class="icon.icon"></i>
-          <span class="nav-icon__name">
+          <i class="nav-icon__icon" :class="icon.icon" :style="icon.name == 'reload' ? 'color: white;' : ''"></i>
+          <span class="nav-icon__name" :style="icon.name == 'reload' ? 'color: white;' : ''">
             {{ icon.name | toUpperCase }}
           </span>
         </div>
+        <!-- <i class="icon-cached header-icon-refresh" ></i> -->
       </div>
       <div class="profile-icon border"></div>
     </div>
@@ -38,6 +39,7 @@
 <script>
 import Vue from 'vue'
 import { EventBus } from '@/components/event-bus'
+import { idbKeyval } from '@/plugins/idb.ts'
 
 export default Vue.extend({
   data() {
@@ -48,7 +50,7 @@ export default Vue.extend({
         backgroundColor: ['0', '0', '0'],
         logo: { name: '#FFFFFF' }
       },
-      icons: [{ name: 'tasks', icon: 'icon-library_books' }, { name: 'chat', icon: 'icon-chat' }, { name: 'timers', icon: 'icon-timer' }],
+      icons: [{ name: 'tasks', icon: 'icon-library_books' }, { name: 'chat', icon: 'icon-chat' }, { name: 'timers', icon: 'icon-timer' }, { name: 'reload', icon: 'icon-cached' }],
       toggles: {
         tasks: true,
         chat: false,
@@ -62,13 +64,50 @@ export default Vue.extend({
       return `${rgb[0]}, ${rgb[0]}, ${rgb[0]}`
     }
   },
+  mounted() {
+    // window.$_app = this
+  },
   methods: {
     navClick() {
       alert('no function yet')
     },
     async toggle(iconName) {
+      if (iconName === 'reload') {
+        return await this.storeDataInIndexedDb()
+      }
       this.toggles[iconName] = !this.toggles[iconName]
       await EventBus.$emit(`toggle_${iconName}`)
+    },
+    async getAppDataFromApi() {
+      try {
+        return await this.$http().get('/test-tasks')
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    async storeDataInIndexedDb() {
+      const appData = await this.getAppDataFromApi()
+      console.log('appData', appData)
+      for (let key in appData) {
+        if (Array.isArray(appData[key])) {
+          appData[key].forEach(async entity => {
+            try {
+              if (key === 'lists') {
+                key = 'user_task_lists' //TODO: fix name
+              }
+              await idbKeyval.set(entity.id, entity, key)
+            } catch (e) {
+              console.error('---------------------')
+              console.error(e)
+              console.error(entity)
+              console.error('---------------------')
+            }
+          })
+        } else {
+          await idbKeyval.set(key, appData[key], 'properties')
+        }
+      }
+      return appData
     }
   },
   filters: {

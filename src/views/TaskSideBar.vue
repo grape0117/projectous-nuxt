@@ -1,24 +1,32 @@
 <template>
-  <div class="task-side-bar" style="padding: 20px;">
-    <div class="message-sidebar" v-if="!active_task.id">
+  <div class="task-side-bar">
+    <div class="message-sidebar">
       <b-list-group>
-        <b-list-group-item v-for="(task, index) in tasks" :key="index" :class="[task.id == active_task.id ? 'active' : '']" @click="onSelectTask(task)">
-          <b-avatar class="mr-2 project-avatar"></b-avatar>
-          <div class="message-item">
-            <div class="message-item-header">
-              <label class="task-title mr-auto">{{ task.title }}</label>
-              <span class="task-time">{{ messageTime(task.last_task_message_created_at) }}</span>
+        <b-list-group-item :class="[task.id == active_task.id ? 'active' : '']" v-for="(task, index) in tasks" :key="index" @click="onSelectTask(task)">
+          <div class="">
+            <span class="ml-2">{{ messageTime(task.last_task_message_created_at) }}</span>
+            <div class="d-flex align-items-center">
+              <div class="message-avatar">
+                <i class="icon-person icon-class"></i>
+              </div>
+              <!-- <b-avatar class="mr-2 project-avatar"></b-avatar> -->
+              <div>
+                <span class="task-sidebar-title">{{ task.title }}</span>
+              </div>
             </div>
-            <div class="message-item-content">
-              <label for="">{{ getLastMessage(task) }}</label>
+          </div>
+
+          <div class="task-sidebar-last-message-wrapper">
+            <div class="task-sidebar-last-message">
+              <span class="">{{ getLastMessage(task) }}</span>
+            </div>
+            <div v-if="active_task.id" class="task-sidebar-message-detail">
+              <b-button variant="dark" @click="onBack()" style="margin-bottom: 10px;"> <- Back</b-button>
+              <task-message v-bind:task_id="active_task.id"> </task-message>
             </div>
           </div>
         </b-list-group-item>
       </b-list-group>
-    </div>
-    <div v-else class="message-detail">
-      <b-button variant="dark" @click="onBack()" style="margin-bottom: 10px;"> <- Back</b-button>
-      <task-message v-bind:task_id="active_task.id"> </task-message>
     </div>
   </div>
 </template>
@@ -26,7 +34,7 @@
 <script>
 import uuid from 'uuid'
 import moment from 'moment'
-import TaskMessage from './TaskMessage.vue'
+// import TaskMessage from './TaskMessage.vue'
 import { chain, groupBy } from 'lodash'
 
 export default {
@@ -81,10 +89,35 @@ export default {
   },
   watch: {},
   components: {
-    'task-message': TaskMessage
+    'task-message': () => import('./TaskMessage.vue')
   }
 }
 </script>
+<style>
+.message-avatar {
+  /* width: 50px;
+    height: 50px; */
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+}
+.task-side-bar .icon-class {
+  font-size: 25px;
+}
+.task-side-bar .list-group-item {
+  /* display: flex; */
+  /* border: 5px solid red; */
+}
+.task-sidebar-last-message {
+  margin-top: 5px;
+  font-size: 15px;
+  padding-left: 10px !important;
+}
+.task-sidebar-last-message-wrapper {
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+</style>
+
 <style scoped>
 :root {
   --h: 1.4rem;
@@ -94,7 +127,11 @@ html {
   line-height: var(--1h);
 }
 .task-side-bar {
+  padding: 20px;
+  color: white;
   background-color: #616161;
+  height: calc(100vh - 50px);
+  overflow-y: scroll;
 }
 .message-sidebar {
   width: 300px;
@@ -102,13 +139,26 @@ html {
 .message-panel {
   width: 298px;
 }
+.list-group {
+  background-color: rgba(0, 0, 0, 0);
+}
 .list-group-item {
-  padding-right: 5px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(0, 0, 0, 0);
+  background-color: #818181;
+  padding: 10px !important;
 }
-
-.project-avatar {
-  vertical-align: top;
+.task-sidebar-title {
+  font-size: 17px;
+  font-weight: bold;
 }
+/* .task-side-bar .message-sidebar .list-group {
+  border: 5px solid red;
+} */
+/* .project-avatar {
+  vertical-align: top; */
+/* } */
 
 .message-sidebar .task-title {
   font-size: 14px;
@@ -131,15 +181,6 @@ html {
 
 .list-group-item {
   cursor: pointer;
-}
-
-.message-item-content label {
-  padding-right: 10px;
-  --max-lines: 2;
-  position: relative;
-  max-height: 48px;
-  overflow: hidden;
-  cursor: inherit;
 }
 
 /* .message-item-content label:before {

@@ -1,31 +1,30 @@
 <template id="timer-row-template">
-  <li v-if="isCurrentUser()" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at">
-    <div class="hover-tab project-details" @click="editTimer()">
-      <p class="title-project-client-name">{{ client_name() }}</p>
-      <p v-if="project.id" class="title-project-project-name">{{ project.name }}</p>
-      <p v-else="" class="title-project-project-name" style="color: red;">{{ project.name }}</p>
+  <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
+  <li v-if="isCurrentUser()" class="sidebar-timer" :class="{ 'sidebar-timer-client-no-project': !project.id }" v-bind:data-restarted="timer.restart_at">
+    <div>
+      <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
+    </div>
+    <div class="status-icon-with-timer">
+      <div v-if="isCurrentUser()" class="status-icons">
+        <i class="icon-pause icon-class" v-if="timer.status === 'running'" v-on:click="pauseTimer"></i>
+        <i class="icon-stop icon-class" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
+        <i class="icon-play_arrow icon-class" v-else @click="restartTimer"></i>
+      </div>
+      <div class="sidebar-timer-timer">
+        <span :style="timer.status === 'running' ? 'font-weight: bold;' : ''">{{ durationDisplay() }}</span>
+      </div>
+    </div>
+    <div class="project-details sidebar-timer-client-info" @click="editTimer()">
+      <p v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</p>
+      <p v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</p>
       <!-- <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>-->
     </div>
-    <div v-if="isCurrentUser()">
-      <b-button v-if="timer.status === 'running'" v-on:click="pauseTimer" class="btn btn-default" style="float: left; margin-right: 5px;margin-top:2px;">
-        <b-icon icon="pause"></b-icon>
-      </b-button>
-      <button v-if="timer.status === 'running'" v-on:click="stopTimer" class="btn btn-default" style="float: left; margin-right: 5px;margin-top:2px;">
-        <b-icon icon="stop"></b-icon>
-      </button>
-      <b-button variant="outline-secondary" v-else v-on:click="restartTimer" style="float: left;  margin-right: 5px;margin-top:5px;">
-        <b-icon icon="play-fill"></b-icon>
-      </b-button>
-    </div>
-    <div style="font-size: 19px; margin-top: 5px; margin-right: -1px; text-align: left;">
-      {{ durationDisplay() }}
-    </div>
-    <div style="float: left; clear: right;">{{ reportAt() }}</div>
-    <div v-if="timer.notes">
-      <div placeholder="Notes..." v-bind:class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
+    <div class="sidebar-timer-report-at" style="float: left; clear: right;">{{ reportAt() }}</div>
+    <div class="sidebar-timer-notes" v-if="timer.notes">
+      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
     </div>
     <div v-else>
-      <div placeholder="Notes..." v-bind:class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: pink"></div>
+      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: pink;"></div>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
     <small>{{ timer.id }}</small>
@@ -221,3 +220,77 @@ export default {
   }
 }
 </script>
+
+<style>
+.sidebar-timer {
+  padding: 5px 15px;
+  padding-top: 15px;
+  color: white;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: #818181;
+}
+/* title-project-project-name */
+.sidebar-timer-client-info {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.sidebar-timer-client-name {
+  font-size: 12px;
+  font-weight: bold;
+}
+.sidebar-timer-client-project {
+  border-left: 2px solid white;
+  padding-left: 5px;
+  margin-bottom: 0 !important;
+  font-size: 15px;
+}
+.sidebar-timer-client-no-project {
+  border: 2px solid red;
+}
+.sidebar-timer-client-no-project-title {
+  font-weight: bold;
+  padding-left: 2px;
+  font-size: 20px;
+  margin-bottom: 0 !important;
+}
+.sidebar-timer-client-no-project-title:hover {
+  background-color: red;
+}
+.sidebar-timer-report-at {
+  font-weight: bold;
+  font-size: 12px;
+}
+.sidebar-timer-notes > .timer-task {
+  background-color: rgba(0, 0, 0, 0) !important;
+}
+.sidebar-timer-timer {
+  font-size: 20px;
+}
+.status-icon-with-timer {
+  display: flex;
+  align-items: center;
+}
+.sidebar-timer-timer-task {
+  /* border-radius: 5px; */
+  padding: 5px 5px;
+  font-size: 17px;
+  font-weight: 600;
+  /* color: black; */
+}
+</style>
+<style scoped>
+.status-icons {
+  display: flex;
+  margin-right: 5px;
+}
+.icon-class {
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  /* border: 1px solid red; */
+}
+li {
+  list-style: none;
+}
+</style>
