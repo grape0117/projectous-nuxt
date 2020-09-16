@@ -1,17 +1,19 @@
 <template id="timer-row-template">
   <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
   <li v-if="isCurrentUser()" class="sidebar-timer" :class="{ 'sidebar-timer-client-no-project': !project.id }" v-bind:data-restarted="timer.restart_at">
-    <div>
-      <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
-    </div>
-    <div class="status-icon-with-timer">
-      <div v-if="isCurrentUser()" class="status-icons">
-        <i class="icon-pause icon-class" v-if="timer.status === 'running'" v-on:click="pauseTimer"></i>
-        <i class="icon-stop icon-class" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
-        <i class="icon-play_arrow icon-class" v-else @click="restartTimer"></i>
+    <div class="d-flex align-items-center justify-content-between">
+      <div v-if="client_name()">
+        <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
       </div>
-      <div class="sidebar-timer-timer">
-        <span :style="timer.status === 'running' ? 'font-weight: bold;' : ''">{{ durationDisplay() }}</span>
+      <div class="status-icon-with-timer">
+        <div v-if="isCurrentUser()" class="status-icons">
+          <i class="icon-pause icon-class" v-if="timer.status === 'running'" v-on:click="pauseTimer"></i>
+          <i class="icon-stop icon-class" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
+          <i class="icon-play_arrow icon-class" v-else @click="restartTimer"></i>
+        </div>
+        <div class="sidebar-timer-timer">
+          <span :style="timer.status === 'running' ? 'font-weight: bold;' : ''">{{ durationDisplay() }}</span>
+        </div>
       </div>
     </div>
     <div class="project-details sidebar-timer-client-info" @click="editTimer()">
@@ -19,15 +21,17 @@
       <p v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</p>
       <!-- <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>-->
     </div>
-    <div class="sidebar-timer-report-at" style="float: left; clear: right;">{{ reportAt() }}</div>
     <div class="sidebar-timer-notes" v-if="timer.notes">
       <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
     </div>
     <div v-else>
-      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: pink;"></div>
+      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: rgba(0,0,0, 0.2);"></div>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
-    <small>{{ timer.id }}</small>
+    <div class="sidebar-timer-timer-details">
+      <div class="sidebar-timer-report-at">{{ reportAt() }}</div>
+      <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
+    </div>
   </li>
 </template>
 
@@ -226,36 +230,31 @@ export default {
   padding: 5px 15px;
   padding-top: 15px;
   color: white;
-  margin-bottom: 10px;
+  margin-bottom: 7px;
   border-radius: 5px;
   background-color: #818181;
 }
 /* title-project-project-name */
 .sidebar-timer-client-info {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 .sidebar-timer-client-name {
   font-size: 12px;
   font-weight: bold;
 }
 .sidebar-timer-client-project {
-  border-left: 2px solid white;
-  padding-left: 5px;
+  /* border-left: 2px solid white; */
+  /* padding-left: 5px; */
   margin-bottom: 0 !important;
   font-size: 15px;
-}
-.sidebar-timer-client-no-project {
-  border: 2px solid red;
 }
 .sidebar-timer-client-no-project-title {
   font-weight: bold;
   padding-left: 2px;
-  font-size: 20px;
+  font-size: 17px;
   margin-bottom: 0 !important;
-}
-.sidebar-timer-client-no-project-title:hover {
-  background-color: red;
+  color: red;
 }
 .sidebar-timer-report-at {
   font-weight: bold;
@@ -272,11 +271,8 @@ export default {
   align-items: center;
 }
 .sidebar-timer-timer-task {
-  /* border-radius: 5px; */
-  padding: 5px 5px;
-  font-size: 17px;
+  padding: 0 5px;
   font-weight: 600;
-  /* color: black; */
 }
 </style>
 <style scoped>
@@ -292,5 +288,14 @@ export default {
 }
 li {
   list-style: none;
+}
+.sidebar-timer-timer-id {
+  font-size: 12px;
+}
+.sidebar-timer-timer-details {
+  margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

@@ -381,11 +381,11 @@ export default class Dragzone extends Vue {
 }
 .dragzone__item-block-content {
   /*display: flex;*/
-  padding: 10px 0;
+  padding: 2px 0;
   align-items: center;
   clear: both;
   color: white;
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 5px;
 }
