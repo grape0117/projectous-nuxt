@@ -141,7 +141,8 @@ export default class Draggable extends Vue {
   width: 100%;
 }
 .list__group {
-  max-width: 200px;
+  /* max-width: 200px; */
+  max-width: 280px;
   height: calc(100vh - 105px);
   overflow-y: scroll;
   width: 100%;

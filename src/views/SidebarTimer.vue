@@ -228,7 +228,6 @@ export default {
 <style>
 .sidebar-timer {
   padding: 5px 15px;
-  padding-top: 15px;
   color: white;
   margin-bottom: 7px;
   border-radius: 5px;

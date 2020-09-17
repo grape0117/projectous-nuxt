@@ -24,11 +24,11 @@
           <h4 class="kanban-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
-        <div class="right-fixed">
+        <!-- <div class="right-fixed">
           <task-tray v-show="showTask" />
           <task-side-bar v-show="showChat" />
           <timer-tab v-show="showTimer" />
-        </div>
+        </div> -->
       </b-row>
     </b-container>
     <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
@@ -285,17 +285,17 @@ export default class Custom extends Vue {
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
 
-  created() {
-    EventBus.$on('toggle_tasks', () => {
-      this.showTask = !this.showTask
-    })
-    EventBus.$on('toggle_timers', () => {
-      this.showTimer = !this.showTimer
-    })
-    EventBus.$on('toggle_chat', () => {
-      this.showChat = !this.showChat
-    })
-  }
+  // created() {
+  //   EventBus.$on('toggle_tasks', () => {
+  //     this.showTask = !this.showTask
+  //   })
+  //   EventBus.$on('toggle_timers', () => {
+  //     this.showTimer = !this.showTimer
+  //   })
+  //   EventBus.$on('toggle_chat', () => {
+  //     this.showChat = !this.showChat
+  //   })
+  // }
 }
 </script>
 <style>
@@ -356,8 +356,5 @@ export default class Custom extends Vue {
   width: 100%;
   height: 100%;
   color: white;
-}
-.right-fixed {
-  display: flex;
 }
 </style>

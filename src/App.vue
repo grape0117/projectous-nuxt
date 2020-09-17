@@ -1,9 +1,16 @@
 <template>
-  <div id="app" style="position: relative">
+  <div id="app" style="position: relative" class="app-class">
     <main style="flex-grow: 1">
       <div class="row-no-padding">
         <Header />
-        <router-view />
+        <div class="d-flex justify-content-between">
+          <router-view class="router-view-class" />
+          <div class="d-flex">
+            <task-tray v-show="showTask" />
+            <task-side-bar v-show="showChat" />
+            <timer-tab v-show="showTimer" />
+          </div>
+        </div>
       </div>
     </main>
 
@@ -33,7 +40,9 @@ import '@/assets/icons/fontello/css/fontello.css'
 
 import Header from '@/components/Header.vue'
 
-import TimerTab from './views/TimerTab'
+import TaskTray from './views/TaskTray.vue'
+import TimerTab from './views/TimerTab.vue'
+import TaskSideBar from './views/TaskSideBar.vue'
 import EditClientModal from './views/EditClientModal.vue'
 import EditUserModal from './views/EditUserModal'
 import InviteUserModal from './views/InviteUserModal'
@@ -44,7 +53,6 @@ import { createListsByDays, createUserLists, getCookie } from '@/utils/util-func
 import Vue from 'vue'
 import { idbKeyval, idbGetAll } from '@/plugins/idb.ts'
 import { modulesNames, modulesNamesList } from './store/modules-names'
-import TaskTray from './views/TaskTray'
 import uuid from 'uuid'
 import AllTaskFilipTemplate from './views/AllTaskFilipTemplate'
 import { EventBus } from '@/components/event-bus'
@@ -55,6 +63,7 @@ export default {
     AllTaskFilipTemplate,
     TimerTab,
     TaskTray,
+    TaskSideBar,
     EditClientModal,
     EditUserModal,
     InviteUserModal,
@@ -65,6 +74,7 @@ export default {
   data() {
     return {
       showTask: true,
+      showChat: false,
       showTimer: true
     }
   },
@@ -134,6 +144,17 @@ export default {
       await this.getAppData()
       setInterval(this.getNewData, 3000)
     }
+  },
+  created() {
+    EventBus.$on('toggle_tasks', () => {
+      this.showTask = !this.showTask
+    })
+    EventBus.$on('toggle_timers', () => {
+      this.showTimer = !this.showTimer
+    })
+    EventBus.$on('toggle_chat', () => {
+      this.showChat = !this.showChat
+    })
   },
   methods: {
     getNewData() {
@@ -242,5 +263,11 @@ export default {
   height: 30px;
   cursor: pointer;
   background: url('assets/icons/refresh-icon.svg');
+}
+.right-fixed {
+  display: flex;
+}
+.router-view-class {
+  flex: 1;
 }
 </style>

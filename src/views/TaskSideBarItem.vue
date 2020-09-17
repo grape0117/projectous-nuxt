@@ -1,7 +1,7 @@
 <template>
   <b-list-group-item>
     <div class="">
-      <span class="ml-2">{{ messageTime(task.last_task_message_created_at) }}</span>
+      <span class="ml-2 task-sidebar-date">{{ messageTime(task.last_task_message_created_at) }}</span>
       <div class="d-flex align-items-center">
         <div class="message-avatar">
           <i class="icon-person icon-class"></i>
@@ -71,5 +71,9 @@ export default {
 <style>
 .task-sidebar-message-detail {
   margin-top: 10px;
+}
+.task-sidebar-date {
+  font-size: 13px;
+  font-weight: bold;
 }
 </style>

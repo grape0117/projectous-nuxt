@@ -1,32 +1,12 @@
 <template>
   <div class="task-side-bar">
     <div class="message-sidebar">
-      <b-list-group>
+      <b-list-group v-if="tasks.length > 0">
         <task-sidebar-item v-for="(task, index) in tasks" :key="index" :task="task" />
-        <!-- <b-list-group-item :class="[task.id == active_task.id ? 'active' : '']" v-for="(task, index) in tasks" :key="index" @click="onSelectTask(task)">
-          <div class="">
-            <span class="ml-2">{{ messageTime(task.last_task_message_created_at) }}</span>
-            <div class="d-flex align-items-center">
-              <div class="message-avatar">
-                <i class="icon-person icon-class"></i>
-              </div>
-              <div>
-                <span class="task-sidebar-title">{{ task.title }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="task-sidebar-last-message-wrapper">
-            <div class="task-sidebar-last-message">
-              <span class="">{{ getLastMessage(task) }}</span>
-            </div>
-            <div class="task-sidebar-message-detail">
-              <b-button variant="dark" @click="onBack()" style="margin-bottom: 10px;"> <- Back</b-button>
-              <task-message v-bind:task_id="task.id"> </task-message>
-            </div>
-          </div>
-        </b-list-group-item> -->
       </b-list-group>
+      <div v-else class="d-flex justify-content-center">
+        <span class="task-side-bar-no-messages">No messages yet.</span>
+      </div>
     </div>
   </div>
 </template>
@@ -185,20 +165,9 @@ html {
 .list-group-item {
   cursor: pointer;
 }
-
-/* .message-item-content label:before {
-    content: '...';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-  }
-
-  .message-item-content label:after {
-    content: '';
-    position: absolute;
-    right: 0;
-    width: 1rem;
-    height: 1rem;
-    background: white;
-  } */
+.task-side-bar-no-messages {
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
 </style>
