@@ -301,6 +301,7 @@ export default class Custom extends Vue {
 <style>
 .kanban-page {
   /* background-color: rgba(0, 0, 0, 0.3); */
+  overflow-y: initial;
 }
 .kanban-draggable {
   width: 100px;
