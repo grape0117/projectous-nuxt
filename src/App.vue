@@ -40,9 +40,6 @@ import '@/assets/icons/fontello/css/fontello.css'
 
 import Header from '@/components/Header.vue'
 
-import TaskTray from './views/TaskTray.vue'
-import TimerTab from './views/TimerTab.vue'
-import TaskSideBar from './views/TaskSideBar.vue'
 import EditClientModal from './views/EditClientModal.vue'
 import EditUserModal from './views/EditUserModal'
 import InviteUserModal from './views/InviteUserModal'
@@ -61,9 +58,9 @@ export default {
   components: {
     Header,
     AllTaskFilipTemplate,
-    TimerTab,
-    TaskTray,
-    TaskSideBar,
+    TimerTab: () => import('./views/TimerTab.vue'),
+    TaskTray: () => import('./views/TaskTray.vue'),
+    TaskSideBar: () => import('./views/TaskSideBar.vue'),
     EditClientModal,
     EditUserModal,
     InviteUserModal,
@@ -73,9 +70,9 @@ export default {
   },
   data() {
     return {
-      showTask: true,
+      showTask: false,
       showChat: false,
-      showTimer: true
+      showTimer: false
     }
   },
   computed: {
@@ -146,14 +143,33 @@ export default {
     }
   },
   created() {
+    if (getCookie('tasks') === 'true') {
+      this.showTask = true
+    } else {
+      this.showTask = false
+    }
+    if (getCookie('chat') === 'true') {
+      this.showChat = true
+    } else {
+      this.showChat = false
+    }
+    if (getCookie('timers') === 'true') {
+      this.showTimer = true
+    } else {
+      this.showTimer = false
+    }
+
     EventBus.$on('toggle_tasks', () => {
       this.showTask = !this.showTask
+      document.cookie = `tasks=${this.showTask}`
     })
     EventBus.$on('toggle_timers', () => {
       this.showTimer = !this.showTimer
+      document.cookie = `timers=${this.showTimer}`
     })
     EventBus.$on('toggle_chat', () => {
       this.showChat = !this.showChat
+      document.cookie = `chat=${this.showChat}`
     })
   },
   methods: {
@@ -254,6 +270,8 @@ export default {
 <style lang="scss">
 #app {
   display: flex;
+  // background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba($color: orange, $alpha: 0.6);
 }
 #update-data-button {
   position: absolute;
@@ -268,6 +286,8 @@ export default {
   display: flex;
 }
 .router-view-class {
+  height: calc(100vh - 50px);
+  overflow-y: scroll;
   flex: 1;
 }
 </style>

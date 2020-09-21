@@ -282,7 +282,8 @@ export default class Custom extends Vue {
   width: 300px;
   height: calc(100vh - 50px);
   overflow-y: scroll;
-  background-color: #616161;
+  // background-color: #616161;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 .task-tray-draggable {
   width: 87%;

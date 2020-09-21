@@ -87,7 +87,8 @@ export default {
 }
 .message-panel .list-group .list-group-item {
   /* display: flex; */
-  background-color: #616161;
+  /* background-color: #616161; */
+  background-color: rgba(0, 0, 0, 0.5);
   width: 87%;
   /* border: 5px solid red; */
 }
@@ -112,7 +113,8 @@ html {
 .task-side-bar {
   padding: 20px;
   color: white;
-  background-color: #616161;
+  /* background-color: #616161; */
+  background-color: rgba(0, 0, 0, 0.5);
   height: calc(100vh - 50px);
   overflow-y: scroll;
 }
@@ -129,7 +131,8 @@ html {
   border-radius: 10px;
   margin-bottom: 10px;
   border: 1px solid rgba(0, 0, 0, 0);
-  background-color: #818181;
+  /* background-color: #818181; */
+  background-color: rgba(0, 0, 0, 0.2);
   padding: 10px !important;
 }
 .task-sidebar-title {

@@ -40,6 +40,7 @@
 import Vue from 'vue'
 import { EventBus } from '@/components/event-bus'
 import { idbKeyval } from '@/plugins/idb.ts'
+import { getCookie } from '@/utils/util-functions'
 
 export default Vue.extend({
   data() {
@@ -52,9 +53,9 @@ export default Vue.extend({
       },
       icons: [{ name: 'tasks', icon: 'icon-library_books' }, { name: 'chat', icon: 'icon-chat' }, { name: 'timers', icon: 'icon-timer' }, { name: 'reload', icon: 'icon-cached' }],
       toggles: {
-        tasks: true,
+        tasks: false,
         chat: false,
-        timers: true
+        timers: false
       }
     }
   },
@@ -110,6 +111,23 @@ export default Vue.extend({
       return appData
     }
   },
+  created() {
+    if (getCookie('tasks') === 'true') {
+      this.toggles.tasks = true
+    } else {
+      this.toggles.tasks = false
+    }
+    if (getCookie('chat') === 'true') {
+      this.toggles.chat = true
+    } else {
+      this.toggles.chat = false
+    }
+    if (getCookie('timers') === 'true') {
+      this.toggles.timers = true
+    } else {
+      this.toggles.timers = false
+    }
+  },
   filters: {
     toUpperCase(val) {
       return val.toUpperCase()
@@ -133,7 +151,8 @@ export default Vue.extend({
   align-items: center;
   padding-right: 30px;
   border-bottom: 2px solid white;
-  background-color: #616161;
+  /* background-color: #616161; */
+  background-color: rgba(0, 0, 0, 0.4);
 }
 .header-nav {
   display: flex;

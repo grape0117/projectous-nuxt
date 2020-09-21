@@ -300,7 +300,7 @@ export default class Custom extends Vue {
 </script>
 <style>
 .kanban-page {
-  background-color: #7d7d7d;
+  /* background-color: rgba(0, 0, 0, 0.3); */
 }
 .kanban-draggable {
   width: 100px;
@@ -318,9 +318,10 @@ export default class Custom extends Vue {
 .client-section {
   flex-grow: 0 !important;
   flex-basis: 260px !important;
-  margin-top: 20px;
+  padding-top: 10px;
   overflow-y: scroll;
-  height: calc(100vh - 70px) !important;
+  height: calc(100vh - 50px) !important;
+  background-color: rgba(0, 0, 0, 0.4);
 }
 .project-item-status {
 }

@@ -386,7 +386,7 @@ export default class Dragzone extends Vue {
   clear: both;
   color: white;
   /* margin-bottom: 5px; */
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 5px;
 }
 .dragzone__item-block-content-text {

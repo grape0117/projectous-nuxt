@@ -92,7 +92,8 @@ export default {
   width: 300px;
   height: calc(100vh - 50px);
   overflow-y: scroll;
-  background-color: #616161;
+  // background-color: #616161;
+  background-color: rgba(0, 0, 0, 0.5);
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
@@ -113,9 +114,10 @@ export default {
   padding: 8px 15px;
   margin-right: 5px;
   border-radius: 5px;
-  background-color: rgb(0, 0, 255);
+  // background-color: rgb(0, 0, 255);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 .makeBtn:hover {
-  background-color: rgba(0, 0, 255, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
 }
 </style>

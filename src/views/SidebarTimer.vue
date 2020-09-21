@@ -1,6 +1,6 @@
-<template id="timer-row-template">
+<template>
   <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
-  <li v-if="isCurrentUser()" class="sidebar-timer" :class="{ 'sidebar-timer-client-no-project': !project.id }" v-bind:data-restarted="timer.restart_at">
+  <li id="timer-row-template" v-if="isCurrentUser()" class="sidebar-timer" :class="{ 'sidebar-timer-client-no-project': !project.id }" v-bind:data-restarted="timer.restart_at">
     <div class="d-flex align-items-center justify-content-between">
       <div v-if="client_name()">
         <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
@@ -231,7 +231,8 @@ export default {
   color: white;
   margin-bottom: 7px;
   border-radius: 5px;
-  background-color: #818181;
+  /* background-color: #818181; */
+  background-color: rgba(0, 0, 0, 0.2);
 }
 /* title-project-project-name */
 .sidebar-timer-client-info {
