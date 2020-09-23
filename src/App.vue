@@ -1,5 +1,5 @@
 <template>
-  <div id="app" style="position: relative" class="app-class">
+  <div id="app" style="position: relative" class="app-class" :class="bgColor ? bgColor : 'paletteDefault'">
     <main style="flex-grow: 1">
       <div class="row-no-padding">
         <Header />
@@ -72,7 +72,8 @@ export default {
     return {
       showTask: false,
       showChat: false,
-      showTimer: false
+      showTimer: false,
+      bgColor: ''
     }
   },
   computed: {
@@ -83,6 +84,15 @@ export default {
       console.log('cureent edit projec')
       return this.$store.getters['settings/get_current_edit_project']
     }
+    // getBackground() {
+    //   if(this.bgColor) return this.bgColor
+
+    //   if(!getCookie('bg-color')) {
+    //     return false
+    //   } else {
+    //     return getCookie('bg-color')
+    //   }
+    // },
   },
   watch: {
     current_edit_task: function(value) {
@@ -170,6 +180,15 @@ export default {
     EventBus.$on('toggle_chat', () => {
       this.showChat = !this.showChat
       document.cookie = `chat=${this.showChat}`
+    })
+
+    if (getCookie('bg-color')) {
+      this.bgColor = getCookie('bg-color')
+    }
+    // background
+    EventBus.$on('changeBackground', color => {
+      this.bgColor = color
+      document.cookie = `bg-color=${color}`
     })
   },
   methods: {
@@ -271,7 +290,7 @@ export default {
 #app {
   display: flex;
   // background-color: rgba(0, 0, 0, 0.3);
-  background-color: rgba($color: orange, $alpha: 0.6);
+  // background-color: rgba($color: orange, $alpha: 0.6);
 }
 #update-data-button {
   position: absolute;
@@ -289,5 +308,31 @@ export default {
   height: calc(100vh - 50px);
   overflow-y: scroll;
   flex: 1;
+}
+
+// background-color options
+.paletteDefault {
+  background-color: rgba($color: orange, $alpha: 0.6);
+}
+.paletteRed {
+  background-color: rgba($color: red, $alpha: 0.6);
+}
+.paletteGreen {
+  background-color: rgba($color: green, $alpha: 0.6);
+}
+.paletteBlue {
+  background-color: rgba($color: blue, $alpha: 0.6);
+}
+.paletteOrange {
+  background-color: rgba($color: orange, $alpha: 0.6);
+}
+.palettePink {
+  background-color: rgba($color: pink, $alpha: 0.6);
+}
+.paletteViolet {
+  background-color: rgba($color: violet, $alpha: 0.6);
+}
+.paletteYellow {
+  background-color: rgba($color: yellow, $alpha: 0.6);
 }
 </style>

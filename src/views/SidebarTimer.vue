@@ -1,6 +1,6 @@
 <template>
   <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
-  <li id="timer-row-template" v-if="isCurrentUser()" class="sidebar-timer" :class="{ 'sidebar-timer-client-no-project': !project.id }" v-bind:data-restarted="timer.restart_at">
+  <li id="timer-row-template" v-if="isCurrentUser()" class="sidebar-timer" v-bind:data-restarted="timer.restart_at" :class="[{ 'sidebar-timer-client-no-project': !project.id }, { 'side-timer-timer-active': timer.status === 'running' }, { 'side-timer-less-work': hasLessWork }]">
     <div class="d-flex align-items-center justify-content-between">
       <div v-if="client_name()">
         <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
@@ -8,7 +8,7 @@
       <div class="status-icon-with-timer">
         <div v-if="isCurrentUser()" class="status-icons">
           <i class="icon-pause icon-class" v-if="timer.status === 'running'" v-on:click="pauseTimer"></i>
-          <i class="icon-stop icon-class" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
+          <i class="icon-stop icon-class" style="color: red;" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
           <i class="icon-play_arrow icon-class" v-else @click="restartTimer"></i>
         </div>
         <div class="sidebar-timer-timer">
@@ -82,7 +82,11 @@ export default {
         return task
       }
     },
-    client: function() {}
+    client: function() {},
+    hasLessWork() {
+      const thirtyMinutes = 30
+      return parseInt(this.durationMinutes()) < thirtyMinutes
+    }
   },
   mounted: function() {
     /**
@@ -225,16 +229,14 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .sidebar-timer {
   padding: 5px 15px;
   color: white;
   margin-bottom: 7px;
   border-radius: 5px;
-  /* background-color: #818181; */
   background-color: rgba(0, 0, 0, 0.2);
 }
-/* title-project-project-name */
 .sidebar-timer-client-info {
   margin-top: 5px;
   margin-bottom: 5px;
@@ -244,8 +246,6 @@ export default {
   font-weight: bold;
 }
 .sidebar-timer-client-project {
-  /* border-left: 2px solid white; */
-  /* padding-left: 5px; */
   margin-bottom: 0 !important;
   font-size: 15px;
 }
@@ -274,6 +274,12 @@ export default {
   padding: 0 5px;
   font-weight: 600;
 }
+.side-timer-timer-active {
+  box-shadow: 0px 0px 5px rgba($color: lightgreen, $alpha: 1) !important;
+}
+.side-timer-less-work {
+  box-shadow: 0px 0px 5px rgba($color: red, $alpha: 0.7);
+}
 </style>
 <style scoped>
 .status-icons {
@@ -284,7 +290,6 @@ export default {
   color: white;
   font-size: 20px;
   cursor: pointer;
-  /* border: 1px solid red; */
 }
 li {
   list-style: none;

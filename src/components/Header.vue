@@ -29,6 +29,15 @@
             {{ icon.name | toUpperCase }}
           </span>
         </div>
+        <div class="header-paint" v-if="toggles.paint">
+          <div class="d-flex justify-content-between">
+            <span style="font-weight: bold;">Theme</span>
+            <i class="icon-close" style="cursor: pointer;" @click="toggles.paint = false"></i>
+          </div>
+          <div class="header-paint-colors">
+            <span class="header-paint-color" :class="color" @click="setBackground(color)" v-for="(color, colorIndex) in paletteColors" :key="colorIndex"> </span>
+          </div>
+        </div>
         <!-- <i class="icon-cached header-icon-refresh" ></i> -->
       </div>
       <div class="profile-icon border"></div>
@@ -46,17 +55,30 @@ export default Vue.extend({
   data() {
     return {
       projectName: 'P',
-      navLinks: [{ name: 'Task Cloud', path: '/tasks' }, { name: 'Kanban', path: '/kanban' }, { name: 'clients', path: '/clients' }, { name: 'users', path: '/users' }],
+      navLinks: [
+        { name: 'Task Cloud', path: '/tasks' },
+        { name: 'Kanban', path: '/kanban' },
+        { name: 'clients', path: '/clients' },
+        { name: 'users', path: '/users' }
+      ],
       colors: {
         backgroundColor: ['0', '0', '0'],
         logo: { name: '#FFFFFF' }
       },
-      icons: [{ name: 'tasks', icon: 'icon-library_books' }, { name: 'chat', icon: 'icon-chat' }, { name: 'timers', icon: 'icon-timer' }, { name: 'reload', icon: 'icon-cached' }],
+      icons: [
+        { name: 'tasks', icon: 'icon-library_books' },
+        { name: 'chat', icon: 'icon-chat' },
+        { name: 'timers', icon: 'icon-timer' },
+        { name: 'paint', icon: 'icon-format_paint' },
+        { name: 'reload', icon: 'icon-cached' }
+      ],
       toggles: {
         tasks: false,
         chat: false,
-        timers: false
-      }
+        timers: false,
+        paint: false
+      },
+      paletteColors: ['paletteRed', 'paletteGreen', 'paletteBlue', 'paletteOrange', 'palettePink', 'paletteViolet', 'paletteYellow']
     }
   },
   computed: {
@@ -69,8 +91,8 @@ export default Vue.extend({
     // window.$_app = this
   },
   methods: {
-    navClick() {
-      alert('no function yet')
+    async setBackground(color) {
+      await EventBus.$emit('changeBackground', color)
     },
     async toggle(iconName) {
       if (iconName === 'reload') {
@@ -136,7 +158,7 @@ export default Vue.extend({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* .header { */
 /* display: flex; */
 /* flex-direction: column; */
@@ -199,6 +221,7 @@ export default Vue.extend({
   align-items: center;
   padding-right: 30px;
   color: rgba(255, 255, 255, 0.5);
+  position: relative;
 }
 .nav-icons-active {
   color: white;
@@ -221,4 +244,34 @@ export default Vue.extend({
   font-size: 10px;
   margin-top: -5px;
 }
+.header-paint {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  border-radius: 7px;
+  padding: 20px 25px;
+  width: 100%;
+  top: 50px;
+  z-index: 10;
+  color: #1d2228;
+  background-color: #f7f8ff;
+}
+
+.header-paint-colors {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  grid-row-gap: 10px;
+  grid-column-gap: 21px;
+}
+.header-paint-color {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  border-radius: 100px;
+  cursor: pointer;
+  /* background-color: black; */
+}
+
+/* paletteColors: ['red', 'green', 'blue', 'rgba($color: orange, $alpha: 0.6)', 'pink', 'violet', 'rgba(255, 165, 0, 0.6)' ] */
 </style>
