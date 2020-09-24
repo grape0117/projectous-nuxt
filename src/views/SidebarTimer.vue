@@ -1,26 +1,29 @@
 <template>
   <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
   <li id="timer-row-template" v-if="isCurrentUser()" class="sidebar-timer" v-bind:data-restarted="timer.restart_at" :class="[{ 'sidebar-timer-client-no-project': !project.id }, { 'side-timer-timer-active': timer.status === 'running' }, { 'side-timer-less-work': hasLessWork }]">
-    <div class="d-flex align-items-center justify-content-between">
-      <div v-if="client_name()">
-        <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
-      </div>
-      <div class="status-icon-with-timer">
-        <div v-if="isCurrentUser()" class="status-icons">
-          <i class="icon-pause icon-class" v-if="timer.status === 'running'" v-on:click="pauseTimer"></i>
-          <i class="icon-stop icon-class" style="color: red;" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
-          <i class="icon-play_arrow icon-class" v-else @click="restartTimer"></i>
-        </div>
-        <div class="sidebar-timer-timer">
-          <span :style="timer.status === 'running' ? 'font-weight: bold;' : ''">{{ durationDisplay() }}</span>
-        </div>
-      </div>
+    <div v-if="client_name()">
+      <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
-    <div class="project-details sidebar-timer-client-info" @click="editTimer()">
+
+    <div class="project-details" @click="editTimer()">
       <p v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</p>
       <p v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</p>
       <!-- <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>-->
     </div>
+
+    <div class="status-icon-with-timer">
+      <div v-if="isCurrentUser()" class="status-icons">
+        <i class="icon-pause icon-class" v-if="timer.status === 'running'" v-on:click="pauseTimer"></i>
+        <i class="icon-stop icon-class" style="color: red;" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
+        <i class="icon-play_arrow icon-class" v-else @click="restartTimer"></i>
+      </div>
+      <div class="sidebar-timer-timer">
+        <span :style="timer.status === 'running' ? 'font-weight: bold;' : ''">{{ durationDisplay() }}</span>
+      </div>
+    </div>
+
+    <div class="sidebar-timer-report-at">{{ reportAt() }}</div>
+
     <div class="sidebar-timer-notes" v-if="timer.notes">
       <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
     </div>
@@ -28,10 +31,8 @@
       <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: rgba(0,0,0, 0.2);"></div>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
-    <div class="sidebar-timer-timer-details">
-      <div class="sidebar-timer-report-at">{{ reportAt() }}</div>
-      <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
-    </div>
+
+    <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
   </li>
 </template>
 
@@ -237,10 +238,6 @@ export default {
   border-radius: 5px;
   background-color: rgba(0, 0, 0, 0.2);
 }
-.sidebar-timer-client-info {
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
 .sidebar-timer-client-name {
   font-size: 12px;
   font-weight: bold;
@@ -259,6 +256,8 @@ export default {
 .sidebar-timer-report-at {
   font-weight: bold;
   font-size: 12px;
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 .sidebar-timer-notes > .timer-task {
   background-color: rgba(0, 0, 0, 0) !important;
@@ -269,6 +268,7 @@ export default {
 .status-icon-with-timer {
   display: flex;
   align-items: center;
+  margin-left: -5px;
 }
 .sidebar-timer-timer-task {
   padding: 0 5px;
@@ -296,11 +296,5 @@ li {
 }
 .sidebar-timer-timer-id {
   font-size: 12px;
-}
-.sidebar-timer-timer-details {
-  margin-top: 5px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 </style>

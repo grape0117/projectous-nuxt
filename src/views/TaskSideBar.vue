@@ -89,7 +89,6 @@ export default {
   /* display: flex; */
   /* background-color: #616161; */
   background-color: rgba(0, 0, 0, 0.5);
-  width: 87%;
   /* border: 5px solid red; */
 }
 .task-sidebar-last-message {

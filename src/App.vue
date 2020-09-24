@@ -191,6 +191,13 @@ export default {
       document.cookie = `bg-color=${color}`
     })
   },
+  beforeDestroy() {
+    // to avoid memory leak
+    EventBus.$off('toggle_tasks')
+    EventBus.$off('toggle_timers')
+    EventBus.$off('toggle_chat')
+    EventBus.$off('changeBackground')
+  },
   methods: {
     getNewData() {
       this.$http()
