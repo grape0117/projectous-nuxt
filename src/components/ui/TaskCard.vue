@@ -1,47 +1,24 @@
-<style scoped>
-.task-img {
-  width: 40px;
-  display: inline-block;
-  vertical-align: top;
-}
-.task-detail {
-  display: inline-block;
-  width: calc(100% - 50px);
-}
-.task-title {
-  height: 40px;
-  /* max-height: 60px; */
-  text-overflow: ellipsis;
-  overflow-y: hidden;
-}
-
-.project-title {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-</style>
 <template>
   <div @click="$emit('showTask', task)" class="task-card" :style="'background-color: ' + backgroundColor">
     <!-- <img :src="'//www.projectous.com/api/projects/' + task.project_id + '/favicon.png'" /> -->
     <!-- <img src="https://dummyimage.com/30x30/000/fff" /> -->
     <div class="task-img">
-      <b-avatar v-if="project.avatar" variant="primary" text="BV" class="mr-3"></b-avatar>
-      <b-avatar v-if="project.acronym" variant="primary" :text="project.acronym" class="mr-3"></b-avatar>
+      <b-avatar v-if="task.avatar" variant="primary" text="BV" class="mr-3"></b-avatar>
+      <b-avatar v-if="task.acronym" variant="primary" :text="task.acronym" class="mr-3"></b-avatar>
       <b-avatar v-else variant="primary" text="P" class="mr-3"></b-avatar>
     </div>
     <div class="task-detail">
-      <div class="project-title" v-if="!project.acronym">
-        <strong>{{ project.name }}</strong>
+      <div class="project-title" v-if="!task.acronym">
+        <strong>{{ task.name }}</strong>
       </div>
       <div class="task-title">
-        <span v-if="project.acronym"
-          ><strong>{{ project.acronym }}</strong></span
+        <span v-if="task.acronym"
+          ><strong>{{ task.acronym }}</strong></span
         >
         {{ task.title }}
       </div>
       <div class="assigned-users">
-        <b-avatar v-for="user in taskUsers" v-if="user.name" :text="user.abbr" class="mr-3" v-b-tooltip.hover :title="user.name" size="25px" style="margin-right: 5px;"> </b-avatar>
+        <b-avatar v-for="(user, userIndex) in taskUsers" :key="userIndex" v-if="user.name" :text="user.abbr" class="mr-3" v-b-tooltip.hover :title="user.name" size="25px" style="margin-right: 5px;"> </b-avatar>
       </div>
       <div></div>
     </div>
@@ -55,11 +32,12 @@ export default {
   name: 'task-card',
   props: ['task'],
   computed: {
-    project() {
-      if (!this.task.project_id) return { acronym: 'test', name: 'name' }
-      let project = this.$store.getters['projects/getById'](this.task.project_id)
-      return project
-    },
+    // project() {
+    //   if (!this.task.project_id) return { acronym: 'test', name: 'name' }
+    //   // let project = this.task
+    //   let project = this.$store.getters['projects/getById'](this.task.project_id)
+    //   return project
+    // },
     backgroundColor() {
       //no due date and older than 2 weeks => yellow
       //due tomorrow: yellow
@@ -93,7 +71,8 @@ export default {
       return 'lightblue'
     },
     getDiffAssignedDate() {
-      const task_users = this.$store.getters['task_users/getByTaskId'](this.task.id)
+      // const task_users = this.$store.getters['task_users/getByTaskId'](this.task.id)
+      const task_users = this.task.users
       if (task_users.length) {
         let today = moment()
         let assigned_at = moment(task_users[0].created_at)
@@ -107,7 +86,8 @@ export default {
     },
     taskUsers() {
       let me = this
-      let task_users = this.$store.getters['task_users/getByTaskId'](this.task.id)
+      // let task_users = this.$store.getters['task_users/getByTaskId'](this.task.id)
+      let task_users = this.task.users
       if (!task_users.length) return []
       let r_users = []
 
@@ -159,5 +139,29 @@ export default {
 
 .task-card {
   padding: 6px;
+}
+</style>
+
+<style scoped>
+.task-img {
+  width: 40px;
+  display: inline-block;
+  vertical-align: top;
+}
+.task-detail {
+  display: inline-block;
+  width: calc(100% - 50px);
+}
+.task-title {
+  height: 40px;
+  /* max-height: 60px; */
+  text-overflow: ellipsis;
+  overflow-y: hidden;
+}
+
+.project-title {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 </style>

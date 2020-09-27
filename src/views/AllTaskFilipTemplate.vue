@@ -4,8 +4,8 @@
       <b-row style="margin-bottom: 10px;">
         <select v-model="project_sort" style="width: 400px;">
           <option value="">All Projects</option>
-          <optgroup :label="client.name" v-for="client in clients">
-            <option :value="project.id" v-for="project in clientProjects(client)">{{ project.name }}</option>
+          <optgroup :label="client.name" v-for="(client, clientIndex) in clients" :key="clientIndex">
+            <option :value="project.id" v-for="(project, projectIndex) in clientProjects(client)" :key="projectIndex">{{ project.name }}</option>
           </optgroup>
         </select>
         <button @click="project_sort = ''">Reset</button>
@@ -18,17 +18,17 @@
       </b-row>
       <b-row>
         <div style="width: 100%">Leads</div>
-        <task-card @showTask="showTask(task)" v-bind:task="task" v-for="task in lead_client_tasks" class="task-card"> </task-card>
+        <task-card @showTask="showTask(task)" v-bind:task="task" v-for="(task, taskIndex) in lead_client_tasks" :key="taskIndex" class="task-card"> </task-card>
       </b-row>
 
       <b-row>
         <div style="width: 100%">New</div>
-        <task-card @showTask="showTask(task)" v-bind:task="task" v-for="task in new_client_tasks" class="task-card"> </task-card>
+        <task-card @showTask="showTask(task)" v-bind:task="task" v-for="(task, taskIndex) in new_client_tasks" :key="taskIndex" class="task-card"> </task-card>
       </b-row>
 
-      <b-row>
+      <b-row class="border">
         <div style="width: 100%">Active</div>
-        <task-card @showTask="showTask(task)" v-bind:task="task" v-for="task in active_client_tasks" class="task-card"> </task-card>
+        <task-card @showTask="showTask(task)" v-bind:task="task" :keyid="taskIndex" v-for="(task, taskIndex) in active_client_tasks" :key="taskIndex" class="task-card"> </task-card>
       </b-row>
     </div>
     <div v-else class="task-full-screen">
@@ -40,7 +40,7 @@
               <b-form-textarea type="text" v-model="show_task.title" placeholder="Task Title" rows="2" max-rows="4"> </b-form-textarea>
             </b-form-group>
             <b-form-group label="Resources">
-              <div @click="onSelectResource(resource)" v-for="resource in getResources" :href="resource.href">
+              <div @click="onSelectResource(resource)" v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" :href="resource.href">
                 <div class="resource-title">
                   <span>{{ resource.name }}</span>
                 </div>
@@ -90,12 +90,12 @@
       </div>
       <div style="width: calc(100vw - 380px); margin-top: 10px;">
         <draggable class="tab">
-          <button class="tablinks active" v-for="resource in getResources" @click="openTab(resource.name)">
+          <button class="tablinks active" v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" @click="openTab(resource.name)">
             {{ resource.name }}
           </button>
         </draggable>
         <!-- Tab content -->
-        <div v-for="resource in getResources" class="tabcontent" :id="resource.name">
+        <div v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" class="tabcontent" :id="resource.name">
           <label style="width: calc(100% - 280px); white-space: nowrap; overflow: hidden; margin-top: 8px; padding-left: 10px;">{{ resource.href }}</label>
           <div style="float: right; display: inline-block; margin-bottom: 8px; margin-top: 5px;" v-if="resource.href != ''">
             <b-button @click="copyURL(resource.href)" style="margin-right: 10px;">Copy URL</b-button>
@@ -121,11 +121,12 @@
 </template>
 <script>
 import Vue from 'vue'
-import TaskCard from '../components/ui/TaskCard.vue'
+// import TaskCard from '../components/ui/TaskCard.vue'
 import uuid from 'uuid'
 import moment from 'moment'
 import draggable from 'vuedraggable'
-import TaskMessage from './TaskMessage.vue'
+import { each } from 'lodash'
+// import TaskMessage from './TaskMessage.vue'
 
 export default {
   name: 'all-task-filip-template',
@@ -141,9 +142,9 @@ export default {
   },
   props: ['task_id'],
   components: {
-    'task-card': TaskCard,
+    'task-card': () => import('../components/ui/TaskCard.vue'),
     draggable,
-    'task-message': TaskMessage
+    'task-message': () => import('./TaskMessage.vue')
   },
   computed: {
     clients() {
@@ -194,7 +195,7 @@ export default {
     },
     active_client_tasks: function() {
       let self = this
-      return this.tasks.filter(function(task) {
+      let task = this.tasks.filter(function(task) {
         if (task.status === 'completed') {
           return false
         }
@@ -209,6 +210,20 @@ export default {
           return true
         }
       })
+
+      // let taskUser = this.$store.state.task_users
+
+      // let task = _.cloneDeep(taskFilter);
+
+      // // let ids = []
+      // task.map(t => {
+      //   t['task_id'] = 'test'
+      //   // taskUser.find(obj => obj.id)
+
+      //   return t
+      // })
+      return task
+      // return task
     },
     getResources() {
       if (this.show_task && this.show_task.settings && this.show_task.settings.resources && this.show_task.settings.resources.length) {
@@ -228,13 +243,13 @@ export default {
     })
   },
   methods: {
-    getResources() {
-      if (this.show_task && this.show_task.settings && this.show_task.settings.resources && this.show_task.settings.resources.length) {
-        return this.show_task.settings.resources
-      } else {
-        return []
-      }
-    },
+    // getResources() {
+    //   if (this.show_task && this.show_task.settings && this.show_task.settings.resources && this.show_task.settings.resources.length) {
+    //     return this.show_task.settings.resources
+    //   } else {
+    //     return []
+    //   }
+    // },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
     },
