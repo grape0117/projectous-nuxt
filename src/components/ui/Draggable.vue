@@ -12,15 +12,11 @@
           }"
           v-if="verticalAlignment"
         >
-          <div v-if="group.isDraggable" class="dragzone__item-dragbox dragzone__item-dragbox--active list-group-dragbox">
-            <span />
-            <span />
-            <span />
-          </div>
+          <div v-if="group.isDraggable" class="dragzone__item-dragbox dragzone__item-dragbox--active list-group-dragbox"><span /> <span /> <span /></div>
           <div class="list__group-subtitle-title">{{ title }}</div>
         </div>
-
-        <pj-dragzone :id="id" :tasks="groupedData[id]" :isListDragged="isListDragged" :draggedItemId="draggedItemId" :group="group" :selectedCompanyUserId="selectedCompanyUserId" :initiallyExpanded="initiallyExpanded" @delete="$emit('delete', $event)" @taskTimerToggled="$emit('taskTimerToggled', $event)" @updateDataIndexes="updateDataIndexes" @setDraggedItemId="draggedItemId = $event" @updateSortOrders="$emit('updateSortOrders', $event)" @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)" />
+        <div></div>
+        <pj-dragzone :id="id" :tasks="groupedDataWithProjects(id)" :isListDragged="isListDragged" :draggedItemId="draggedItemId" :group="group" :selectedCompanyUserId="selectedCompanyUserId" :initiallyExpanded="initiallyExpanded" @delete="$emit('delete', $event)" @taskTimerToggled="$emit('taskTimerToggled', $event)" @updateDataIndexes="updateDataIndexes" @setDraggedItemId="draggedItemId = $event" @updateSortOrders="$emit('updateSortOrders', $event)" @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)" />
       </div>
     </div>
   </div>
@@ -118,6 +114,30 @@ export default class Draggable extends Vue {
 
     //@Mikhail: not sure what this TODO means
     // TODO: bug if change position here because of different height
+  }
+
+  private groupedDataWithProjects(id: string) {
+    let tasks = this.groupedData[id]
+    let projects = this.$store.state.projects.projects
+
+    console.log(tasks)
+
+    if (tasks) {
+      tasks.map(task => {
+        console.log(task.id)
+      })
+    }
+
+    if (tasks) {
+      tasks.forEach(task => {
+        let project = projects.find(({ id: projectId }) => projectId === task.project_id)
+        task['project'] = project ? project : []
+
+        return task
+      })
+    }
+
+    return tasks
   }
 }
 </script>

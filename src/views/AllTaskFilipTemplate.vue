@@ -195,7 +195,7 @@ export default {
     },
     active_client_tasks: function() {
       let self = this
-      let task = this.tasks.filter(function(task) {
+      let taskFilter = this.tasks.filter(function(task) {
         if (task.status === 'completed') {
           return false
         }
@@ -211,19 +211,30 @@ export default {
         }
       })
 
-      // let taskUser = this.$store.state.task_users
+      let tasks = _.cloneDeep(taskFilter)
 
-      // let task = _.cloneDeep(taskFilter);
+      let projects = this.$store.state.projects.projects
 
-      // // let ids = []
-      // task.map(t => {
-      //   t['task_id'] = 'test'
-      //   // taskUser.find(obj => obj.id)
+      let clients = this.$store.state.clients.clients
+      console.log('[CLIENTS] :')
+      console.log(clients)
 
-      //   return t
-      // })
-      return task
-      // return task
+      tasks.forEach(task => {
+        let project = projects.find(({ id: projectId }) => projectId === task.project_id)
+        task['project'] = project ? project : []
+
+        if (project && project.client_id !== null) {
+          task.client = clients.find(async ({ id: clientId }) => {
+            clientId === (await project.client_id)
+          })
+        } else {
+          task.client = []
+        }
+
+        return task
+      })
+
+      return tasks
     },
     getResources() {
       if (this.show_task && this.show_task.settings && this.show_task.settings.resources && this.show_task.settings.resources.length) {
@@ -368,7 +379,7 @@ export default {
     },
     t_update() {
       // function to use after this.show_task = task
-      if (!this.show_task.settings) this.show_task.settings = []
+      if (!this.show_task.settings) return (this.show_task.settings = [])
 
       // open first resource in right side
       if (this.show_task.settings.resources && this.show_task.settings.resources.length) {

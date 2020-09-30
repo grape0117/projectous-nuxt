@@ -2,27 +2,28 @@
   <div @click="$emit('showTask', task)" class="task-card" :style="'background-color: ' + backgroundColor">
     <!-- <img :src="'//www.projectous.com/api/projects/' + task.project_id + '/favicon.png'" /> -->
     <!-- <img src="https://dummyimage.com/30x30/000/fff" /> -->
-    <div class="task-img">
-      <b-avatar v-if="task.avatar" variant="primary" text="BV" class="mr-3"></b-avatar>
-      <b-avatar v-if="task.acronym" variant="primary" :text="task.acronym" class="mr-3"></b-avatar>
-      <b-avatar v-else variant="primary" text="P" class="mr-3"></b-avatar>
+    <!-- <pre>{{ task }}</pre> -->
+
+    <div class="task-img" v-if="task.project.acronym">
+      <b-avatar variant="primary" :text="task.project.acronym" class="task-card-avatar mr-3"></b-avatar>
     </div>
-    <div class="task-detail">
-      <div class="project-title" v-if="!task.acronym">
-        <strong>{{ task.name }}</strong>
+    <div class="task-detail" v-else>
+      <div class="project-title">
+        <strong>{{ task.project.name }}</strong>
       </div>
-      <div class="task-title">
-        <span v-if="task.acronym"
-          ><strong>{{ task.acronym }}</strong></span
+      <!-- <div class="task-title">
+        <span v-if="task.project.acronym"
+          ><strong>{{ task.project.acronym }}</strong></span
         >
-        {{ task.title }}
-      </div>
-      <div class="assigned-users">
+        {{ task.project.title }}
+      </div> -->
+      <!-- <div class="assigned-users">
         <b-avatar v-for="(user, userIndex) in taskUsers" :key="userIndex" v-if="user.name" :text="user.abbr" class="mr-3" v-b-tooltip.hover :title="user.name" size="25px" style="margin-right: 5px;"> </b-avatar>
-      </div>
-      <div></div>
+      </div> -->
     </div>
-    <small>{{ getDiffAssignedDate }}</small>
+    <div class="task-card-date">
+      <small>{{ getDiffAssignedDate }}</small>
+    </div>
   </div>
 </template>
 <script>
@@ -138,7 +139,14 @@ export default {
 }
 
 .task-card {
-  padding: 6px;
+  padding: 10px 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.task-img .task-card-avatar {
+  background-color: green !important;
+  border-radius: 0 !important;
 }
 </style>
 

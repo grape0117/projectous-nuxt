@@ -6,6 +6,7 @@
     <div class="dragzone__content">
       <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
+          <!-- <pre>{{ item }}</pre> -->
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
@@ -17,15 +18,16 @@
                 <img v-if="project_url(item)" :src="project_url(item)" />
                 {{ projectName(item.project_id) }}
               </div>
-              <div class="dragzone__item-dragbox dragzone__item-dragbox--active" @click="editTask(item.task_id || item.id)">
-                <span />
-                <span />
-                <span />
-              </div>
+              <div class="dragzone__item-dragbox dragzone__item-dragbox--active" @click="editTask(item.task_id || item.id)"><span /> <span /> <span /></div>
               <div class="dragzone__add-task dragzone__add-task--item" @click="createTempItem(index, item.id)">
                 +
               </div>
-              <div class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
+              <div class="d-flex">
+                <div class="dragzone-project-acronym" v-if="item.project.acronym">
+                  <span>{{ item.project.acronym }}</span>
+                </div>
+                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
+              </div>
             </div>
             <div class="dragzone__task-users">
               <small v-if="show_debug()"
@@ -35,6 +37,7 @@
             </div>
           </div>
           <div v-if="index == tasks.length - 1" class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
+
           <!-- <div
             v-if="true || editedItemId === item.id"
             class="dragzone__item-tracker"
@@ -326,6 +329,19 @@ export default class Dragzone extends Vue {
 </script>
 
 <style>
+.dragzone-project-acronym {
+  width: 40px;
+  height: 40px;
+  background-color: green;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.dragzon-icon-dehaze {
+  cursor: all-scroll;
+  font-size: 20px;
+}
 .dragzone {
   width: 100%;
   /* border: 5px solid red; */
@@ -380,7 +396,7 @@ export default class Dragzone extends Vue {
   width: 100%;
 }
 .dragzone__item-block-content {
-  /*display: flex;*/
+  /* display: flex; */
   padding: 2px 0;
   align-items: center;
   clear: both;
@@ -415,7 +431,7 @@ export default class Dragzone extends Vue {
   background: lightgrey; /*#cef3f7;*/
 }
 .dragzone__item-text {
-  margin-left: 30px;
+  margin-left: 5px;
   flex-grow: 1;
   min-height: 1.459em;
   font-size: 0.9rem;
