@@ -23,9 +23,9 @@
                 +
               </div>
               <div class="d-flex">
-                <div class="dragzone-project-acronym" v-if="item.project.acronym">
-                  <span>{{ item.project.acronym }}</span>
-                </div>
+                <span class="dragzone-project-acronym" v-if="item.project.acronym">
+                  {{ item.project.acronym }}
+                </span>
                 <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
             </div>
@@ -330,8 +330,8 @@ export default class Dragzone extends Vue {
 
 <style>
 .dragzone-project-acronym {
-  width: 40px;
-  height: 40px;
+  padding: 5px 10px;
+  white-space: nowrap;
   background-color: green;
   font-size: 12px;
   display: flex;

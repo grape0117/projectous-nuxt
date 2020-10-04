@@ -5,7 +5,10 @@
     <!-- <pre>{{ task }}</pre> -->
 
     <div class="task-img" v-if="task.project.acronym">
-      <b-avatar variant="primary" :text="task.project.acronym" class="task-card-avatar mr-3"></b-avatar>
+      <!-- <b-avatar variant="primary" :text="task.project.acronym" class="task-card-avatar mr-3"></b-avatar> -->
+      <span class="task-card-avatar mr-3">
+        {{ task.project.acronym }}
+      </span>
     </div>
     <div class="task-detail" v-else>
       <div class="project-title">
@@ -74,7 +77,7 @@ export default {
     getDiffAssignedDate() {
       // const task_users = this.$store.getters['task_users/getByTaskId'](this.task.id)
       const task_users = this.task.users
-      if (task_users.length) {
+      if (task_users && task_users.length) {
         let today = moment()
         let assigned_at = moment(task_users[0].created_at)
         let diff = today.diff(assigned_at, 'days')
@@ -145,14 +148,18 @@ export default {
   justify-content: space-between;
 }
 .task-img .task-card-avatar {
+  padding: 5px 10px;
+  height: 30px !important;
+  font-weight: 500;
   background-color: green !important;
+  color: white;
   border-radius: 0 !important;
 }
 </style>
 
 <style scoped>
 .task-img {
-  width: 40px;
+  /* width: 40px; */
   display: inline-block;
   vertical-align: top;
 }

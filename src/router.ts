@@ -27,10 +27,11 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "Tasks" */ '@/views/AllTaskFilipTemplate.vue')
     },
     {
-      path: '/task/:task_id',
+      path: '/tasks/:task_id',
       name: 'Task_Detail',
-      props: true,
-      component: () => import(/* webpackChunkName: "Tasks-detail" */ '@/components/draggable/TaskDetails.vue')
+      // props: true,
+      // component: () => import(/* webpackChunkName: "Tasks-detail" */ '@/components/draggable/TaskDetails.vue')
+      component: () => import(/* webpackChunkName: "Tasks-detail" */ '@/views/AllTaskFilipTemplate.vue')
     },
     {
       // for test

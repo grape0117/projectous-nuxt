@@ -31,9 +31,9 @@
         <task-card @showTask="showTask(task)" v-bind:task="task" :keyid="taskIndex" v-for="(task, taskIndex) in active_client_tasks" :key="taskIndex" class="task-card"> </task-card>
       </b-row>
     </div>
-    <div v-else class="task-full-screen">
-      <div style="width: 300px; padding-right: 15px; padding-top: 10px;">
-        <button @click="saveTask">Close (ESC)</button>
+    <div v-else class="show-task">
+      <div class="left-section">
+        <button @click="saveTask()">Close (ESC)</button>
         <b-tabs content-class="mt-3" style="margin-top: 10px;">
           <b-tab title="Details" active>
             <b-form-group label="Task">
@@ -88,33 +88,23 @@
           </b-tab>
         </b-tabs>
       </div>
-      <div style="width: calc(100vw - 380px); margin-top: 10px;">
+      <div class="center-section">
         <draggable class="tab">
           <button class="tablinks active" v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" @click="openTab(resource.name)">
             {{ resource.name }}
           </button>
         </draggable>
-        <!-- Tab content -->
-        <div v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" class="tabcontent" :id="resource.name">
-          <label style="width: calc(100% - 280px); white-space: nowrap; overflow: hidden; margin-top: 8px; padding-left: 10px;">{{ resource.href }}</label>
-          <div style="float: right; display: inline-block; margin-bottom: 8px; margin-top: 5px;" v-if="resource.href != ''">
-            <b-button @click="copyURL(resource.href)" style="margin-right: 10px;">Copy URL</b-button>
-            <b-button @click="openURL(resource.href)">Open in a new tab</b-button>
-          </div>
-          <iframe :src="resource.href" style="height: 100vh; width: 100%"></iframe>
-        </div>
 
-        <!-- <b-tabs content-class="mt-3" v-model="tabIndex">
-          <b-tab v-for="resource in getResources" :title="resource.name">
-            <label
-              style="width: calc(100% - 280px); white-space: nowrap; overflow: hidden; margin-top: 8px;">{{resource.href}}</label>
-            <div style="float: right; display: inline-block; margin-bottom: 10px;" v-if="resource.href != ''">
+        <div v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" class="tabcontent" :id="resource.name">
+          <div class="d-flex justify-content-between align-items-center">
+            <label style="white-space: nowrap; overflow: hidden;">{{ resource.href }}</label>
+            <div style="float: right; display: inline-block; margin-bottom: 8px; margin-top: 5px;" v-if="resource.href != ''">
               <b-button @click="copyURL(resource.href)" style="margin-right: 10px;">Copy URL</b-button>
               <b-button @click="openURL(resource.href)">Open in a new tab</b-button>
             </div>
-            <iframe :src="resource.href" style="height: 100vh; width: 100%"></iframe>
-          </b-tab>
-          </b-tabs> -->
+          </div>
+          <iframe :src="resource.href" style="height: calc(100vh - 155px); width: 100%;"></iframe>
+        </div>
       </div>
     </div>
   </div>
@@ -128,7 +118,7 @@ import draggable from 'vuedraggable'
 import { each } from 'lodash'
 // import TaskMessage from './TaskMessage.vue'
 
-export default {
+export default Vue.extend({
   name: 'all-task-filip-template',
   data: function() {
     return {
@@ -253,6 +243,18 @@ export default {
       }
     })
   },
+  created() {
+    if (Object.keys(this.$route.params).length) {
+      this.$watch('active_client_tasks', async data => {
+        if (data) {
+          console.log('DATA RESULT')
+          // console.log(data.find(({id}) => id === this.$route.params.task_id))
+          this.show_task = await data.find(({ id }) => id === this.$route.params.task_id)
+          // console.log(this.show_task)
+        }
+      })
+    }
+  },
   methods: {
     // getResources() {
     //   if (this.show_task && this.show_task.settings && this.show_task.settings.resources && this.show_task.settings.resources.length) {
@@ -315,13 +317,14 @@ export default {
       //console.log('client', client)
       return this.$store.getters['projects/getOpenCompanyProjects'](client.client_company_id)
     },
-    saveTask(isRedirect = true) {
+    async saveTask(isRedirect = true) {
       console.log(this.show_task)
-      this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.show_task })
+      // http://localhost:8080/tasks/1048
+      await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.show_task })
       if (isRedirect) {
         this.show_task = false
         this.isEditResource = null
-        this.$router.push({ name: 'Tasks' })
+        this.$router.push({ name: 'Task Cloud' })
       }
     },
     addResource() {
@@ -436,7 +439,10 @@ export default {
       }
 
       // Show the current tab, and add an "active" class to the button that opened the tab
-      document.getElementById(resourceName).style.display = 'block'
+      if (document.getElementById(resourceName)) {
+        document.getElementById(resourceName).style.display = 'block'
+      }
+      // console.log(document.getElementById(resourceName))
     }
   },
   watch: {
@@ -461,6 +467,7 @@ export default {
       }
     },
     $route(to, from) {
+      console.log(to)
       if (to.name == 'Task_Detail' && from.name == 'Tasks') {
         document.documentElement.scrollTop = 0
       } else if (to.name == 'Tasks' && from.name == 'Task_Detail') {
@@ -471,8 +478,20 @@ export default {
       }
     }
   }
-}
+})
 </script>
+<style>
+.left-section {
+  max-width: 300px;
+  width: 100%;
+  padding: 10px;
+}
+.center-section {
+  margin-top: 10px;
+  width: 100%;
+}
+</style>
+
 <style scoped>
 .list-group-item {
   border: none;
@@ -505,10 +524,11 @@ export default {
   min-width: 75px;
 }
 
-.task-full-screen {
+.show-task {
+  background-color: white;
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  /* height: 100vh;
+  width: 100vw; */
 }
 
 .resource-title {
