@@ -1,5 +1,5 @@
 <template>
-  <div id="app" style="position: relative" class="app-class" :class="bgColor ? bgColor : 'paletteDefault'">
+  <div id="app" style="position: relative; " class="app-class" :class="bgStyle && bgTheme === 'Colors' ? bgStyle : 'paletteDefault'" :style="{ background: bgTheme === 'Images' ? `url(${this.bgStyle})` : '' }">
     <main style="flex-grow: 1">
       <div class="row-no-padding">
         <Header />
@@ -73,10 +73,23 @@ export default {
       showTask: false,
       showChat: false,
       showTimer: false,
-      bgColor: ''
+      bgStyle: '',
+      bgTheme: ''
     }
   },
   computed: {
+    // backgroundStyle() {
+    //   if(this.bgTheme === 'Images') {
+    //     return `
+    //       background: url(${this.bgStyle}),
+    //     `
+    //       // 'background-repeat': no-repeat,
+    //       // 'background-size': cover,
+    //     // background: url(https://images.pexels.com/photos/38537/woodland-road-falling-leaf-natural-38537.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260);
+    //     // background-repeat: no-repeat;
+    //     // background-size: cover;
+    //   }
+    // },
     current_edit_task: function() {
       return this.$store.getters['settings/get_current_edit_task']
     },
@@ -85,9 +98,10 @@ export default {
       return this.$store.getters['settings/get_current_edit_project']
     }
     // getBackground() {
-    //   if(this.bgColor) return this.bgColor
+    //   if(this.bgStyle) return this.bgStyle
 
     //   if(!getCookie('bg-color')) {
+
     //     return false
     //   } else {
     //     return getCookie('bg-color')
@@ -182,13 +196,19 @@ export default {
       document.cookie = `chat=${this.showChat}`
     })
 
-    if (getCookie('bg-color')) {
-      this.bgColor = getCookie('bg-color')
+    if (getCookie('bg-style')) {
+      this.bgStyle = getCookie('bg-style')
+    }
+    if (getCookie('bg-theme')) {
+      this.bgTheme = getCookie('bg-theme')
     }
     // background
-    EventBus.$on('changeBackground', color => {
-      this.bgColor = color
-      document.cookie = `bg-color=${color}`
+    EventBus.$on('changeBackground', ({ option, styleTheme }) => {
+      this.bgStyle = option
+      this.bgTheme = styleTheme
+
+      document.cookie = `bg-style=${option}`
+      document.cookie = `bg-theme=${styleTheme}`
     })
   },
   beforeDestroy() {
@@ -319,27 +339,29 @@ export default {
 
 // background-color options
 .paletteDefault {
-  background-color: rgba($color: orange, $alpha: 0.6);
+  background: rgba($color: orange, $alpha: 0.6);
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
 }
 .paletteRed {
-  background-color: rgba($color: red, $alpha: 0.6);
+  background: rgba($color: red, $alpha: 0.6);
 }
 .paletteGreen {
-  background-color: rgba($color: green, $alpha: 0.6);
+  background: rgba($color: green, $alpha: 0.6);
 }
 .paletteBlue {
-  background-color: rgba($color: blue, $alpha: 0.6);
+  background: rgba($color: blue, $alpha: 0.6);
 }
 .paletteOrange {
-  background-color: rgba($color: orange, $alpha: 0.6);
+  background: rgba($color: orange, $alpha: 0.6);
 }
 .palettePink {
-  background-color: rgba($color: pink, $alpha: 0.6);
+  background: rgba($color: pink, $alpha: 0.6);
 }
 .paletteViolet {
-  background-color: rgba($color: violet, $alpha: 0.6);
+  background: rgba($color: violet, $alpha: 0.6);
 }
 .paletteYellow {
-  background-color: rgba($color: yellow, $alpha: 0.6);
+  background: rgba($color: yellow, $alpha: 0.6);
 }
 </style>

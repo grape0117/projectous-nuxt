@@ -30,12 +30,20 @@
           </span>
         </div>
         <div class="header-paint" v-if="toggles.paint">
-          <div class="d-flex justify-content-between">
-            <span style="font-weight: bold;">Theme</span>
-            <i class="icon-close" style="cursor: pointer;" @click="toggles.paint = false"></i>
-          </div>
-          <div class="header-paint-colors">
-            <span class="header-paint-color" :class="color" @click="setBackground(color)" v-for="(color, colorIndex) in paletteColors" :key="colorIndex"> </span>
+          <div class="mb-3" v-for="(style, styleIndex) in backgroundStyle" :key="styleIndex">
+            <div class="d-flex justify-content-between">
+              <span style="font-weight: bold;">{{ style.name }}</span>
+              <i v-if="styleIndex === 0" class="icon-close" style="cursor: pointer;" @click="toggles.paint = false"></i>
+            </div>
+            <div>
+              <div class="header-paint-style" v-if="style.name === 'Colors'">
+                <span class="header-paint-color" :class="option" @click="setBackground(option, style.name)" v-for="(option, optionIndex) in style.options" :key="optionIndex"> </span>
+              </div>
+
+              <div v-else class="header-paint-style">
+                <div class="header-paint-image" @click="setBackground(option, style.name)" v-for="(option, optionIndex) in style.options" :key="optionIndex" :style="{ background: `url(${option})` }"></div>
+              </div>
+            </div>
           </div>
         </div>
         <!-- <i class="icon-cached header-icon-refresh" ></i> -->
@@ -78,7 +86,25 @@ export default Vue.extend({
         timers: false,
         paint: false
       },
-      paletteColors: ['paletteRed', 'paletteGreen', 'paletteBlue', 'paletteOrange', 'palettePink', 'paletteViolet', 'paletteYellow']
+      backgroundStyle: [
+        // the 'name' inside these objects is connected in the App.vue's "changeBackground" EventBus. If wanted to rename, please rename it there also
+        {
+          name: 'Colors',
+          options: ['paletteRed', 'paletteGreen', 'paletteBlue', 'paletteOrange', 'palettePink', 'paletteViolet', 'paletteYellow']
+        },
+        {
+          name: 'Images',
+          options: [
+            'https://images.pexels.com/photos/38537/woodland-road-falling-leaf-natural-38537.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260',
+            'https://images.pexels.com/photos/490466/pexels-photo-490466.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+            'https://images.pexels.com/photos/128234/pexels-photo-128234.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+            'https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+            'https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+            'https://images.pexels.com/photos/531321/pexels-photo-531321.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+            'https://images.pexels.com/photos/719609/pexels-photo-719609.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260'
+          ]
+        }
+      ]
     }
   },
   computed: {
@@ -91,8 +117,9 @@ export default Vue.extend({
     // window.$_app = this
   },
   methods: {
-    async setBackground(color) {
-      await EventBus.$emit('changeBackground', color)
+    async setBackground(option, styleTheme) {
+      console.log(styleTheme)
+      await EventBus.$emit('changeBackground', { option, styleTheme })
     },
     async toggle(iconName) {
       if (iconName === 'reload') {
@@ -257,7 +284,7 @@ export default Vue.extend({
   background-color: #f7f8ff;
 }
 
-.header-paint-colors {
+.header-paint-style {
   margin-top: 10px;
   display: grid;
   grid-template-columns: auto auto auto auto auto;
@@ -271,6 +298,18 @@ export default Vue.extend({
   border-radius: 100px;
   cursor: pointer;
   /* background-color: black; */
+}
+
+.header-paint-images {
+  display: flex;
+}
+.header-paint-image {
+  width: 35px;
+  height: 35px;
+  border-radius: 7px;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  cursor: pointer;
 }
 
 /* paletteColors: ['red', 'green', 'blue', 'rgba($color: orange, $alpha: 0.6)', 'pink', 'violet', 'rgba(255, 165, 0, 0.6)' ] */
