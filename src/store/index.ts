@@ -9,7 +9,8 @@ import { actions } from './actions'
 Vue.use(Vuex)
 const store: StoreOptions<IRootState> = {
   state: {
-    version: '0.1.0'
+    version: '0.1.0',
+    loading: false
   },
   actions,
   mutations,

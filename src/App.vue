@@ -1,7 +1,11 @@
 <template>
   <div id="app" style="position: relative; " class="app-class" :class="bgStyle && bgTheme === 'Colors' ? bgStyle : 'paletteDefault'" :style="{ background: bgTheme === 'Images' ? `url(${this.bgStyle})` : '' }">
-    <main style="flex-grow: 1">
+    <b-overlay :show="$store.state.loading" rounded="sm" style="flex-grow: 1">
       <div class="row-no-padding">
+        <!-- <button @click="$store.state.loading = !$store.state.loading">update</button>
+<pre>
+{{ $store.state.loading }}
+</pre> -->
         <Header />
         <div class="d-flex justify-content-between">
           <router-view class="router-view-class" />
@@ -12,7 +16,7 @@
           </div>
         </div>
       </div>
-    </main>
+    </b-overlay>
 
     <task-modal />
     <edit-client-modal id="edit-client-modal" />
@@ -234,6 +238,7 @@ export default {
       }
     },
     async getAppData() {
+      this.$store.state.loading = true
       let indexDBExists = false
       let request = window.indexedDB.open('projectous-data')
 

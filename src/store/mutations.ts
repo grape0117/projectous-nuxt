@@ -12,7 +12,7 @@ export const mutations: MutationTree<IRootState> = {
    * @param {any} entities
    * @constructor
    */
-  ADD_MANY(state: IRootState, { module, entities }: any) {
+  async ADD_MANY(state: IRootState, { module, entities }: any) {
     console.log('ADD_MANY ' + module)
     if (!state[module]) {
       console.error('Module ' + module + ' does not exist.')
@@ -52,6 +52,8 @@ export const mutations: MutationTree<IRootState> = {
 
     // @ts-ignore
     this.commit('LOOKUP', { module })
+
+    state.loading = false
 
     // @ts-ignore
     if (this._mutations[module + '/ADD_MANY']) {
