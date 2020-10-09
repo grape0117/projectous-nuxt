@@ -1,14 +1,17 @@
 <template>
   <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
   <li id="timer-row-template" v-if="isCurrentUser()" class="sidebar-timer" v-bind:data-restarted="timer.restart_at" :class="[{ 'sidebar-timer-client-no-project': !project.id }, { 'side-timer-timer-active': timer.status === 'running' }, { 'side-timer-less-work': hasLessWork }]">
-    <div v-if="client_name()">
+    <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
 
-    <div class="project-details" @click="editTimer()">
-      <p v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</p>
-      <p v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</p>
-      <!-- <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>-->
+    <div class="d-flex align-items-center">
+      <span class="sidebar-timer-acronmy mr-2" v-if="project.acronym">{{ project.acronym }}</span>
+      <div class="project-details" @click="editTimer()">
+        <p v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</p>
+        <p v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</p>
+        <!-- <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>-->
+      </div>
     </div>
 
     <div class="status-icon-with-timer">
@@ -237,6 +240,16 @@ export default {
   margin-bottom: 7px;
   border-radius: 5px;
   background-color: rgba(0, 0, 0, 0.2);
+}
+.sidebar-timer-acronmy {
+  padding: 5px 10px;
+  white-space: nowrap;
+  background-color: green;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 35px;
 }
 .sidebar-timer-client-name {
   font-size: 12px;

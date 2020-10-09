@@ -4,7 +4,7 @@
       <div v-if="!verticalAlignment" class="list__group-title">
         {{ group.name }}
       </div>
-      <div class="list__group" :class="title.replace(/[^a-zA-Z0-9]/, '-')" v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id">
+      <div class="list__group" :class="title.replace(/[^a-zA-Z0-9]/, '-')" :style="{ height: !verticalAlignment ? 'calc(100vh - 140px)' : '' }" v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id">
         <div
           :class="'list__group-subtitle-title' + title.replace(/[^a-zA-Z0-9]/, '-')"
           :style="{
@@ -162,7 +162,6 @@ export default class Draggable extends Vue {
 }
 .list__group {
   max-width: 280px;
-  height: calc(100vh - 140px);
   overflow-y: scroll;
   width: 100%;
   padding: 0 10px;

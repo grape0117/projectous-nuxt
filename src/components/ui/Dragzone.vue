@@ -10,22 +10,24 @@
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-block-content-text">
-              <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
-                <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
-                <span v-else class="dragzone__item-tracker-icon-triangle" />
-              </div>
-              <div class="dragzone__item-subtext">
+              <div class="dragzone__item-subtext mt-2">
                 <img v-if="project_url(item)" :src="project_url(item)" />
-                {{ projectName(item.project_id) }}
+                <div class="d-flex align-items-center">
+                  <span class="dragzone-project-acronym" v-if="item.project.acronym">
+                    {{ item.project.acronym }}
+                  </span>
+                  <span v-else>{{ projectName(item.project_id) }}</span>
+                  <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
+                    <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
+                    <span v-else class="dragzone__item-tracker-icon-triangle" />
+                  </div>
+                </div>
               </div>
               <div class="dragzone__item-dragbox dragzone__item-dragbox--active" @click="editTask(item.task_id || item.id)"><span /> <span /> <span /></div>
               <div class="dragzone__add-task dragzone__add-task--item" @click="createTempItem(index, item.id)">
                 +
               </div>
-              <div class="d-flex">
-                <span class="dragzone-project-acronym" v-if="item.project.acronym">
-                  {{ item.project.acronym }}
-                </span>
+              <div class="">
                 <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
             </div>
@@ -337,6 +339,7 @@ export default class Dragzone extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 35px;
 }
 .dragzon-icon-dehaze {
   cursor: all-scroll;

@@ -90,20 +90,20 @@
       </div>
       <div class="center-section">
         <draggable class="tab">
-          <button class="tablinks active" v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" @click="openTab(resource.name)">
+          <button class="tablinks" :class="{ active: resource.name === selected_tab }" v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" @click="openTab(resource.name)">
             {{ resource.name }}
           </button>
         </draggable>
-
-        <div v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" class="tabcontent" :id="resource.name">
-          <div class="d-flex justify-content-between align-items-center">
-            <label style="white-space: nowrap; overflow: hidden;">{{ resource.href }}</label>
+        <div v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" :id="resource.name">
+          <!-- class="tabcontent" -->
+          <div v-if="resource.name === selected_tab" class="d-flex justify-content-between align-items-center">
+            <label class="docs-path" style="white-space: nowrap; overflow: hidden;">{{ resource.href }}</label>
             <div style="float: right; display: inline-block; margin-bottom: 8px; margin-top: 5px;" v-if="resource.href != ''">
               <b-button @click="copyURL(resource.href)" style="margin-right: 10px;">Copy URL</b-button>
               <b-button @click="openURL(resource.href)">Open in a new tab</b-button>
             </div>
           </div>
-          <iframe :src="resource.href" style="height: calc(100vh - 155px); width: 100%;"></iframe>
+          <iframe v-if="resource.name === selected_tab" :src="resource.href" style="height: calc(100vh - 155px); width: 100%;"></iframe>
         </div>
       </div>
     </div>
@@ -127,7 +127,8 @@ export default Vue.extend({
       selected_resource: '',
       project_sort: '',
       isEditResource: null,
-      scrollTop: 0
+      scrollTop: 0,
+      selected_tab: ''
     }
   },
   props: ['task_id'],
@@ -422,26 +423,28 @@ export default Vue.extend({
       window.open(url, '_blank')
     },
     openTab(resourceName) {
-      let i
-      // Get all elements with class="tabcontent" and hide them
-      let tabcontent = document.getElementsByClassName('tabcontent')
-      for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = 'none'
-      }
+      this.selected_tab = resourceName
+
+      // let i
+      // // Get all elements with class="tabcontent" and hide them
+      // let tabcontent = document.getElementsByClassName('tabcontent')
+      // for (i = 0; i < tabcontent.length; i++) {
+      //   tabcontent[i].style.display = 'none'
+      // }
 
       // Get all elements with class="tablinks" and remove the class "active"
-      let tablinks = document.getElementsByClassName('tablinks')
-      for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(' active', '')
-        if (tablinks[i].innerHTML.trim() == resourceName) {
-          tablinks[i].className += ' active'
-        }
-      }
+      // let tablinks = document.getElementsByClassName('tablinks')
+      // for (i = 0; i < tablinks.length; i++) {
+      //   tablinks[i].className = tablinks[i].className.replace(' active', '')
+      //   if (tablinks[i].innerHTML.trim() == resourceName) {
+      //     tablinks[i].className += ' active'
+      //   }
+      // }
 
       // Show the current tab, and add an "active" class to the button that opened the tab
-      if (document.getElementById(resourceName)) {
-        document.getElementById(resourceName).style.display = 'block'
-      }
+      // if (document.getElementById(resourceName)) {
+      //   document.getElementById(resourceName).style.display = 'block'
+      // }
       // console.log(document.getElementById(resourceName))
     }
   },
@@ -590,8 +593,14 @@ button.tablinks {
 }
 
 /* Style the tab content */
-.tabcontent {
+/* .tabcontent {
   display: none;
   border-top: none;
+} */
+
+.center-section .docs-path {
+  max-width: 350px;
+  width: 100%;
+  text-overflow: ellipsis;
 }
 </style>
