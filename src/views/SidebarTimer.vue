@@ -1,6 +1,11 @@
 <template>
   <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
-  <li id="timer-row-template" v-if="isCurrentUser()" class="sidebar-timer" v-bind:data-restarted="timer.restart_at" :class="[{ 'sidebar-timer-client-no-project': !project.id }, { 'side-timer-timer-active': timer.status === 'running' }, { 'side-timer-less-work': hasLessWork }]">
+  <li id="timer-row-template" v-if="isCurrentUser()" class="sidebar-timer" v-bind:data-restarted="timer.restart_at">
+    <!-- :class="[
+      { 'sidebar-timer-client-no-project': !project.id }, 
+      { 'side-timer-timer-active': timer.status === 'running' }, 
+      { 'side-timer-less-work': hasLessWork }]" -->
+
     <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
@@ -26,12 +31,11 @@
     </div>
 
     <div class="sidebar-timer-report-at">{{ reportAt() }}</div>
-
     <div class="sidebar-timer-notes" v-if="timer.notes">
       <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
     </div>
     <div v-else>
-      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: rgba(0,0,0, 0.2);"></div>
+      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: rgba(240, 52, 52, 0.4);"></div>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
 
@@ -86,11 +90,11 @@ export default {
         return task
       }
     },
-    client: function() {},
-    hasLessWork() {
-      const thirtyMinutes = 30
-      return parseInt(this.durationMinutes()) < thirtyMinutes
-    }
+    client: function() {}
+    // hasLessWork() {
+    //   const thirtyMinutes = 30
+    //   return parseInt(this.durationMinutes()) < thirtyMinutes
+    // }
   },
   mounted: function() {
     /**
@@ -225,7 +229,7 @@ export default {
     pauseTimer: function() {
       this.$store.dispatch('timers/pauseTimer', this.timer)
     },
-    saveNotes: function(event) {
+    saveNotes: async function(event) {
       this.timer.notes = event.target.innerHTML
       this.$store.dispatch('timers/saveTimer', this.timer)
     }
@@ -287,12 +291,12 @@ export default {
   padding: 0 5px;
   font-weight: 600;
 }
-.side-timer-timer-active {
-  box-shadow: 0px 0px 5px rgba($color: lightgreen, $alpha: 1) !important;
-}
-.side-timer-less-work {
-  box-shadow: 0px 0px 5px rgba($color: red, $alpha: 0.7);
-}
+// .side-timer-timer-active {
+//   box-shadow: 0px 0px 5px rgba($color: lightgreen, $alpha: 1) !important;
+// }
+// .side-timer-less-work {
+//   box-shadow: 0px 0px 5px rgba($color: red, $alpha: 0.7);
+// }
 </style>
 <style scoped>
 .status-icons {
