@@ -130,7 +130,7 @@ export default class Draggable extends Vue {
 
     if (tasks) {
       tasks.forEach(task => {
-        let project = projects.find(({ id: projectId }) => projectId === task.project_id)
+        let project = projects.find(({ id: projectId }: any) => projectId === task.project_id)
         task['project'] = project ? project : []
 
         return task
