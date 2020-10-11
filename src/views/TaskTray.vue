@@ -1,14 +1,18 @@
 <template>
   <div id="task-tray">
-    <div class="task-tray-title">TASKS</div>
     <div class="task-tray-wrapper">
-      <div class="topSelectionBox">
-        <select id="selectCompanyUser" v-model="selectedCompanyUserId">
-          <option v-for="(companyUser, i) in sortedCompanyUsers" :value="companyUser.id" :id="'company_user-' + companyUser.id" :key="`${companyUser.id}-${i}`">
-            {{ companyUser.name }}
-          </option>
-        </select>
-        <!-- <button class="closebtnLeft" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
+      <div class="task-tray-top-div">
+        <div class="task-tray-title">
+          <span>TASKS</span>
+        </div>
+        <div class="task-tray-selection-box">
+          <select id="selectCompanyUser" v-model="selectedCompanyUserId">
+            <option v-for="(companyUser, i) in sortedCompanyUsers" :value="companyUser.id" :id="'company_user-' + companyUser.id" :key="`${companyUser.id}-${i}`">
+              {{ companyUser.name }}
+            </option>
+          </select>
+          <!-- <button class="closebtnLeft" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
+        </div>
       </div>
       <pj-draggable class="task-tray-draggable" :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" />
       <new-list-form v-if="selectedCompanyUserId" :user-id="selectedCompanyUserId" />
@@ -257,7 +261,10 @@ export default class Custom extends Vue {
   //TODO: pass only ids instead of whole objects?
   private updateTaskUserSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.$store.dispatch('task_users/updateSortOrders', parsedTasks.map(({ id }: { id: number }) => id))
+    this.$store.dispatch(
+      'task_users/updateSortOrders',
+      parsedTasks.map(({ id }: { id: number }) => id)
+    )
   }
 
   @Watch('selectedCompanyUserId')
@@ -285,23 +292,39 @@ export default class Custom extends Vue {
   // background-color: #616161;
   background-color: rgba(0, 0, 0, 0.5);
 }
+.task-tray-selection-box {
+  align-self: center;
+}
+.task-tray-top-div {
+  display: flex;
+  // flex-direction: column;
+  top: 0;
+  font-weight: bold;
+  position: sticky;
+  padding: 10px;
+  z-index: 1;
+  background-color: rgba($color: #000000, $alpha: 0.5);
+}
 .task-tray-draggable {
   width: 87%;
+  align-self: center;
 }
 .task-tray-draggable .list__group {
   width: auto !important;
   padding: 0;
 }
 .task-tray-title {
-  margin-top: 10px;
-  margin-left: 15px;
   color: white;
-  font-weight: bold;
+  margin-right: 30px;
+  // margin-top: 10px;
+  // margin-left: 15px;
+  // color: white;
+  // font-weight: bold;
 }
 .task-tray-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  // align-items: center;
 }
 
 .task-tray-wrapper .list__wrapper > .list > .list__group {

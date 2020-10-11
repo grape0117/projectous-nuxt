@@ -1,15 +1,19 @@
 <template>
   <!-- <div id="timer-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh; position: fixed;"> -->
   <div id="timer-tray">
-    <span class="timer-tray-title">TIMERS</span>
-    <div class="trayTopBtn">
-      <!-- <button class="closebtn" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
-      <span class="makeBtn" @click="addTimer()">Modal</span>
-      <span class="makeBtn" @click="startTimer()">Start New</span>
-      <span>{{ total_time_today }}</span>
+    <div class="timer-tray-top-div">
+      <span class="timer-tray-title">TIMERS</span>
+      <div class="trayTopBtn">
+        <!-- <button class="closebtn" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
+        <span class="makeBtn" @click="addTimer()">Modal</span>
+        <span class="makeBtn" @click="startTimer()">Start New</span>
+        <span>{{ total_time_today }}</span>
+      </div>
     </div>
 
-    <my-sidebar-timer :class="getSidebarClass()" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
+    <div class="timer-tray-timer-card">
+      <my-sidebar-timer :class="getSidebarClass()" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
+    </div>
     <!-- <div :class="'chat-hide-btn ' + trayClass()">
       <button @click="trayToggle()" type="button" :class="'btn btn-gray ' + trayClass()">
         timers
@@ -88,8 +92,8 @@ export default {
 <style lang="scss">
 #timer-tray {
   height: 100%;
-  padding: 0 15px;
-  width: 300px;
+  // padding: 0 15px;
+  width: 340px;
   height: calc(100vh - 50px);
   overflow-y: scroll;
   // background-color: #616161;
@@ -97,6 +101,19 @@ export default {
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
+}
+.timer-tray-top-div {
+  top: 0;
+  // font-weight: bold;
+  position: sticky;
+  padding: 10px;
+  z-index: 1;
+  background-color: rgba($color: #000000, $alpha: 0.5);
+}
+.timer-tray-timer-card {
+  width: 300px;
+  align-self: center;
+  margin-top: 10px;
 }
 .timer-tray-title {
   margin-top: 10px;

@@ -1,5 +1,8 @@
 <template>
   <div class="task-side-bar">
+    <div class="task-side-bar-label">
+      <span>CHAT</span>
+    </div>
     <div class="message-sidebar">
       <b-list-group v-if="tasks.length > 0">
         <task-sidebar-item v-for="(task, index) in tasks" :key="index" :task="task" />
@@ -74,7 +77,34 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
+.task-side-bar {
+  position: relative;
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  /* justify-content: center; */
+  /* padding: 0 20px 20px 20px; */
+  color: white;
+  /* background-color: #616161; */
+  background-color: rgba(0, 0, 0, 0.5);
+  height: calc(100vh - 50px);
+  overflow-y: scroll;
+}
+.message-sidebar {
+  align-self: center;
+  width: 300px;
+  margin-top: 15px;
+}
+.task-side-bar-label {
+  top: 0;
+  font-weight: bold;
+  position: sticky;
+  padding: 10px;
+  z-index: 1;
+  background-color: rgba($color: #000000, $alpha: 0.5);
+}
 .message-avatar {
   /* width: 50px;
     height: 50px; */
@@ -109,17 +139,7 @@ export default {
 html {
   line-height: var(--1h);
 }
-.task-side-bar {
-  padding: 20px;
-  color: white;
-  /* background-color: #616161; */
-  background-color: rgba(0, 0, 0, 0.5);
-  height: calc(100vh - 50px);
-  overflow-y: scroll;
-}
-.message-sidebar {
-  width: 300px;
-}
+
 .message-panel {
   width: 298px;
 }

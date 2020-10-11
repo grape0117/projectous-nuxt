@@ -67,7 +67,9 @@ export default Vue.extend({
         { name: 'Task Cloud', path: '/tasks' },
         { name: 'Kanban', path: '/kanban' },
         { name: 'clients', path: '/clients' },
-        { name: 'users', path: '/users' }
+        { name: 'users', path: '/users' },
+        { name: 'invoices', path: '/invoices' },
+        { name: 'reports', path: '/reports' }
       ],
       colors: {
         backgroundColor: ['0', '0', '0'],
