@@ -52,12 +52,12 @@ const router = new Router({
     {
       path: '/users',
       name: 'Company Users',
-      component: () => import(/* webpackChunkName: "Custom" */ '@/views/ClientsTemplate.vue')
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/CompanyUsers.vue')
     },
     {
       path: '/clients',
       name: 'Clients',
-      component: () => import(/* webpackChunkName: "Custom" */ '@/views/CompanyUsers.vue')
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/ClientsTemplate.vue')
     },
     {
       path: '/users',

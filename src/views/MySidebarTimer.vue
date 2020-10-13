@@ -1,18 +1,43 @@
 <template id="mytimer-sidebar-template">
   <div>
     <pre></pre>
+    <!-- {{ timerEmptyFields }} -->
+    <!-- <sidebar-timer v-bind:running_timers="running_timers" v-bind:projects="projects" v-bind:users="users" v-for="timer in mytimers()" v-bind:timer="timer" :key="'sidebar-' + timer.id"></sidebar-timer> -->
     <sidebar-timer v-bind:running_timers="running_timers" v-bind:projects="projects" v-bind:users="users" v-for="timer in mytimers()" v-bind:timer="timer" :key="'sidebar-' + timer.id"></sidebar-timer>
   </div>
 </template>
 
 <script>
-import SidebarTimer from './SidebarTimer.vue'
+import { EventBus } from '@/components/event-bus'
+
 export default {
   name: 'my-sidebar-timer',
+  data: function() {
+    return {
+      running_timers: {}
+    }
+  },
   components: {
-    SidebarTimer
+    SidebarTimer: () => import('./SidebarTimer.vue')
+  },
+  created() {
+    this.$watch('timerEmptyFields', async count => {
+      await EventBus.$emit('timerEmptyFields', this.timerEmptyFields)
+    })
   },
   computed: {
+    timerEmptyFields() {
+      let totalCount = 0
+      this.mytimers().forEach(timer => {
+        if (timer.project_id === null) {
+          totalCount++
+        }
+        if (timer.notes === null) {
+          totalCount++
+        }
+      })
+      return totalCount
+    },
     timers: function() {
       console.log('trigger!')
       return this.$store.state.timers.timers
@@ -31,11 +56,6 @@ export default {
     },
     user_id: function() {
       return this.$store.state.settings.current_user_id
-    }
-  },
-  data: function() {
-    return {
-      running_timers: {}
     }
   },
   methods: {

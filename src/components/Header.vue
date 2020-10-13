@@ -23,12 +23,21 @@
     <div class="header-bottom">
       <div class="nav-icons">
         <i class="nav-icon icon-arrow_forward_ios nav-icons-active"></i>
-        <div class="nav-icon" :class="toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index" @click="toggle(icon.name)">
-          <i class="nav-icon__icon" :class="icon.icon" :style="icon.name == 'reload' ? 'color: white;' : ''"></i>
-          <span class="nav-icon__name" :style="icon.name == 'reload' ? 'color: white;' : ''">
-            {{ icon.name | toUpperCase }}
-          </span>
+        <div class="d-flex" :class="toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index">
+          <div class="nav-icon" @click="toggle(icon.name)">
+            <i class="nav-icon__icon" :class="icon.icon" :style="icon.name == 'reload' ? 'color: white;' : ''"></i>
+            <span class="nav-icon__name" :style="icon.name == 'reload' ? 'color: white;' : ''">
+              {{ icon.name | toUpperCase }}
+            </span>
+          </div>
+          <div class="timers-right-icons" v-if="icon.name === 'timers' && (timerRunning || timerEmptyFields > 0)">
+            <i class="icon-play_arrow" style="font-size: 20px;" :style="{ color: timerRunning ? '#20d420' : 'rgba(0,0,0,0)' }" />
+            <div class="red-circle-icon" v-if="timerEmptyFields > 0">
+              <span class="red-circle-icon-text">{{ timerEmptyFields }}</span>
+            </div>
+          </div>
         </div>
+
         <div class="header-paint" v-if="toggles.paint">
           <div class="mb-3" v-for="(style, styleIndex) in backgroundStyle" :key="styleIndex">
             <div class="d-flex justify-content-between">
@@ -62,6 +71,8 @@ import { getCookie } from '@/utils/util-functions'
 export default Vue.extend({
   data() {
     return {
+      timerEmptyFields: 0,
+      timerRunning: false,
       projectName: 'P',
       navLinks: [
         { name: 'Task Cloud', path: '/tasks' },
@@ -178,16 +189,53 @@ export default Vue.extend({
     } else {
       this.toggles.timers = false
     }
+    EventBus.$on('timerEmptyFields', count => {
+      this.timerEmptyFields = count
+    })
+    EventBus.$on('timerStatus', status => {
+      if (status === 'running') {
+        return (this.timerRunning = true)
+      }
+      this.timerRunning = false
+    })
+    //
   },
   filters: {
     toUpperCase(val) {
       return val.toUpperCase()
     }
+  },
+  beforeDestroy() {
+    EventBus.$off('timerEmptyFields')
+    EventBus.$off('timerStatus')
   }
 })
 </script>
 
+<style lang="scss">
+.timers-right-icons {
+  // border: 1px solid red;
+  display: flex;
+  flex-direction: column;
+  // justify-content: center;
+  align-items: center;
+}
+.red-circle-icon .red-circle-icon-text {
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+}
+</style>
+
 <style lang="scss" scoped>
+.red-circle-icon {
+  width: 15px;
+  height: 15px;
+  background-color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 /* .header { */
 /* display: flex; */
 /* flex-direction: column; */

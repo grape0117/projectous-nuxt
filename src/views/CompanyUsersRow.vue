@@ -1,6 +1,8 @@
-<template id="users-row">
-  <tr @click="editCompanyUser" class="table-row-hover">
-    <td :style="'background: ' + user.color">{{ user.name }}</td>
+<template>
+  <tr @click="editCompanyUser" class="company-user-row">
+    <!-- <td :style="'background: ' + user.color">{{ user.name }}</td> -->
+    <td :style="{ background: user.color }" :class="{ 'color-black': !!user.color }">{{ user.name }}</td>
+    <!-- <td :style="{ background : user.color }" class="color-black">{{ user.name }}</td> -->
     <td>{{ user.user_role }}</td>
     <td>{{ user.address }}</td>
   </tr>
@@ -17,3 +19,21 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.company-user-row {
+  background: rgba($color: #000000, $alpha: 0.4);
+  cursor: pointer;
+}
+.company-user-row:hover {
+  background: rgba($color: #000000, $alpha: 0.6);
+}
+.company-user-row td {
+  // border: 5px solid red !important;
+  font-weight: 500;
+  color: white;
+}
+.color-black {
+  color: black !important;
+}
+</style>

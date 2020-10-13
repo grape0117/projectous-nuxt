@@ -1,6 +1,6 @@
-<template id="users-template">
-  <div class="container-fluid">
-    <div class="row">
+<template>
+  <div class="company-users container-fluid">
+    <div class="row company-users-top">
       <div class="col-sm-12 form-group form-inline"></div>
       <div class="col-sm-12 form-group form-inline" v-if="isAdmin">
         <div @click="inviteUser()" class="btn btn-primary">Invite User</div>
@@ -48,3 +48,22 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.company-users {
+  padding: 0 65px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.company-users-top {
+  width: 100%;
+}
+.row-date {
+  background-color: rgba($color: #000000, $alpha: 0.6) !important;
+}
+.row-date td {
+  color: white !important;
+  font-weight: 500;
+}
+</style>
