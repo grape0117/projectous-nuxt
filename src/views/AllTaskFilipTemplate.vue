@@ -33,7 +33,17 @@
     </div>
     <div v-else class="show-task">
       <div class="left-section">
-        <button @click="saveTask()">Close (ESC)</button>
+        <div class="task-detail-top-buttons">
+          <button @click="saveTask()">Close (ESC)</button>
+          <b-button class="action-button" variant="outline-success" @click="completeTask()">
+            <!-- <i class="icon-check" /> -->
+            <span>Complete</span>
+          </b-button>
+          <b-button class="action-button" variant="outline-danger" @click="deleteTask">
+            <!-- <i class="icon-close" /> -->
+            <span>Delete</span>
+          </b-button>
+        </div>
         <b-tabs content-class="mt-3" style="margin-top: 10px;">
           <b-tab title="Details" active>
             <b-form-group label="Task">
@@ -73,6 +83,7 @@
                 </optgroup>
               </select>
             </div>
+
             <div class="form-section">
               Assigned to:
               <select id="task-user" class="form-control select2-select" name="task_user" v-on:change="switchAssignedUser">
@@ -80,8 +91,54 @@
                 <option v-for="company_user in company_users" :key="company_user.id" v-bind:company_user="company_user" :value="company_user.id"> {{ company_user.name }} </option>
               </select>
             </div>
-            <b-button variant="primary" @click="completeTask()">Complete</b-button>
-            <b-button variant="warning" @click="deleteTask">Delete</b-button>
+
+            <div class="form-group">
+              <label class="control-label col-sm-4">Task Type: </label>
+              <div class="col-sm-8">
+                <select class="form-control select2-select" name="project_id" :value="show_task.settings && show_task.settings.task_type ? show_task.settings.task_type : ''" @input="e => (task['settings']['task_type'] = e.target.value)">
+                  <option value="">***** Select Task Type *****</option>
+                  <option>Habit</option>
+                  <option>Appointment</option>
+                  <option>Recurring</option>
+                  <option>Meeting</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-sm-4" for="taskDueDate">Due Date: </label>
+              <div class="col-sm-8">
+                <input id="taskDueDate" class="form-control" type="date" name="due_at" placeholder="Due Date" v-model="show_task.due_date" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-sm-4" for="taskEditEstimate">Estimate: </label>
+              <div class="col-sm-8">
+                <input id="taskEditEstimate" class="form-control" type="text" name="estimate" placeholder="Estimate" v-model="show_task.estimate" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-sm-4" for="taskEditEstimate">Status: </label>
+              <div class="col-sm-8">
+                <select class="form-control" v-model="show_task.status">
+                  <option value="open">Open</option>
+                  <option value="turned-in">Turned-In</option>
+                  <option value="reviewed">Reviewed</option>
+                  <option value="completed">Completed</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row without-margin">
+              <p style="max-width: 100%; margin-bottom: 5px; font-weight: 700;">
+                Users:
+              </p>
+            </div>
+
+            <edit-task-modal-user v-for="user in active_users" :key="user.id" @toggle="toggleUser" v-bind:task_user="task_user(user)" v-bind:user="user" v-bind:task="show_task" />
           </b-tab>
           <b-tab title="Chat">
             <task-message v-bind:task_id="show_task.id"> </task-message>
@@ -118,6 +175,8 @@ import draggable from 'vuedraggable'
 import { each } from 'lodash'
 // import TaskMessage from './TaskMessage.vue'
 
+import EditTaskModalUser from './EditTaskModalUser.vue'
+
 export default Vue.extend({
   name: 'all-task-filip-template',
   data: function() {
@@ -128,16 +187,26 @@ export default Vue.extend({
       project_sort: '',
       isEditResource: null,
       scrollTop: 0,
-      selected_tab: ''
+      selected_tab: '',
+      changed_task_users: []
     }
   },
   props: ['task_id'],
   components: {
     'task-card': () => import('../components/ui/TaskCard.vue'),
     draggable,
-    'task-message': () => import('./TaskMessage.vue')
+    'task-message': () => import('./TaskMessage.vue'),
+    'edit-task-modal-user': EditTaskModalUser
   },
   computed: {
+    // task: function() {
+    //   let task = this.$store.state.settings.current_edit_task
+    //   // console.log('modal task', task)
+    //   return task
+    // },
+    active_users: function() {
+      return this.$store.getters['company_users/getActive']
+    },
     clients() {
       let clients = this.$store.getters['clients/getActiveCompanyClients']
       //console.log('clients', clients)
@@ -257,13 +326,35 @@ export default Vue.extend({
     }
   },
   methods: {
-    // getResources() {
-    //   if (this.show_task && this.show_task.settings && this.show_task.settings.resources && this.show_task.settings.resources.length) {
-    //     return this.show_task.settings.resources
-    //   } else {
-    //     return []
-    //   }
-    // },
+    task_user(company_user) {
+      // let self = this
+      let userTask = this.$store.state.task_users.task_users.find(task_user => {
+        if (task_user.task_id !== this.show_task.id) return false
+        return task_user.company_user_id === company_user.id
+      })
+
+      return userTask !== -1 ? userTask : false
+    },
+    toggleUser(user) {
+      //only add each entry once into changed_task_users
+      const task_user_index = this.changed_task_users.findIndex(changed_task_user => {
+        //TODO: figure out why no match
+        return changed_task_user.company_user_id === user.company_user_id
+      })
+      if (task_user_index !== -1) {
+        //update only things that can change
+        this.changed_task_users[task_user_index].user_rate = user.user_rate
+        this.changed_task_users[task_user_index].role = user.role
+        this.changed_task_users[task_user_index].user_checked = user.user_checked
+      } else {
+        //create
+        this.changed_task_users.push(user)
+      }
+    },
+    updateStatus(status) {
+      this.show_task.status = status
+      this.saveTask()
+    },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
     },
@@ -320,7 +411,6 @@ export default Vue.extend({
     },
     async saveTask(isRedirect = true) {
       console.log(this.show_task)
-      // http://localhost:8080/tasks/1048
       await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.show_task })
       if (isRedirect) {
         this.show_task = false
@@ -488,6 +578,8 @@ export default Vue.extend({
   max-width: 300px;
   width: 100%;
   padding: 10px;
+  height: calc(100vh - 50px);
+  overflow-y: scroll;
 }
 .center-section {
   margin-top: 10px;
@@ -496,6 +588,14 @@ export default Vue.extend({
 </style>
 
 <style scoped>
+.task-detail-top-buttons {
+  /* border: 1px solid red; */
+  display: flex;
+  justify-content: space-between;
+}
+.task-detail-top-buttons .action-button {
+  font-size: 13px;
+}
 .list-group-item {
   border: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);

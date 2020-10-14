@@ -22,7 +22,7 @@
             <label class="control-label col-sm-4" for="timer-modal-project-id">Project: </label>
             <div class="col-sm-6">
               <select id="timer-modal-project-id" class="form-control" name="project_id" v-model="timer.project_id">
-                <option>***** Select Project *****</option>
+                <option :value="null">***** Select Project *****</option>
                 <option value="create">Create New Project</option>
                 <option v-for="project in openprojects()" v-bind:project="project" :value="project.id">
                   {{ client_name(project.client_company_id) }} -
@@ -99,7 +99,7 @@
           <div class="form-group">
             <label class="control-label col-sm-4" for="report_at">Started at: </label>
             <div class="col-sm-8">
-              <input name="report_at" type="datetime" id="report_at" class="form-control" v-modal="timer.report_at" />
+              <input name="report_at" type="datetime" id="report_at" class="form-control" v-model="timer.report_at" />
             </div>
           </div>
           <!--          <div v-if="isIHI()" class="form-group">

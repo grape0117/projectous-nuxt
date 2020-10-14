@@ -47,6 +47,8 @@
 import Vue from 'vue'
 import { format_report_at, datetimeToJS } from '../utils/util-functions'
 
+import { EventBus } from '@/components/event-bus'
+
 export default {
   name: 'sidebar-timer',
   props: ['timer', 'projects', 'users', 'tasks', 'running_timers'],
@@ -54,6 +56,12 @@ export default {
     return {
       totalDuration: 0,
       invoiceDuration: 0
+    }
+  },
+  watch: {
+    async 'timer.status'(status) {
+      await EventBus.$emit('timerStatus', status)
+      // EventBus.$emit('timerEmptyFields', this.timerEmptyFields)
     }
   },
   computed: {

@@ -23,7 +23,11 @@
                   </div>
                 </div>
               </div>
-              <div class="dragzone__item-dragbox dragzone__item-dragbox--active" @click="editTask(item.task_id || item.id)"><span /> <span /> <span /></div>
+              <div class="dragzone__item-dragbox dragzone__item-dragbox--active" @click="editTask(item.task_id || item.id)">
+                <span />
+                <span />
+                <span />
+              </div>
               <div class="dragzone__add-task dragzone__add-task--item" @click="createTempItem(index, item.id)">
                 +
               </div>

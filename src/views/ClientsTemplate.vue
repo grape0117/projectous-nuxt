@@ -1,4 +1,4 @@
-<template id="clients-template">
+<template>
   <div class="container-fluid">
     <div class="row">
       <div class="col-sm-12 form-group form-inline"></div>
@@ -13,7 +13,7 @@
             <tr class="row-date">
               <td>Client</td>
             </tr>
-            <tr v-bind:client="client" v-for="client in filteredclients('lead')" is="clients-row"></tr>
+            <tr v-bind:client="client" v-for="(client, clientIndex) in filteredclients('lead')" :key="clientIndex" is="clients-row"></tr>
           </tbody>
         </table>
       </b-tab>
@@ -23,7 +23,7 @@
             <tr class="row-date">
               <td>Client</td>
             </tr>
-            <tr v-bind:client="client" v-for="client in filteredclients('new')" is="clients-row"></tr>
+            <tr v-bind:client="client" v-for="(client, clientIndex) in filteredclients('new')" :key="clientIndex" is="clients-row"></tr>
           </tbody>
         </table>
       </b-tab>
@@ -33,7 +33,7 @@
             <tr class="row-date">
               <td>Client</td>
             </tr>
-            <tr v-bind:client="client" v-for="client in filteredclients('active')" is="clients-row"></tr>
+            <tr v-bind:client="client" v-for="(client, clientIndex) in filteredclients('active')" :key="clientIndex" is="clients-row"></tr>
           </tbody>
         </table>
       </b-tab>
@@ -43,7 +43,7 @@
             <tr class="row-date">
               <td>Client</td>
             </tr>
-            <tr v-bind:client="client" v-for="client in filteredclients('inactive')" is="clients-row"></tr>
+            <tr v-bind:client="client" v-for="(client, clientIndex) in filteredclients('inactive')" is="clients-row"></tr>
           </tbody>
         </table>
       </b-tab>
@@ -53,7 +53,7 @@
             <tr class="row-date">
               <td>Client</td>
             </tr>
-            <tr v-bind:client="client" v-for="client in filteredclients('archived')" is="clients-row"></tr>
+            <tr v-bind:client="client" v-for="(client, clientIndex) in filteredclients('archived')" :key="clientIndex" is="clients-row"></tr>
           </tbody>
         </table>
       </b-tab>
