@@ -334,7 +334,7 @@ export default class Dragzone extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss">
 .dragzone-project-acronym {
   padding: 5px 10px;
   white-space: nowrap;
@@ -408,8 +408,8 @@ export default class Dragzone extends Vue {
   align-items: center;
   clear: both;
   color: white;
-  /* margin-bottom: 5px; */
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba($color: #000000, $alpha: 0.4);
+  box-shadow: 0px 0px 16px -7px rgba($color: #ffffff, $alpha: 1);
   border-radius: 5px;
 }
 .dragzone__item-block-content-text {

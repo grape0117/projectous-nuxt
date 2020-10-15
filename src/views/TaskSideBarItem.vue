@@ -1,5 +1,5 @@
 <template>
-  <b-list-group-item>
+  <b-list-group-item class="task-sidebar-item">
     <div class="">
       <span class="ml-2 task-sidebar-date">{{ messageTime(task.last_task_message_created_at) }}</span>
       <div class="d-flex align-items-center">
@@ -68,7 +68,11 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+.task-sidebar-item {
+  background-color: rgba($color: #000000, $alpha: 0.4) !important;
+  box-shadow: 0px 0px 16px -7px rgba($color: #ffffff, $alpha: 1);
+}
 .task-sidebar-message-detail {
   margin-top: 10px;
 }

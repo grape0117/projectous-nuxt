@@ -4,7 +4,7 @@
       <span>CHAT</span>
     </div>
     <div class="message-sidebar">
-      <b-list-group v-if="tasks.length > 0">
+      <b-list-group v-if="tasks.length > 0" class="">
         <task-sidebar-item v-for="(task, index) in tasks" :key="index" :task="task" />
       </b-list-group>
       <div v-else class="d-flex justify-content-center">

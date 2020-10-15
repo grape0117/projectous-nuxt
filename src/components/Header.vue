@@ -30,6 +30,14 @@
               {{ icon.name | toUpperCase }}
             </span>
           </div>
+          <div class="chat-right-icons" v-if="icon.name === 'chat'">
+            <div class="chat-right-icon" style="background-color: green;">
+              <span class="chat-right-icon-text">0</span>
+            </div>
+            <div class="chat-right-icon" style="background-color: red;">
+              <span class="chat-right-icon-text">0</span>
+            </div>
+          </div>
           <div class="timers-right-icons" v-if="icon.name === 'timers' && (timerRunning || timerEmptyFields > 0)">
             <i class="icon-play_arrow" style="font-size: 20px;" :style="{ color: timerRunning ? '#20d420' : 'rgba(0,0,0,0)' }" />
             <div class="red-circle-icon" v-if="timerEmptyFields > 0">
@@ -220,6 +228,25 @@ export default Vue.extend({
   // justify-content: center;
   align-items: center;
 }
+.chat-right-icons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3px 1px;
+}
+.chat-right-icon {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  // background-color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.chat-right-icon-text {
+  font-size: 10px;
+  color: white;
+}
 .red-circle-icon .red-circle-icon-text {
   font-size: 10px;
   font-weight: bold;
@@ -232,6 +259,7 @@ export default Vue.extend({
   width: 15px;
   height: 15px;
   background-color: red;
+  border-radius: 100px;
   display: flex;
   justify-content: center;
   align-items: center;

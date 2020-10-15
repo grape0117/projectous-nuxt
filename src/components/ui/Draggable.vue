@@ -4,7 +4,7 @@
       <div v-if="!verticalAlignment" class="list__group-title">
         {{ group.name }}
       </div>
-      <div class="list__group" :class="title.replace(/[^a-zA-Z0-9]/, '-')" :style="{ height: !verticalAlignment ? 'calc(100vh - 140px)' : '' }" v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id">
+      <div class="list__group" :class="title.replace(/[^a-zA-Z0-9]/, '-')" :style="{ height: !verticalAlignment ? 'calc(100vh - 140px)' : '', 'overflow-y': verticalAlignment ? 'hidden' : 'scroll' }" v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id">
         <div
           :class="'list__group-subtitle-title' + title.replace(/[^a-zA-Z0-9]/, '-')"
           :style="{
@@ -162,16 +162,16 @@ export default class Draggable extends Vue {
 }
 .list__group {
   max-width: 280px;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
   width: 100%;
   padding: 0 10px;
   display: flex;
   margin-bottom: 10px;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-  -webkit-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
   box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
+  -webkit-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
 }
 .list__group:first-child {
   margin-top: 15px;

@@ -1,6 +1,6 @@
 <template>
   <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
-  <li id="timer-row-template" v-if="isCurrentUser()" class="sidebar-timer" v-bind:data-restarted="timer.restart_at">
+  <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" v-bind:data-restarted="timer.restart_at">
     <!-- :class="[
       { 'sidebar-timer-client-no-project': !project.id }, 
       { 'side-timer-timer-active': timer.status === 'running' }, 
@@ -306,7 +306,7 @@ export default {
 //   box-shadow: 0px 0px 5px rgba($color: red, $alpha: 0.7);
 // }
 </style>
-<style scoped>
+<style lang="scss" scoped>
 .status-icons {
   display: flex;
   margin-right: 5px;
@@ -321,5 +321,9 @@ li {
 }
 .sidebar-timer-timer-id {
   font-size: 12px;
+}
+.sidebar-timer {
+  background-color: rgba($color: #000000, $alpha: 0.4);
+  box-shadow: 0px 0px 16px -7px rgba($color: #ffffff, $alpha: 1);
 }
 </style>
