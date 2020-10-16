@@ -15,7 +15,7 @@
           <b-nav-item to="/profile">Profile</b-nav-item>
           <b-nav-item to="/logout">Log Out</b-nav-item>
         </b-nav> -->
-        <router-link class="nav-buttons__button" @click="navClick(button)" :to="button.path" v-for="(button, index) in navLinks" :key="index">
+        <router-link class="nav-buttons__button" @click="navClick(button)" :to="button.path" v-for="(button, index) in navLinks" :style="{ 'text-decoration': $route.path === button.path ? 'underline' : '' }" :key="index">
           {{ button.name | toUpperCase }}
         </router-link>
       </div>

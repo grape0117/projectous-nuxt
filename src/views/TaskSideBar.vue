@@ -90,6 +90,7 @@ export default {
   /* background-color: #616161; */
   background-color: rgba(0, 0, 0, 0.5);
   height: calc(100vh - 50px);
+
   overflow-y: scroll;
 }
 .message-sidebar {

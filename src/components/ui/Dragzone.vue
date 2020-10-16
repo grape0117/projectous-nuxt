@@ -9,7 +9,31 @@
           <!-- <pre>{{ item }}</pre> -->
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
-            <div class="dragzone__item-block-content-text">
+            <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px;">
+              <div class="burger-icon-wrapper">
+                <span v-show="showPlusIcon.task_id === item.task_id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.task_id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
+                  +
+                </span>
+                <div style="padding-left: 5px; padding-right: 5px;" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.task_id, true)" @mouseleave="show_plusIcon(null, false)">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+
+              <div class="dragzone__item-info">
+                <span class="dragzone-project-acronym" v-if="item.project.acronym"> {{ item.project.acronym }} </span>
+                <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
+
+                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
+
+                <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
+                  <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
+                  <span v-else class="dragzone__item-tracker-icon-triangle" />
+                </div>
+              </div>
+            </div>
+            <!-- <div class="dragzone__item-block-content-text">
               <div class="dragzone__item-subtext mt-2">
                 <img v-if="project_url(item)" :src="project_url(item)" />
                 <div class="d-flex align-items-center">
@@ -34,7 +58,7 @@
               <div class="">
                 <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
-            </div>
+            </div> -->
             <div class="dragzone__task-users">
               <small v-if="show_debug()"
                 ><span style="color: red;">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small
@@ -110,6 +134,7 @@ export default class Dragzone extends Vue {
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
   private currentListsBlockName: string | null = null
+  private showPlusIcon: object = { task_id: null, visible: false }
 
   @Watch('tasks')
   public onTaskChanged(newTasks: any, oldTasks: any) {
@@ -129,6 +154,10 @@ export default class Dragzone extends Vue {
         }, 50)
       }
     }
+  }
+
+  private show_plusIcon(task_id: any, visibility: boolean) {
+    this.showPlusIcon = { task_id: task_id, visible: visibility }
   }
 
   private show_debug() {
@@ -335,15 +364,46 @@ export default class Dragzone extends Vue {
 </script>
 
 <style lang="scss">
-.dragzone-project-acronym {
-  padding: 5px 10px;
-  white-space: nowrap;
-  background-color: green;
-  font-size: 12px;
+.dragzone-project-project-name {
+  font-size: 10px;
+  font-weight: bold;
+  max-width: 80px;
+  color: green;
+  // background-color: orange;
+  text-decoration: underline;
+}
+.dragzone__item-wrapper {
+  display: flex;
+  align-items: center;
+  // border: 1px solid red;
+}
+.dragzone__item-info {
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 35px;
+}
+.burger-icon-wrapper {
+  display: flex;
+  align-items: center;
+  // border: 1px solid red;
+}
+.burger-icon span {
+  display: block;
+  width: 15px;
+  height: 2px;
+  background: #cccccf;
+  margin: 2px 0;
+}
+.dragzone-project-acronym {
+  padding: 5px 5px;
+  white-space: nowrap;
+  background-color: green;
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20px;
 }
 .dragzon-icon-dehaze {
   cursor: all-scroll;

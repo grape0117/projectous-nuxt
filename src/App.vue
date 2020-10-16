@@ -319,6 +319,9 @@ export default {
 </script>
 
 <style lang="scss">
+.modal-content {
+  max-height: calc(100vh - 70px);
+}
 #app {
   display: flex;
   // background-color: rgba(0, 0, 0, 0.3);

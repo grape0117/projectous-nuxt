@@ -13,6 +13,7 @@
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
                 <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
               </div>
+              <span class="client-section-acronym" v-if="client.acronym">{{ client.acronym }}</span>
               <div class="client-project-name__name" @click="setProjectId(id)">
                 {{ name }}
               </div>
@@ -244,7 +245,10 @@ export default class Custom extends Vue {
   //TODO: pass only ids instead of whole objects?
   private updateTaskSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.$store.dispatch('tasks/updateSortOrders', parsedTasks.map(({ id }: { id: string }) => id))
+    this.$store.dispatch(
+      'tasks/updateSortOrders',
+      parsedTasks.map(({ id }: { id: string }) => id)
+    )
   }
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {
@@ -309,6 +313,16 @@ export default class Custom extends Vue {
   overflow-x: scroll;
   overflow-y: hidden;
 }
+.client-section-acronym {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  background-color: green;
+  color: white;
+  font-size: 10px;
+  padding: 0 5px;
+}
 .kanban-page-innerwrapper {
   display: flex;
   justify-content: space-between;
@@ -317,10 +331,14 @@ export default class Custom extends Vue {
 
 <style scoped>
 .client-section {
+  /* max-width: 350px; */
+  max-width: 240px;
+  /* border: 5px solid red; */
   flex-grow: 0 !important;
   flex-basis: 260px !important;
   padding-top: 10px;
   overflow-y: scroll;
+  overflow-x: hidden;
   height: calc(100vh - 50px) !important;
   background-color: rgba(0, 0, 0, 0.4);
 }

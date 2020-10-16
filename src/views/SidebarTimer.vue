@@ -257,11 +257,11 @@ export default {
   padding: 5px 10px;
   white-space: nowrap;
   background-color: green;
-  font-size: 12px;
+  font-size: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 35px;
+  height: 20px;
 }
 .sidebar-timer-client-name {
   font-size: 12px;
