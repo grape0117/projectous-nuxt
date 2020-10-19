@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="task-cloud">
     <div v-if="!show_task" style="padding: 20px;">
       <b-row style="margin-bottom: 10px;">
         <select v-model="project_sort" style="width: 400px;">
@@ -26,9 +26,11 @@
         <task-card @showTask="showTask(task)" v-bind:task="task" v-for="(task, taskIndex) in new_client_tasks" :key="taskIndex" class="task-card"> </task-card>
       </b-row>
 
-      <b-row class="border">
-        <div style="width: 100%">Active</div>
-        <task-card @showTask="showTask(task)" v-bind:task="task" :keyid="taskIndex" v-for="(task, taskIndex) in active_client_tasks" :key="taskIndex" class="task-card"> </task-card>
+      <b-row class="border active-task-card">
+        <div class="active-task-card-title">Active</div>
+        <div style="margin-top: 40px;">
+          <task-card @showTask="showTask(task)" v-bind:task="task" :keyid="taskIndex" v-for="(task, taskIndex) in active_client_tasks" :key="taskIndex" class="task-card"> </task-card>
+        </div>
       </b-row>
     </div>
     <div v-else class="show-task">
@@ -573,7 +575,23 @@ export default Vue.extend({
   }
 })
 </script>
-<style>
+<style lang="scss">
+#task-cloud {
+  overflow: hidden;
+}
+.active-task-card {
+  height: calc(100vh - 180px);
+  overflow-y: scroll;
+  padding: 5px 5px;
+}
+.active-task-card-title {
+  position: fixed;
+  font-weight: 500;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background-color: rgba($color: #000000, $alpha: 0.6);
+}
 .left-section {
   max-width: 300px;
   width: 100%;
@@ -622,9 +640,19 @@ export default Vue.extend({
 
 .task-card {
   float: left;
-  min-height: 30px;
   margin: 5px;
   min-width: 75px;
+  padding: 10px 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  font-size: small;
+  width: 200px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  min-height: 80px;
+  max-height: 80px;
 }
 
 .show-task {

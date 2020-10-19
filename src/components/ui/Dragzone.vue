@@ -11,7 +11,7 @@
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px;">
               <div class="burger-icon-wrapper">
-                <span v-show="showPlusIcon.task_id === item.task_id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.task_id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
+                <span style="margin-top: -7px;" v-show="showPlusIcon.task_id === item.task_id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.task_id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
                   +
                 </span>
                 <div style="padding-left: 5px; padding-right: 5px;" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.task_id, true)" @mouseleave="show_plusIcon(null, false)">
@@ -22,15 +22,19 @@
               </div>
 
               <div class="dragzone__item-info">
-                <span class="dragzone-project-acronym" v-if="item.project.acronym"> {{ item.project.acronym }} </span>
+                <p style="margin-bottom: 0 !important;">
+                  <span class="dragzone-project-acronym" v-if="item.project.acronym">{{ item.project.acronym }}</span>
+                  <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
+                  <span class="dragzone__item-text" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id">{{ item.title }}</span>
+                </p>
+                <!-- <div class="dragzone-project-acronym" v-if="item.project.acronym"> {{ item.project.acronym }} </div>
                 <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
 
-                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
-
-                <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
-                  <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
-                  <span v-else class="dragzone__item-tracker-icon-triangle" />
-                </div>
+                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" /> -->
+              </div>
+              <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
+                <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
+                <span v-else class="dragzone__item-tracker-icon-triangle" />
               </div>
             </div>
             <!-- <div class="dragzone__item-block-content-text">
@@ -374,18 +378,20 @@ export default class Dragzone extends Vue {
 }
 .dragzone__item-wrapper {
   display: flex;
-  align-items: center;
+  // height: 100%;
+  // align-items: center;
+  // justify-content: center;
   // border: 1px solid red;
 }
 .dragzone__item-info {
   width: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  // align-items: center;
 }
 .burger-icon-wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   // border: 1px solid red;
 }
 .burger-icon span {
@@ -400,9 +406,9 @@ export default class Dragzone extends Vue {
   white-space: nowrap;
   background-color: green;
   font-size: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
   height: 20px;
 }
 .dragzon-icon-dehaze {
@@ -503,6 +509,7 @@ export default class Dragzone extends Vue {
   min-height: 1.459em;
   font-size: 0.9rem;
   color: white;
+  margin-bottom: 0 !important;
 }
 .dragzone__item-subtext {
   margin-left: 30px;

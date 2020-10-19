@@ -1,5 +1,5 @@
 <template>
-  <div @click="$emit('showTask', task)" class="task-card" :style="'background-color: ' + backgroundColor">
+  <div @click="$emit('showTask', task)" style="" :style="'background-color: ' + backgroundColor">
     <!-- <img :src="'//www.projectous.com/api/projects/' + task.project_id + '/favicon.png'" /> -->
     <!-- <img src="https://dummyimage.com/30x30/000/fff" /> -->
     <!-- <pre>{{ task }}</pre> -->
@@ -130,23 +130,7 @@ export default {
 }
 .task-card.coming-up {
 }
-.task-card {
-  cursor: pointer;
-  font-size: small;
-  width: 200px;
-  /* white-space: nowrap; */
-  overflow-x: hidden;
-  text-overflow: ellipsis;
-  min-height: 120px;
-  max-height: 120px;
-}
 
-.task-card {
-  padding: 10px 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
 .task-img .task-card-avatar {
   padding: 5px 10px;
   height: 30px !important;
