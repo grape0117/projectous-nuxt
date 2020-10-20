@@ -3,7 +3,8 @@
     <!-- <div class="header-top" :style="`background-image: linear-gradient(to right, rgba(${headerBgColor},0.2), rgba(${headerBgColor},0.9), rgba(${headerBgColor},1));`"> -->
     <div class="header-nav">
       <router-link class="logo-name" to="/">
-        {{ projectName | toUpperCase }}
+        <!-- {{ projectName | toUpperCase }} -->
+        <img src="/apple-touch-icon.png" width="30" height="30" alt="logo" />
       </router-link>
       <div class="nav-buttons">
         <!-- <b-nav horizntal>
@@ -16,6 +17,7 @@
           <b-nav-item to="/logout">Log Out</b-nav-item>
         </b-nav> -->
         <router-link class="nav-buttons__button" @click="navClick(button)" :to="button.path" v-for="(button, index) in navLinks" :style="{ 'text-decoration': $route.path === button.path ? 'underline' : '' }" :key="index">
+          <!-- <router-link class="nav-buttons__button" @click="navClick(button)" :to="button.path" v-for="(button, index) in navLinks" :key="index"> -->
           {{ button.name | toUpperCase }}
         </router-link>
       </div>
@@ -81,7 +83,7 @@ export default Vue.extend({
     return {
       timerEmptyFields: 0,
       timerRunning: false,
-      projectName: 'P',
+      // projectName: 'P',
       navLinks: [
         { name: 'Task Cloud', path: '/tasks' },
         { name: 'Kanban', path: '/kanban' },
@@ -221,6 +223,12 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+.nav-buttons {
+  display: flex;
+}
+.nav-buttons__button {
+  margin-right: 5px;
+}
 .timers-right-icons {
   // border: 1px solid red;
   display: flex;
@@ -287,10 +295,13 @@ export default Vue.extend({
   padding-left: 20px;
 }
 .logo-name {
-  font-weight: bold;
-  font-size: 27px;
-  color: white;
-  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  // font-weight: bold;
+  // font-size: 27px;
+  // color: white;
+  // text-decoration: none;
 }
 .logo-name:hover {
   cursor: pointer;

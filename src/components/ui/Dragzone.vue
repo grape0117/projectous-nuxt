@@ -4,17 +4,18 @@
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
     <div class="dragzone__content">
-      <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
+      <!-- <pre>{{ tasksOrderByProjectUpdated_at }}</pre> -->
+      <!-- <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)"> -->
+      <div v-for="(item, index) in expandedList ? tasksOrderByProjectUpdated_at : tasksOrderByProjectUpdated_at.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
-          <!-- <pre>{{ item }}</pre> -->
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px;">
               <div class="burger-icon-wrapper">
-                <span style="margin-top: -7px;" v-show="showPlusIcon.task_id === item.task_id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.task_id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
+                <span style="margin-top: -7px;" v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
                   +
                 </span>
-                <div style="padding-left: 5px; padding-right: 5px;" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.task_id, true)" @mouseleave="show_plusIcon(null, false)">
+                <div style="padding-left: 5px; padding-right: 5px;" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
                   <span></span>
                   <span></span>
                   <span></span>
@@ -27,75 +28,24 @@
                   <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
                   <span class="dragzone__item-text" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id">{{ item.title }}</span>
                 </p>
-                <!-- <div class="dragzone-project-acronym" v-if="item.project.acronym"> {{ item.project.acronym }} </div>
-                <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
-
-                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" /> -->
               </div>
               <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
                 <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
                 <span v-else class="dragzone__item-tracker-icon-triangle" />
               </div>
             </div>
-            <!-- <div class="dragzone__item-block-content-text">
-              <div class="dragzone__item-subtext mt-2">
-                <img v-if="project_url(item)" :src="project_url(item)" />
-                <div class="d-flex align-items-center">
-                  <span class="dragzone-project-acronym" v-if="item.project.acronym">
-                    {{ item.project.acronym }}
-                  </span>
-                  <span v-else>{{ projectName(item.project_id) }}</span>
-                  <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
-                    <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
-                    <span v-else class="dragzone__item-tracker-icon-triangle" />
-                  </div>
-                </div>
-              </div>
-              <div class="dragzone__item-dragbox dragzone__item-dragbox--active" @click="editTask(item.task_id || item.id)">
-                <span />
-                <span />
-                <span />
-              </div>
-              <div class="dragzone__add-task dragzone__add-task--item" @click="createTempItem(index, item.id)">
-                +
-              </div>
-              <div class="">
-                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
-              </div>
-            </div> -->
             <div class="dragzone__task-users">
-              <small v-if="show_debug()"
-                ><span style="color: red;">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small
-              >
+              <small v-if="show_debug()">
+                <span style="color: red;">{{ getTaskType(item.task_id || item.id) }}</span>
+                list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }}
+                <small v-if="item.task_id">TaskUser</small>
+                <small v-else>Task.id</small>:
+                {{ item.id }}
+              </small>
               <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
             </div>
           </div>
           <div v-if="index == tasks.length - 1" class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
-
-          <!-- <div
-            v-if="true || editedItemId === item.id"
-            class="dragzone__item-tracker"
-          >
-            <div
-              v-if="getTaskDueDate(item.task_id || item.id)"
-              class="dragzone__item-tracker-number"
-            >
-              08/01 {{ getTaskDueDate(item.task_id || item.id) }}
-            </div>
-            <div
-              class="dragzone__item-tracker-name"
-              :class="{
-                'dragzone__item-tracker-name--active': timerId === item.id
-              }"
-            />
-            <span
-              class="dragzone__item-tracker-circle"
-              :class="{
-                'dragzone__item-tracker-circle--active': timerId === item.id
-              }"
-            />
-            <div class="dragzone__item-tracker-time">00:00:00</div>
-          </div>-->
         </div>
       </div>
 
@@ -103,9 +53,6 @@
         +
       </div>
     </div>
-    <!--<div v-if="!expandedList && isListExpandable" class="pl-2">
-      ...
-    </div>-->
   </div>
 </template>
 <script lang="ts">
@@ -160,6 +107,13 @@ export default class Dragzone extends Vue {
     }
   }
 
+  get tasksOrderByProjectUpdated_at() {
+    return this.tasks.sort(function compare(a: any, b: any) {
+      let dateA = new Date(a.project.updated_at)
+      let dateB = new Date(b.project.updated_at)
+      return dateA - dateB
+    })
+  }
   private show_plusIcon(task_id: any, visibility: boolean) {
     this.showPlusIcon = { task_id: task_id, visible: visibility }
   }

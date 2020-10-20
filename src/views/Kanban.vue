@@ -6,17 +6,20 @@
       <b-row class="kanban-page-innerwrapper">
         <b-col class="client-section scroll-col">
           <div v-if="clientVisible(client)" v-for="(client, index) in activeClients" :key="index">
-            <!--            Todo: change client id to client name-->
             <div class="client-name">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
-            <div class="client-project-name" v-for="{ name, id } in openClientProjects(client)" :key="id">
+            <div class="client-project-name" v-for="{ name, id, acronym } in openClientProjects(client)" :key="id">
               <div @click="setPinnedProject(id)" class="project-item-status">
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
                 <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
               </div>
-              <span class="client-section-acronym" v-if="client.acronym">{{ client.acronym }}</span>
+              <p style="margin-bottom: 0 !important;">
+                <span class="client-section-acronym" v-if="acronym">{{ acronym }}</span>
+                <span class="client-project-name__name" @click="setProjectId(id)">{{ name }}</span>
+              </p>
+              <!-- <span class="client-section-acronym" v-if="acronym">{{ acronym }}</span>
               <div class="client-project-name__name" @click="setProjectId(id)">
                 {{ name }}
-              </div>
+              </div> -->
             </div>
           </div>
         </b-col>
@@ -314,14 +317,15 @@ export default class Custom extends Vue {
   overflow-y: hidden;
 }
 .client-section-acronym {
-  display: flex;
+  /* display: flex;
   align-items: center;
-  justify-content: center;
-  height: 25px;
+  justify-content: center; */
   background-color: green;
   color: white;
   font-size: 10px;
-  padding: 0 5px;
+  white-space: nowrap;
+  padding: 5px 5px;
+  margin-right: 5px;
 }
 .kanban-page-innerwrapper {
   display: flex;
@@ -361,10 +365,11 @@ export default class Custom extends Vue {
   color: white;
 }
 .client-project-name {
+  padding: 5px 0;
   font-size: 14px;
   font-weight: 500;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 }
 .client-project-name:hover {
   background-color: rgba(0, 0, 0, 0.2);
@@ -372,7 +377,6 @@ export default class Custom extends Vue {
   color: white;
 }
 .client-project-name__name {
-  padding: 5px 0 5px 8px;
   width: 100%;
   height: 100%;
   color: white;
