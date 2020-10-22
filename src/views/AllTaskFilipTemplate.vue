@@ -315,19 +315,32 @@ export default Vue.extend({
       }
     })
   },
-  created() {
+  async created() {
+    if (this.$route.params.task_id) {
+      await this.setShowTask()
+    }
+    // this.$nextTick(() => {
+    // this.$watch('$route', (val) => {
+    //   console.log('WATCH ON CREATED');
+    // })
+    // })
+    // if(this.$route.params.task_id) {
+    //   console.log('THERE IS DATA!!!')
+    //   console.log(this.$route.params);
+    // }
     if (Object.keys(this.$route.params).length) {
       this.$watch('active_client_tasks', async data => {
         if (data) {
           console.log('DATA RESULT')
-          // console.log(data.find(({id}) => id === this.$route.params.task_id))
           this.show_task = await data.find(({ id }) => id === this.$route.params.task_id)
-          // console.log(this.show_task)
         }
       })
     }
   },
   methods: {
+    async setShowTask() {
+      this.show_task = await this.tasks.find(({ id }) => id === this.$route.params.task_id)
+    },
     task_user(company_user) {
       // let self = this
       let userTask = this.$store.state.task_users.task_users.find(task_user => {
@@ -561,8 +574,11 @@ export default Vue.extend({
         }
       }
     },
-    $route(to, from) {
+    async $route(to, from) {
       console.log(to)
+
+      // console.log('ROUTE IS CHANGING')
+
       if (to.name == 'Task_Detail' && from.name == 'Tasks') {
         document.documentElement.scrollTop = 0
       } else if (to.name == 'Tasks' && from.name == 'Task_Detail') {
@@ -570,6 +586,10 @@ export default Vue.extend({
         setTimeout(function() {
           document.documentElement.scrollTop = me.scrollTop
         }, 100)
+      }
+
+      if (to.params.task_id) {
+        await this.setShowTask()
       }
     }
   }

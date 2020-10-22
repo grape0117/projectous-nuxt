@@ -4,6 +4,9 @@
       <span>CHAT</span>
     </div>
     <div class="message-sidebar">
+      <div class="message-sidebar_new-task" @click="createTask">
+        +
+      </div>
       <b-list-group v-if="tasks.length > 0" class="">
         <task-sidebar-item v-for="(task, index) in tasks" :key="index" :task="task" />
       </b-list-group>
@@ -51,6 +54,12 @@ export default {
   },
   mounted() {},
   methods: {
+    async createTask() {
+      let newTask = { id: uuid.v4() }
+      await this.$store.dispatch('UPSERT', { module: 'tasks', entity: newTask })
+      this.$router.push({ name: 'Task_Detail', params: { task_id: newTask.id } })
+      // await EventBus.$emit('')
+    },
     messageTime(time) {
       let today = moment()
       let msgTime = moment(time)
@@ -78,6 +87,13 @@ export default {
 }
 </script>
 <style lang="scss">
+.message-sidebar_new-task {
+  cursor: pointer;
+  margin-top: -10px;
+  margin-bottom: 5px;
+  font-size: 20px;
+}
+
 .task-side-bar {
   position: relative;
   width: 350px;

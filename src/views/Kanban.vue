@@ -5,7 +5,14 @@
     <b-container fluid>
       <b-row class="kanban-page-innerwrapper">
         <b-col class="client-section scroll-col">
-          <div v-if="clientVisible(client)" v-for="(client, index) in activeClients" :key="index">
+          <div class="d-flex justify-content-center mb-3">
+            <select v-model="selectedClient" style="width: 100px;">
+              <option :value="null" selected>All Clients</option>
+              <option :value="id" v-for="{ id, name } in activeClients" :key="id">{{ name }}</option>
+            </select>
+          </div>
+
+          <div v-if="clientVisible(client)" v-for="(client, index) in selectedClient ? filteredClient : activeClients" :key="index">
             <div class="client-name">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
             <div class="client-project-name" v-for="{ name, id, acronym } in openClientProjects(client)" :key="id">
               <div @click="setPinnedProject(id)" class="project-item-status">
@@ -16,10 +23,6 @@
                 <span class="client-section-acronym" v-if="acronym">{{ acronym }}</span>
                 <span class="client-project-name__name" @click="setProjectId(id)">{{ name }}</span>
               </p>
-              <!-- <span class="client-section-acronym" v-if="acronym">{{ acronym }}</span>
-              <div class="client-project-name__name" @click="setProjectId(id)">
-                {{ name }}
-              </div> -->
             </div>
           </div>
         </b-col>
@@ -85,6 +88,11 @@ export default class Custom extends Vue {
   private showTask: boolean = true
   private showTimer: boolean = true
   private showChat: boolean = false
+  private selectedClient: string = ''
+
+  get filteredClient() {
+    return this.activeClients.filter(client => client.id === this.selectedClient)
+  }
 
   get listsBlockNames() {
     return listsBlockNames
