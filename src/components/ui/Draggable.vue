@@ -162,7 +162,7 @@ export default class Draggable extends Vue {
 }
 .list__group {
   max-width: 280px;
-  /* overflow-y: scroll; */
+  overflow-x: hidden;
   width: 100%;
   padding: 0 10px;
   display: flex;

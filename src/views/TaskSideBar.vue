@@ -3,12 +3,14 @@
     <div class="task-side-bar-label">
       <span>CHAT</span>
     </div>
+    <!-- {{ this.$store.state.task_messages.task_messages.length }} -->
+    <!-- <span>{{ taskMessages.length }}</span> -->
     <div class="message-sidebar">
       <div class="message-sidebar_new-task" @click="createTask">
         +
       </div>
-      <b-list-group v-if="tasks.length > 0" class="">
-        <task-sidebar-item v-for="(task, index) in tasks" :key="index" :task="task" />
+      <b-list-group v-if="taskMessages.length > 0" class="">
+        <task-sidebar-item v-for="(task, index) in taskMessages" :key="index" :task="task" />
       </b-list-group>
       <div v-else class="d-flex justify-content-center">
         <span class="task-side-bar-no-messages">No messages yet.</span>
@@ -21,7 +23,7 @@
 import uuid from 'uuid'
 import moment from 'moment'
 // import TaskMessage from './TaskMessage.vue'
-import { chain, groupBy } from 'lodash'
+import { chain, forEach, groupBy } from 'lodash'
 
 export default {
   data() {
@@ -30,24 +32,38 @@ export default {
     }
   },
   computed: {
-    tasks() {
+    // messagesTaskIds() {
+    //   return this.$store.state.task_messages.task_messages.map(message => message.task_id)
+    // },
+    taskMessages() {
       let tasks = this.$store.state.tasks.tasks
-      let r_tasks = chain(tasks)
-        .filter(function(item) {
-          return item.last_task_message_created_at
-        })
-        .sortBy('last_task_message_created_at')
-        .reverse()
-        .value()
-        .slice(0, 50)
-      console.log(r_tasks)
-      for (let key in r_tasks) {
-        let task_id = r_tasks[key].id
-        let task_messages = this.$store.getters['task_messages/getByTaskId'](task_id)
-        r_tasks[key].messages = task_messages
-      }
-      return r_tasks
+
+      let messages = tasks.map(task => task).filter(task => task.messages.length > 0)
+      // .filter(task => {
+      //   if(_.includes(this.messagesTaskIds, task.id)) {
+      //     return task
+      //   }
+      // })
+      return messages
     },
+    // tasks() {
+    //   let tasks = this.$store.state.tasks.tasks
+    //   let r_tasks = chain(tasks)
+    //     .filter(function(item) {
+    //       return item.last_task_message_created_at
+    //     })
+    //     .sortBy('last_task_message_created_at')
+    //     .reverse()
+    //     .value()
+    //     .slice(0, 50)
+    //   console.log(r_tasks)
+    //   for (let key in r_tasks) {
+    //     let task_id = r_tasks[key].id
+    //     let task_messages = this.$store.getters['task_messages/getByTaskId'](task_id)
+    //     r_tasks[key].messages = task_messages
+    //   }
+    //   return r_tasks
+    // },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
     }

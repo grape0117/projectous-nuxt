@@ -671,8 +671,8 @@ export default Vue.extend({
   width: 200px;
   overflow-x: hidden;
   text-overflow: ellipsis;
-  min-height: 80px;
-  max-height: 80px;
+  min-height: 105px;
+  max-height: 105px;
 }
 
 .show-task {

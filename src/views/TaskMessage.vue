@@ -4,7 +4,7 @@
       <b-list-group-item v-for="(message, index) in getMessages" :key="index">
         <div class="msg-header">
           <span>{{ getUserNameWithCompanyUserId(message.company_user_id) }}</span> /
-          <span>{{ formatTime(message.timestamp) }}</span>
+          <span v-if="message.timestamp">{{ formatTime(message.timestamp) }}</span>
         </div>
         <label class="msg-content">{{ message.message }}</label>
         <div class="msg-action" v-if="current_company_user_id == message.company_user_id">

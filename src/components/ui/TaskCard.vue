@@ -6,13 +6,19 @@
 
     <div class="task-img" v-if="task.project.acronym">
       <!-- <b-avatar variant="primary" :text="task.project.acronym" class="task-card-avatar mr-3"></b-avatar> -->
-      <span class="task-card-avatar mr-3">
+      <div class="task-card-avatar mr-1">
         {{ task.project.acronym }}
-      </span>
+      </div>
+      <div class="task-card_task-title" style="max-width: 130px;">
+        <span>{{ task.title }}</span>
+      </div>
     </div>
     <div class="task-detail" v-else>
       <div class="project-title">
         <strong>{{ task.project.name }}</strong>
+      </div>
+      <div class="task-card_task-title">
+        <span>{{ task.title }}</span>
       </div>
       <!-- <div class="task-title">
         <span v-if="task.project.acronym"
@@ -20,12 +26,15 @@
         >
         {{ task.project.title }}
       </div> -->
-      <!-- <div class="assigned-users">
-        <b-avatar v-for="(user, userIndex) in taskUsers" :key="userIndex" v-if="user.name" :text="user.abbr" class="mr-3" v-b-tooltip.hover :title="user.name" size="25px" style="margin-right: 5px;"> </b-avatar>
-      </div> -->
     </div>
-    <div class="task-card-date">
-      <small>{{ getDiffAssignedDate }}</small>
+
+    <div class="d-flex justify-content-between align-items-end">
+      <div class="task-card-date">
+        <small>{{ getDiffAssignedDate }}</small>
+      </div>
+      <div class="assigned-users">
+        <b-avatar v-for="(user, userIndex) in taskUsers" :key="userIndex" v-if="user.name" :text="user.abbr" v-b-tooltip.hover :title="user.name" size="25px" :style="{ 'margin-left': userIndex === 0 ? '0' : '2px' }"> </b-avatar>
+      </div>
     </div>
   </div>
 </template>
@@ -117,6 +126,17 @@ export default {
 }
 </script>
 <style>
+.task-card_task-title {
+  font-size: 12px;
+  font-weight: 500;
+  height: 40px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: pre-wrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 .task-card.past-due {
   background: red;
 }
@@ -139,13 +159,16 @@ export default {
   color: white;
   border-radius: 0 !important;
 }
+.assigned-users {
+  display: flex;
+}
 </style>
 
 <style scoped>
 .task-img {
   /* width: 40px; */
-  display: inline-block;
-  vertical-align: top;
+  display: flex;
+  /* vertical-align: top; */
 }
 .task-detail {
   display: inline-block;

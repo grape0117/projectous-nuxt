@@ -11,10 +11,10 @@
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px;">
               <div class="burger-icon-wrapper">
-                <span style="margin-top: -7px;" v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
+                <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
                   +
                 </span>
-                <div style="padding-left: 5px; padding-right: 5px;" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
+                <div style="padding-left: 5px; padding-right: 5px; margin-top: 5px;" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
                   <span></span>
                   <span></span>
                   <span></span>
@@ -23,15 +23,15 @@
 
               <div class="dragzone__item-info">
                 <!-- {{ tasksOrderByProjectUpdated_at }} -->
-                <p style="margin-bottom: 0 !important;">
+                <!-- <p style="margin-bottom: 0 !important;">
                   <span class="dragzone-project-acronym" v-if="item.project.acronym">{{ item.project.acronym }}</span>
                   <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
                   <span class="dragzone__item-text" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id">{{ item.title }}</span>
-                </p>
-                <!-- <div class="dragzone-project-acronym" v-if="item.project.acronym"> {{ item.project.acronym }} </div>
+                </p> -->
+                <div class="dragzone-project-acronym" v-if="item.project.acronym">{{ item.project.acronym }}</div>
                 <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
 
-                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" /> -->
+                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
               <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
                 <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
@@ -410,14 +410,15 @@ export default class Dragzone extends Vue {
   margin: 2px 0;
 }
 .dragzone-project-acronym {
-  padding: 5px 5px;
+  padding: 3px 5px;
   white-space: nowrap;
   background-color: green;
   font-size: 10px;
   // display: flex;
   // justify-content: center;
   // align-items: center;
-  height: 20px;
+  // height: 20px;
+  max-height: 20px;
 }
 .dragzon-icon-dehaze {
   cursor: all-scroll;
