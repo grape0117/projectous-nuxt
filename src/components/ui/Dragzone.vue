@@ -22,7 +22,6 @@
               </div>
 
               <div class="dragzone__item-info">
-                <!-- {{ tasksOrderByProjectUpdated_at }} -->
                 <!-- <p style="margin-bottom: 0 !important;">
                   <span class="dragzone-project-acronym" v-if="item.project.acronym">{{ item.project.acronym }}</span>
                   <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
@@ -164,13 +163,6 @@ export default class Dragzone extends Vue {
     }
   }
 
-  get tasksOrderByProjectUpdated_at() {
-    return this.tasks.sort(function compare(a, b) {
-      var dateA = new Date(a.date)
-      var dateB = new Date(b.date)
-      return a.project.updated_at - b.project.updated_at
-    })
-  }
   private show_plusIcon(task_id: any, visibility: boolean) {
     this.showPlusIcon = { task_id: task_id, visible: visibility }
   }

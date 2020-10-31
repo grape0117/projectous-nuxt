@@ -91,7 +91,7 @@ export default class Custom extends Vue {
   private selectedClient: string = ''
 
   get filteredClient() {
-    return this.activeClients.filter(client => client.id === this.selectedClient)
+    return this.activeClients.filter((client: any) => client.id === this.selectedClient)
   }
 
   get listsBlockNames() {
