@@ -69,6 +69,9 @@
                 ><span style="color: red;">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small
               >
               <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
+              <!-- <span v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id">
+                <pre>{{task_user}}</pre>
+              </span> -->
             </div>
           </div>
           <div v-if="index == tasks.length - 1" class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
