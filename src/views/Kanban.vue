@@ -85,6 +85,11 @@ enum listsBlockNames {
   }
 })
 export default class Custom extends Vue {
+  @Projects.Mutation('projects/SET_SELECTED_PROJECT') public setProjectId!: any
+  @Projects.Action public pinProject!: any
+  @Projects.State(state => state.selectedProjectId) public selectedProjectId!: string | number | null
+  @Projects.State(state => state.pinnedProjects)
+  public pinnedProjects!: number[]
   private showTask: boolean = true
   private showTimer: boolean = true
   private showChat: boolean = false
@@ -158,11 +163,7 @@ export default class Custom extends Vue {
       initiallyExpanded: true
     }))
   }
-  @Projects.Mutation('projects/SET_SELECTED_PROJECT') public setProjectId!: any
-  @Projects.Action public pinProject!: any
-  @Projects.State(state => state.selectedProjectId) public selectedProjectId!: string | number | null
-  @Projects.State(state => state.pinnedProjects)
-  public pinnedProjects!: number[]
+
   @TaskUsers.Getter('getById') private getTaskUserById!: any
   @TaskUsers.Getter private sortedByDays!: any
   @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any

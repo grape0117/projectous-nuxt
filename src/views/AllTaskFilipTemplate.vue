@@ -280,7 +280,7 @@ export default Vue.extend({
 
         if (project && project.client_id !== null) {
           task.client = clients.find(async ({ id: clientId }) => {
-            clientId === (await project.client_id)
+            return clientId === (await project.client_id)
           })
         } else {
           task.client = []
