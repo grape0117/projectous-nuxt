@@ -13,7 +13,6 @@
           <b-button variant="primary" @click="addClient()">Add Client</b-button>
           <b-button variant="primary" @click="addProject()">Add Project</b-button>
           <b-button variant="primary" @click="addTask()">Add Task</b-button>
-          <!--<b-button>Add Team Member</b-button>-->
         </b-col>
       </b-row>
       <b-row>
@@ -38,11 +37,9 @@
         <div class="task-detail-top-buttons">
           <button @click="saveTask()">Close (ESC)</button>
           <b-button class="action-button" variant="outline-success" @click="completeTask()">
-            <!-- <i class="icon-check" /> -->
             <span>Complete</span>
           </b-button>
           <b-button class="action-button" variant="outline-danger" @click="deleteTask">
-            <!-- <i class="icon-close" /> -->
             <span>Delete</span>
           </b-button>
         </div>
@@ -154,7 +151,6 @@
           </button>
         </draggable>
         <div v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" :id="resource.name">
-          <!-- class="tabcontent" -->
           <div v-if="resource.name === selected_tab" class="d-flex justify-content-between align-items-center">
             <label class="docs-path" style="white-space: nowrap; overflow: hidden;">{{ resource.href }}</label>
             <div style="float: right; display: inline-block; margin-bottom: 8px; margin-top: 5px;" v-if="resource.href != ''">
@@ -274,12 +270,9 @@ export default Vue.extend({
       })
 
       let tasks = _.cloneDeep(taskFilter)
-
       let projects = this.$store.state.projects.projects
-
       let clients = this.$store.state.clients.clients
-      console.log('[CLIENTS] :')
-      console.log(clients)
+      let company_users = this.$store.state.company_users.company_users
 
       tasks.forEach(task => {
         let project = projects.find(({ id: projectId }) => projectId === task.project_id)
@@ -292,6 +285,14 @@ export default Vue.extend({
         } else {
           task.client = []
         }
+
+        task.users.forEach(user => {
+          company_users.forEach(company_user => {
+            if (company_user.id === user.company_user_id) {
+              user.color = company_user.color
+            }
+          })
+        })
 
         return task
       })

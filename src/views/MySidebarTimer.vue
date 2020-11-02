@@ -29,10 +29,7 @@ export default {
     timerEmptyFields() {
       let totalCount = 0
       this.mytimers().forEach(timer => {
-        if (timer.project_id === null) {
-          totalCount++
-        }
-        if (timer.notes === null) {
+        if (timer.project_id === null || timer.notes === null) {
           totalCount++
         }
       })

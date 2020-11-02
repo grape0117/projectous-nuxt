@@ -1,10 +1,10 @@
 <template>
-  <div class="list__wrapper" :class="{ 'horizontal-alignment': !verticalAlignment }">
+  <div class="list__wrapper " :class="{ 'horizontal-alignment': !verticalAlignment }">
     <div v-for="(group, index) in listGroups" :key="index" class="list" draggable="true" @dragstart.self="dragStart($event, index)" @dragend.self="dragEnd" @dragenter="moveList(index)">
       <div v-if="!verticalAlignment" class="list__group-title">
         {{ group.name }}
       </div>
-      <div class="list__group" :class="title.replace(/[^a-zA-Z0-9]/, '-')" :style="{ height: !verticalAlignment ? 'calc(100vh - 140px)' : '', 'overflow-y': verticalAlignment ? 'hidden' : 'scroll' }" v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id">
+      <div class="list__group" :class="title.replace(/[^a-zA-Z0-9]/, '-')" :style="{ height: !verticalAlignment ? 'calc(100vh - 140px)' : '', 'overflow-y': verticalAlignment ? 'hidden' : setOverflow(group.name) }" v-for="{ id, title, initiallyExpanded } in lists.filter(list => list.group === group.name)" :key="id">
         <div
           :class="'list__group-subtitle-title' + title.replace(/[^a-zA-Z0-9]/, '-')"
           :style="{
@@ -16,7 +16,8 @@
           <div class="list__group-subtitle-title">{{ title }}</div>
         </div>
         <div></div>
-        <pj-dragzone :id="id" :tasks="groupedDataWithProjects(id)" :isListDragged="isListDragged" :draggedItemId="draggedItemId" :group="group" :selectedCompanyUserId="selectedCompanyUserId" :initiallyExpanded="initiallyExpanded" @delete="$emit('delete', $event)" @taskTimerToggled="$emit('taskTimerToggled', $event)" @updateDataIndexes="updateDataIndexes" @setDraggedItemId="draggedItemId = $event" @updateSortOrders="$emit('updateSortOrders', $event)" @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)" />
+        <!-- <pre>{{ groupedDataWithProjects(id) }}</pre> -->
+        <pj-dragzone :ref="title" :id="id" :tasks="groupedDataWithProjects(id)" :isListDragged="isListDragged" :draggedItemId="draggedItemId" :group="group" :selectedCompanyUserId="selectedCompanyUserId" :initiallyExpanded="initiallyExpanded" @delete="$emit('delete', $event)" @taskTimerToggled="$emit('taskTimerToggled', $event)" @updateDataIndexes="updateDataIndexes" @setDraggedItemId="draggedItemId = $event" @updateSortOrders="$emit('updateSortOrders', $event)" @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)" />
       </div>
     </div>
   </div>
@@ -24,6 +25,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { groupBy, cloneDeep, uniq, invert } from 'lodash'
+import { EventBus } from '@/components/event-bus'
 
 @Component
 export default class Draggable extends Vue {
@@ -39,6 +41,14 @@ export default class Draggable extends Vue {
   private isListDragged: boolean = false
   private draggedListIndex: number = NaN
   private targetListIndex: number = NaN
+  private dragzoneHeightList: any = {
+    open: 0,
+    'in-progress': 0,
+    'turned-in': 0,
+    completed: 0,
+    closed: 0
+  }
+  private windowHeight: any = window.innerHeight
 
   get groupedData() {
     return groupBy(this.clonedData, 'listId')
@@ -65,6 +75,16 @@ export default class Draggable extends Vue {
       })
   }
 
+  @Watch('windowHeight', { immediate: true })
+  public onWindowHeightChanged(value: any) {
+    this.dragzoneHeight()
+  }
+
+  @Watch('$store.state.projects.selectedProjectId', { immediate: true })
+  public onSelectedProjectIdChanged(value: any) {
+    this.dragzoneHeight()
+  }
+
   /**
    * Splices in item in place of dropped item
    *
@@ -78,6 +98,38 @@ export default class Draggable extends Vue {
 
     const droppedIndex = Number(this.clonedDataIndexes[dropped_id])
     this.clonedData.splice(droppedIndex, 0, this.clonedData.splice(itemIndex, 1)[0])
+  }
+
+  private setOverflow(groupName: string) {
+    let dragzoneHeight = this.dragzoneHeightList[groupName]
+
+    if (this.windowHeight - dragzoneHeight < 170) {
+      return 'scroll'
+    }
+
+    return 'hidden'
+  }
+
+  private onResize() {
+    this.windowHeight = window.innerHeight
+  }
+  private async dragzoneHeight() {
+    let refs: any = await this.$refs
+    if (Object.keys(refs).length > 0) {
+      let openHeight = refs.open[0].$refs.dragzone_wrapper.clientHeight
+      let inProgressHeight = refs['in-progress'][0].$refs.dragzone_wrapper.clientHeight
+      let turnedInHeight = refs['turned-in'][0].$refs.dragzone_wrapper.clientHeight
+      let completedHeight = refs.completed[0].$refs.dragzone_wrapper.clientHeight
+      let closedHeight = refs.closed[0].$refs.dragzone_wrapper.clientHeight
+
+      this.dragzoneHeightList = {
+        open: openHeight,
+        'in-progress': inProgressHeight,
+        'turned-in': turnedInHeight,
+        completed: completedHeight,
+        closed: closedHeight
+      }
+    }
   }
 
   private dragStart(e: any, index: number) {
@@ -120,12 +172,8 @@ export default class Draggable extends Vue {
     let tasks = this.groupedData[id]
     let projects = this.$store.state.projects.projects
 
-    console.log(tasks)
-
     if (tasks) {
-      tasks.map(task => {
-        console.log(task.id)
-      })
+      tasks.map(task => {})
     }
 
     if (tasks) {
@@ -138,6 +186,36 @@ export default class Draggable extends Vue {
     }
 
     return tasks
+  }
+
+  created() {
+    this.dragzoneHeight()
+    EventBus.$on('toggle_tasks', () => {
+      this.dragzoneHeight()
+    })
+    EventBus.$on('toggle_timers', () => {
+      this.dragzoneHeight()
+    })
+    EventBus.$on('toggle_chat', () => {
+      this.dragzoneHeight()
+    })
+    EventBus.$on('updateDraggableHeight', () => {
+      this.dragzoneHeight()
+    })
+  }
+
+  mounted() {
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize)
+    })
+  }
+
+  beforeDestroy() {
+    window.removeEventListener('resize', this.onResize)
+    // EventBus.$off('toggle_tasks')
+    // EventBus.$off('toggle_timers')
+    // EventBus.$off('toggle_chat')
+    EventBus.$off('updateDraggableHeight')
   }
 }
 </script>
@@ -163,6 +241,7 @@ export default class Draggable extends Vue {
 .list__group {
   max-width: 280px;
   overflow-x: hidden;
+
   width: 100%;
   padding: 0 10px;
   display: flex;

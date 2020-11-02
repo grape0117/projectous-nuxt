@@ -3,7 +3,7 @@
     <div v-if="isListExpandable" @click="expandedList = !expandedList" class="dragzone__item-icon">
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
-    <div class="dragzone__content">
+    <div class="dragzone__content" ref="dragzone_wrapper">
       <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
           <!-- <pre>{{ item }}</pre> -->
@@ -68,10 +68,9 @@
               <small v-if="show_debug()"
                 ><span style="color: red;">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small
               >
-              <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
-              <!-- <span v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id">
-                <pre>{{task_user}}</pre>
-              </span> -->
+              <b-badge v-if="task_user.company_user_id !== current_company_user_id" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" style="color: black" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" v-bind:task_user="task_user">
+                {{ getCompanyUser(task_user.company_user_id).name }}
+              </b-badge>
             </div>
           </div>
           <div v-if="index == tasks.length - 1" class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
@@ -116,6 +115,7 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
+import { EventBus } from '@/components/event-bus'
 import uuid from 'uuid'
 
 const Tasks = namespace('tasks')
@@ -194,10 +194,10 @@ export default class Dragzone extends Vue {
   private getTaskUsers(task_id: any) {
     return this.$store.getters['task_users/getByTaskId'](task_id)
   }
-  private getCompanyUserName(company_user_id: any) {
+  private getCompanyUser(company_user_id: any) {
     let company_user = this.$store.getters['company_users/getById'](company_user_id)
     //console.log(company_user)
-    return company_user ? company_user.name : ''
+    return company_user ? company_user : []
   }
   private getTaskDueDate(task_id: any) {
     let task = this.$store.getters['tasks/getById'](task_id)
@@ -231,7 +231,7 @@ export default class Dragzone extends Vue {
   /**
    * Triggers only on destination list
    */
-  private drop() {
+  private async drop() {
     console.log('************* DROP *************')
     const item = JSON.parse(localStorage.getItem('item') as string)
     if (item) {
@@ -244,6 +244,8 @@ export default class Dragzone extends Vue {
         this.$emit('updateSortOrders', JSON.stringify(this.tasks))
       }
     }
+
+    await EventBus.$emit('updateDraggableHeight')
   }
 
   /**

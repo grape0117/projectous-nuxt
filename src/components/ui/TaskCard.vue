@@ -33,7 +33,7 @@
         <small>{{ getDiffAssignedDate }}</small>
       </div>
       <div class="assigned-users">
-        <b-avatar v-for="(user, userIndex) in taskUsers" :key="userIndex" v-if="user.name" :text="user.abbr" v-b-tooltip.hover :title="user.name" size="25px" :style="{ 'margin-left': userIndex === 0 ? '0' : '2px' }"> </b-avatar>
+        <b-avatar v-for="(user, userIndex) in taskUsers" :key="userIndex" v-if="user.name" :text="user.abbr" v-b-tooltip.hover :title="user.name" size="25px" :style="{ 'margin-left': userIndex === 0 ? '0' : '2px', 'background-color': user.color }" style="color: black; box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);"> </b-avatar>
       </div>
     </div>
   </div>

@@ -67,7 +67,16 @@
         </div>
         <!-- <i class="icon-cached header-icon-refresh" ></i> -->
       </div>
-      <div class="profile-icon border"></div>
+      <div class="header_menu-wrapper">
+        <div class="profile-icon border" @click="showMenu = !showMenu"></div>
+        <div class="header_menu" v-if="showMenu">
+          <div class="header_menu-item-list">
+            <span class="header_menu-item">Profile</span>
+            <span class="header_menu-item">Change company</span>
+            <span class="header_menu-item">Log Out</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -81,6 +90,7 @@ import { getCookie } from '@/utils/util-functions'
 export default Vue.extend({
   data() {
     return {
+      showMenu: false,
       timerEmptyFields: 0,
       timerRunning: false,
       // projectName: 'P',
@@ -223,6 +233,39 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+.header_menu-wrapper {
+  // border: 1px solid red;
+  position: relative;
+}
+.header_menu {
+  border-radius: 3px;
+  position: absolute;
+  // color: white;
+  z-index: 10;
+  background-color: #f7f8ff;
+  right: 0;
+  top: 40px;
+  // width: 180px;
+  display: flex;
+  justify-content: center;
+  border: 1px solid rgba($color: #000000, $alpha: 0.4);
+  box-shadow: 0px 0px 15px rgba($color: #000000, $alpha: 0.8);
+}
+.header_menu-item-list {
+  margin: 15px 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+}
+.header_menu-item {
+  padding: 2px 20px;
+  white-space: nowrap;
+}
+.header_menu-item:hover {
+  background-color: rgba($color: #000000, $alpha: 0.2);
+  // color: white;
+}
 .nav-buttons {
   display: flex;
 }
