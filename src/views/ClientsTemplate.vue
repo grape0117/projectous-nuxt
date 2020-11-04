@@ -10,8 +10,8 @@
       <div class="client-template_tabs">
         <div class="client-template_tabName" v-for="(tab, tabIndex) in tabs" :key="tabIndex" @click="selectTab(tab)" :style="{ 'background-color': tab === selectedTab ? 'rgba(0,0,0, 0.4)' : '' }">
           <span>{{ tab | capitalize }}</span>
-          <span v-if="tab === selectedTab" class="client-template_item-count">
-            {{ filteredclients(selectedTab).length }}
+          <span class="client-template_item-count">
+            {{ filteredclients(tab).length }}
           </span>
         </div>
       </div>

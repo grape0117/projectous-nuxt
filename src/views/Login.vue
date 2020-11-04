@@ -24,14 +24,16 @@ export default class Login extends Vue {
   private async login(e: any) {
     e.preventDefault()
     // @ts-ignore
-    const { auth_token, message } = await this.$http().post('/login', {
+    const { auth_token, user_id } = await this.$http().post('/login', {
       // @ts-ignore
       email: document.getElementById('email')['value'],
       // @ts-ignore
       password: document.getElementById('password')['value']
     })
+
     if (auth_token) {
       document.cookie = 'auth_token=' + auth_token
+      await this.$store.dispatch('SET_CURRENT_USER', user_id)
       this.$router.push('/')
     } else {
       alert('Invalid email or password')
@@ -58,8 +60,7 @@ export default class Login extends Vue {
   position: relative;
   background: #ffffff;
   border-radius: 4px;
-  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 .login-page__block-title {
   display: flex;

@@ -14,21 +14,24 @@
 
           <div v-if="clientVisible(client)" v-for="(client, index) in selectedClient ? filteredClient : activeClients" :key="index">
             <div class="client-name">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
-            <div class="client-project-name" v-for="{ name, id, acronym } in openClientProjects(client)" :key="id">
+            <div class="client-project-name" v-for="{ name, id, acronym } in openClientProjects(client)" :key="id" @click="setProjectId(id)">
               <div @click="setPinnedProject(id)" class="project-item-status">
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
                 <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
               </div>
               <p style="margin-bottom: 0 !important;">
                 <span class="client-section-acronym" v-if="acronym">{{ acronym }}</span>
-                <span class="client-project-name__name" @click="setProjectId(id)">{{ name }}</span>
+                <span class="client-project-name__name">{{ name }}</span>
               </p>
             </div>
           </div>
         </b-col>
 
         <b-col v-if="selectedProjectId" class="kanban-draggable custom-width">
-          <h4 class="kanban-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
+          <div class="kanban_title-part">
+            <h4 class="kanban-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
+            <span class="kanban_current-users-name">{{ currentUsersName($store.state.current_user) }}</span>
+          </div>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
         <!-- <div class="right-fixed">
@@ -185,6 +188,10 @@ export default class Custom extends Vue {
 
   private selectedCompanyUserId: any = null
 
+  private currentUsersName(user_id: number) {
+    return this.$store.state.company_users.company_users.filter((user: any) => user.user_id === user_id)[0].name
+  }
+
   public setPinnedProject(id: number) {
     this.pinProject({ id, userId: this.selectedCompanyUserId })
   }
@@ -313,7 +320,26 @@ export default class Custom extends Vue {
   // }
 }
 </script>
-<style>
+<style lang="scss">
+.kanban_title-part {
+  display: flex;
+  justify-content: space-between;
+  /* border: 1px solid red;
+  padding: 0 5px; */
+}
+.kanban_current-users-name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 17px;
+  font-weight: 500;
+  background-color: rgba($color: #000000, $alpha: 0.5);
+  margin-right: 18px;
+  padding: 0 15px;
+  border-radius: 50px;
+  margin-top: 5px;
+}
 .kanban-page {
   /* background-color: rgba(0, 0, 0, 0.3); */
   overflow-y: initial;

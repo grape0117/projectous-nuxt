@@ -73,7 +73,7 @@
           <div class="header_menu-item-list">
             <span class="header_menu-item">Profile</span>
             <span class="header_menu-item">Change company</span>
-            <span class="header_menu-item">Log Out</span>
+            <span class="header_menu-item" @click="logout">Log Out</span>
           </div>
         </div>
       </div>
@@ -150,6 +150,10 @@ export default Vue.extend({
     // window.$_app = this
   },
   methods: {
+    async logout() {
+      document.cookie = 'auth_token=' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      window.location.reload()
+    },
     async setBackground(option, styleTheme) {
       console.log(styleTheme)
       await EventBus.$emit('changeBackground', { option, styleTheme })

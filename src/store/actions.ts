@@ -2,6 +2,9 @@ import { IRootState } from '@/store/types'
 import { ActionTree } from 'vuex'
 
 export const actions: ActionTree<IRootState, IRootState> = {
+  SET_CURRENT_USER({ commit }, user_id) {
+    commit('SET_CURRENT_USER', user_id)
+  },
   ADD_MANY({ commit, dispatch }, { module, entities }) {
     //TODO: rename to load?
     commit('ADD_MANY', { module, entities })
