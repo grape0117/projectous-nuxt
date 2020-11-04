@@ -188,7 +188,7 @@ export default class Draggable extends Vue {
     return tasks
   }
 
-  created() {
+  private created() {
     this.dragzoneHeight()
     EventBus.$on('toggle_tasks', () => {
       this.dragzoneHeight()
@@ -204,13 +204,13 @@ export default class Draggable extends Vue {
     })
   }
 
-  mounted() {
+  private mounted() {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize)
     })
   }
 
-  beforeDestroy() {
+  private beforeDestroy() {
     window.removeEventListener('resize', this.onResize)
     // EventBus.$off('toggle_tasks')
     // EventBus.$off('toggle_timers')
