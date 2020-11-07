@@ -63,12 +63,14 @@
                 <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
             </div> -->
+            <div v-if="show_debug()" style="padding: 0 10px;">
+              <small>
+                <span style="color: red;">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}
+              </small>
+            </div>
             <div class="dragzone__task-users">
-              <small v-if="show_debug()"
-                ><span style="color: red;">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small
-              >
-              <b-badge v-if="task_user.company_user_id !== current_company_user_id" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" style="color: black" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" v-bind:task_user="task_user">
-                {{ getCompanyUser(task_user.company_user_id).name }}
+              <b-badge v-if="task_user.company_user_id !== current_company_user_id" class="dragzone_badge" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" v-bind:task_user="task_user">
+                {{ getCompanyUser(task_user.company_user_id).name | abbrName }}
               </b-badge>
             </div>
           </div>
@@ -119,7 +121,15 @@ import uuid from 'uuid'
 
 const Tasks = namespace('tasks')
 
-@Component
+@Component({
+  filters: {
+    abbrName(name: string) {
+      if (!name) return ''
+      if (name.includes(' ')) return name.charAt(0).toUpperCase()
+      else return name.charAt(0).toUpperCase() + name.charAt(1).toUpperCase()
+    }
+  }
+})
 export default class Dragzone extends Vue {
   private get isListExpandable() {
     return this.tasks.length > this.numberOfExpandedItems
@@ -373,6 +383,19 @@ export default class Dragzone extends Vue {
 </script>
 
 <style lang="scss">
+.dragzone_badge {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-radius: 50% !important;
+  width: 25px;
+  height: 25px;
+  color: black !important;
+  font-size: 10px !important;
+  margin-right: 3px;
+  box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 5px;
+  margin-left: 0px;
+}
 .dragzone-project-project-name {
   font-size: 10px;
   font-weight: bold;
@@ -607,7 +630,9 @@ export default class Dragzone extends Vue {
 }
 
 .dragzone__task-users {
-  margin-left: 25px;
+  // margin-left: 25px;
+  margin: 2px 0 2px 25px;
+  display: flex;
 }
 
 *:focus {

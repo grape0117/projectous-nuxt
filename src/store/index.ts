@@ -10,8 +10,8 @@ Vue.use(Vuex)
 const store: StoreOptions<IRootState> = {
   state: {
     version: '0.1.0',
-    loading: false,
-    current_user: null
+    loading: false
+    // current_user: null
   },
   actions,
   mutations,

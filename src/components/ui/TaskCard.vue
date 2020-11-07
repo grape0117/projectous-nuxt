@@ -3,7 +3,6 @@
     <!-- <img :src="'//www.projectous.com/api/projects/' + task.project_id + '/favicon.png'" /> -->
     <!-- <img src="https://dummyimage.com/30x30/000/fff" /> -->
     <!-- <pre>{{ task }}</pre> -->
-
     <div class="task-img" v-if="task.project.acronym">
       <!-- <b-avatar variant="primary" :text="task.project.acronym" class="task-card-avatar mr-3"></b-avatar> -->
       <div class="task-card-avatar mr-1">
@@ -98,27 +97,29 @@ export default {
       }
     },
     taskUsers() {
-      let me = this
+      // let me = this
       // let task_users = this.$store.getters['task_users/getByTaskId'](this.task.id)
       let task_users = this.task.users
       if (!task_users.length) return []
       let r_users = []
 
-      task_users.forEach(function(user) {
-        if (!user.company_user_id) user.name = ''
+      task_users.forEach(async user => {
+        if (!user.company_user_id) return (user.name = '')
         else {
-          let c_user = me.$store.state.company_users.company_users[user.company_user_id]
+          // let c_user = await this.$store.state.company_users.company_users[user.company_user_id - 1]
+          let c_user = this.$store.state.company_users.company_users.find(x => x.user_id === user.company_user_id)
           user.name = c_user ? c_user.name : ''
+          user.abbr = this.abbrName(user.name)
         }
-        user.abbr = me.abbrName(user.name)
         r_users.push(user)
       })
-      return task_users
+
+      return r_users
     }
   },
   methods: {
     abbrName(name) {
-      if (name == '') return name
+      if (!name) return name
       if (name.includes(' ')) return name.charAt(0).toUpperCase()
       else return name.charAt(0).toUpperCase() + name.charAt(1).toUpperCase()
     }

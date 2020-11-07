@@ -16,8 +16,7 @@
           <b-nav-item to="/profile">Profile</b-nav-item>
           <b-nav-item to="/logout">Log Out</b-nav-item>
         </b-nav> -->
-        <router-link class="nav-buttons__button" @click="navClick(button)" :to="button.path" v-for="(button, index) in navLinks" :style="{ 'text-decoration': $route.path === button.path ? 'underline' : '' }" :key="index">
-          <!-- <router-link class="nav-buttons__button" @click="navClick(button)" :to="button.path" v-for="(button, index) in navLinks" :key="index"> -->
+        <router-link class="nav-buttons__button" :to="button.path" v-for="(button, index) in navLinks" :style="{ 'text-decoration': $route.path === button.path ? 'underline' : '' }" :key="index">
           {{ button.name | toUpperCase }}
         </router-link>
       </div>
@@ -71,7 +70,7 @@
         <div class="profile-icon border" @click="showMenu = !showMenu"></div>
         <div class="header_menu" v-if="showMenu">
           <div class="header_menu-item-list">
-            <span class="header_menu-item">Profile</span>
+            <span class="header_menu-item" @click="goTo('profile')">Profile</span>
             <span class="header_menu-item">Change company</span>
             <span class="header_menu-item" @click="logout">Log Out</span>
           </div>
@@ -150,6 +149,12 @@ export default Vue.extend({
     // window.$_app = this
   },
   methods: {
+    goTo(path) {
+      this.showMenu = false
+      if (this.$route.path === `/${path}`) return
+
+      this.$router.push({ path: `/${path}` })
+    },
     async logout() {
       document.cookie = 'auth_token=' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
       window.location.reload()

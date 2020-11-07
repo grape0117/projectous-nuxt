@@ -39,11 +39,11 @@ const router = new Router({
       name: 'MessageSideBar',
       component: () => import(/* webpackChunkName: "Message-sidebar" */ '@/views/TaskSideBar.vue')
     },
-    // {
-    //   path: '/projects',
-    //   name: 'Projects',
-    //   component: () => import(/* webpackChunkName: "Tasks" */ '@/views/Projects.vue')
-    // },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: () => import(/* webpackChunkName: "Profile" */ '@/views/Profile.vue')
+    },
     {
       path: '/kanban',
       name: 'Kanban',

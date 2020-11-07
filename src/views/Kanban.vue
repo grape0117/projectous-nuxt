@@ -30,7 +30,6 @@
         <b-col v-if="selectedProjectId" class="kanban-draggable custom-width">
           <div class="kanban_title-part">
             <h4 class="kanban-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
-            <span class="kanban_current-users-name">{{ currentUsersName($store.state.current_user) }}</span>
           </div>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
@@ -189,10 +188,6 @@ export default class Custom extends Vue {
 
   private selectedCompanyUserId: any = null
 
-  private currentUsersName(user_id: number) {
-    return this.$store.state.company_users.company_users.filter((user: any) => user.user_id === user_id)[0].name
-  }
-
   public setPinnedProject(id: number) {
     this.pinProject({ id, userId: this.selectedCompanyUserId })
   }
@@ -327,19 +322,6 @@ export default class Custom extends Vue {
   justify-content: space-between;
   /* border: 1px solid red;
   padding: 0 5px; */
-}
-.kanban_current-users-name {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-size: 17px;
-  font-weight: 500;
-  background-color: rgba($color: #000000, $alpha: 0.5);
-  margin-right: 18px;
-  padding: 0 15px;
-  border-radius: 50px;
-  margin-top: 5px;
 }
 .kanban-page {
   /* background-color: rgba(0, 0, 0, 0.3); */

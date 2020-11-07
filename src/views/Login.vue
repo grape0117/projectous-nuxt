@@ -33,7 +33,9 @@ export default class Login extends Vue {
 
     if (auth_token) {
       document.cookie = 'auth_token=' + auth_token
-      await this.$store.dispatch('SET_CURRENT_USER', user_id)
+      document.cookie = 'id=' + user_id
+
+      // await this.$store.dispatch('SET_CURRENT_USER', user_id)
       this.$router.push('/')
     } else {
       alert('Invalid email or password')

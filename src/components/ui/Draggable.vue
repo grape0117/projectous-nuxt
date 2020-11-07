@@ -17,7 +17,7 @@
         </div>
         <div></div>
         <!-- <pre>{{ groupedDataWithProjects(id) }}</pre> -->
-        <pj-dragzone :ref="title" :id="id" :tasks="groupedDataWithProjects(id)" :isListDragged="isListDragged" :draggedItemId="draggedItemId" :group="group" :selectedCompanyUserId="selectedCompanyUserId" :initiallyExpanded="initiallyExpanded" @delete="$emit('delete', $event)" @taskTimerToggled="$emit('taskTimerToggled', $event)" @updateDataIndexes="updateDataIndexes" @setDraggedItemId="draggedItemId = $event" @updateSortOrders="$emit('updateSortOrders', $event)" @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)" />
+        <pj-dragzone :ref="title" :id="id" :tasks="groupedDataWithProjects(id)" :verticalAlignment="verticalAlignment" :isListDragged="isListDragged" :draggedItemId="draggedItemId" :group="group" :selectedCompanyUserId="selectedCompanyUserId" :initiallyExpanded="initiallyExpanded" @delete="$emit('delete', $event)" @taskTimerToggled="$emit('taskTimerToggled', $event)" @updateDataIndexes="updateDataIndexes" @setDraggedItemId="draggedItemId = $event" @updateSortOrders="$emit('updateSortOrders', $event)" @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)" />
       </div>
     </div>
   </div>
@@ -172,9 +172,9 @@ export default class Draggable extends Vue {
     let tasks = this.groupedData[id]
     let projects = this.$store.state.projects.projects
 
-    if (tasks) {
-      tasks.map(task => {})
-    }
+    // if (tasks) {
+    //   tasks.map(task => {})
+    // }
 
     if (tasks) {
       tasks.forEach(task => {

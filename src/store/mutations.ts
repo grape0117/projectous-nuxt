@@ -5,9 +5,9 @@ import { idbKeyval } from '@/plugins/idb'
 import { has } from 'lodash'
 
 export const mutations: MutationTree<IRootState> = {
-  async SET_CURRENT_USER(state: IRootState, user_id: number) {
-    state.current_user = await user_id
-  },
+  // async SET_CURRENT_USER(state: IRootState, user_id: number) {
+  //   state.current_user = await user_id
+  // },
   /**
    * Adds multiple entities all stores checking for duplicates, updating lookup tables as needed.
    * @param {IRootState} state

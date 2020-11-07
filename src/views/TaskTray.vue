@@ -3,6 +3,10 @@
     <div class="task-tray-wrapper">
       <div class="task-tray-top-div">
         <div class="task-tray-title">
+          <!-- current_user: <pre>{{ currentUser }}</pre> -->
+          <span>
+            <!-- {{ sortedCompanyUsers.find((user) => user.user_id === 295) }} -->
+          </span>
           <span>TASKS</span>
         </div>
         <div class="task-tray-selection-box">
@@ -37,6 +41,7 @@ import NewListForm from '@/components/draggable/NewListForm.vue'
 import TimerTab from './TimerTab.vue'
 import { ITimer } from '../store/modules/timers/types'
 import uuid from 'uuid'
+import { getCookie } from '@/utils/util-functions'
 
 const TaskUsers = namespace('task_users')
 const Lists = namespace('lists')
@@ -60,6 +65,10 @@ enum listsBlockNames {
   }
 })
 export default class Custom extends Vue {
+  get currentUser() {
+    return this.$store.state
+  }
+
   get listsBlockNames() {
     return listsBlockNames
   }
@@ -126,7 +135,6 @@ export default class Custom extends Vue {
   private tray_expanded: boolean = false
 
   private selectedCompanyUserId: any = null
-  // private selectedCompanyUserId = 345
 
   public async createTaskUser({ item, ids_of_items_to_shift_up }: any) {
     let next_work_day = null
@@ -267,20 +275,40 @@ export default class Custom extends Vue {
     )
   }
 
+  private getCompanyUser() {
+    if (!!getCookie('id')) {
+      const id = parseInt(getCookie('id'))
+      let user = this.sortedCompanyUsers.find((user: any) => user.user_id === id)
+      this.selectedCompanyUserId = user.id
+    }
+  }
+
   @Watch('selectedCompanyUserId')
   private changeRouteQueryParams(value: any) {
+    if (!getCookie('auth_token')) return
     if (value) {
       this.$router.push({ query: { user: value } }).catch(e => {})
     }
   }
   @Watch('sortedCompanyUsers')
-  private onSortedCompanyUsersChanged(users: any) {
+  private onSortedCompanyUsersChanged(users: any, oldVal: any) {
     const query = this.$route.query.user
+
+    if (oldVal.length === 0) {
+      this.getCompanyUser()
+    }
+
     if (query) {
       const user = users.find(({ id }: any) => id === +query)
       if (user && !this.selectedCompanyUserId) this.selectedCompanyUserId = user.id
     }
   }
+  // mounted() {
+  //   let companyUsers = this.sortedCompanyUsers
+  //   console.log('[companyUsers]')
+  //   // let result = companyUsers.find(async (user: any) => user.user_id === await getCookie('id'))
+  //   console.log(this.sortedCompanyUsers)
+  // }
 }
 </script>
 
