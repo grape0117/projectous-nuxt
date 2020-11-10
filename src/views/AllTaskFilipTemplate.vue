@@ -82,6 +82,7 @@
                 </optgroup>
               </select>
             </div>
+            <input type="file" @change="Images_onFileChanged" /><button @click="Images_onUpload">Upload!</button>
 
             <div class="form-section">
               Assigned to:
@@ -186,7 +187,8 @@ export default Vue.extend({
       isEditResource: null,
       scrollTop: 0,
       selected_tab: '',
-      changed_task_users: []
+      changed_task_users: [],
+      selectedFile: null
     }
   },
   props: ['task_id'],
@@ -286,13 +288,13 @@ export default Vue.extend({
           task.client = []
         }
 
-        task.users.forEach(user => {
-          company_users.forEach(company_user => {
-            if (company_user.id === user.company_user_id) {
-              user.color = company_user.color
-            }
-          })
-        })
+        // task.users.forEach(user => {
+        //   company_users.forEach(company_user => {
+        //     if (company_user.id === user.company_user_id) {
+        //       user.color = company_user.color
+        //     }
+        //   })
+        // })
 
         return task
       })
@@ -339,6 +341,17 @@ export default Vue.extend({
     }
   },
   methods: {
+    Images_onFileChanged(event) {
+      console.log('adding file')
+      this.selectedFile = event.target.files[0]
+    },
+    Images_onUpload() {
+      const mypostparameters = new FormData()
+      mypostparameters.append('image', this.selectedFile, this.selectedFile.name)
+      mypostparameters.append('project_id', this.task.project_id)
+      mypostparameters.append('task_id', this.task.id)
+      this.$http().post('/uploadmyfile', mypostparameters)
+    },
     async setShowTask() {
       this.show_task = await this.tasks.find(({ id }) => id === this.$route.params.task_id)
     },
