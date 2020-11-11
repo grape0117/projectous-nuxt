@@ -1,7 +1,8 @@
 <template>
   <div class="message-panel">
-    <b-list-group style="max-height:500px; overflow-y: auto;">
-      <b-list-group-item v-for="(message, index) in getMessages" :key="index">
+    <!-- <b-list-group class="message-panel_inner" style="height:calc(100vh - 450px); overflow-y: auto;"> -->
+    <b-list-group class="message-panel_inner">
+      <b-list-group-item class="message-panel_inner-message" v-for="(message, index) in getMessages" :key="index">
         <div class="msg-header">
           <span>{{ getUserNameWithCompanyUserId(message.company_user_id) }}</span> /
           <span v-if="message.timestamp">{{ formatTime(message.timestamp) }}</span>
@@ -13,8 +14,10 @@
         </div>
       </b-list-group-item>
     </b-list-group>
-    <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="2" max-rows="4"> </b-form-textarea>
-    <b-button pill variant="primary" @click="saveMessage()" style="margin-top: 5px; margin-left: 210px;">Save</b-button>
+    <div>
+      <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3"> </b-form-textarea>
+      <b-button pill variant="primary" @click="saveMessage()" style="float: right; margin-top: 10px;">Save</b-button>
+    </div>
   </div>
 </template>
 
@@ -126,9 +129,14 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .message-panel {
   width: 100%;
+  // height: 100%;
+  // border: 1px solid red;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .msg-content {
@@ -136,5 +144,12 @@ export default {
   border: solid 1px grey;
   border-radius: 8px;
   margin-top: 5px;
+}
+.message-panel_inner {
+  background-color: rgba($color: #000000, $alpha: 0.7);
+}
+.message-panel_inner-message {
+  background-color: rgba($color: #000000, $alpha: 0) !important;
+  border-bottom: 1px solid white;
 }
 </style>

@@ -16,7 +16,6 @@
           <div class="list__group-subtitle-title">{{ title }}</div>
         </div>
         <div></div>
-        <!-- <pre>{{ groupedDataWithProjects(id) }}</pre> -->
         <pj-dragzone :ref="title" :id="id" :tasks="groupedDataWithProjects(id)" :verticalAlignment="verticalAlignment" :isListDragged="isListDragged" :draggedItemId="draggedItemId" :group="group" :selectedCompanyUserId="selectedCompanyUserId" :initiallyExpanded="initiallyExpanded" @delete="$emit('delete', $event)" @taskTimerToggled="$emit('taskTimerToggled', $event)" @updateDataIndexes="updateDataIndexes" @setDraggedItemId="draggedItemId = $event" @updateSortOrders="$emit('updateSortOrders', $event)" @setCurrentListsBlockName="$emit('setCurrentListsBlockName', $event)" />
       </div>
     </div>
@@ -33,8 +32,7 @@ export default class Draggable extends Vue {
   @Prop({ required: true }) public data!: any
   @Prop({ required: true }) public lists!: any
   @Prop({ required: false, default: true }) public verticalAlignment!: boolean
-  @Prop({ required: false, default: null }) public selectedCompanyUserId!: number | null
-
+  @Prop({ required: false, default: null }) private selectedCompanyUserId!: number | null
   private clonedData: any = cloneDeep(this.data)
   private listGroups: any = []
   private draggedItemId: number | null = null

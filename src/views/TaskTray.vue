@@ -18,7 +18,7 @@
           <!-- <button class="closebtnLeft" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
         </div>
       </div>
-      <pj-draggable class="task-tray-draggable" :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" />
+      <pj-draggable class="task-tray-draggable" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" :selectedCompanyUserId="selectedCompanyUserId" :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" />
       <new-list-form v-if="selectedCompanyUserId" :user-id="selectedCompanyUserId" />
     </div>
     <!-- <div

@@ -140,7 +140,7 @@
             <edit-task-modal-user v-for="user in active_users" :key="user.id" @toggle="toggleUser" v-bind:task_user="task_user(user)" v-bind:user="user" v-bind:task="show_task" />
           </b-tab>
           <b-tab title="Chat">
-            <task-message v-bind:task_id="show_task.id"> </task-message>
+            <task-message class="task-cloud_task-message" v-bind:task_id="show_task.id"> </task-message>
           </b-tab>
         </b-tabs>
       </div>
@@ -600,6 +600,16 @@ export default Vue.extend({
 #task-cloud {
   overflow: hidden;
 }
+.task-cloud_task-message {
+  height: 100%;
+  height: calc(100vh - 160px) !important;
+}
+.task-cloud_task-message .message-panel_inner {
+  min-height: calc(100vh - 305px);
+  max-height: calc(100vh - 305px);
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 .active-task-card {
   height: calc(100vh - 180px);
   overflow-y: scroll;
@@ -617,8 +627,9 @@ export default Vue.extend({
   max-width: 300px;
   width: 100%;
   padding: 10px;
-  height: calc(100vh - 50px);
+  height: calc(100vh - 39px);
   overflow-y: scroll;
+  color: white;
 }
 .center-section {
   margin-top: 10px;

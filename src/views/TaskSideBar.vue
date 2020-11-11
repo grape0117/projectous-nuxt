@@ -3,18 +3,25 @@
     <div class="task-side-bar-label">
       <span>CHAT</span>
     </div>
-    <!-- {{ this.$store.state.task_messages.task_messages.length }} -->
-    <!-- <span>{{ taskMessages.length }}</span> -->
-    <div class="message-sidebar">
+
+    <!-- All Chats -->
+    <div class="message-sidebar" v-show="Object.keys(openedChat).length === 0">
       <div class="message-sidebar_new-task" @click="createTask">
         +
       </div>
-      <b-list-group v-if="taskMessages.length > 0" class="">
-        <task-sidebar-item v-for="(task, index) in taskMessages" :key="index" :task="task" />
+      <b-list-group v-if="taskMessages.length > 0" class="task-side-bar_list">
+        <task-sidebar-item @openChat="openChat" v-for="(task, index) in taskMessages" :key="index" :task="task" />
       </b-list-group>
       <div v-else class="d-flex justify-content-center">
         <span class="task-side-bar-no-messages">No messages yet.</span>
       </div>
+    </div>
+
+    <!-- Viewed chat -->
+    <div class="" v-if="Object.keys(openedChat).length > 0">
+      <!-- <span class="task-side-bar_back-button" @click="closeChat">back</span> -->
+      <b-button variant="dark" @click="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px;"> <i class="icon-arrow_back" />Back </b-button>
+      <task-message class="task-side-bar_task-message" v-bind:task_id="openedChat.id" :task_messages="openedChat.messages"> </task-message>
     </div>
   </div>
 </template>
@@ -28,7 +35,8 @@ import { chain, forEach, groupBy } from 'lodash'
 export default {
   data() {
     return {
-      active_task: {}
+      active_task: {},
+      openedChat: {}
     }
   },
   computed: {
@@ -70,6 +78,12 @@ export default {
   },
   mounted() {},
   methods: {
+    openChat(chat) {
+      this.openedChat = chat
+    },
+    closeChat() {
+      this.openedChat = {}
+    },
     async createTask() {
       let newTask = { id: uuid.v4() }
       await this.$store.dispatch('UPSERT', { module: 'tasks', entity: newTask })
@@ -103,11 +117,31 @@ export default {
 }
 </script>
 <style lang="scss">
+.task-side-bar_back-button {
+  background-color: blue;
+}
+.task-side-bar_task-message {
+  height: 100%;
+  height: calc(100vh - 160px) !important;
+}
+.task-side-bar_task-message .message-panel_inner {
+  max-height: calc(100vh - 300px);
+  min-height: calc(100vh - 300px);
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 .message-sidebar_new-task {
   cursor: pointer;
   margin-top: -10px;
   margin-bottom: 5px;
   font-size: 20px;
+}
+.task-side-bar_list {
+  // border: 1px solid red;
+  // height: 100%;
+  // height: calc(100vh - 140px);
+  // overflow-y: scroll;
+  overflow: hidden;
 }
 
 .task-side-bar {
@@ -122,13 +156,16 @@ export default {
   /* background-color: #616161; */
   background-color: rgba(0, 0, 0, 0.5);
   height: calc(100vh - 50px);
-
-  overflow-y: scroll;
+  overflow: hidden;
 }
 .message-sidebar {
   align-self: center;
-  width: 300px;
-  margin-top: 15px;
+  // width: 300px;
+  padding: 0 10px 0 10px;
+  width: 100%;
+  padding-top: 15px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 .task-side-bar-label {
   top: 0;

@@ -11,14 +11,15 @@
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px;">
               <div class="burger-icon-wrapper">
-                <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
-                  +
-                </span>
                 <div style="padding-left: 5px; padding-right: 5px; margin-top: 5px;" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
                   <span></span>
                   <span></span>
                   <span></span>
                 </div>
+                <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
+                  <!-- <span  @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> -->
+                  +
+                </span>
               </div>
 
               <div class="dragzone__item-info">
@@ -69,7 +70,7 @@
               </small>
             </div>
             <div class="dragzone__task-users">
-              <b-badge v-if="task_user.company_user_id !== current_company_user_id" class="dragzone_badge" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" v-bind:task_user="task_user">
+              <b-badge v-if="task_user.company_user_id !== selectedCompanyUserId || !verticalAlignment" class="dragzone_badge" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" v-bind:task_user="task_user">
                 {{ getCompanyUser(task_user.company_user_id).name | abbrName }}
               </b-badge>
             </div>
@@ -125,8 +126,11 @@ const Tasks = namespace('tasks')
   filters: {
     abbrName(name: string) {
       if (!name) return ''
-      if (name.includes(' ')) return name.charAt(0).toUpperCase()
-      else return name.charAt(0).toUpperCase() + name.charAt(1).toUpperCase()
+      let matches = name.match(/\b(\w)/g) // ['J','S','O','N']
+      if (matches) {
+        let acronym = matches.join('') // JSON
+        return acronym.toUpperCase()
+      }
     }
   }
 })
@@ -139,10 +143,12 @@ export default class Dragzone extends Vue {
   @Prop({ required: true, default: () => [] }) public tasks!: any
   @Prop({ required: true }) public isListDragged!: boolean
   @Prop({ required: true }) public group!: any
+  @Prop({ required: true }) public verticalAlignment!: boolean
+  @Prop({ required: true }) private selectedCompanyUserId!: number
   @Prop({ required: false, default: false }) public initiallyExpanded!: boolean
   @Prop({ required: false, default: false })
-  public selectedCompanyUserId!: number
-  @Tasks.Getter public getById!: any
+  @Tasks.Getter
+  public getById!: any
 
   private current_company_user_id: any = this.$store.state.settings.current_company_user_id
   private expandedList: boolean = this.initiallyExpanded
@@ -415,11 +421,13 @@ export default class Dragzone extends Vue {
   width: 100%;
   display: flex;
   justify-content: flex-start;
-  // align-items: center;
+  align-items: flex-start;
 }
 .burger-icon-wrapper {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  // align-items: flex-start;
   // border: 1px solid red;
 }
 .burger-icon span {

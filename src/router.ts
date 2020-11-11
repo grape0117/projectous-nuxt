@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import checkAuth from '@/middlewares/checkAuth'
 
-import store from 'vuex'
+import store from '@/store'
 
 Vue.use(Router)
 //TODO: lazy load https://blog.logrocket.com/lazy-loading-in-vue-js/
@@ -52,11 +52,13 @@ const router = new Router({
     {
       path: '/users',
       name: 'Company Users',
+      meta: { isAdmin: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/CompanyUsers.vue')
     },
     {
       path: '/clients',
       name: 'Clients',
+      meta: { isAdmin: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/ClientsTemplate.vue')
     },
     // {
@@ -67,21 +69,33 @@ const router = new Router({
     {
       path: '/reports',
       name: 'Reports',
+      meta: { isAdmin: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoiceableTemplate.vue')
     },
     {
       path: '/invoices',
       name: 'Invoices',
+      meta: { isAdmin: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoicesTemplate.vue')
     }
   ]
 })
 
 const unGuardedRoutes = ['Login', 'AcceptInvite', 'Register']
+import { getCookie } from '@/utils/util-functions'
 
 router.beforeEach((to, from, next) => {
+  const isAdmin = store.getters['settings/isAdmin']
   const guardedRoute = !unGuardedRoutes.find(route => route === to.name)
-  checkAuth(guardedRoute, next)
+
+  let isLoggedIn = getCookie('auth_token')
+  let routeMetaAdmin = to.meta.isAdmin
+
+  if (!isLoggedIn || (isLoggedIn && (routeMetaAdmin === isAdmin || routeMetaAdmin === undefined))) {
+    checkAuth(guardedRoute, next)
+  } else {
+    return alert('Only admin can access.')
+  }
 })
 
 export default router

@@ -119,9 +119,12 @@ export default {
   },
   methods: {
     abbrName(name) {
-      if (!name) return name
-      if (name.includes(' ')) return name.charAt(0).toUpperCase()
-      else return name.charAt(0).toUpperCase() + name.charAt(1).toUpperCase()
+      if (!name) return ''
+      let matches = name.match(/\b(\w)/g) // ['J','S','O','N']
+      if (matches) {
+        let acronym = matches.join('') // JSON
+        return acronym.toUpperCase()
+      }
     }
   }
 }

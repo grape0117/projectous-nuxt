@@ -1,10 +1,7 @@
 <template>
   <b-list-group-item class="task-sidebar-item">
-    <!-- <pre style="color: white;">{{ task }}</pre> -->
-    <!-- <div style="border: 1px solid red;">
-  <pre style="color: white;">{{ task.title }}</pre>
-</div> -->
-    <div class="">
+    <!-- {{ showMessages}} -->
+    <div class="" @click="openChat">
       <span class="ml-2 task-sidebar-date">{{ messageTime(task.last_task_message_created_at) }}</span>
       <div class="d-flex align-items-center">
         <div class="message-avatar">
@@ -17,13 +14,13 @@
     </div>
 
     <div class="task-sidebar-last-message-wrapper">
-      <div class="task-sidebar-last-message" @click="toggleMessages">
+      <div class="task-sidebar-last-message" style="margin-top: 0 !important; padding-top: 5px !important;" @click="openChat">
         <span class="">{{ getLastMessage(task) }}</span>
       </div>
-      <div class="task-sidebar-message-detail" v-show="showMessages">
-        <b-button variant="dark" @click="toggleMessages" style="margin-bottom: 10px;"> <i class="icon-arrow_back" />Back </b-button>
+      <!-- <div class="task-sidebar-message-detail" v-show="showMessages">
+        <b-button variant="dark" @click="showMessages = false" style="margin-bottom: 10px;"> <i class="icon-arrow_back" />Back </b-button>
         <task-message v-bind:task_id="task.id" :task_messages="task.messages"> </task-message>
-      </div>
+      </div> -->
     </div>
   </b-list-group-item>
 </template>
@@ -36,9 +33,7 @@ import { chain, groupBy } from 'lodash'
 
 export default {
   data() {
-    return {
-      showMessages: false
-    }
+    return {}
   },
   props: {
     task: {
@@ -49,6 +44,9 @@ export default {
   computed: {},
   mounted() {},
   methods: {
+    openChat() {
+      this.$emit('openChat', this.task)
+    },
     messageTime(time) {
       if (time === null) return 'No Date'
 
@@ -63,9 +61,6 @@ export default {
       return task.messages[0].message
       // if (task.last_task_message_id == '') return ''
       // else return this.$store.getters['task_messages/getById'](task.last_task_message_id).message
-    },
-    toggleMessages() {
-      this.showMessages = !this.showMessages
     }
   },
   watch: {},
