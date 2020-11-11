@@ -277,7 +277,7 @@ export default class Custom extends Vue {
 
   private getCompanyUser() {
     if (!!getCookie('id')) {
-      const id = parseInt(getCookie('id'))
+      const id = getCookie('id')
       let user = this.sortedCompanyUsers.find((user: any) => user.user_id === id)
       this.selectedCompanyUserId = user.id
     }

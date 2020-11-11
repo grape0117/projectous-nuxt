@@ -8,9 +8,10 @@
 </pre> -->
         <Header />
         <div class="d-flex justify-content-between">
-          <router-view class="router-view-class" />
+          <task-details v-if="show_task"></task-details>
+          <router-view v-else class="router-view-class" />
           <div class="d-flex">
-            <task-tray v-show="showTask" />
+            <task-tray v-show="showTasks" />
             <task-side-bar v-show="showChat" />
             <timer-tab v-show="showTimer" />
           </div>
@@ -74,7 +75,7 @@ export default {
   },
   data() {
     return {
-      showTask: false,
+      showTasks: false,
       showChat: false,
       showTimer: false,
       bgStyle: '',
@@ -172,9 +173,9 @@ export default {
   },
   created() {
     if (getCookie('tasks') === 'true') {
-      this.showTask = true
+      this.showTasks = true
     } else {
-      this.showTask = false
+      this.showTasks = false
     }
     if (getCookie('chat') === 'true') {
       this.showChat = true
@@ -187,9 +188,13 @@ export default {
       this.showTimer = false
     }
 
+    EventBus.$on('toggle_task', () => {
+      this.showTaskDetail = !this.showTaskDetail
+      document.cookie = `task=${this.showTaskDetail}`
+    })
     EventBus.$on('toggle_tasks', () => {
-      this.showTask = !this.showTask
-      document.cookie = `tasks=${this.showTask}`
+      this.showTasks = !this.showTasks
+      document.cookie = `tasks=${this.showTasks}`
     })
     EventBus.$on('toggle_timers', () => {
       this.showTimer = !this.showTimer
