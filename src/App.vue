@@ -9,7 +9,7 @@
         <Header />
         <div class="d-flex justify-content-between">
           <task-details v-if="show_task"></task-details>
-          <router-view v-else class="router-view-class" />
+          <router-view class="router-view-class" />
           <div class="d-flex">
             <task-tray v-show="showTasks" />
             <task-side-bar v-show="showChat" />

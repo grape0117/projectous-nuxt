@@ -350,7 +350,7 @@ export default Vue.extend({
       mypostparameters.append('image', this.selectedFile, this.selectedFile.name)
       mypostparameters.append('project_id', this.task.project_id)
       mypostparameters.append('task_id', this.task.id)
-      this.$http().post('/uploadmyfile', mypostparameters)
+      this.$http().post('/files/add', mypostparameters)
     },
     async setShowTask() {
       this.show_task = await this.tasks.find(({ id }) => id === this.$route.params.task_id)
