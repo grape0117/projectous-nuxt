@@ -3,10 +3,6 @@
     <div class="task-tray-wrapper">
       <div class="task-tray-top-div">
         <div class="task-tray-title">
-          <!-- current_user: <pre>{{ currentUser }}</pre> -->
-          <span>
-            <!-- {{ sortedCompanyUsers.find((user) => user.user_id === 295) }} -->
-          </span>
           <span>TASKS</span>
         </div>
         <div class="task-tray-selection-box">
@@ -65,10 +61,6 @@ enum listsBlockNames {
   }
 })
 export default class Custom extends Vue {
-  get currentUser() {
-    return this.$store.state
-  }
-
   get listsBlockNames() {
     return listsBlockNames
   }
@@ -276,11 +268,12 @@ export default class Custom extends Vue {
   }
 
   private getCompanyUser() {
-    if (!!getCookie('id')) {
-      const id = getCookie('id')
-      let user = this.sortedCompanyUsers.find((user: any) => user.user_id === id)
-      this.selectedCompanyUserId = user.id
-    }
+    const id = this.$store.state.settings.current_user_id
+    // let user = this.sortedCompanyUsers.find((user: any) => user.user_id === 345)
+    let user = this.sortedCompanyUsers.find((user: any) => user.user_id === id)
+    // console.log('[USER]')
+    // console.log(user)
+    this.selectedCompanyUserId = user.id
   }
 
   @Watch('selectedCompanyUserId')

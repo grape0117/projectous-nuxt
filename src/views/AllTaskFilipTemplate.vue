@@ -288,13 +288,13 @@ export default Vue.extend({
           task.client = []
         }
 
-        // task.users.forEach(user => {
-        //   company_users.forEach(company_user => {
-        //     if (company_user.id === user.company_user_id) {
-        //       user.color = company_user.color
-        //     }
-        //   })
-        // })
+        task.users.forEach(user => {
+          company_users.forEach(company_user => {
+            if (company_user.id === user.company_user_id) {
+              user.color = company_user.color
+            }
+          })
+        })
 
         return task
       })

@@ -45,14 +45,25 @@ export default {
     // },
     taskMessages() {
       let tasks = this.$store.state.tasks.tasks
+      let projects = this.$store.state.projects.projects
+      let companyUsers = this.$store.state.company_users.company_users
+      let taskMessages = tasks.map(task => task).filter(task => task.messages.length > 0)
 
-      let messages = tasks.map(task => task).filter(task => task.messages.length > 0)
+      taskMessages.forEach(taskMessage => {
+        taskMessage.project = projects.find(project => project.id === taskMessage.project_id)
+
+        taskMessage.messages.forEach(async messages => {
+          let company_user = await companyUsers.find(user => user.id === messages.company_user_id)
+          messages.user_name = await company_user.name
+          messages.user_color = await company_user.color
+        })
+      })
       // .filter(task => {
       //   if(_.includes(this.messagesTaskIds, task.id)) {
       //     return task
       //   }
       // })
-      return messages
+      return taskMessages
     },
     // tasks() {
     //   let tasks = this.$store.state.tasks.tasks

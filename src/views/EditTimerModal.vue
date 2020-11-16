@@ -1,10 +1,21 @@
 <template>
   <b-modal id="timer-modal" tabindex="-1" title="Edit Timer" class="modal fade" role="dialog" @ok="saveTimer">
     <template v-slot:modal-header="{ ok, cancel }">
-      <b-tabs content-class="mt-3">
-        <b-tab title="Edit" active><p>I'm the first tab</p></b-tab>
-        <b-tab title="History"><p>I'm the second tab</p></b-tab>
-      </b-tabs>
+      <div class="timer-modal_header-section">
+        <b-tabs content-class="mt-3">
+          <b-tab title="Edit" active><p>I'm the first tab</p></b-tab>
+          <b-tab title="History"><p>I'm the second tab</p></b-tab>
+        </b-tabs>
+        <div class="">
+          <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
+          <div class="timer-modal_notes">
+            <div contenteditable="true" id="timerUserNotes" class="form-control" style="height: auto; min-height: 60px; max-height: 90px; overflow-y: scroll;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
+          </div>
+        </div>
+        <div>
+          <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard>
+        </div>
+      </div>
     </template>
     <ul id="timerModalTabs" class="nav nav-tabs" role="tablist">
       <li role="presentation" class="active">
@@ -78,12 +89,12 @@
               <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value()" />
             </div>
           </div>
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
             <div class="col-sm-8">
               <div contenteditable="true" id="timerUserNotes" class="form-control" style="height: auto; min-height: 35px;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
             </div>
-          </div>
+          </div> -->
           <div v-if="isAdmin()" class="form-group">
             <label class="control-label col-sm-4" for="timerInvoiceNotes">Invoice Notes: </label>
             <div class="col-sm-8">
@@ -108,7 +119,7 @@
               <input type="date" id="timerUserDate" class="form-control" :value="timerDate()" />
             </div>
           </div>-->
-          <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard>
+          <!-- <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard> -->
 
           <!--<div v-if="isIHI()" class="form-group row">
             <label for="projectName" class="control-label labelLeft col-sm-4" style="line-height:46px;">Start: </label>
@@ -406,3 +417,15 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.timer-modal_header-section {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  // border: 1px solid red !important;
+}
+.timer-modal_notes {
+  width: 100px;
+}
+</style>

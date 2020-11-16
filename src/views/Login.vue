@@ -24,7 +24,7 @@ export default class Login extends Vue {
   private async login(e: any) {
     e.preventDefault()
     // @ts-ignore
-    const { auth_token, user_id } = await this.$http().post('/login', {
+    const { auth_token } = await this.$http().post('/login', {
       // @ts-ignore
       email: document.getElementById('email')['value'],
       // @ts-ignore
@@ -33,9 +33,6 @@ export default class Login extends Vue {
 
     if (auth_token) {
       document.cookie = 'auth_token=' + auth_token
-      document.cookie = 'id=' + user_id
-
-      // await this.$store.dispatch('SET_CURRENT_USER', user_id)
       this.$router.push('/')
     } else {
       alert('Invalid email or password')

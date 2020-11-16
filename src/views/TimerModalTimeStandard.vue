@@ -1,11 +1,14 @@
 <template id="timer-modal-time-standard-template">
   <div>
-    <div class="form-group" v-if="timer.status !== 'running'" style="border: blue 1px solid">
-      <label class="control-label col-sm-4" for="timerDuration">Duration: </label>
-      <div class="col-sm-6">
+    <div class="timer-modal_duration" v-if="timer.status !== 'running'">
+      <span class="timer-modal_label">Duration</span>
+      <div>
         <div id="timerDuration" class="form-control-static">
-          <input name="duration_hours" id="duration_hours" placeholder="00" style="display:inline; width: 15%;" v-model="hours" />:<input name="duration_minutes" id="duration_minutes" style="display:inline; width: 15%;" placeholder="00" v-model="minutes" />:<input name="duration_seconds" id="duration_seconds" style="display:inline; width: 15%;" placeholder="00" v-model="seconds" />
-          (hours : minutes : seconds)
+          <div class="timer-modal_timer">
+            <input name="duration_hours" id="duration_hours" placeholder="00" style="display:inline;" v-model="hours" />: <input name="duration_minutes" id="duration_minutes" style="display:inline;" placeholder="00" v-model="minutes" />:
+            <input name="duration_seconds" id="duration_seconds" style="display:inline;" placeholder="00" v-model="seconds" />
+          </div>
+          <div class="timer-modal_timer-label">(Hours : Minutes : Seconds)</div>
         </div>
       </div>
 
@@ -14,11 +17,18 @@
               <button v-else class="btn btn-default" style="float: right;"><i class="glyphicon glyphicon-play"></i></button>
           </div>-->
     </div>
-    <button @click="set_invoice_duration = true" v-if="(timer.status !== 'running' && isAdmin() && !set_invoice_duration) || timer.duration === timer.invoice_duration">Set Invoice Duration</button>
+    <span class="timer-modal_button" @click="set_invoice_duration = true" v-if="(timer.status !== 'running' && isAdmin() && !set_invoice_duration) || timer.duration === timer.invoice_duration">Set Invoice Duration</span>
     <div class="form-group" v-else-if="timer.status !== 'running' && isAdmin()">
-      <label class="control-label col-sm-4" for="timerDuration">Invoice Duration: </label>
-      <div class="col-sm-6">
-        <div id="timerDuration" class="form-control-static"><input name="duration_hours" id="invoice_hours" placeholder="00" style="display:inline; width: 15%;" v-model="invoice_hours" />:<input name="duration_minutes" id="invoice_minutes" style="display:inline; width: 15%;" placeholder="00" v-model="invoice_minutes" />:<input name="duration_seconds" id="invoice_seconds" style="display:inline; width: 15%;" placeholder="00" v-model="invoice_seconds" /> (hours : minutes)</div>
+      <span class="timer-modal_label">Invoice Duration:</span>
+
+      <div>
+        <div id="timerDuration" class="form-control-static">
+          <div class="timer-modal_timer">
+            <input name="duration_hours" id="invoice_hours" placeholder="00" style="display:inline;" v-model="invoice_hours" />: <input name="duration_minutes" id="invoice_minutes" style="display:inline;" placeholder="00" v-model="invoice_minutes" />:
+            <input name="duration_seconds" id="invoice_seconds" style="display:inline;" placeholder="00" v-model="invoice_seconds" />
+          </div>
+          <div class="timer-modal_timer-label">(Hours : Minutes : Seconds)</div>
+        </div>
       </div>
     </div>
   </div>
@@ -160,3 +170,38 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.timer-modal_duration {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.timer-modal_timer {
+  display: flex;
+  // width: 200px;
+}
+.timer-modal_timer input {
+  width: 30px;
+}
+.timer-modal_label {
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.timer-modal_timer-label {
+  font-size: 10px;
+  font-weight: bold;
+  margin-top: 3px;
+}
+.timer-modal_button {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #6c8eff;
+  padding: 5px 8px;
+  border-radius: 50px;
+  color: white;
+}
+</style>
