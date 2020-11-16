@@ -1,14 +1,19 @@
 <template>
   <div id="app" style="position: relative; " class="app-class" :class="bgStyle && bgTheme === 'Colors' ? bgStyle : 'paletteDefault'" :style="{ background: bgTheme === 'Images' ? `url(${this.bgStyle})` : '' }">
     <b-overlay :show="$store.state.loading" rounded="sm" style="flex-grow: 1">
+      <!-- Loading area -->
+      <template #overlay>
+        <div class="text-center">
+          <b-progress style="width: 500px;" :value="100" variant="success" :animated="true" class="mt-3"></b-progress>
+          <!-- <b-spinner label="Spinning"></b-spinner> -->
+          <p id="cancel-label">Loading data...</p>
+        </div>
+      </template>
+
       <div class="row-no-padding">
-        <!-- <button @click="$store.state.loading = !$store.state.loading">update</button>
-<pre>
-{{ $store.state.loading }}
-</pre> -->
         <Header />
         <div class="d-flex justify-content-between">
-          <task-details v-if="show_task"></task-details>
+          <!-- <task-details v-if="show_task"></task-details> -->
           <router-view class="router-view-class" />
           <div class="d-flex">
             <task-tray v-show="showTasks" />
@@ -75,6 +80,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       showTasks: false,
       showChat: false,
       showTimer: false,
