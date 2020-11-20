@@ -1,28 +1,33 @@
 <template>
   <b-list-group-item class="task-sidebar-item">
     <!-- <pre class="border" style="color: white;">
-      {{ task }}
+      {{ getLastMessage }}
+      {{ task.last_message }}
+      {{ task.last_task_message_created_at}}
     </pre> -->
+
     <div class="" @click="openChat">
       <p class="task-sidebar-item_header-part">
-        <span class="task-sidebar-item_project-badge" v-if="task.project.acronym">{{ task.project.acronym }}</span>
-        <span class="task-sidebar-item_project-name">{{ task.project.name }}</span>
+        <span v-if="task.project.acronym" class="task-sidebar-item_project-badge">{{ task.project.acronym }}</span>
+        <span v-else class="task-sidebar-item_project-name mr-2" style="color: green;">{{ task.project.name }}</span>
+        <span class="task-sidebar-item_project-name">{{ task.title }}</span>
       </p>
       <div class="d-flex align-items-center">
         <div class="message-avatar" style="margin-right: 10px;">
-          <span class="rounded-circle task-sidebar-item_badge" :style="{ backgroundColor: task.messages[0].user_color }">
-            {{ task.messages[0].user_name | abbrName }}
+          <span class="rounded-circle task-sidebar-item_badge" :style="{ backgroundColor: getLastMessageCompanyUser.color }">
+            {{ getLastMessageCompanyUser.name | abbrName }}
           </span>
         </div>
         <div>
-          <span class="task-sidebar-title">{{ task.messages[0].message }}</span>
+          <span class="task-sidebar-title">{{ getLastMessage.message }}</span>
         </div>
       </div>
     </div>
 
     <div class="task-sidebar-last-message-wrapper">
       <div class="task-sidebar-last-message" style="margin-top: 0 !important; padding-top: 5px !important;" @click="openChat">
-        <span class="ml-2 task-sidebar-date">{{ messageTime(task.messages[0].updated_at) }}</span>
+        <!-- <span class="ml-2 task-sidebar-date" >{{ task.last_task_message_created_at }}</span> -->
+        <span class="ml-2 task-sidebar-date">{{ task.last_task_message_created_at | moment('MMMM Do YYYY') }}</span>
       </div>
     </div>
   </b-list-group-item>
@@ -43,7 +48,18 @@ export default {
       required: true
     }
   },
-  computed: {},
+  computed: {
+    getLastMessageCompanyUser() {
+      return this.$store.state.company_users.company_users.find(user => user.id === this.getLastMessage.company_user_id)
+    },
+    getLastMessage() {
+      let messages = this.$store.state.task_messages.task_messages.filter(msg => msg.task_id === this.task.id)
+      messages.sort(function(a, b) {
+        return new Date(b.created_at) - new Date(a.created_at)
+      })
+      return messages.reverse()[messages.length - 1]
+    }
+  },
   mounted() {},
   methods: {
     openChat() {
@@ -60,7 +76,13 @@ export default {
       else return msgTime.format('d/MM/YY')
     }
   },
-  watch: {},
+  watch: {
+    getLastMessage(newVal, oldVal) {
+      if (newVal === oldVal) return
+
+      this.$emit('setLastMessage', newVal)
+    }
+  },
   components: {
     'task-message': () => import('./TaskMessage.vue')
   },

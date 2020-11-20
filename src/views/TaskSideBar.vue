@@ -3,23 +3,19 @@
     <div class="task-side-bar-label">
       <span>CHAT</span>
     </div>
-
-    <!-- All Chats -->
     <div class="message-sidebar" v-show="Object.keys(openedChat).length === 0">
       <div class="message-sidebar_new-task" @click="createTask">
         +
       </div>
       <b-list-group v-if="taskMessages.length > 0" class="task-side-bar_list">
-        <task-sidebar-item @openChat="openChat" v-for="(task, index) in taskMessages" :key="index" :task="task" />
+        <task-sidebar-item @openChat="openChat" v-for="(task, index) in taskMessages" :key="index" :task="task" @setLastMessage="setLastMessage" />
       </b-list-group>
       <div v-else class="d-flex justify-content-center">
         <span class="task-side-bar-no-messages">No messages yet.</span>
       </div>
     </div>
 
-    <!-- Viewed chat -->
     <div class="" v-if="Object.keys(openedChat).length > 0">
-      <!-- <span class="task-side-bar_back-button" @click="closeChat">back</span> -->
       <b-button variant="dark" @click="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px;"> <i class="icon-arrow_back" />Back </b-button>
       <task-message class="task-side-bar_task-message" v-bind:task_id="openedChat.id" :task_messages="openedChat.messages"> </task-message>
     </div>
@@ -46,17 +42,14 @@ export default {
     taskMessages() {
       let tasks = this.$store.state.tasks.tasks
       let projects = this.$store.state.projects.projects
-      let companyUsers = this.$store.state.company_users.company_users
       let taskMessages = tasks.map(task => task).filter(task => task.messages.length > 0)
 
-      taskMessages.forEach(taskMessage => {
-        taskMessage.project = projects.find(project => project.id === taskMessage.project_id)
+      taskMessages.forEach(async taskMessage => {
+        taskMessage.project = await projects.find(project => project.id === taskMessage.project_id)
+      })
 
-        taskMessage.messages.forEach(async messages => {
-          let company_user = await companyUsers.find(user => user.id === messages.company_user_id)
-          messages.user_name = await company_user.name
-          messages.user_color = await company_user.color
-        })
+      taskMessages.sort((a, b) => {
+        return new Date(b.last_task_message_created_at) - new Date(a.last_task_message_created_at)
       })
       // .filter(task => {
       //   if(_.includes(this.messagesTaskIds, task.id)) {
@@ -89,6 +82,25 @@ export default {
   },
   mounted() {},
   methods: {
+    // sortedTaskMessages() {
+    //   let taskMessages = this.taskMessages
+    //   this.$nextTick(() => {
+    //     taskMessages.sort(async (a,b) =>{
+    //       return new Date(await b.last_task_message_created_at) - new Date(await a.last_task_message_created_at);
+    //       // return new Date(b.last_message.updated_at || b.last_message.created_at) - new Date(a.last_message.updated_at || a.last_message.created_at);
+    //     });
+    //   });
+    //   return taskMessages
+    // },
+    async setLastMessage(lastMessage) {
+      let tasks = this.$store.state.tasks.tasks
+      await tasks.forEach(async task => {
+        if (task.id === lastMessage.task_id) {
+          task.last_task_message_created_at = await lastMessage.created_at
+          task.last_task_message_id = await lastMessage.id
+        }
+      })
+    },
     openChat(chat) {
       this.openedChat = chat
     },

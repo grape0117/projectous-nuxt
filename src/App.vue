@@ -4,9 +4,8 @@
       <!-- Loading area -->
       <template #overlay>
         <div class="text-center">
-          <b-progress style="width: 500px;" :value="100" variant="success" :animated="true" class="mt-3"></b-progress>
-          <!-- <b-spinner label="Spinning"></b-spinner> -->
-          <p id="cancel-label">Loading data...</p>
+          <b-spinner label="Spinning"></b-spinner>
+          <p>Loading data...</p>
         </div>
       </template>
 

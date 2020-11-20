@@ -2,12 +2,13 @@
   <div class="message-panel">
     <!-- <b-list-group class="message-panel_inner" style="height:calc(100vh - 450px); overflow-y: auto;"> -->
     <b-list-group class="message-panel_inner">
+      <!-- <pre style="color: white;">{{ getMessages }}</pre> -->
       <b-list-group-item class="message-panel_inner-message" v-for="(message, index) in getMessages" :key="index">
         <div class="msg-header">
           <span>{{ getUserNameWithCompanyUserId(message.company_user_id) }}</span> /
           <span v-if="message.timestamp">{{ formatTime(message.timestamp) }}</span>
         </div>
-        <label class="msg-content">{{ message.message }}</label>
+        <pre class="msg-content" style="color: white;">{{ message.message }}</pre>
         <div class="msg-action" v-if="current_company_user_id == message.company_user_id">
           <b-button variant="primary" @click="editMessage(message)" style="margin-right: 10px;">Edit</b-button>
           <b-button variant="warning" @click="deleteMessage(message)">Delete</b-button>
@@ -38,7 +39,11 @@ export default {
   created() {},
   computed: {
     getMessages() {
-      return this.$store.getters['task_messages/getByTaskId'](this.task_id)
+      let messages = this.$store.getters['task_messages/getByTaskId'](this.task_id)
+      messages.sort(function(a, b) {
+        return new Date(b.created_at) - new Date(a.created_at)
+      })
+      return messages.reverse()
     },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
@@ -104,8 +109,8 @@ export default {
 
         // })
         console.log(task_message.task_messages)
-        return
         this.s_message = ''
+        return
         task = this.$store.getters['tasks/getById'](task_id)
         task.last_task_message_id = task_message.task_messages.id
         task.last_task_message_created_at = moment().format('YYYY-MM-DD HH:mm:ss')
