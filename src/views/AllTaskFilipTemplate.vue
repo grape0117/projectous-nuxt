@@ -1,6 +1,6 @@
 <template>
   <div id="task-cloud">
-    <div v-if="!show_task" style="padding: 20px;">
+    <div style="padding: 20px;">
       <b-row style="margin-bottom: 10px;">
         <select v-model="project_sort" style="width: 400px;">
           <option value="">All Projects</option>
@@ -32,7 +32,7 @@
         </div>
       </b-row>
     </div>
-    <div v-else class="show-task">
+    <!-- <div class="show-task">
       <div class="left-section">
         <div class="task-detail-top-buttons">
           <button @click="saveTask()">Close (ESC)</button>
@@ -162,11 +162,13 @@
           <iframe v-if="resource.name === selected_tab" :src="resource.href" style="height: calc(100vh - 155px); width: 100%;"></iframe>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
 import Vue from 'vue'
+import { EventBus } from '@/components/event-bus'
+
 // import TaskCard from '../components/ui/TaskCard.vue'
 import uuid from 'uuid'
 import moment from 'moment'
@@ -492,13 +494,16 @@ export default Vue.extend({
       })
       this.$bvModal.show('client-modal')
     },
-    showTask(task) {
+    async showTask(task) {
       console.log('show task!', task)
       this.scrollTop = document.documentElement.scrollTop
       //pop modal
-      this.show_task = task
-      this.t_update()
-      this.$router.push({ name: 'Task_Detail', params: { task_id: task.id } })
+      // this.show_task = task
+      await this.$router.push({ query: { task: task.id } })
+      await EventBus.$emit('showTask', task)
+
+      // this.t_update()
+      // this.$router.push({ name: 'Task_Detail', params: { task_id: task.id } })
     },
     t_update() {
       // function to use after this.show_task = task

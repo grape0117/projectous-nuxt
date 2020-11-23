@@ -5,14 +5,13 @@
       {{ task.last_message }}
       {{ task.last_task_message_created_at}}
     </pre> -->
-
     <div class="" @click="openChat">
-      <p class="task-sidebar-item_header-part">
+      <p class="task-sidebar-item_header-part" style="margin-bottom: 8px !important;">
         <span v-if="task.project.acronym" class="task-sidebar-item_project-badge">{{ task.project.acronym }}</span>
         <span v-else class="task-sidebar-item_project-name mr-2" style="color: green;">{{ task.project.name }}</span>
         <span class="task-sidebar-item_project-name">{{ task.title }}</span>
       </p>
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center" style="margin-bottom: 8px !important;">
         <div class="message-avatar" style="margin-right: 10px;">
           <span class="rounded-circle task-sidebar-item_badge" :style="{ backgroundColor: getLastMessageCompanyUser.color }">
             {{ getLastMessageCompanyUser.name | abbrName }}
@@ -26,9 +25,9 @@
 
     <div class="task-sidebar-last-message-wrapper">
       <div class="task-sidebar-last-message" style="margin-top: 0 !important; padding-top: 5px !important;" @click="openChat">
-        <!-- <span class="ml-2 task-sidebar-date" >{{ task.last_task_message_created_at }}</span> -->
-        <span class="ml-2 task-sidebar-date">{{ task.last_task_message_created_at | moment('MMMM Do YYYY') }}</span>
+        <span class="task-sidebar-date">{{ task.last_task_message_created_at | moment('MMMM Do YYYY') }}</span>
       </div>
+      <span class="task-sidebar_go-to-task" @click="goToTask()">[ Go to task]</span>
     </div>
   </b-list-group-item>
 </template>
@@ -37,6 +36,7 @@ import uuid from 'uuid'
 import moment from 'moment'
 // import TaskMessage from './TaskMessage.vue'
 import { chain, groupBy } from 'lodash'
+import { EventBus } from '@/components/event-bus'
 
 export default {
   data() {
@@ -74,6 +74,10 @@ export default {
       if (diff == 0) return 'Today'
       else if (diff == 1) return 'Yesterday'
       else return msgTime.format('d/MM/YY')
+    },
+    async goToTask() {
+      await this.$router.push({ query: { task: this.task.id } })
+      await EventBus.$emit('showTask', this.task)
     }
   },
   watch: {
@@ -133,5 +137,26 @@ export default {
   box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 5px;
   margin-left: 0px;
   font-size: 10px;
+}
+.task-sidebar-last-message {
+  font-size: 15px;
+  flex: 1;
+}
+.task-sidebar-last-message-wrapper {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+.task-sidebar_go-to-task {
+  font-size: 12px;
+  font-weight: bold;
+  color: lightblue;
+  display: flex;
+  align-self: center;
+  cursor: pointer;
+  // border: 1px solid red;
+}
+.task-sidebar_go-to-task:hover {
+  color: #007fff;
 }
 </style>

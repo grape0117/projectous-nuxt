@@ -13,7 +13,10 @@
         <Header />
         <div class="d-flex justify-content-between">
           <!-- <task-details v-if="show_task"></task-details> -->
-          <router-view class="router-view-class" />
+          <div class="router-view-class">
+            <task-detail v-if="Object.keys(showTask).length > 0" class="app_task-detail" :task="showTask" />
+            <router-view style="width: 100%; height: 100%;" />
+          </div>
           <div class="d-flex">
             <task-tray v-show="showTasks" />
             <task-side-bar v-show="showChat" />
@@ -70,6 +73,7 @@ export default {
     TimerTab: () => import('./views/TimerTab.vue'),
     TaskTray: () => import('./views/TaskTray.vue'),
     TaskSideBar: () => import('./views/TaskSideBar.vue'),
+    TaskDetail: () => import('./views/TaskDetail.vue'),
     EditClientModal,
     EditUserModal,
     InviteUserModal,
@@ -84,7 +88,8 @@ export default {
       showChat: false,
       showTimer: false,
       bgStyle: '',
-      bgTheme: ''
+      bgTheme: '',
+      showTask: {}
     }
   },
   computed: {
@@ -175,6 +180,10 @@ export default {
       await this.getAppData()
       setInterval(this.getNewData, 3000)
     }
+
+    EventBus.$on('showTask', task => {
+      this.showTask = task
+    })
   },
   created() {
     if (getCookie('tasks') === 'true') {
@@ -227,10 +236,12 @@ export default {
   },
   beforeDestroy() {
     // to avoid memory leak
+
     EventBus.$off('toggle_tasks')
     EventBus.$off('toggle_timers')
     EventBus.$off('toggle_chat')
     EventBus.$off('changeBackground')
+    EventBus.$off('showTask')
   },
   methods: {
     getNewData() {
@@ -350,9 +361,16 @@ export default {
   display: flex;
 }
 .router-view-class {
+  position: relative;
   height: calc(100vh - 50px);
-  overflow-y: scroll;
+  overflow-y: hidden;
   flex: 1;
+}
+.app_task-detail {
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  position: absolute;
 }
 
 // background-color options

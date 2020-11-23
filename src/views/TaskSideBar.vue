@@ -2,12 +2,13 @@
   <div class="task-side-bar">
     <div class="task-side-bar-label">
       <span>CHAT</span>
-    </div>
-    <div class="message-sidebar" v-show="Object.keys(openedChat).length === 0">
+      <span style="font-weight: normal; align-self: center; max-width: 200px;" v-if="hasOpenedChat">{{ openedChat.title }}</span>
       <div class="message-sidebar_new-task" @click="createTask">
         +
       </div>
-      <b-list-group v-if="taskMessages.length > 0" class="task-side-bar_list">
+    </div>
+    <div class="message-sidebar" v-show="!hasOpenedChat">
+      <b-list-group v-if="taskMessages && taskMessages.length > 0" class="task-side-bar_list">
         <task-sidebar-item @openChat="openChat" v-for="(task, index) in taskMessages" :key="index" :task="task" @setLastMessage="setLastMessage" />
       </b-list-group>
       <div v-else class="d-flex justify-content-center">
@@ -15,8 +16,12 @@
       </div>
     </div>
 
-    <div class="" v-if="Object.keys(openedChat).length > 0">
-      <b-button variant="dark" @click="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px;"> <i class="icon-arrow_back" />Back </b-button>
+    <div class="" v-if="hasOpenedChat">
+      <div class="d-flex justify-content-between">
+        <b-button variant="dark" @click="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px;"> <i class="icon-arrow_back" />Back </b-button>
+        <span class="task-sidebar_go-to-task" style="margin-right: 20px;" @click="goToTask()">[ Go to task]</span>
+      </div>
+
       <task-message class="task-side-bar_task-message" v-bind:task_id="openedChat.id" :task_messages="openedChat.messages"> </task-message>
     </div>
   </div>
@@ -27,6 +32,7 @@ import uuid from 'uuid'
 import moment from 'moment'
 // import TaskMessage from './TaskMessage.vue'
 import { chain, forEach, groupBy } from 'lodash'
+import { EventBus } from '@/components/event-bus'
 
 export default {
   data() {
@@ -36,13 +42,16 @@ export default {
     }
   },
   computed: {
+    hasOpenedChat() {
+      return Object.keys(this.openedChat).length > 0
+    },
     // messagesTaskIds() {
     //   return this.$store.state.task_messages.task_messages.map(message => message.task_id)
     // },
     taskMessages() {
       let tasks = this.$store.state.tasks.tasks
       let projects = this.$store.state.projects.projects
-      let taskMessages = tasks.map(task => task).filter(task => task.messages.length > 0)
+      let taskMessages = tasks.map(task => task).filter(task => task.messages && task.messages.length > 0)
 
       taskMessages.forEach(async taskMessage => {
         taskMessage.project = await projects.find(project => project.id === taskMessage.project_id)
@@ -92,6 +101,10 @@ export default {
     //   });
     //   return taskMessages
     // },
+    async goToTask() {
+      await this.$router.push({ query: { task: this.openedChat.id } })
+      await EventBus.$emit('showTask', this.openedChat)
+    },
     async setLastMessage(lastMessage) {
       let tasks = this.$store.state.tasks.tasks
       await tasks.forEach(async task => {
@@ -110,7 +123,10 @@ export default {
     async createTask() {
       let newTask = { id: uuid.v4() }
       await this.$store.dispatch('UPSERT', { module: 'tasks', entity: newTask })
-      this.$router.push({ name: 'Task_Detail', params: { task_id: newTask.id } })
+      // this.$router.push({ name: 'Task_Detail', params: { task_id: newTask.id } })
+      // this.$router.push({ name: 'Task_Detail', params: { task_id: newTask.id } })
+      await this.$router.push({ query: { task: newTask.id } })
+      await EventBus.$emit('showTask', newTask)
       // await EventBus.$emit('')
     },
     messageTime(time) {
@@ -155,8 +171,9 @@ export default {
 }
 .message-sidebar_new-task {
   cursor: pointer;
-  margin-top: -10px;
-  margin-bottom: 5px;
+  margin-top: -5px;
+  margin-right: 10px;
+  // margin-bottom: 5px;
   font-size: 20px;
 }
 .task-side-bar_list {
@@ -197,6 +214,10 @@ export default {
   padding: 10px;
   z-index: 1;
   background-color: rgba($color: #000000, $alpha: 0.5);
+  display: flex;
+  justify-content: space-between;
+  // align-items: center;
+  // border: 1px solid red;
 }
 .message-avatar {
   /* width: 50px;
@@ -213,14 +234,6 @@ export default {
   /* background-color: #616161; */
   background-color: rgba(0, 0, 0, 0.5);
   /* border: 5px solid red; */
-}
-.task-sidebar-last-message {
-  margin-top: 5px;
-  font-size: 15px;
-  padding-left: 10px !important;
-}
-.task-sidebar-last-message-wrapper {
-  border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 </style>
 
