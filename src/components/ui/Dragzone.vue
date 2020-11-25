@@ -34,8 +34,8 @@
                 <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
               <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
-                <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
-                <span v-else class="dragzone__item-tracker-icon-triangle" />
+                <span v-if="timerId === item.id" class=" icon-stop" style="font-size: 25px; color: red;" />
+                <span v-else class="icon-play_arrow" style="font-size: 25px; color: green;" />
               </div>
             </div>
             <!-- <div class="dragzone__item-block-content-text">
@@ -564,7 +564,7 @@ export default class Dragzone extends Vue {
   height: 20px;
   margin-left: auto;
   border-radius: 100%;
-  background: #c5c5c8;
+  // background: #c5c5c8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -573,25 +573,26 @@ export default class Dragzone extends Vue {
 .dragzone__item-tracker-icon--active {
   background: #5cd8e2;
 }
-.dragzone__item-tracker-icon-triangle {
-  width: 8px;
-  height: 0;
-  margin-left: 3px;
-  border-left: solid 8px #ffffff;
-  border-bottom: solid 6px transparent;
-  border-top: solid 6px transparent;
-}
+// .dragzone__item-tracker-icon-triangle {
+//   width: 8px;
+//   height: 0;
+//   margin-left: 3px;
+//   border-left: solid 8px #ffffff;
+//   border-bottom: solid 6px transparent;
+//   border-top: solid 6px transparent;
+// }
 .dragzone__item-tracker-icon-square {
   width: 8px;
   height: 8px;
   background: #ffffff;
   border-radius: 3px;
 }
-.dragzone__item-tracker-icon:hover span {
-  transform: scale(0.8);
-  transform-origin: 50% 50%;
-  transition: transform 200ms ease-out;
-}
+// .dragzone__item-tracker-icon .icon-play_arrow:hover {
+//   color: white;
+//   // transform: scale(0.8);
+//   // transform-origin: 50% 50%;
+//   // transition: transform 200ms ease-out;
+// }
 .dragzone__item-tracker {
   width: 100%;
   padding: 0.25rem 0.5rem;

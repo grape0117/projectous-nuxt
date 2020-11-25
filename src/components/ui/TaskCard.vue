@@ -103,19 +103,24 @@ export default {
       // let me = this
       // let task_users = this.$store.getters['task_users/getByTaskId'](this.task.id)
       let task_users = this.task.users
-      if (!task_users.length) return []
+      if (task_users && task_users.length === 0) return []
       let r_users = []
 
-      task_users.forEach(async user => {
-        if (!user.company_user_id) return (user.name = '')
-        else {
-          // let c_user = await this.$store.state.company_users.company_users[user.company_user_id - 1]
-          let c_user = this.$store.state.company_users.company_users.find(x => x.user_id === user.company_user_id)
-          user.name = c_user ? c_user.name : ''
-          user.abbr = this.abbrName(user.name)
-        }
-        r_users.push(user)
-      })
+      // console.log(task_users)
+      // console.log(typeof task_users)
+
+      if (task_users && task_users.length > 0) {
+        task_users.forEach(async user => {
+          if (!user.company_user_id) return (user.name = '')
+          else {
+            // let c_user = await this.$store.state.company_users.company_users[user.company_user_id - 1]
+            let c_user = this.$store.state.company_users.company_users.find(x => x.user_id === user.company_user_id)
+            user.name = c_user ? c_user.name : ''
+            user.abbr = this.abbrName(user.name)
+          }
+          r_users.push(user)
+        })
+      }
 
       return r_users
     }

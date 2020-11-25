@@ -335,6 +335,7 @@ export default {
   color: white;
   font-size: 20px;
   cursor: pointer;
+  color: green;
 }
 li {
   list-style: none;

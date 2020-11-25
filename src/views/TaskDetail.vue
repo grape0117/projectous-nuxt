@@ -40,7 +40,7 @@
           </b-form-group>
           <div class="form-section">
             Project:
-            <select id="timer-modal-project-id" class="form-control select2-select" name="project_id" v-on:change="isCreateProject()" v-model="task.project_id"
+            <select id="timer-modal-project-id" class="form-control select2-select" name="project_id" v-model="task.project_id"
               >{{
                 task.project_id
               }}
