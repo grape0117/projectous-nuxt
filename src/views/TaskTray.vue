@@ -280,7 +280,12 @@ export default class Custom extends Vue {
   private changeRouteQueryParams(value: any) {
     if (!getCookie('auth_token')) return
     if (value) {
-      this.$router.push({ query: { user: value } }).catch(e => {})
+      // this.$router.push({ query: { user: value } }).catch(e => {})
+      // will only delete the "task" in $router.query
+      let query = Object.assign({}, this.$route.query)
+      query.user = value
+      // delete query.task
+      this.$router.replace({ query }).catch(e => {})
     }
   }
   @Watch('sortedCompanyUsers')

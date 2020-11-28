@@ -185,7 +185,18 @@ export default {
       this.showTask = task
     })
   },
+
   created() {
+    let getTaskFromQuery = 0
+    this.$watch('$route.query', async val => {
+      if (getTaskFromQuery > 2) return
+      if (!!val.task && this.$store.state.tasks.tasks && this.$store.state.tasks.tasks.length > 0) {
+        const task = await this.$store.state.tasks.tasks.find(task => task.id === val.task)
+        this.showTask = task
+        getTaskFromQuery += 1
+      }
+    })
+
     if (getCookie('tasks') === 'true') {
       this.showTasks = true
     } else {
