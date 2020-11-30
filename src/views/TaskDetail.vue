@@ -51,15 +51,16 @@
               </optgroup>
             </select>
           </div>
-          <input type="file" @change="Images_onFileChanged" /><button @click="Images_onUpload">Upload!</button>
+          <input type="file" @change="Images_onFileChanged" />
+          <button @click="Images_onUpload" v-if="selectedFile">Upload!</button>
 
-          <div class="form-section" style="color: black;">
+          <!-- <div class="form-section" style="color: black;">
             Assigned to:
             <select id="task-user" class="form-control select2-select" name="task_user" v-on:change="switchAssignedUser">
               <option value="" selected>***** Select User *****</option>
               <option v-for="company_user in company_users" :key="company_user.id" v-bind:company_user="company_user" :value="company_user.id"> {{ company_user.name }} </option>
             </select>
-          </div>
+          </div> -->
 
           <div class="form-group">
             <label class="control-label col-sm-4">Task Type: </label>
@@ -367,5 +368,33 @@ export default Vue.extend({
   display: flex;
   /* height: 100vh;
   width: 100vw; */
+}
+
+.left-section {
+  max-width: 300px;
+  width: 100%;
+  padding: 0 10px;
+  height: calc(100vh - 39px);
+  overflow-y: scroll;
+  color: white;
+  position: relative;
+}
+
+.task-detail-top-buttons {
+  display: flex;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: white;
+  padding: 5px 15px 5px 0;
+  z-index: 10;
+}
+.task-detail-top-buttons .action-button {
+  font-size: 13px;
+}
+
+#task-detail .form-group label {
+  white-space: nowrap;
 }
 </style>

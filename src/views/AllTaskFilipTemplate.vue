@@ -512,14 +512,7 @@ export default Vue.extend({
   border-radius: 3px;
   background-color: rgba($color: #000000, $alpha: 0.6);
 }
-.left-section {
-  max-width: 300px;
-  width: 100%;
-  padding: 10px;
-  height: calc(100vh - 39px);
-  overflow-y: scroll;
-  color: white;
-}
+
 .center-section {
   margin-top: 10px;
   width: 100%;
@@ -527,14 +520,6 @@ export default Vue.extend({
 </style>
 
 <style scoped>
-.task-detail-top-buttons {
-  /* border: 1px solid red; */
-  display: flex;
-  justify-content: space-between;
-}
-.task-detail-top-buttons .action-button {
-  font-size: 13px;
-}
 .list-group-item {
   border: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);

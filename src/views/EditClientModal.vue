@@ -1,10 +1,10 @@
 <template>
-  <b-modal id="client-modal" class="modal fade" tabindex="-1" role="dialog" @ok="saveClient">
+  <b-modal id="client-modal" class="modal fade" tabindex="-1" role="dialog" title="Edit Client" @ok="saveClient">
     <div v-if="client.history !== 'null'" v-for="event in client.history">{{ event.message }} | {{ event.timestamp }}</div>
     <form id="editClientForm" class="form-horizontal">
-      {{ client.id }}
+      <!-- {{ client.id }} -->
       <div class="form-group">
-        <label class="col-sm-3 control-label" for="inputClientName" @blur="updateClient('name')">Client Name: </label>
+        <label class="col-sm-3 control-label" for="inputClientName" @blur="updateClient('name')" style="white-space: nowrap;">Client Name: </label>
         <div class="col-sm-9">
           <input id="inputClientName" class="form-control" type="text" name="name" v-model="client.name" />
         </div>
