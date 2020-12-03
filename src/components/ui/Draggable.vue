@@ -169,7 +169,7 @@ export default class Draggable extends Vue {
   private groupedDataWithProjects(id: string) {
     let tasks = this.groupedData[id]
     let projects = this.$store.state.projects.projects
-
+    let clients = this.$store.state.clients.clients
     // if (tasks) {
     //   tasks.map(task => {})
     // }
@@ -177,7 +177,12 @@ export default class Draggable extends Vue {
     if (tasks) {
       tasks.forEach(task => {
         let project = projects.find(({ id: projectId }: any) => projectId === task.project_id)
-        task['project'] = project ? project : []
+        task['project'] = project ? project : {}
+
+        if (Object.keys(task.project).length > 0) {
+          let client = clients.find((client: any) => client.client_company_id === task.project.client_company_id)
+          task.project.client_color = client.color
+        }
 
         return task
       })

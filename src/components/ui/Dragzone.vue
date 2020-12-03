@@ -3,6 +3,7 @@
     <div v-if="isListExpandable" @click="expandedList = !expandedList" class="dragzone__item-icon">
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
+    <!-- <pre>{{ tasks }}</pre> -->
     <div class="dragzone__content" ref="dragzone_wrapper">
       <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
@@ -29,7 +30,7 @@
                 </p> -->
 
                 <div class="dragzone-project-acronym-wrapper" v-if="item.project.acronym">
-                  <div class="dragzone-project-acronym" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
+                  <div class="dragzone-project-acronym" :style="{ 'background-color': item.project.client_color }" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
                     {{ item.project.acronym }}
                   </div>
                   <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
@@ -447,12 +448,8 @@ export default class Dragzone extends Vue {
 .dragzone-project-acronym {
   padding: 3px 5px;
   white-space: nowrap;
-  background-color: green;
+  color: black;
   font-size: 10px;
-  // display: flex;
-  // justify-content: center;
-  // align-items: center;
-  // height: 20px;
   max-height: 20px;
 }
 .dragzon-icon-dehaze {
@@ -461,8 +458,6 @@ export default class Dragzone extends Vue {
 }
 .dragzone {
   width: 100%;
-  /* border: 5px solid red; */
-  /*width: calc(100% - 121px);*/
   min-height: 40px;
   height: auto;
 }

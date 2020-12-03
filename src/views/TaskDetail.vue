@@ -177,6 +177,7 @@ export default Vue.extend({
       return this.$store.state.company_users.company_users
     },
     getResources() {
+      // return this.task.settings
       if (this.task && this.task.settings && this.task.settings.resources && this.task.settings.resources.length) {
         return this.task.settings.resources
       } else {
@@ -186,11 +187,12 @@ export default Vue.extend({
   },
   watch: {},
   methods: {
-    addResource() {
+    async addResource() {
       // add or update action
       console.log(this.task)
-      if (!this.task.settings.resources) {
-        Vue.set(this.task.settings, 'resources', [])
+      if (!this.task.settings) {
+        this.task.settings = {}
+        await Vue.set(this.task.settings, 'resources', [])
       }
       if (!this.isEditResource) {
         // if add new resource
@@ -200,18 +202,17 @@ export default Vue.extend({
         })
         document.getElementById('add-resource-name').value = ''
         document.getElementById('add-resource-href').value = ''
-        this.saveTask(false)
+        await this.saveTask(false)
       } else {
         // if edit resource
         let me = this
-        let index = this.task.settings.resources.findIndex(function(item, i) {
+        let index = await this.task.settings.resources.findIndex(function(item, i) {
           return item == me.selected_resource
         })
-        if (index != -1)
-          this.task.settings.resources[index] = {
-            name: document.getElementById('add-resource-name').value,
-            href: document.getElementById('add-resource-href').value
-          }
+        if (index != -1) console.log(index)
+
+        this.task.settings.resources[index].name = document.getElementById('add-resource-name').value
+        this.task.settings.resources[index].href = document.getElementById('add-resource-href').value
       }
       console.log(this.task)
     },

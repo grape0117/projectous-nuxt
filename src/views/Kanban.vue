@@ -20,7 +20,8 @@
                 <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
               </div>
               <p style="margin-bottom: 0 !important;">
-                <span class="client-section-acronym" v-if="acronym">{{ acronym }}</span>
+                <!-- <pre>{{ client }}</pre> -->
+                <span class="client-section-acronym" :style="{ 'background-color': client.color }" v-if="acronym">{{ acronym }}</span>
                 <span class="client-project-name__name">{{ name }}</span>
               </p>
             </div>
@@ -337,8 +338,6 @@ export default class Custom extends Vue {
   /* display: flex;
   align-items: center;
   justify-content: center; */
-  background-color: green;
-  color: white;
   font-size: 10px;
   white-space: nowrap;
   padding: 5px 5px;
@@ -391,7 +390,6 @@ export default class Custom extends Vue {
 .client-project-name:hover {
   background-color: rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  color: white;
 }
 .client-project-name__name {
   width: 100%;
