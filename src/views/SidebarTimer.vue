@@ -5,7 +5,7 @@
       { 'sidebar-timer-client-no-project': !project.id }, 
       { 'side-timer-timer-active': timer.status === 'running' }, 
       { 'side-timer-less-work': hasLessWork }]" -->
-
+    <!-- <pre>{{ timer.status_changed_at }}</pre> -->
     <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
@@ -30,7 +30,8 @@
       </div>
     </div>
 
-    <div class="sidebar-timer-report-at">{{ reportAt() }}</div>
+    <!-- <div class="sidebar-timer-report-at">{{ reportAt()  }}</div> -->
+    <div class="sidebar-timer-report-at">{{ restartedAt() }}</div>
     <div class="sidebar-timer-notes" v-if="timer.notes">
       <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
     </div>
@@ -45,6 +46,7 @@
 
 <script>
 import Vue from 'vue'
+import moment from 'moment'
 import { format_report_at, datetimeToJS } from '../utils/util-functions'
 
 import { EventBus } from '@/components/event-bus'
@@ -211,6 +213,9 @@ export default {
         delete self.running_timers[self.timer.id]
       } else {
       }
+    },
+    restartedAt() {
+      return format_report_at(datetimeToJS(this.timer.status_changed_at))
     },
     reportAt: function() {
       return format_report_at(datetimeToJS(this.timer.report_at))

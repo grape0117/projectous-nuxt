@@ -3,7 +3,7 @@
     <pre></pre>
     <!-- {{ timerEmptyFields }} -->
     <!-- <sidebar-timer v-bind:running_timers="running_timers" v-bind:projects="projects" v-bind:users="users" v-for="timer in mytimers()" v-bind:timer="timer" :key="'sidebar-' + timer.id"></sidebar-timer> -->
-    <sidebar-timer v-bind:running_timers="running_timers" v-bind:projects="projects" v-bind:users="users" v-for="timer in mytimers()" v-bind:timer="timer" :key="'sidebar-' + timer.id"></sidebar-timer>
+    <sidebar-timer v-bind:running_timers="running_timers" v-bind:projects="projects" v-bind:users="users" v-for="timer in mytimers" v-bind:timer="timer" :key="'sidebar-' + timer.id"> </sidebar-timer>
   </div>
 </template>
 
@@ -28,7 +28,7 @@ export default {
   computed: {
     timerEmptyFields() {
       let totalCount = 0
-      this.mytimers().forEach(timer => {
+      this.mytimers.forEach(timer => {
         if (timer.project_id === null || timer.notes === null) {
           totalCount++
         }
@@ -53,9 +53,7 @@ export default {
     },
     user_id: function() {
       return this.$store.state.settings.current_user_id
-    }
-  },
-  methods: {
+    },
     mytimers: function() {
       const self = this
       if (this.$store.state.settings.current_company_user.id == 36) {
@@ -112,8 +110,8 @@ export default {
           return timer.company_user_id === self.$store.state.settings.current_company_user.id
         })
         .sort(function(a, b) {
-          let aDate = new Date(a.report_at)
-          let bDate = new Date(b.report_at)
+          let aDate = new Date(a.status_changed_at)
+          let bDate = new Date(b.status_changed_at)
           if (aDate > bDate) return -1
           if (aDate < bDate) return 1
           return 0
