@@ -215,6 +215,20 @@ export default {
       }
     },
     restartedAt() {
+      let getYesterday = moment()
+        .subtract(1, 'day')
+        .format('YYYY-MM-DD HH:mm:ss')
+
+      let date = datetimeToJS(this.timer.status_changed_at)
+        .toString()
+        .split(' ')
+      let yesterday = datetimeToJS(getYesterday)
+        .toString()
+        .split(' ')
+
+      if (date[0] === yesterday[0] && date[1] === yesterday[1] && date[2] === yesterday[2] && date[3] === yesterday[3]) {
+        return 'Yesterday'
+      }
       return format_report_at(datetimeToJS(this.timer.status_changed_at))
     },
     reportAt: function() {
