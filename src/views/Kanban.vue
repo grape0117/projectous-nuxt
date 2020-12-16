@@ -2,6 +2,7 @@
   <div class="kanban-page">
     <!-- Project Filter: <input v-model="project_search" /> <input type="checkbox" v-model="show_all_active_projects" /> Show all active projects
     <hr /> -->
+    <!-- <pre>{{ $store.state.projects.projects }}</pre> -->
     <b-container fluid>
       <b-row class="kanban-page-innerwrapper">
         <b-col class="client-section scroll-col">

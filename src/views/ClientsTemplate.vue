@@ -1,5 +1,9 @@
 <template>
   <div id="client-template" class="container-fluid">
+    <!-- <pre style="font-size: 12px;">{{ $store.state.projects.projects }}</pre> -->
+    <!-- <pre style="font-size: 10px;">{{ $store.state.clients.clients }}</pre> -->
+    <!-- <pre style="font-size: 10px;">{{ $store.state.client_users.client_users }}</pre> -->
+    <pre style="font-size: 10px;">{{ $store.state.timers.timers[0] }}</pre>
     <div class="row">
       <div class="col-sm-12 form-group form-inline"></div>
       <div class="col-sm-12 form-group form-inline">

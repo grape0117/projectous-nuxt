@@ -1,6 +1,9 @@
 <template>
   <b-modal id="client-modal" class="modal fade" tabindex="-1" role="dialog" title="Edit Client" @ok="saveClient">
-    <div v-if="client.history !== 'null'" v-for="event in client.history">{{ event.message }} | {{ event.timestamp }}</div>
+    <div v-if="client.history !== 'null'">
+      <div v-for="(event, eventIndex) in typeof client.history === 'string' ? JSON.parse(client.history) : client.history" :key="eventIndex">{{ event.message }} | {{ event.timestamp }}</div>
+    </div>
+
     <form id="editClientForm" class="form-horizontal">
       <!-- {{ client.id }} -->
       <div class="form-group">
@@ -69,12 +72,22 @@
           <input id="phone" class="form-control" type="text" name="phone" v-model="client.phone" />
         </div>
       </div>
+      <div class="form-group">
+        <label class="col-sm-3 control-label" for="color">Color: </label>
+        <div class="col-sm-9">
+          <select id="color" class="form-control" type="text" name="color" placeholder="Phone" :style="{ 'background-color': client.color }" v-model="client.color">
+            <option v-for="color in colors" :key="color" :style="'background-color: ' + color + ';'">{{ color }}</option>
+          </select>
+          <!-- <input id="phone" class="form-control" type="text" name="phone" v-model="client.phone" /> -->
+        </div>
+      </div>
       <!--<div class="form-group checkbox">
                       <label>
                           <input id="allUserCheck" type="checkbox" name="default_all_users"> Default All Users?
                       </label>
                   </div>-->
-      <client-modal-user :key="user.id" @change="updateHistory" v-bind:client="client" v-for="user in active_users" v-bind:client_user="clientUser(client.id, user.id)" v-bind:user="user"> </client-modal-user>
+      <!-- <client-modal-user :key="user.id" @change="updateHistory" v-bind:client="client" v-for="user in active_users" v-bind:client_user="clientUser(client.id, user.id)" v-bind:user="user"> </client-modal-user> -->
+      <client-modal-user :key="user.id" v-bind:client="client" v-for="user in active_users" v-bind:client_user="clientUser(client.id, user.id)" v-bind:user="user"> </client-modal-user>
     </form>
     <!-- /.modal-dialog --> </b-modal
   ><!-- /.modal -->
@@ -87,6 +100,151 @@ export default {
   name: 'client-modal',
   components: {
     'client-modal-user': EditClientModalUser
+  },
+  data() {
+    return {
+      colors: [
+        'lightsalmon',
+        'salmon',
+        'darksalmon',
+        'lightcoral',
+        'indianred',
+        'crimson',
+        'firebrick',
+        'red',
+        'darkred',
+        'coral',
+        'tomato',
+        'orangered',
+        'gold',
+        'orange',
+        'darkorange',
+        'lightyellow',
+        'lemonchiffon',
+        'lightgoldenrodyellow',
+        'papayawhip',
+        'moccasin',
+        'peachpuff',
+        'palegoldenrod',
+        'khaki',
+        'darkkhaki',
+        'yellow',
+        'lawngreen',
+        'chartreuse',
+        'limegreen',
+        'lime',
+        'forestgreen',
+        'green',
+        'darkgreen',
+        'greenyellow',
+        'yellowgreen',
+        'springgreen',
+        'mediumspringgreen',
+        'lightgreen',
+        'palegreen',
+        'darkseagreen',
+        'mediumseagreen',
+        'seagreen',
+        'olive',
+        'darkolivegreen',
+        'olivedrab',
+        'lightcyan',
+        'cyan',
+        'aqua',
+        'aquamarine',
+        'mediumaquamarine',
+        'paleturquoise',
+        'turquoise',
+        'mediumturquoise',
+        'darkturquoise',
+        'lightseagreen',
+        'cadetblue',
+        'darkcyan',
+        'teal',
+        'powderblue',
+        'lightblue',
+        'lightskyblue',
+        'skyblue',
+        'deepskyblue',
+        'lightsteelblue',
+        'dodgerblue',
+        'cornflowerblue',
+        'steelblue',
+        'royalblue',
+        'blue',
+        'mediumblue',
+        'darkblue',
+        'navy',
+        'midnightblue',
+        'mediumslateblue',
+        'slateblue',
+        'darkslateblue',
+        'lavender',
+        'thistle',
+        'plum',
+        'violet',
+        'orchid',
+        'fuchsia',
+        'magenta',
+        'mediumorchid',
+        'mediumpurple',
+        'blueviolet',
+        'darkviolet',
+        'darkorchid',
+        'darkmagenta',
+        'purple',
+        'indigo',
+        'pink',
+        'lightpink',
+        'hotpink',
+        'deeppink',
+        'palevioletred',
+        'mediumvioletred',
+        'white',
+        'snow',
+        'honeydew',
+        'mintcream',
+        'azure',
+        'aliceblue',
+        'ghostwhite',
+        'whitesmoke',
+        'seashell',
+        'beige',
+        'oldlace',
+        'floralwhite',
+        'ivory',
+        'antiquewhite',
+        'linen',
+        'lavenderblush',
+        'mistyrose',
+        'gainsboro',
+        'lightgray',
+        'silver',
+        'darkgray',
+        'gray',
+        'dimgray',
+        'lightslategray',
+        'slategray',
+        'darkslategray',
+        'black',
+        'cornsilk',
+        'blanchedalmond',
+        'bisque',
+        'navajowhite',
+        'wheat',
+        'burlywood',
+        'tan',
+        'rosybrown',
+        'sandybrown',
+        'goldenrod',
+        'peru',
+        'chocolate',
+        'saddlebrown',
+        'sienna',
+        'brown',
+        'maroon'
+      ]
+    }
   },
   computed: {
     client: function() {
@@ -108,6 +266,7 @@ export default {
     },
     updateHistory({ message }) {
       console.log('message', message, typeof this.client.history)
+      console.log('This is client user')
       let history = this.client.history
       if (history === 'null') {
         history = []
@@ -123,6 +282,7 @@ export default {
     saveClient: function() {
       //TODO: change Save button to Saving...
       console.log('client save', this.client)
+      // this.client.history = null
       this.$store.dispatch('UPSERT', { module: 'clients', entity: this.client })
     }
   }

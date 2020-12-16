@@ -374,7 +374,7 @@ export default {
 .router-view-class {
   position: relative;
   height: calc(100vh - 50px);
-  overflow-y: hidden;
+  // overflow-y: hidden;
   flex: 1;
 }
 .app_task-detail {
