@@ -12,8 +12,8 @@
           <span>Delete</span>
         </b-button>
       </div>
-      <b-tabs content-class="mt-3" style="margin-top: 10px;">
-        <b-tab title="Details" active style="color: black;">
+      <b-tabs content-class="mt-3" style="margin-top: 10px">
+        <b-tab title="Details" active style="color: black">
           <b-form-group label="Task">
             <b-form-textarea type="text" v-model="task.title" placeholder="Task Title" rows="2" max-rows="4"> </b-form-textarea>
           </b-form-group>
@@ -40,14 +40,14 @@
           </b-form-group>
           <div class="form-section">
             Project:
-            <select id="timer-modal-project-id" class="form-control select2-select" name="project_id" v-model="task.project_id"
-              >{{
+            <select id="timer-modal-project-id" class="form-control select2-select" name="project_id" v-model="task.project_id">
+              {{
                 task.project_id
               }}
               <option value="" selected>***** Select Project *****</option>
-              <option value="create">Create New Project </option>
+              <option value="create">Create New Project</option>
               <optgroup :label="client.name" v-bind:client="client" v-for="client in clients" :key="client.id">
-                <option v-for="project in openprojects(client)" :key="project.id" v-bind:client="client" :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
+                <option v-for="project in openprojects(client)" :key="project.id" v-bind:client="client" :value="project.id">{{ client_name(project.client_company_id) }} - {{ project.name }}</option>
               </optgroup>
             </select>
           </div>
@@ -103,9 +103,7 @@
           </div>
 
           <div class="row without-margin">
-            <p style="max-width: 100%; margin-bottom: 5px; font-weight: 700;">
-              Users:
-            </p>
+            <p style="max-width: 100%; margin-bottom: 5px; font-weight: 700">Users:</p>
           </div>
           <edit-task-modal-user v-for="user in active_users" :key="user.id" @toggle="toggleUser" v-bind:task_user="task_user(user)" v-bind:user="user" v-bind:task="task" />
         </b-tab>
@@ -122,13 +120,13 @@
       </draggable>
       <div v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" :id="resource.name">
         <div v-if="resource.name === selected_tab" class="d-flex justify-content-between align-items-center">
-          <label class="docs-path" style="white-space: nowrap; overflow: hidden;">{{ resource.href }}</label>
-          <div style="float: right; display: inline-block; margin-bottom: 8px; margin-top: 5px;" v-if="resource.href != ''">
-            <b-button @click="copyURL(resource.href)" style="margin-right: 10px;">Copy URL</b-button>
+          <label class="docs-path" style="white-space: nowrap; overflow: hidden">{{ resource.href }}</label>
+          <div style="float: right; display: inline-block; margin-bottom: 8px; margin-top: 5px" v-if="resource.href != ''">
+            <b-button @click="copyURL(resource.href)" style="margin-right: 10px">Copy URL</b-button>
             <b-button @click="openURL(resource.href)">Open in a new tab</b-button>
           </div>
         </div>
-        <iframe v-if="resource.name === selected_tab" :src="resource.href" style="height: calc(100vh - 155px); width: 100%;"></iframe>
+        <iframe v-if="resource.name === selected_tab" :src="resource.href" style="height: calc(100vh - 155px); width: 100%"></iframe>
       </div>
     </div>
   </div>
@@ -344,12 +342,24 @@ export default Vue.extend({
         //create
         this.changed_task_users.push(user)
       }
+    },
+    onEsc(evnt) {
+      let key = evnt.key || evnt.keyCode
+      if (key === 'Escape' || key === 'Esc' || key === 27) {
+        this.saveTask()
+      }
     }
   },
   created() {
     if (!!this.getResources.length) {
       this.openTab(this.getResources[0].name)
     }
+  },
+  mounted() {
+    window.addEventListener('keyup', this.onEsc)
+  },
+  beforeDestroy() {
+    window.removeEventListener('keyup', this.onEsc)
   }
 })
 </script>

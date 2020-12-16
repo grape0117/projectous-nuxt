@@ -22,7 +22,7 @@
     <div class="status-icon-with-timer">
       <div v-if="isCurrentUser()" class="status-icons">
         <i class="icon-pause icon-class" v-if="timer.status === 'running'" v-on:click="pauseTimer"></i>
-        <i class="icon-stop icon-class" style="color: red;" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
+        <i class="icon-stop icon-class" style="color: red" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
         <i class="icon-play_arrow icon-class" v-else @click="restartTimer"></i>
       </div>
       <div class="sidebar-timer-timer">
@@ -30,16 +30,13 @@
       </div>
     </div>
 
-    <!-- <div class="sidebar-timer-report-at">{{ reportAt()  }}</div> -->
     <div class="sidebar-timer-report-at">{{ restartedAt() }}</div>
-    <div class="sidebar-timer-notes" v-if="timer.notes">
-      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
-    </div>
-    <div v-else>
-      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: rgba(240, 52, 52, 0.4);"></div>
-    </div>
-    <div v-if="isNotCurrentUser()">{{ user.name }}</div>
 
+    <div class="sidebar-timer-notes">
+      <input ref="noteInput" placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" v-model="timer.notes" :style="{ 'background-color': timer.notes === '' || timer.notes === null ? 'rgba(240, 52, 52, 0.4) !important' : '' }" />
+    </div>
+
+    <div v-if="isNotCurrentUser()">{{ user.name }}</div>
     <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
   </li>
 </template>
@@ -54,7 +51,7 @@ import { IProject } from '../store/modules/projects/types'
 
 export default {
   name: 'sidebar-timer',
-  props: ['timer', 'projects', 'users', 'tasks', 'running_timers'],
+  props: ['timer', 'projects', 'users', 'tasks', 'running_timers', 'index'],
   data: function() {
     return {
       totalDuration: 0,
@@ -64,7 +61,12 @@ export default {
   watch: {
     async 'timer.status'(status) {
       await EventBus.$emit('timerStatus', status)
-      // EventBus.$emit('timerEmptyFields', this.timerEmptyFields)
+    },
+    'timer.notes'(notes) {
+      if (notes === null) return
+      if ((notes.includes('&#8203;') && notes.length === 7) || notes === '') {
+        this.timer.notes = ''
+      }
     }
   },
   computed: {
@@ -108,6 +110,9 @@ export default {
     // }
   },
   mounted: function() {
+    if (this.index === 0 && this.timer.notes === null) {
+      this.$refs['noteInput'].focus()
+    }
     /**
      * load in current running project if one exists
      */
@@ -216,7 +221,7 @@ export default {
     },
     restartedAt() {
       let getYesterday = moment()
-        .subtract(1, 'day')
+        .subtract(2, 'day')
         .format('YYYY-MM-DD HH:mm:ss')
 
       let date = datetimeToJS(this.timer.status_changed_at)
@@ -258,27 +263,29 @@ export default {
       this.$store.dispatch('timers/pauseTimer', this.timer)
     },
     saveNotes: async function(event) {
-      let notes = event.target.innerHTML
-      //Check for ABC: //TODO: move somewhere else to common area?
-      const projectRegex = /^([A-Z]+):\s*/ //TODO: fix the :[:space] not being captured
-      const acronym_match = notes.match(projectRegex)
-      console.log('saveNotes', acronym_match)
-
-      // We have an acronym. Look for a matching project
-      if (acronym_match && acronym_match[1]) {
-        const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === acronym_match[1])
-        if (projects_by_acronym.length === 1) {
-          console.log('match found: ', projects_by_acronym[0].name)
-          //TODO: update history
-          this.timer.project_id = projects_by_acronym[0].id
-          notes = notes.replace(acronym_match[0], '')
-          console.log('acronym', acronym_match[0], notes.replace(acronym_match[0], ''))
-        }
-      }
-      console.log('after note acronym')
-      this.timer.notes = notes
-      event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
-      this.$store.dispatch('timers/saveTimer', this.timer)
+      // let notes = event.target.innerHTML
+      // //Check for ABC: //TODO: move somewhere else to common area?
+      // const projectRegex = /^([A-Z]+):\s*/ //TODO: fix the :[:space] not being captured
+      // const acronym_match = notes.match(projectRegex)
+      // console.log('saveNotes', acronym_match)
+      // // We have an acronym. Look for a matching project
+      // if (acronym_match && acronym_match[1]) {
+      //   const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === acronym_match[1])
+      //   if (projects_by_acronym.length === 1) {
+      //     console.log('match found: ', projects_by_acronym[0].name)
+      //     //TODO: update history
+      //     this.timer.project_id = projects_by_acronym[0].id
+      //     notes = notes.replace(acronym_match[0], '')
+      //     console.log('acronym', acronym_match[0], notes.replace(acronym_match[0], ''))
+      //   }
+      // }
+      // console.log('[NOTES]')
+      // console.log(notes);
+      // console.log('after note acronym')
+      // this.timer.notes = notes
+      // event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
+      // console.log(this.timer.notes === '&#8203;')
+      await this.$store.dispatch('timers/saveTimer', this.timer)
     }
   }
 }
@@ -335,8 +342,16 @@ export default {
   margin-left: -5px;
 }
 .sidebar-timer-timer-task {
+  border: 0px;
+  border-left: 1px solid white;
+  width: 100%;
   padding: 0 5px;
   font-weight: 600;
+  color: white;
+
+  &::placeholder {
+    color: rgba($color: #ffffff, $alpha: 0.5);
+  }
 }
 // .side-timer-timer-active {
 //   box-shadow: 0px 0px 5px rgba($color: lightgreen, $alpha: 1) !important;
