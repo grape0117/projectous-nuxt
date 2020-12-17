@@ -7,7 +7,7 @@
     <form id="editClientForm" class="form-horizontal">
       <!-- {{ client.id }} -->
       <div class="form-group">
-        <label class="col-sm-3 control-label" for="inputClientName" @blur="updateClient('name')" style="white-space: nowrap;">Client Name: </label>
+        <label class="col-sm-3 control-label" for="inputClientName" @blur="updateClient('name')" style="white-space: nowrap">Client Name: </label>
         <div class="col-sm-9">
           <input id="inputClientName" class="form-control" type="text" name="name" v-model="client.name" />
         </div>
@@ -279,7 +279,7 @@ export default {
     clientUser(client_id, company_user_id) {
       return this.$store.getters['client_users/getByClientIdAndCompanyUserId']({ client_id, company_user_id })
     },
-    saveClient: function() {
+    saveClient: async function() {
       //TODO: change Save button to Saving...
       console.log('client save', this.client)
       // this.client.history = null

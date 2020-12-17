@@ -2,10 +2,8 @@
   <div class="task-side-bar">
     <div class="task-side-bar-label">
       <span>CHAT</span>
-      <span style="font-weight: normal; align-self: center; max-width: 200px;" v-if="hasOpenedChat">{{ openedChat.title }}</span>
-      <div class="message-sidebar_new-task" @click="createTask">
-        +
-      </div>
+      <span style="font-weight: normal; align-self: center; max-width: 200px" v-if="hasOpenedChat">{{ openedChat.title }}</span>
+      <div class="message-sidebar_new-task" @click="createTask">+</div>
     </div>
     <div class="message-sidebar" v-show="!hasOpenedChat">
       <b-list-group v-if="taskMessages && taskMessages.length > 0" class="task-side-bar_list">
@@ -18,8 +16,8 @@
 
     <div class="" v-if="hasOpenedChat">
       <div class="d-flex justify-content-between">
-        <b-button variant="dark" @click="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px;"> <i class="icon-arrow_back" />Back </b-button>
-        <span class="task-sidebar_go-to-task" style="margin-right: 20px;" @click="goToTask()">[ Go to task]</span>
+        <b-button variant="dark" @click="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px"> <i class="icon-arrow_back" />Back </b-button>
+        <span class="task-sidebar_go-to-task" style="margin-right: 20px" @click="goToTask()">[ Go to task]</span>
       </div>
 
       <task-message class="task-side-bar_task-message" v-bind:task_id="openedChat.id" :task_messages="openedChat.messages"> </task-message>
@@ -206,6 +204,7 @@ export default {
   padding-top: 15px;
   overflow-y: scroll;
   overflow-x: hidden;
+  height: 100%;
 }
 .task-side-bar-label {
   top: 0;
