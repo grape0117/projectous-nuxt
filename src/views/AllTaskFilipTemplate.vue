@@ -1,8 +1,8 @@
 <template>
   <div id="task-cloud">
-    <div style="padding: 20px;">
-      <b-row style="margin-bottom: 10px;">
-        <select v-model="project_sort" style="width: 400px;">
+    <div style="padding: 20px">
+      <b-row style="margin-bottom: 10px">
+        <select v-model="project_sort" style="width: 400px">
           <option value="">All Projects</option>
           <optgroup :label="client.name" v-for="(client, clientIndex) in clients" :key="clientIndex">
             <option :value="project.id" v-for="(project, projectIndex) in clientProjects(client)" :key="projectIndex">{{ project.name }}</option>
@@ -27,7 +27,7 @@
 
       <b-row class="border active-task-card">
         <div class="active-task-card-title">Active</div>
-        <div style="margin-top: 40px;">
+        <div style="margin-top: 40px">
           <task-card @showTask="showTask(task)" v-bind:task="task" :keyid="taskIndex" v-for="(task, taskIndex) in active_client_tasks" :key="taskIndex" class="task-card"> </task-card>
         </div>
       </b-row>
@@ -184,12 +184,12 @@ export default Vue.extend({
   },
   mounted() {
     console.log('moment', moment('2010-10-20'))
-    window.addEventListener('keyup', ev => {
-      if (ev.keyCode === 27) {
-        //* Note keyCode 27 is ESC
-        this.saveTask()
-      }
-    })
+    // addEventListener('keyup', ev => {
+    //   if (ev.keyCode === 27) {
+    //     //* Note keyCode 27 is ESC
+    //     this.saveTask()
+    //   }
+    // })
   },
   async created() {
     if (this.$route.params.task_id) {

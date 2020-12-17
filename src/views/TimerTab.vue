@@ -28,7 +28,8 @@ export default {
   data: function() {
     return {
       tray_expanded: true,
-      timer_filter: ''
+      timer_filter: '',
+      keys: []
     }
   },
   computed: {
@@ -60,6 +61,9 @@ export default {
     'my-sidebar-timer': MySideBarTimer
   },
   methods: {
+    keyUpTest() {
+      console.log('working')
+    },
     trayClass: function() {
       return this.tray_expanded ? 'expanded' : ''
     },
@@ -75,16 +79,35 @@ export default {
     addTimer: function() {
       this.$store.dispatch('timers/addTimer') //timers/addTimer2 signature
     },
-    startTimer: function() {
-      this.$store.dispatch('timers/startTimer', {
-        current_company_id: this.$store.state.settings.current_company.id,
-        client_id: '',
-        project_id: '',
-        task_id: '',
-        is_billable: 1,
-        report_at: ''
-      })
+    startTimer: function(e) {
+      let start = () => {
+        this.$store.dispatch('timers/startTimer', {
+          current_company_id: this.$store.state.settings.current_company.id,
+          client_id: '',
+          project_id: '',
+          task_id: '',
+          is_billable: 1,
+          report_at: ''
+        })
+      }
+
+      if (e) {
+        let key = e.key || keyCode
+        this.keys.push(key)
+        if ((this.keys.includes('n') && this.keys.includes('Alt')) || (this.keys.includes('N') && this.keys.includes('Alt'))) {
+          this.keys = []
+          start()
+        }
+        return
+      }
+      start()
     }
+  },
+  mounted() {
+    window.addEventListener('keyup', this.startTimer)
+  },
+  beforeDestroy() {
+    window.removeEventListener('keyup', this.startTimer)
   }
 }
 </script>
