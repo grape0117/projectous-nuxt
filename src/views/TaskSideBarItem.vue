@@ -6,13 +6,13 @@
       {{ task.last_task_message_created_at}}
     </pre> -->
     <div class="" @click="openChat">
-      <p class="task-sidebar-item_header-part" style="margin-bottom: 8px !important;">
-        <span v-if="task.project.acronym" class="task-sidebar-item_project-badge">{{ task.project.acronym }}</span>
-        <span v-else class="task-sidebar-item_project-name mr-2" style="color: green;">{{ task.project.name }}</span>
+      <p class="task-sidebar-item_header-part" style="margin-bottom: 8px !important">
+        <span v-if="task.project.acronym" class="task-sidebar-item_project-badge" :style="{ 'background-color': clientColor ? clientColor : '' }">{{ task.project.acronym }}</span>
+        <span v-else class="task-sidebar-item_project-name mr-2" style="color: green">{{ task.project.name }}</span>
         <span class="task-sidebar-item_project-name">{{ task.title }}</span>
       </p>
-      <div class="d-flex align-items-center" style="margin-bottom: 8px !important;">
-        <div class="message-avatar" style="margin-right: 10px;">
+      <div class="d-flex align-items-center" style="margin-bottom: 8px !important">
+        <div class="message-avatar" style="margin-right: 10px">
           <span class="rounded-circle task-sidebar-item_badge" :style="{ backgroundColor: getLastMessageCompanyUser.color }">
             {{ getLastMessageCompanyUser.name | abbrName }}
           </span>
@@ -24,7 +24,7 @@
     </div>
 
     <div class="task-sidebar-last-message-wrapper">
-      <div class="task-sidebar-last-message" style="margin-top: 0 !important; padding-top: 5px !important;" @click="openChat">
+      <div class="task-sidebar-last-message" style="margin-top: 0 !important; padding-top: 5px !important" @click="openChat">
         <span class="task-sidebar-date">{{ task.last_task_message_created_at | moment('MMMM Do YYYY') }}</span>
       </div>
       <span class="task-sidebar_go-to-task" @click="goToTask()">[ Go to task]</span>
@@ -49,6 +49,9 @@ export default {
     }
   },
   computed: {
+    clientColor() {
+      return this.$store.state.clients.clients.find(client => client.client_company_id === this.task.project.client_company_id).color
+    },
     getLastMessageCompanyUser() {
       return this.$store.state.company_users.company_users.find(user => user.id === this.getLastMessage.company_user_id)
     },
@@ -112,7 +115,7 @@ export default {
   // display: flex;
 }
 .task-sidebar-item_project-badge {
-  background-color: green;
+  // background-color: green;
   white-space: nowrap;
   font-size: 10px;
   padding: 2px 5px;

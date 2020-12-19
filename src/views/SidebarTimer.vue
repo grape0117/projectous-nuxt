@@ -293,6 +293,8 @@ export default {
 
 <style lang="scss">
 .sidebar-timer {
+  // min-width: 200px;
+  // width: 100%;
   padding: 5px 15px;
   color: white;
   margin-bottom: 7px;

@@ -7,7 +7,7 @@
       <b-row class="kanban-page-innerwrapper">
         <b-col class="client-section scroll-col">
           <div class="d-flex justify-content-center mb-3">
-            <select v-model="selectedClient" style="width: 100px;">
+            <select v-model="selectedClient" style="width: 100px">
               <option :value="null" selected>All Clients</option>
               <option :value="id" v-for="{ id, name } in activeClients" :key="id">{{ name }}</option>
             </select>
@@ -20,7 +20,7 @@
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
                 <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
               </div>
-              <p style="margin-bottom: 0 !important;">
+              <p style="margin-bottom: 0 !important">
                 <!-- <pre>{{ client }}</pre> -->
                 <span class="client-section-acronym" :style="{ 'background-color': client.color }" v-if="acronym">{{ acronym }}</span>
                 <span class="client-project-name__name">{{ name }}</span>
@@ -339,6 +339,7 @@ export default class Custom extends Vue {
   /* display: flex;
   align-items: center;
   justify-content: center; */
+  color: white;
   font-size: 10px;
   white-space: nowrap;
   padding: 5px 5px;
@@ -367,7 +368,7 @@ export default class Custom extends Vue {
 }
 .scroll-col {
   height: calc(100vh - 40px);
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 .custom-width {
   width: 50% !important;

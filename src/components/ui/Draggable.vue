@@ -1,5 +1,5 @@
 <template>
-  <div class="list__wrapper " :class="{ 'horizontal-alignment': !verticalAlignment }">
+  <div class="list__wrapper" :class="{ 'horizontal-alignment': !verticalAlignment }">
     <div v-for="(group, index) in listGroups" :key="index" class="list" draggable="true" @dragstart.self="dragStart($event, index)" @dragend.self="dragEnd" @dragenter="moveList(index)">
       <div v-if="!verticalAlignment" class="list__group-title">
         {{ group.name }}
@@ -179,10 +179,10 @@ export default class Draggable extends Vue {
         let project = projects.find(({ id: projectId }: any) => projectId === task.project_id)
         task['project'] = project ? project : {}
 
-        if (Object.keys(task.project).length > 0) {
-          let client = clients.find((client: any) => client.client_company_id === task.project.client_company_id)
-          task.project.client_color = client.color
-        }
+        // if (Object.keys(task.project).length > 0) {
+        //   let client = clients.find((client: any) => client.client_company_id === task.project.client_company_id)
+        //   task.project.client_color = client.color
+        // }
 
         return task
       })

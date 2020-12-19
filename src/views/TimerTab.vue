@@ -115,13 +115,14 @@ export default {
 <style lang="scss">
 #timer-tray {
   height: 100%;
+  min-width: 252px;
   // padding: 0 15px;
-  width: 340px;
+  // max-width: 300px;
   height: calc(100vh - 50px);
-  overflow-y: scroll;
+  overflow: hidden auto;
   // background-color: #616161;
   background-color: rgba(0, 0, 0, 0.5);
-  overflow-y: scroll;
+  // overflow-y: scroll;
   display: flex;
   flex-direction: column;
 }
@@ -134,9 +135,10 @@ export default {
   background-color: rgba($color: #000000, $alpha: 0.5);
 }
 .timer-tray-timer-card {
-  width: 300px;
+  width: 100%;
+  padding: 0 10px;
   align-self: center;
-  margin-top: 10px;
+  // margin-top: 10px;
 }
 .timer-tray-title {
   margin-top: 10px;

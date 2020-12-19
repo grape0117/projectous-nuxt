@@ -501,7 +501,7 @@ export default Vue.extend({
 }
 .active-task-card {
   height: calc(100vh - 180px);
-  overflow-y: scroll;
+  overflow-y: auto;
   padding: 5px 5px;
 }
 .active-task-card-title {
