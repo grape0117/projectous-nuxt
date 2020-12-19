@@ -312,7 +312,9 @@ export default class Custom extends Vue {
 
 <style lang="scss">
 #task-tray {
-  width: 300px;
+  min-width: 280px;
+  max-width: 300px;
+  // width: 100%;
   height: calc(100vh - 50px);
   overflow-y: scroll;
   // background-color: #616161;

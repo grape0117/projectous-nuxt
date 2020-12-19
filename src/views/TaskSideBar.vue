@@ -5,6 +5,7 @@
       <span style="font-weight: normal; align-self: center; max-width: 200px" v-if="hasOpenedChat">{{ openedChat.title }}</span>
       <div class="message-sidebar_new-task" @click="createTask">+</div>
     </div>
+    <!-- <pre>{{ taskMessages }}</pre> -->
     <div class="message-sidebar" v-show="!hasOpenedChat">
       <b-list-group v-if="taskMessages && taskMessages.length > 0" class="task-side-bar_list">
         <task-sidebar-item @openChat="openChat" v-for="(task, index) in taskMessages" :key="index" :task="task" @setLastMessage="setLastMessage" />
@@ -16,7 +17,7 @@
 
     <div class="" v-if="hasOpenedChat">
       <div class="d-flex justify-content-between">
-        <b-button variant="dark" @click="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px"> <i class="icon-arrow_back" />Back </b-button>
+        <b-button variant="dark" @cli;;ck="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px"> <i class="icon-arrow_back" />Back </b-button>
         <span class="task-sidebar_go-to-task" style="margin-right: 20px" @click="goToTask()">[ Go to task]</span>
       </div>
 
@@ -184,7 +185,8 @@ export default {
 
 .task-side-bar {
   position: relative;
-  width: 350px;
+  min-width: 300px;
+  max-width: 350px;
   display: flex;
   flex-direction: column;
   /* align-items: center; */

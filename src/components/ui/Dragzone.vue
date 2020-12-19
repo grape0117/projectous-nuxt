@@ -10,16 +10,14 @@
           <!-- <pre>{{ item }}</pre> -->
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
-            <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px;">
+            <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px">
               <div class="burger-icon-wrapper" v-if="!item.project.acronym">
-                <div style="padding-left: 5px; padding-right: 5px; margin-top: 5px;" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
+                <div style="padding-left: 5px; padding-right: 5px; margin-top: 5px" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
                   <span></span>
                   <span></span>
                   <span></span>
                 </div>
-                <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
-                  +
-                </span>
+                <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
               </div>
 
               <div class="dragzone__item-info">
@@ -28,22 +26,19 @@
                   <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
                   <span class="dragzone__item-text" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id">{{ item.title }}</span>
                 </p> -->
-
                 <div class="dragzone-project-acronym-wrapper" v-if="item.project.acronym">
-                  <div class="dragzone-project-acronym" :style="{ 'background-color': item.project.client_color }" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
+                  <div class="dragzone-project-acronym" :style="{ 'background-color': clientColor(item) }" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
                     {{ item.project.acronym }}
                   </div>
-                  <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">
-                    +
-                  </span>
+                  <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
                 </div>
                 <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
 
                 <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
               <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
-                <span v-if="timerId === item.id" class=" icon-stop" style="font-size: 25px; color: red;" />
-                <span v-else class="icon-play_arrow" style="font-size: 25px; color: green;" />
+                <span v-if="timerId === item.id" class="icon-stop" style="font-size: 25px; color: red" />
+                <span v-else class="icon-play_arrow" style="font-size: 25px; color: green" />
               </div>
             </div>
             <!-- <div class="dragzone__item-block-content-text">
@@ -72,9 +67,9 @@
                 <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
             </div> -->
-            <div v-if="show_debug()" style="padding: 0 10px;">
+            <div v-if="show_debug()" style="padding: 0 10px">
               <small>
-                <span style="color: red;">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}
+                <span style="color: red">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}
               </small>
             </div>
             <div class="dragzone__task-users">
@@ -112,9 +107,7 @@
         </div>
       </div>
 
-      <div v-if="tasks.length === 0" class="dragzone__add-task" @click="createTempItem(-1)">
-        +
-      </div>
+      <div v-if="tasks.length === 0" class="dragzone__add-task" @click="createTempItem(-1)">+</div>
     </div>
     <!--<div v-if="!expandedList && isListExpandable" class="pl-2">
       ...
@@ -185,6 +178,10 @@ export default class Dragzone extends Vue {
         }, 50)
       }
     }
+  }
+
+  private clientColor(item: any) {
+    return this.$store.state.clients.clients.find((client: any) => client.client_company_id === item.project.client_company_id).color
   }
 
   private show_plusIcon(task_id: any, visibility: boolean) {
@@ -448,7 +445,7 @@ export default class Dragzone extends Vue {
 .dragzone-project-acronym {
   padding: 3px 5px;
   white-space: nowrap;
-  color: black;
+  color: white;
   font-size: 10px;
   max-height: 20px;
 }
