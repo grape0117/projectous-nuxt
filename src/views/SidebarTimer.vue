@@ -9,9 +9,8 @@
     <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
-
     <div class="d-flex align-items-center">
-      <span class="sidebar-timer-acronmy mr-2" v-if="project.acronym">{{ project.acronym }}</span>
+      <span class="sidebar-timer-acronmy mr-2" :style="{ 'background-color': `${clientColor}` }" v-if="project.acronym">{{ project.acronym }}</span>
       <div class="project-details" @click="editTimer()">
         <p v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</p>
         <p v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</p>
@@ -75,6 +74,9 @@ export default {
     }
   },
   computed: {
+    clientColor() {
+      return this.$store.state.clients.clients.find(client => client.client_company_id === this.project.client_company_id).color
+    },
     current_user_id: function() {
       return this.$store.state.settings.current_user_id
     },
@@ -268,11 +270,11 @@ export default {
       this.$store.dispatch('timers/pauseTimer', this.timer)
     },
     saveNotes: async function(event) {
-      let notes = event.target.innerHTML
-      //Check for ABC: //TODO: move somewhere else to common area?
+      let notes = this.timer.notes
+      // Check for ABC: //TODO: move somewhere else to common area?
       const projectRegex = /^([A-Z]+):\s*/ //TODO: fix the :[:space] not being captured
-      const acronym_match = notes.match(projectRegex)
-      console.log('saveNotes', acronym_match)
+      const acronym_match = notes ? notes.match(projectRegex) : null
+      // console.log('saveNotes', acronym_match)
       // We have an acronym. Look for a matching project
       if (acronym_match && acronym_match[1]) {
         const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === acronym_match[1])
@@ -284,12 +286,8 @@ export default {
           console.log('acronym', acronym_match[0], notes.replace(acronym_match[0], ''))
         }
       }
-      console.log('[NOTES]')
-      console.log(notes)
-      console.log('after note acronym')
-      this.timer.notes = notes
-      event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
-      console.log(this.timer.notes === '&#8203;')
+      // this.timer.notes = notes
+      // event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
       await this.$store.dispatch('timers/saveTimer', this.timer)
     }
   }
@@ -309,7 +307,7 @@ export default {
 .sidebar-timer-acronmy {
   padding: 5px 10px;
   white-space: nowrap;
-  background-color: green;
+  // background-color: green;
   font-size: 10px;
   display: flex;
   justify-content: center;
