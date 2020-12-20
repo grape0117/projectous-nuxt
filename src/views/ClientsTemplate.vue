@@ -1,7 +1,8 @@
 <template>
   <div id="client-template" class="container-fluid">
-    <!-- <pre style="font-size: 10px">{{ $store.state.clients.clients }}</pre> -->
-    <pre style="font-size: 10px">{{ $store.state.client_users.client_users }}</pre>
+    <pre style="font-size: 10px">{{ $store.state.clients.clients }}</pre>
+    <!-- <b style="color: black">Data from $store.state.client_users.client_users:</b>
+    <pre style="font-size: 10px">{{ $store.state.client_users.client_users }}</pre> -->
     <div class="row">
       <div class="col-sm-12 form-group form-inline"></div>
       <div class="col-sm-12 form-group form-inline">

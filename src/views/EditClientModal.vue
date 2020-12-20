@@ -86,8 +86,8 @@
                           <input id="allUserCheck" type="checkbox" name="default_all_users"> Default All Users?
                       </label>
                   </div>-->
-      <!-- <client-modal-user :key="user.id" @change="updateHistory" v-bind:client="client" v-for="user in active_users" v-bind:client_user="clientUser(client.id, user.id)" v-bind:user="user"> </client-modal-user> -->
-      <client-modal-user :key="user.id" v-bind:client="client" v-for="user in active_users" v-bind:client_user="clientUser(client.id, user.id)" v-bind:user="user"> </client-modal-user>
+      <client-modal-user :key="user.id" @change="updateHistory" v-bind:client="client" v-for="user in active_users" v-bind:client_user="clientUser(client.id, user.id)" v-bind:user="user"> </client-modal-user>
+      <!-- <client-modal-user :key="user.id" v-bind:client="client" v-for="user in active_users" v-bind:client_user="clientUser(client.id, user.id)" v-bind:user="user"> </client-modal-user> -->
     </form>
     <!-- /.modal-dialog --> </b-modal
   ><!-- /.modal -->
