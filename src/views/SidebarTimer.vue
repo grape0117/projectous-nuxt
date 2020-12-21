@@ -10,7 +10,7 @@
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
     <div class="d-flex align-items-center">
-      <span class="sidebar-timer-acronmy mr-2" :style="{ 'background-color': `${clientColor}` }" v-if="project.acronym">{{ project.acronym }}</span>
+      <span class="sidebar-timer-acronym mr-2" @click="editTimer()" :style="{ 'background-color': `${clientColor}` }" v-if="project.acronym">{{ project.acronym }}</span>
       <div class="project-details" @click="editTimer()">
         <p v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</p>
         <p v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</p>
@@ -304,10 +304,11 @@ export default {
   border-radius: 5px;
   background-color: rgba(0, 0, 0, 0.2);
 }
-.sidebar-timer-acronmy {
+.sidebar-timer-acronym {
   padding: 5px 10px;
   white-space: nowrap;
   // background-color: green;
+  cursor: pointer;
   font-size: 10px;
   display: flex;
   justify-content: center;
