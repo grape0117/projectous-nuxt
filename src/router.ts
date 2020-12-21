@@ -52,13 +52,13 @@ const router = new Router({
     {
       path: '/users',
       name: 'Company Users',
-      meta: { isAdmin: true },
+      meta: { adminOnly: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/CompanyUsers.vue')
     },
     {
       path: '/clients',
       name: 'Clients',
-      meta: { isAdmin: true },
+      meta: { adminOnly: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/ClientsTemplate.vue')
     },
     // {
@@ -69,33 +69,30 @@ const router = new Router({
     {
       path: '/reports',
       name: 'Reports',
-      meta: { isAdmin: true },
+      meta: { adminOnly: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoiceableTemplate.vue')
     },
     {
       path: '/invoices',
       name: 'Invoices',
-      meta: { isAdmin: true },
+      meta: { adminOnly: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoicesTemplate.vue')
     }
   ]
 })
 
 const unGuardedRoutes = ['Login', 'AcceptInvite', 'Register']
-import { getCookie } from '@/utils/util-functions'
 
-router.beforeEach((to, from, next) => {
-  const isAdmin = store.getters['settings/isAdmin']
-  const guardedRoute = !unGuardedRoutes.find(route => route === to.name)
-
-  let isLoggedIn = getCookie('auth_token')
-  let routeMetaAdmin = to.meta.isAdmin
-
-  if (!isLoggedIn || (isLoggedIn && (routeMetaAdmin === isAdmin || routeMetaAdmin === undefined))) {
-    checkAuth(guardedRoute, next)
-  } else {
-    return alert('Only admin can access.')
-  }
-})
+setTimeout(() => {
+  let checkStore = setInterval(async () => {
+    if (!!store && store.state.initialDataLoaded) {
+      clearInterval(checkStore)
+      router.beforeEach((to, from, next) => {
+        const guardedRoute = !unGuardedRoutes.find(route => route === to.name)
+        checkAuth(guardedRoute, to, next, store)
+      })
+    }
+  }, 0)
+}, 0)
 
 export default router
