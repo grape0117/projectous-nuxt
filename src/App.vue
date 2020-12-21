@@ -1,5 +1,5 @@
 <template>
-  <div id="app" style="position: relative; " class="app-class" :class="bgStyle && bgTheme === 'Colors' ? bgStyle : 'paletteDefault'" :style="{ background: bgTheme === 'Images' ? `url(${this.bgStyle})` : '' }">
+  <div id="app" style="position: relative" class="app-class" :class="bgStyle && bgTheme === 'Colors' ? bgStyle : 'paletteDefault'" :style="{ background: bgTheme === 'Images' ? `url(${this.bgStyle})` : '' }">
     <b-overlay :show="$store.state.loading" rounded="sm" style="flex-grow: 1">
       <!-- Loading area -->
       <template #overlay>
@@ -15,7 +15,7 @@
           <!-- <task-details v-if="show_task"></task-details> -->
           <div class="router-view-class">
             <task-detail v-if="Object.keys(showTask).length > 0" class="app_task-detail" :task="showTask" />
-            <router-view style="width: 100%; height: 100%;" />
+            <router-view style="width: 100%; height: 100%" />
           </div>
           <div class="d-flex">
             <task-tray v-show="showTasks" />
@@ -178,6 +178,13 @@ export default {
      */
     if (getCookie('auth_token')) {
       await this.getAppData()
+      this.$store.state.initialDataLoaded = true
+
+      if (!this.$store.getters['settings/isAdmin'] && this.$route.meta.adminOnly) {
+        alert('Only admin can access.')
+        this.$router.push({ path: '/' })
+      }
+
       setInterval(this.getNewData, 3000)
     }
 
