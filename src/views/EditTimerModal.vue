@@ -326,9 +326,9 @@ export default {
     isCurrentUserOrAdmin: function() {
       return this.$store.getters['settings/isCurrentUserOrAdmin'](this.timer.user_id)
     },
-    deleteTimer: function() {
-      this.$store.dispatch('DELETE', { module: 'timers', entity: this.timer })
-      this.$store.commit('settings/setCurrentEditTimer', {})
+    deleteTimer: async function() {
+      await this.$store.dispatch('DELETE', { module: 'timers', entity: this.timer })
+      await this.$store.commit('settings/setCurrentEditTimer', {})
     },
     durationHours: function() {
       if (typeof this.timer.duration != 'number') {

@@ -31,15 +31,15 @@
 
     <div class="sidebar-timer-report-at">{{ restartedAt() }}</div>
 
-    <div class="sidebar-timer-notes">
+    <!-- <div class="sidebar-timer-notes">
       <input ref="noteInput" placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" v-model="timer.notes" :style="{ 'background-color': timer.notes === '' || timer.notes === null ? 'rgba(240, 52, 52, 0.4) !important' : '' }" />
-    </div>
-    <!-- <div class="sidebar-timer-notes" v-if="timer.notes">
+    </div> -->
+    <div class="sidebar-timer-notes" v-if="timer.notes">
       <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
     </div>
     <div v-else>
-      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: rgba(240, 52, 52, 0.4)"></div>
-    </div> -->
+      <div ref="noteInput" placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: rgba(240, 52, 52, 0.4)"></div>
+    </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
     <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
   </li>
@@ -270,7 +270,7 @@ export default {
       this.$store.dispatch('timers/pauseTimer', this.timer)
     },
     saveNotes: async function(event) {
-      let notes = this.timer.notes
+      let notes = event.target.innerHTML
       // Check for ABC: //TODO: move somewhere else to common area?
       const projectRegex = /^([A-Z]+):\s*/ //TODO: fix the :[:space] not being captured
       const acronym_match = notes ? notes.match(projectRegex) : null
@@ -286,8 +286,8 @@ export default {
           console.log('acronym', acronym_match[0], notes.replace(acronym_match[0], ''))
         }
       }
-      // this.timer.notes = notes
-      // event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
+      this.timer.notes = notes
+      event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
       await this.$store.dispatch('timers/saveTimer', this.timer)
     }
   }

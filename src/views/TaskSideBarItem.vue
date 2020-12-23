@@ -118,7 +118,7 @@ export default {
   // background-color: green;
   white-space: nowrap;
   font-size: 10px;
-  padding: 2px 5px;
+  padding: 5px 5px;
   max-height: 20px;
   margin-right: 5px;
 }

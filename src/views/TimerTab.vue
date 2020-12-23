@@ -80,8 +80,8 @@ export default {
       this.$store.dispatch('timers/addTimer') //timers/addTimer2 signature
     },
     startTimer: function(e) {
-      let start = () => {
-        this.$store.dispatch('timers/startTimer', {
+      let start = async () => {
+        await this.$store.dispatch('timers/startTimer', {
           current_company_id: this.$store.state.settings.current_company.id,
           client_id: '',
           project_id: '',

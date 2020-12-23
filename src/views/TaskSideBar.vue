@@ -17,7 +17,7 @@
 
     <div class="" v-if="hasOpenedChat">
       <div class="d-flex justify-content-between">
-        <b-button variant="dark" @cli;;ck="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px"> <i class="icon-arrow_back" />Back </b-button>
+        <b-button variant="dark" @click="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px"> <i class="icon-arrow_back" />Back </b-button>
         <span class="task-sidebar_go-to-task" style="margin-right: 20px" @click="goToTask()">[ Go to task]</span>
       </div>
 
