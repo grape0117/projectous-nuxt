@@ -1,11 +1,11 @@
 import { getCookie } from '@/utils/util-functions'
 
-export default function(guarded: boolean, to: any, next: any, store: any) {
+export default function(guarded: boolean, to: any, from: any, next: any, store: any) {
   let isAdmin = store.getters['settings/isAdmin']
 
   if (guarded && !getCookie('auth_token')) {
     next({ name: 'Login' })
-  } else if (!!store && !isAdmin && to.meta.adminOnly === true) {
+  } else if (!!store && !!store.state.initialDataLoaded && !isAdmin && to.meta.adminOnly === true) {
     alert('Only admin can access.')
   } else next()
 }

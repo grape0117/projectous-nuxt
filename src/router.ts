@@ -1,8 +1,7 @@
 import Vue from 'vue'
+import store from '@/store'
 import Router from 'vue-router'
 import checkAuth from '@/middlewares/checkAuth'
-
-import store from '@/store'
 
 Vue.use(Router)
 //TODO: lazy load https://blog.logrocket.com/lazy-loading-in-vue-js/
@@ -83,16 +82,9 @@ const router = new Router({
 
 const unGuardedRoutes = ['Login', 'AcceptInvite', 'Register']
 
-setTimeout(() => {
-  let checkStore = setInterval(async () => {
-    if (!!store && store.state.initialDataLoaded) {
-      clearInterval(checkStore)
-      router.beforeEach((to, from, next) => {
-        const guardedRoute = !unGuardedRoutes.find(route => route === to.name)
-        checkAuth(guardedRoute, to, next, store)
-      })
-    }
-  }, 0)
-}, 0)
+router.beforeEach((to, from, next) => {
+  const guardedRoute = !unGuardedRoutes.find(route => route === to.name)
+  checkAuth(guardedRoute, to, from, next, store)
+})
 
 export default router
