@@ -117,5 +117,17 @@ export const actions: ActionTree<IRootState, IRootState> = {
         }
       }
     }
+  },
+  GET_NEW_DATA({ dispatch }) {
+    // @ts-ignore
+    this._vm
+      .$http()
+      .get('/get-new-data/' + window.sessionStorage.last_poll_timestamp)
+      // @ts-ignore
+      .then(response => {
+        // @ts-ignore
+
+        dispatch('PROCESS_INCOMING_DATA', response)
+      })
   }
 }

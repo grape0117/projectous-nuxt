@@ -21,6 +21,16 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.config.productionTip = false
 
+import Echo from 'laravel-echo'
+// @ts-ignore
+if (typeof io !== 'undefined') {
+  // @ts-ignore
+  window.Echo = new Echo({
+    broadcaster: 'socket.io',
+    host: process.env.VUE_APP_WEB_SOCKET_SERVER_URL + ':6001'
+  })
+}
+
 export let app = new Vue({
   router,
   store,

@@ -24,15 +24,41 @@ export default class Login extends Vue {
   private async login(e: any) {
     e.preventDefault()
     // @ts-ignore
-    const { auth_token } = await this.$http().post('/login', {
+    const res = await this.$http().post('/login', {
       // @ts-ignore
       email: document.getElementById('email')['value'],
       // @ts-ignore
       password: document.getElementById('password')['value']
     })
 
+    const auth_token = res ? res.auth_token : null
+    const user_id = res ? res.user_id : null
+
     if (auth_token) {
       document.cookie = 'auth_token=' + auth_token
+
+      if (user_id) {
+        document.cookie = 'user_id=' + user_id
+        // @ts-ignore
+        //window.Echo.leave('addentryevent_channel_' + user_id)
+        var that = this
+        // @ts-ignore
+        window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', e => {
+          console.log('-----Called getNewData!----item', e)
+          // @ts-ignore
+          that.$notification.show(
+            e.data.data.item_type + ' has been updated!',
+            {
+              body: JSON.stringify(e)
+            },
+            {}
+          )
+
+          //'item_id = ' + e.item_id + ' & from_user_id = ' + e.from_user_id + ' & to_user_id = ' + e.to_user_id + ' & item_type = ' + e.item_type
+          that.$store.dispatch('GET_NEW_DATA')
+        })
+      }
+
       this.$router.push('/')
     } else {
       alert('Invalid email or password')

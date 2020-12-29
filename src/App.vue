@@ -251,6 +251,24 @@ export default {
       document.cookie = `bg-style=${option}`
       document.cookie = `bg-theme=${styleTheme}`
     })
+
+    //listener
+    var user_id = getCookie('user_id')
+    var that = this
+
+    if (user_id)
+      window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', function(e) {
+        console.log('-----Called getNewData!----item', e)
+
+        that.$notification.show(
+          e.data.data.item_type + ' has been updated!',
+          {
+            body: JSON.stringify(e)
+          },
+          {}
+        )
+        that.$store.dispatch('GET_NEW_DATA')
+      })
   },
   beforeDestroy() {
     // to avoid memory leak
@@ -262,13 +280,14 @@ export default {
     EventBus.$off('showTask')
   },
   methods: {
-    getNewData() {
-      this.$http()
-        .get('/get-new-data/' + window.sessionStorage.last_poll_timestamp)
-        .then(response => {
-          this.$store.dispatch('PROCESS_INCOMING_DATA', response)
-        })
-    },
+    // getNewData() {
+    //   console.log('-getNewData--app.vue---')
+    //   this.$http()
+    //     .get('/get-new-data/' + window.sessionStorage.last_poll_timestamp)
+    //     .then(response => {
+    //       this.$store.dispatch('PROCESS_INCOMING_DATA', response)
+    //     })
+    // },
     async getAppDataFromApi() {
       try {
         return await this.$http().get('/test-tasks')
@@ -279,8 +298,8 @@ export default {
     async getAppData() {
       this.$store.state.loading = true
       let indexDBExists = false
-      let request = window.indexedDB.open('projectous-data')
-
+      let request = window.indexedDB.open('projectous-data', 1.01)
+      console.log(request)
       request.onupgradeneeded = function(e) {
         e.target.transaction.abort()
         indexDBExists = false
