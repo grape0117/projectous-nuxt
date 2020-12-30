@@ -297,7 +297,7 @@ export default {
     },
     async getAppData() {
       this.$store.state.loading = true
-      let indexDBExists = true
+      let indexDBExists = false
       let request = window.indexedDB.open('projectous-data')
 
       request.onupgradeneeded = function(e) {
