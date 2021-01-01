@@ -297,15 +297,15 @@ export default {
     },
     async getAppData() {
       this.$store.state.loading = true
-      let indexDBExists = false
+      let indexDBExists = true
       let request = window.indexedDB.open('projectous-data')
 
       request.onupgradeneeded = function(e) {
         e.target.transaction.abort()
         indexDBExists = false
       }
-
-      const dataValidation = await this.checkDataInIndexDB()
+      let dataValidation = false
+      if (indexDBExists) dataValidation = await this.checkDataInIndexDB()
       let data = {}
       //TODO: find out why adding a table breaks
       if (indexDBExists && dataValidation) {
@@ -321,7 +321,7 @@ export default {
           }
         }
       } else {
-        console.log('----------------loading from API!------------------')
+        console.log('----------------loading from API (/test-tasks) !------------------')
         data = await this.storeDataInIndexedDb()
       }
       this.$store.dispatch('PROCESS_INCOMING_DATA', data)
