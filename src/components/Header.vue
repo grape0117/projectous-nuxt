@@ -165,7 +165,8 @@ export default Vue.extend({
     },
     async toggle(iconName) {
       if (iconName === 'reload') {
-        return await this.storeDataInIndexedDb()
+        let data = await this.storeDataInIndexedDb()
+        return this.$store.dispatch('PROCESS_INCOMING_DATA', data)
       }
       this.toggles[iconName] = !this.toggles[iconName]
       await EventBus.$emit(`toggle_${iconName}`)
