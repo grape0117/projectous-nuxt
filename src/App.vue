@@ -10,7 +10,7 @@
       </template>
 
       <div class="row-no-padding">
-        <Header />
+        <Header v-on:reload="reload" />
         <div class="d-flex justify-content-between">
           <!-- <task-details v-if="show_task"></task-details> -->
           <div class="router-view-class">
@@ -370,6 +370,13 @@ export default {
         }
       }
       return appData
+    },
+    async reload() {
+      this.$store.state.loading = true
+      let data = {}
+      data = await this.storeDataInIndexedDb()
+      //this.$store.dispatch('PROCESS_INCOMING_DATA', data)
+      this.$store.state.loading = false
     },
     dateInterval() {
       this.$store.commit('lists/createListsByDays')
