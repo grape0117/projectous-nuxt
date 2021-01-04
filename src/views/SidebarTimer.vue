@@ -1,6 +1,7 @@
 <template>
   <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
   <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" v-bind:data-restarted="timer.restart_at">
+    <pre style="color: white">{{ timer }}</pre>
     <!-- :class="[
       { 'sidebar-timer-client-no-project': !project.id }, 
       { 'side-timer-timer-active': timer.status === 'running' }, 
@@ -228,7 +229,7 @@ export default {
     },
     restartedAt() {
       let getYesterday = moment()
-        .subtract(2, 'day')
+        .subtract(1, 'day')
         .format('YYYY-MM-DD HH:mm:ss')
 
       let date = datetimeToJS(this.timer.status_changed_at)
@@ -241,7 +242,8 @@ export default {
       if (date[0] === yesterday[0] && date[1] === yesterday[1] && date[2] === yesterday[2] && date[3] === yesterday[3]) {
         return 'Yesterday'
       }
-      return format_report_at(datetimeToJS(this.timer.status_changed_at))
+      // return format_report_at(datetimeToJS(this.timer.status_changed_at))
+      return 'Today'
     },
     reportAt: function() {
       return format_report_at(datetimeToJS(this.timer.report_at))
@@ -272,7 +274,7 @@ export default {
     saveNotes: async function(event) {
       let notes = event.target.innerHTML
       // Check for ABC: //TODO: move somewhere else to common area?
-      const projectRegex = /^([A-Z]+):\s*/ //TODO: fix the :[:space] not being captured
+      const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
       const acronym_match = notes ? notes.match(projectRegex) : null
       // console.log('saveNotes', acronym_match)
       // We have an acronym. Look for a matching project
@@ -282,10 +284,11 @@ export default {
           console.log('match found: ', projects_by_acronym[0].name)
           //TODO: update history
           this.timer.project_id = projects_by_acronym[0].id
-          notes = notes.replace(acronym_match[0], '')
+          // notes = notes.replace(acronym_match[0], '')
           console.log('acronym', acronym_match[0], notes.replace(acronym_match[0], ''))
         }
       }
+
       this.timer.notes = notes
       event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
       await this.$store.dispatch('timers/saveTimer', this.timer)

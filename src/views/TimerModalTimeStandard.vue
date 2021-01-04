@@ -1,12 +1,12 @@
 <template id="timer-modal-time-standard-template">
   <div>
-    <div class="timer-modal_duration" v-if="timer.status !== 'running'">
+    <div class="timer-modal_duration">
       <span class="timer-modal_label">Duration</span>
       <div>
         <div id="timerDuration" class="form-control-static">
           <div class="timer-modal_timer">
-            <input name="duration_hours" id="duration_hours" placeholder="00" style="display:inline;" v-model="hours" />: <input name="duration_minutes" id="duration_minutes" style="display:inline;" placeholder="00" v-model="minutes" />:
-            <input name="duration_seconds" id="duration_seconds" style="display:inline;" placeholder="00" v-model="seconds" />
+            <input name="duration_hours" id="duration_hours" placeholder="00" style="display: inline" v-model="hours" />: <input name="duration_minutes" id="duration_minutes" style="display: inline" placeholder="00" v-model="minutes" />:
+            <input name="duration_seconds" id="duration_seconds" style="display: inline" placeholder="00" v-model="seconds" />
           </div>
           <div class="timer-modal_timer-label">(Hours : Minutes : Seconds)</div>
         </div>
@@ -24,8 +24,8 @@
       <div>
         <div id="timerDuration" class="form-control-static">
           <div class="timer-modal_timer">
-            <input name="duration_hours" id="invoice_hours" placeholder="00" style="display:inline;" v-model="invoice_hours" />: <input name="duration_minutes" id="invoice_minutes" style="display:inline;" placeholder="00" v-model="invoice_minutes" />:
-            <input name="duration_seconds" id="invoice_seconds" style="display:inline;" placeholder="00" v-model="invoice_seconds" />
+            <input name="duration_hours" id="invoice_hours" placeholder="00" style="display: inline" v-model="invoice_hours" />: <input name="duration_minutes" id="invoice_minutes" style="display: inline" placeholder="00" v-model="invoice_minutes" />:
+            <input name="duration_seconds" id="invoice_seconds" style="display: inline" placeholder="00" v-model="invoice_seconds" />
           </div>
           <div class="timer-modal_timer-label">(Hours : Minutes : Seconds)</div>
         </div>
