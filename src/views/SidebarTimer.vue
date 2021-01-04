@@ -1,12 +1,5 @@
 <template>
-  <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
   <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" v-bind:data-restarted="timer.restart_at">
-    <pre style="color: white">{{ timer }}</pre>
-    <!-- :class="[
-      { 'sidebar-timer-client-no-project': !project.id }, 
-      { 'side-timer-timer-active': timer.status === 'running' }, 
-      { 'side-timer-less-work': hasLessWork }]" -->
-    <!-- <pre>{{ timer.status_changed_at }}</pre> -->
     <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
@@ -32,9 +25,6 @@
 
     <div class="sidebar-timer-report-at">{{ restartedAt() }}</div>
 
-    <!-- <div class="sidebar-timer-notes">
-      <input ref="noteInput" placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" v-model="timer.notes" :style="{ 'background-color': timer.notes === '' || timer.notes === null ? 'rgba(240, 52, 52, 0.4) !important' : '' }" />
-    </div> -->
     <div class="sidebar-timer-notes" v-if="timer.notes">
       <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
     </div>
