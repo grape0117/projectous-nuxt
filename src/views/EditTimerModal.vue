@@ -47,9 +47,9 @@
                 </option>
               </select>
             </div>
-            <div class="col-sm-2">
-              <a v-on:click="editClient()">Edit Client</a>
-              <a v-on:click="editProject()">Edit Project</a>
+            <div class="col-sm-2 edit-ClientProject">
+              <a v-on:click="editClient()" class="edit-ClientProject-a-tag">Edit Client</a>
+              <a v-on:click="editProject()" class="edit-ClientProject-a-tag">Edit Project</a>
             </div>
           </div>
           <div class="form-group">
@@ -61,12 +61,13 @@
               </select>
             </div>
           </div>
+          <!-- <pre>{{ users }}</pre> -->
           <div v-if="isAdmin()" class="form-group">
             <label class="control-label col-sm-4" for="timerUserSelect">User: </label>
             <div class="col-sm-8">
               <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer.company_user_id">
                 <option value="">***** Select User *****</option>
-                <option :selected="isTimerUser(user.user_id)" v-for="user in users" v-bind:value="user.user_id">
+                <option :selected="isTimerUser(user.user_id)" v-for="user in users.filter(u => u.user_type === 'user')" :key="user.id" v-bind:value="user.user_id">
                   {{ user.name }}
                 </option>
                 <option>Selected or Current User if Editing Timer?</option>
@@ -433,5 +434,16 @@ export default {
 }
 .timer-modal_notes {
   // width: 100px;
+}
+
+.edit-ClientProject {
+  :first-child {
+    margin-right: 5px;
+  }
+  .edit-ClientProject-a-tag {
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+  }
 }
 </style>

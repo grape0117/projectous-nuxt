@@ -22,7 +22,11 @@
   </div>
 </template>
 <script>
+import moment from 'moment'
+
+// Components
 import MySideBarTimer from './MySidebarTimer.vue'
+
 export default {
   name: 'timer-tab',
   data: function() {
@@ -38,14 +42,14 @@ export default {
       let total_time_today = 0
       let midnight = new Date(new Date().setHours(0, 0, 0, 0))
       let timers = this.$store.state.timers.timers.filter(function(timer) {
-        if (timer.company_user_id === self.$store.state.settings.current_user_id) {
+        if (timer.company_user_id === self.$store.state.settings.current_company_user_id) {
           let timertime = new Date(timer.report_at)
           //console.log(timertime)
           //console.log(midnight)
           /*if(timertime > midnight){
-              console.log('greater')
+            console.log('greater')
           } else {
-              console.log('less than')
+            console.log('less than')
           }*/
 
           if (new Date(timer.report_at) > midnight) {
@@ -53,7 +57,6 @@ export default {
           }
         }
       })
-
       return ('00' + Math.floor(total_time_today / 3600)).slice(-2) + ':' + ('00' + Math.floor((total_time_today % 3600) / 60)).slice(-2)
     }
   },

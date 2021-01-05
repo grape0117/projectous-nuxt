@@ -1,5 +1,6 @@
 <template>
   <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" v-bind:data-restarted="timer.restart_at">
+    {{ timer.project_id }}
     <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
@@ -219,7 +220,7 @@ export default {
     },
     restartedAt() {
       let getYesterday = moment()
-        .subtract(1, 'day')
+        .subtract(2, 'day')
         .format('YYYY-MM-DD HH:mm:ss')
 
       let date = datetimeToJS(this.timer.status_changed_at)
@@ -277,6 +278,8 @@ export default {
           // notes = notes.replace(acronym_match[0], '')
           console.log('acronym', acronym_match[0], notes.replace(acronym_match[0], ''))
         }
+      } else {
+        this.timer.project_id = 0
       }
 
       this.timer.notes = notes
