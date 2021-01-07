@@ -258,15 +258,46 @@ export default {
 
     if (user_id)
       window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', function(e) {
-        console.log('-----Called getNewData!----item', e)
-
-        that.$notification.show(
-          e.data.data.item_type + ' has been updated!',
-          {
-            body: JSON.stringify(e)
-          },
-          {}
-        )
+        console.log('-----Called getNewData!----' + e.data.data.item_type, e.data.data)
+        let body = ''
+        let title = ''
+        let data = e.data
+        switch (data.data.item_type) {
+          case 'timelog':
+            title = ''
+            body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
+            break
+          case 'tasks':
+            title = ''
+            body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
+            break
+          case 'task_messages':
+            title = data.data.value.taskname
+            body = JSON.stringify(data.data.value.sender + ' : ' + data.data.value.message)
+            break
+        }
+        if (body)
+          // @ts-ignore
+          that.$notification.show(
+            title,
+            {
+              body: body
+            },
+            {
+              onerror: function() {
+                console.log('Custom error event was called')
+              },
+              onclick: function() {
+                console.log('Custom click event was called')
+              },
+              onclose: function() {
+                console.log('Custom close event was called')
+              },
+              onshow: function() {
+                console.log('Custom show event was called')
+              }
+            }
+          )
         that.$store.dispatch('GET_NEW_DATA')
       })
   },
