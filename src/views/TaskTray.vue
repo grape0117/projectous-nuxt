@@ -312,12 +312,9 @@ export default class Custom extends Vue {
 
 <style lang="scss">
 #task-tray {
-  min-width: 280px;
-  max-width: 300px;
-  // width: 100%;
+  width: 270px;
   height: calc(100vh - 50px);
   overflow-y: scroll;
-  // background-color: #616161;
   background-color: rgba(0, 0, 0, 0.5);
 }
 .task-tray-selection-box {
@@ -325,7 +322,6 @@ export default class Custom extends Vue {
 }
 .task-tray-top-div {
   display: flex;
-  // flex-direction: column;
   top: 0;
   font-weight: bold;
   position: sticky;

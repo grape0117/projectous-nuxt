@@ -151,20 +151,23 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     //TODO: Check for @mention
 
     //Check for ABC:
-    const projectRegex = /^([A-Z]+):\s*/ //TODO: fix the :[:space] not being captured
-    const acronym_match = title.match(projectRegex)
-    console.log(acronym_match)
+    // const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
+    // const acronym_match = title ? title.match(projectRegex) : null
+    // console.log(acronym_match)
 
-    // We have an acronym. Look for a matching project
-    if (acronym_match && acronym_match[1]) {
-      const projects_by_acronym = rootState.projects.projects.filter((project: IProject) => project.acronym === acronym_match[1])
-      if (projects_by_acronym.length === 1) {
-        //TODO: update history
-        dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
-        console.log('match found: ', projects_by_acronym[0].name)
-        title = title.replace(acronym_match[0], '')
-      }
-    }
+    // // We have an acronym. Look for a matching project
+    // if (acronym_match && acronym_match[1]) {
+    //   const projects_by_acronym = rootState.projects.projects.filter((project: IProject) => project.acronym === acronym_match[1])
+    //   if (projects_by_acronym.length === 1) {
+    //     //TODO: update history
+    //     dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
+    //     console.log('match found: ', projects_by_acronym[0].name)
+    //     title = title.replace(acronym_match[0], '')
+    //   }
+    // }
+    // else {
+    //   dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: null }, { root: true })
+    // }
     //TODO: only get assigned projects
 
     /*      const initialRegex = /.*!/

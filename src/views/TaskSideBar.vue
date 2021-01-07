@@ -185,8 +185,7 @@ export default {
 
 .task-side-bar {
   position: relative;
-  min-width: 300px;
-  max-width: 350px;
+  width: 300px;
   display: flex;
   flex-direction: column;
   /* align-items: center; */

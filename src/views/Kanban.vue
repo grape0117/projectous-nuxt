@@ -370,9 +370,9 @@ export default class Custom extends Vue {
   height: calc(100vh - 40px);
   overflow-y: auto;
 }
-.custom-width {
+/* .custom-width {
   width: 50% !important;
-}
+} */
 .kanban-page-title {
   color: white;
 }

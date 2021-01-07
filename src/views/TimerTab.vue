@@ -117,7 +117,6 @@ export default {
 
 <style lang="scss">
 #timer-tray {
-  height: 100%;
   min-width: 252px;
   // padding: 0 15px;
   // max-width: 300px;

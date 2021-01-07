@@ -13,7 +13,7 @@
       </p>
       <div class="d-flex align-items-center" style="margin-bottom: 8px !important">
         <div class="message-avatar" style="margin-right: 10px">
-          <span class="rounded-circle task-sidebar-item_badge" :style="{ backgroundColor: getLastMessageCompanyUser.color }">
+          <span class="rounded-circle task-sidebar-item_badge" v-if="getLastMessageCompanyUser" :style="{ backgroundColor: getLastMessageCompanyUser.color }">
             {{ getLastMessageCompanyUser.name | abbrName }}
           </span>
         </div>
@@ -23,6 +23,7 @@
       </div>
     </div>
 
+    <!-- <pre style="color: white">{{ task }}</pre> -->
     <div class="task-sidebar-last-message-wrapper">
       <div class="task-sidebar-last-message" style="margin-top: 0 !important; padding-top: 5px !important" @click="openChat">
         <span class="task-sidebar-date">{{ task.last_task_message_created_at | moment('MMMM Do YYYY') }}</span>

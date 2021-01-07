@@ -7,7 +7,6 @@
     <div class="dragzone__content" ref="dragzone_wrapper">
       <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
-          <!-- <pre>{{ item }}</pre> -->
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px">
@@ -33,7 +32,6 @@
                   <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
                 </div>
                 <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
-
                 <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
               <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
@@ -353,10 +351,28 @@ export default class Dragzone extends Vue {
     })
   }
 
-  private updateTaskTitle({ target: { innerHTML: name } }: any, item: any) {
+  private async updateTaskTitle(event: any, item: any) {
+    let title = event.target.innerHTML
     const id = item.task_id ? item.task_id : item.id
     console.log('update title', item, id)
-    this.$store.dispatch('tasks/UPDATE_TITLE', { id, title: name })
+
+    const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
+    const acronym_match = title ? title.match(projectRegex) : null
+
+    if (acronym_match && acronym_match[1]) {
+      const projects_by_acronym = this.$store.state.projects.projects.filter((project: any) => project.acronym === acronym_match[1])
+      if (projects_by_acronym.length === 1) {
+        //TODO: update history
+        await this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
+        console.log('match found: ', projects_by_acronym[0].name)
+      }
+    } else {
+      await this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: '' }, { root: true })
+    }
+
+    event.target.innerHTML = title
+
+    await this.$store.dispatch('tasks/UPDATE_TITLE', { id, title })
   }
 
   private async updateTask({ target: { innerHTML: name } }: any, item: any) {
