@@ -5,7 +5,7 @@
       <template #overlay>
         <div class="text-center">
           <b-spinner label="Spinning"></b-spinner>
-          <p>Loading data...</p>
+          <p>Loading ...</p>
         </div>
       </template>
 
@@ -150,7 +150,7 @@ export default {
     },
     '$route.path': {
       handler(newRoute, oldRoute) {
-        if (oldRoute === '/login') {
+        if (oldRoute === '/login' && newRoute.indexOf('password') < 0) {
           this.getAppData()
         }
       },

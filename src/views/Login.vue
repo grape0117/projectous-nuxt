@@ -5,12 +5,13 @@
         <span>Login</span>
       </div>
       <div class="login-page__block-form">
-        <form @submit="login">
+        <form>
           <label class="control-label">Email</label>
           <input type="text" id="email" class="form-control" />
           <label class="control-label">Password</label>
           <input type="password" id="password" class="form-control" />
-          <button type="submit">Login</button>
+          <button type="button" @click="login">Login</button>
+          <button class="right" type="button" @click="forgotpassword">Reset Password</button>
         </form>
       </div>
     </div>
@@ -97,6 +98,30 @@ export default class Login extends Vue {
       alert('Invalid email or password')
     }
   }
+  private async forgotpassword(e: any) {
+    //send the request to get the reset password link.
+    // @ts-ignore
+    var email = document.getElementById('email')['value']
+    if (!email) {
+      alert('please enter the email')
+      return
+    }
+    this.$store.state.loading = true
+    // @ts-ignore
+    const res = await this.$http().post('/forgotpassword', {
+      // @ts-ignore
+      email: document.getElementById('email')['value']
+    })
+    this.$store.state.loading = false
+    var sent = res ? res.flag : null
+
+    if (sent) {
+      alert('We have just sent the reset link to your email. Please check your email!')
+      //this.$router.push('/reset-password/'+res.api_token)
+    } else {
+      alert('Invalid email')
+    }
+  }
 }
 </script>
 <style>
@@ -134,5 +159,8 @@ export default class Login extends Vue {
   font-weight: 600;
   letter-spacing: 0.0125em;
   padding: 16px 24px 10px;
+}
+.right {
+  float: right;
 }
 </style>
