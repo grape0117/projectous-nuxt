@@ -1,36 +1,51 @@
 <template id="timer-modal-time-standard-template">
   <div>
-    <div class="timer-modal_duration">
-      <span class="timer-modal_label">Duration</span>
-      <div>
+    <div class="timer-modal_duration col-sm-12">
+      <div class="form-group">
+        <label class="control-label" for="timerUserNotes">Duration: </label>
         <div id="timerDuration" class="form-control-static">
           <div class="timer-modal_timer">
-            <input name="duration_hours" id="duration_hours" placeholder="00" style="display: inline" v-model="hours" />: <input name="duration_minutes" id="duration_minutes" style="display: inline" placeholder="00" v-model="minutes" />:
-            <input name="duration_seconds" id="duration_seconds" style="display: inline" placeholder="00" v-model="seconds" />
+            <input name="duration_hours" class="form-control" id="duration_hours" placeholder="00" style="display: inline" v-model="hours" />: <input name="duration_minutes" id="duration_minutes" class="form-control" style="display: inline" placeholder="00" v-model="minutes" />:
+            <input name="duration_seconds" class="form-control" id="duration_seconds" style="display: inline" placeholder="00" v-model="seconds" />
           </div>
           <div class="timer-modal_timer-label">(Hours : Minutes : Seconds)</div>
         </div>
       </div>
+    </div>
+    <div class="timer-modal_duration col-sm-12">
+      <span class="timer-modal_button" @click="set_invoice_duration = true" v-if="(timer.status !== 'running' && isAdmin() && !set_invoice_duration) || timer.duration === timer.invoice_duration">Set Invoice Duration</span>
+      <div class="form-group" v-else-if="timer.status !== 'running' && isAdmin()">
+        <label class="control-label" for="timerUserNotes">Invoice Duration: </label>
+        <div id="timerDuration" class="form-control-static">
+          <div class="timer-modal_timer">
+            <input name="invoice_duration_hours" id="invoice_hours" class="form-control" placeholder="00" style="display: inline" v-model="invoice_hours" />: <input name="invoice_duration_minutes" id="invoice_minutes" class="form-control" style="display: inline" placeholder="00" v-model="invoice_minutes" />:
+            <input name="invoice_duration_seconds" id="invoice_seconds" class="form-control" style="display: inline" placeholder="00" v-model="invoice_seconds" />
+          </div>
+          <div class="timer-modal_timer-label">(Hours : Minutes : Seconds)</div>
+        </div>
+      </div>
+    </div>
+    <!--<div>
 
-      <!--<div class="col-sm-2">
+      <div class="col-sm-2">
               <button v-if="timer.status == 'running'" class="btn btn-default" style="float: right;"><i class="glyphicon glyphicon-stop"></i></button>
               <button v-else class="btn btn-default" style="float: right;"><i class="glyphicon glyphicon-play"></i></button>
-          </div>-->
-    </div>
-    <span class="timer-modal_button" @click="set_invoice_duration = true" v-if="(timer.status !== 'running' && isAdmin() && !set_invoice_duration) || timer.duration === timer.invoice_duration">Set Invoice Duration</span>
-    <div class="form-group" v-else-if="timer.status !== 'running' && isAdmin()">
-      <span class="timer-modal_label">Invoice Duration:</span>
-
-      <div>
-        <div id="timerDuration" class="form-control-static">
-          <div class="timer-modal_timer">
-            <input name="duration_hours" id="invoice_hours" placeholder="00" style="display: inline" v-model="invoice_hours" />: <input name="duration_minutes" id="invoice_minutes" style="display: inline" placeholder="00" v-model="invoice_minutes" />:
-            <input name="duration_seconds" id="invoice_seconds" style="display: inline" placeholder="00" v-model="invoice_seconds" />
           </div>
-          <div class="timer-modal_timer-label">(Hours : Minutes : Seconds)</div>
-        </div>
-      </div>
-    </div>
+    </div>-->
+    <!--<span class="timer-modal_button" @click="set_invoice_duration = true" v-if="(timer.status !== 'running' && isAdmin() && !set_invoice_duration) || timer.duration === timer.invoice_duration">Set Invoice Duration</span>-->
+    <!--<div class="form-group" v-else-if="timer.status !== 'running' && isAdmin()">-->
+    <!--<span class="timer-modal_label">Invoice Duration:</span>-->
+
+    <!--<div>-->
+    <!--<div id="timerDuration" class="form-control-static">-->
+    <!--<div class="timer-modal_timer">-->
+    <!--<input name="duration_hours" id="invoice_hours" placeholder="00" style="display: inline" v-model="invoice_hours" />: <input name="duration_minutes" id="invoice_minutes" style="display: inline" placeholder="00" v-model="invoice_minutes" />:-->
+    <!--<input name="duration_seconds" id="invoice_seconds" style="display: inline" placeholder="00" v-model="invoice_seconds" />-->
+    <!--</div>-->
+    <!--<div class="timer-modal_timer-label">(Hours : Minutes : Seconds)</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
   </div>
 </template>
 
@@ -183,7 +198,8 @@ export default {
   // width: 200px;
 }
 .timer-modal_timer input {
-  width: 30px;
+  width: 45px;
+  text-align: right;
 }
 .timer-modal_label {
   font-size: 13px;
