@@ -106,38 +106,40 @@ export default {
           })
       }
       console.log('getting timers')
-      return this.timers
-        .filter(timer => {
-          // return true
-          return timer.company_user_id === this.$store.state.settings.current_company_user_id
-        })
-        .filter(timer => {
-          let getToday = moment().format('YYYY-MM-DD HH:mm:ss')
-          let getYesterday = moment()
-            .subtract(1, 'day')
-            .format('YYYY-MM-DD HH:mm:ss')
+      return (
+        this.timers
+          .filter(timer => {
+            // return true
+            return timer.company_user_id === this.$store.state.settings.current_company_user_id
+          })
+          // .filter(timer => {
+          //   let getToday = moment().format('YYYY-MM-DD HH:mm:ss')
+          //   let getYesterday = moment()
+          //     .subtract(1, 'day')
+          //     .format('YYYY-MM-DD HH:mm:ss')
 
-          let date = datetimeToJS(timer.status_changed_at)
-            .toString()
-            .split(' ')
-          let today = datetimeToJS(getToday)
-            .toString()
-            .split(' ')
-          let yesterday = datetimeToJS(getYesterday)
-            .toString()
-            .split(' ')
+          //   let date = datetimeToJS(timer.status_changed_at)
+          //     .toString()
+          //     .split(' ')
+          //   let today = datetimeToJS(getToday)
+          //     .toString()
+          //     .split(' ')
+          //   let yesterday = datetimeToJS(getYesterday)
+          //     .toString()
+          //     .split(' ')
 
-          if ((date[0] === yesterday[0] && date[1] === yesterday[1] && date[2] === yesterday[2] && date[3] === yesterday[3]) || (date[0] === today[0] && date[1] === today[1] && date[2] === today[2] && date[3] === today[3])) {
-            return true
-          }
-        })
-        .sort(function(a, b) {
-          let aDate = new Date(a.status_changed_at)
-          let bDate = new Date(b.status_changed_at)
-          if (aDate > bDate) return -1
-          if (aDate < bDate) return 1
-          return 0
-        })
+          //   if ((date[0] === yesterday[0] && date[1] === yesterday[1] && date[2] === yesterday[2] && date[3] === yesterday[3]) || (date[0] === today[0] && date[1] === today[1] && date[2] === today[2] && date[3] === today[3])) {
+          //     return true
+          //   }
+          // })
+          .sort(function(a, b) {
+            let aDate = new Date(a.status_changed_at)
+            let bDate = new Date(b.status_changed_at)
+            if (aDate > bDate) return -1
+            if (aDate < bDate) return 1
+            return 0
+          })
+      )
     }
   }
 }

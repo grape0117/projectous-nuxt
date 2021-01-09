@@ -12,9 +12,6 @@
             <div contenteditable="true" id="timerUserNotes" class="form-control" style="height: auto; min-height: 60px; max-height: 90px; overflow-y: scroll;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
           </div>
         </div> -->
-        <div>
-          <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard>
-        </div>
       </div>
     </template>
     <ul id="timerModalTabs" class="nav nav-tabs" role="tablist">
@@ -29,6 +26,9 @@
       <div role="tabpanel" class="tab-pane active" id="timerEditTabShow">
         <form id="editTimerForm" class="form-horizontal">
           <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
+          <div class="form-group">
+            <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer" style="padding: 5px 14px;"></timer-modal-time-standard>
+          </div>
           <div class="form-group">
             <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
             <div class="timer-modal_notes" style="padding-left: 14px">

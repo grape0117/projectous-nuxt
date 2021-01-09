@@ -364,7 +364,7 @@ export default class Dragzone extends Vue {
       if (projects_by_acronym.length === 1) {
         //TODO: update history
         await this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
-        console.log('match found: ', projects_by_acronym[0].name)
+        // console.log('match found: ', projects_by_acronym[0].name)
       }
     } else {
       await this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: '' }, { root: true })
@@ -443,6 +443,7 @@ export default class Dragzone extends Vue {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  word-break: break-word;
 }
 .burger-icon-wrapper {
   display: flex;

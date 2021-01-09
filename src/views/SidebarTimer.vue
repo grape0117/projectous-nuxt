@@ -263,6 +263,7 @@ export default {
     },
     saveNotes: async function(event) {
       let notes = event.target.innerHTML
+
       // Check for ABC: //TODO: move somewhere else to common area?
       const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
       const acronym_match = notes ? notes.match(projectRegex) : null
