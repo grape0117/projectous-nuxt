@@ -1,17 +1,28 @@
 <template>
   <b-modal id="timer-modal" tabindex="-1" title="Edit Timer" class="modal fade" role="dialog" @ok="saveTimer">
     <template v-slot:modal-header="{ ok, cancel }">
-      <b-tabs content-class="mt-3">
-        <b-tab title="Edit" active><p>I'm the first tab</p></b-tab>
-        <b-tab title="History"><p>I'm the second tab</p></b-tab>
-      </b-tabs>
+      <div class="timer-modal_header-section">
+        <b-tabs content-class="mt-3">
+          <b-tab title="Edit" active><p>I'm the first tab</p></b-tab>
+          <b-tab title="History"><p>I'm the second tab</p></b-tab>
+        </b-tabs>
+        <!-- <div class="">
+          <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
+          <div class="timer-modal_notes">
+            <div contenteditable="true" id="timerUserNotes" class="form-control" style="height: auto; min-height: 60px; max-height: 90px; overflow-y: scroll;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
+          </div>
+        </div> -->
+        <div>
+          <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard>
+        </div>
+      </div>
     </template>
     <ul id="timerModalTabs" class="nav nav-tabs" role="tablist">
       <li role="presentation" class="active">
-        <a href="#timerEditTabShow" aria-controls="timerEditTabShow" role="tab" data-toggle="tab">Edit Timer</a>
+        <a href="#timerEditTabShow" aria-controls="timerEditTabShow" role="tab" data-toggle="tab" style="white-space: nowrap">Edit Timer</a>
       </li>
       <li role="presentation">
-        <a href="#timerTableTab" aria-controls="timerTableTab" role="tab" data-toggle="tab">Timer History</a>
+        <a href="#timerTableTab" aria-controls="timerTableTab" role="tab" data-toggle="tab" style="white-space: nowrap">Timer History</a>
       </li>
     </ul>
     <div class="tab-content">
@@ -19,10 +30,16 @@
         <form id="editTimerForm" class="form-horizontal">
           <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
           <div class="form-group">
+            <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
+            <div class="timer-modal_notes" style="padding-left: 14px">
+              <div contenteditable="true" id="timerUserNotes" class="form-control" style="min-height: 60px; max-height: 90px; overflow-y: auto" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
+            </div>
+          </div>
+          <div class="form-group">
             <label class="control-label col-sm-4" for="timer-modal-project-id">Project: </label>
             <div class="col-sm-6">
               <select id="timer-modal-project-id" class="form-control" name="project_id" v-model="timer.project_id">
-                <option>***** Select Project *****</option>
+                <option :value="null">***** Select Project *****</option>
                 <option value="create">Create New Project</option>
                 <option v-for="project in openprojects()" v-bind:project="project" :value="project.id">
                   {{ client_name(project.client_company_id) }} -
@@ -40,7 +57,7 @@
             <div class="col-sm-8">
               <select name="task_id" id="timerTaskSelect" class="form-control" v-model="timer.task_id">
                 <option value="0">***** Select Task *****</option>
-                <option v-for="task in projecttasks(timer.project_id)" :value="task.id">{{ task.title }} </option>
+                <option v-for="task in projecttasks(timer.project_id)" :value="task.id">{{ task.title }}</option>
               </select>
             </div>
           </div>
@@ -78,28 +95,28 @@
               <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value()" />
             </div>
           </div>
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
             <div class="col-sm-8">
               <div contenteditable="true" id="timerUserNotes" class="form-control" style="height: auto; min-height: 35px;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
             </div>
-          </div>
+          </div> -->
           <div v-if="isAdmin()" class="form-group">
             <label class="control-label col-sm-4" for="timerInvoiceNotes">Invoice Notes: </label>
             <div class="col-sm-8">
-              <div contenteditable="true" id="timerInvoiceNotes" class="form-control" style="height: auto; min-height: 35px;" v-html="checkNotes(timer.invoice_notes)" @blur="setInvoiceNotes"></div>
+              <div contenteditable="true" id="timerInvoiceNotes" class="form-control" style="height: auto; min-height: 35px" v-html="checkNotes(timer.invoice_notes)" @blur="setInvoiceNotes"></div>
             </div>
           </div>
           <div v-if="isAdmin()" class="form-group">
             <label class="control-label col-sm-4" for="timerInvoiceNotes">Admin Notes: (visible to users, not clients)</label>
             <div class="col-sm-8">
-              <div contenteditable="true" id="timerAdminNotes" class="form-control" style="height: auto; min-height: 35px;" v-html="checkNotes(timer.admin_notes)" @blur="setAdminNotes"></div>
+              <div contenteditable="true" id="timerAdminNotes" class="form-control" style="height: auto; min-height: 35px" v-html="checkNotes(timer.admin_notes)" @blur="setAdminNotes"></div>
             </div>
           </div>
           <div class="form-group">
             <label class="control-label col-sm-4" for="report_at">Started at: </label>
             <div class="col-sm-8">
-              <input name="report_at" type="datetime" id="report_at" class="form-control" v-modal="timer.report_at" />
+              <input name="report_at" type="datetime" id="report_at" class="form-control" v-model="timer.report_at" />
             </div>
           </div>
           <!--          <div v-if="isIHI()" class="form-group">
@@ -108,7 +125,7 @@
               <input type="date" id="timerUserDate" class="form-control" :value="timerDate()" />
             </div>
           </div>-->
-          <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard>
+          <!-- <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard> -->
 
           <!--<div v-if="isIHI()" class="form-group row">
             <label for="projectName" class="control-label labelLeft col-sm-4" style="line-height:46px;">Start: </label>
@@ -406,3 +423,15 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.timer-modal_header-section {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  // border: 1px solid red !important;
+}
+.timer-modal_notes {
+  // width: 100px;
+}
+</style>

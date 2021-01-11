@@ -5,7 +5,7 @@
       <!--
                   <input type="checkbox" v-model="user_checked" />
       -->
-
+      <!-- {{ client_user }} -->
       <b-input-group :prepend="user.name" class="mt-12" size="sm">
         <b-input-group-prepend append="$">
           <b-button :variant="buttonVariant('visible')" @click="toggleRole('visible')">Visible</b-button>

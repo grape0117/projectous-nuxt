@@ -1,51 +1,82 @@
-<template id="timer-row-template">
-  <li v-if="isCurrentUser()" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at">
-    <div class="hover-tab project-details" @click="editTimer()">
-      <p class="title-project-client-name">{{ client_name() }}</p>
-      <p v-if="project.id" class="title-project-project-name">{{ project.name }}</p>
-      <p v-else="" class="title-project-project-name" style="color: red;">{{ project.name }}</p>
-      <!-- <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>-->
+<template>
+  <!-- <li v-if="isCurrentUser()" class="sidebar-timer" :class="'project-item timer-' + timer.status" v-bind:data-restarted="timer.restart_at"> -->
+  <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" v-bind:data-restarted="timer.restart_at">
+    <!-- :class="[
+      { 'sidebar-timer-client-no-project': !project.id }, 
+      { 'side-timer-timer-active': timer.status === 'running' }, 
+      { 'side-timer-less-work': hasLessWork }]" -->
+    <!-- <pre>{{ timer.status_changed_at }}</pre> -->
+    <div v-if="client_name() && !project.acronym">
+      <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
-    <div v-if="isCurrentUser()">
-      <b-button v-if="timer.status === 'running'" v-on:click="pauseTimer" class="btn btn-default" style="float: left; margin-right: 5px;margin-top:2px;">
-        <b-icon icon="pause"></b-icon>
-      </b-button>
-      <button v-if="timer.status === 'running'" v-on:click="stopTimer" class="btn btn-default" style="float: left; margin-right: 5px;margin-top:2px;">
-        <b-icon icon="stop"></b-icon>
-      </button>
-      <b-button variant="outline-secondary" v-else v-on:click="restartTimer" style="float: left;  margin-right: 5px;margin-top:5px;">
-        <b-icon icon="play-fill"></b-icon>
-      </b-button>
+    <div class="d-flex align-items-center">
+      <span class="sidebar-timer-acronym mr-2" @click="editTimer()" :style="{ 'background-color': `${clientColor}` }" v-if="project.acronym">{{ project.acronym }}</span>
+      <div class="project-details" @click="editTimer()">
+        <p v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</p>
+        <p v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</p>
+        <!-- <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>-->
+      </div>
     </div>
-    <div style="font-size: 19px; margin-top: 5px; margin-right: -1px; text-align: left;">
-      {{ durationDisplay() }}
+
+    <div class="status-icon-with-timer">
+      <div v-if="isCurrentUser()" class="status-icons">
+        <i class="icon-pause icon-class" v-if="timer.status === 'running'" v-on:click="pauseTimer"></i>
+        <i class="icon-stop icon-class" style="color: red" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
+        <i class="icon-play_arrow icon-class" v-else @click="restartTimer"></i>
+      </div>
+      <div class="sidebar-timer-timer">
+        <span :style="timer.status === 'running' ? 'font-weight: bold;' : ''">{{ durationDisplay() }}</span>
+      </div>
     </div>
-    <div style="float: left; clear: right;">{{ reportAt() }}</div>
-    <div v-if="timer.notes">
-      <div placeholder="Notes..." v-bind:class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
+
+    <div class="sidebar-timer-report-at">{{ restartedAt() }}</div>
+
+    <div class="sidebar-timer-notes">
+      <input ref="noteInput" placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" v-model="timer.notes" :style="{ 'background-color': timer.notes === '' || timer.notes === null ? 'rgba(240, 52, 52, 0.4) !important' : '' }" />
+    </div>
+    <!-- <div class="sidebar-timer-notes" v-if="timer.notes">
+      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
     </div>
     <div v-else>
-      <div placeholder="Notes..." v-bind:class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: pink"></div>
-    </div>
+      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: rgba(240, 52, 52, 0.4)"></div>
+    </div> -->
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
-    <small>{{ timer.id }}</small>
+    <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
   </li>
 </template>
 
 <script>
 import Vue from 'vue'
+import moment from 'moment'
 import { format_report_at, datetimeToJS } from '../utils/util-functions'
+
+import { EventBus } from '@/components/event-bus'
+import { IProject } from '../store/modules/projects/types'
 
 export default {
   name: 'sidebar-timer',
-  props: ['timer', 'projects', 'users', 'tasks', 'running_timers'],
+  props: ['timer', 'projects', 'users', 'tasks', 'running_timers', 'index'],
   data: function() {
     return {
       totalDuration: 0,
       invoiceDuration: 0
     }
   },
+  watch: {
+    async 'timer.status'(status) {
+      await EventBus.$emit('timerStatus', status)
+    },
+    'timer.notes'(notes) {
+      if (notes === null) return
+      if ((notes.includes('&#8203;') && notes.length === 7) || notes === '') {
+        this.timer.notes = ''
+      }
+    }
+  },
   computed: {
+    clientColor() {
+      return this.$store.state.clients.clients.find(client => client.client_company_id === this.project.client_company_id).color
+    },
     current_user_id: function() {
       return this.$store.state.settings.current_user_id
     },
@@ -80,8 +111,15 @@ export default {
       }
     },
     client: function() {}
+    // hasLessWork() {
+    //   const thirtyMinutes = 30
+    //   return parseInt(this.durationMinutes()) < thirtyMinutes
+    // }
   },
   mounted: function() {
+    if (this.index === 0 && this.timer.notes === null) {
+      this.$refs['noteInput'].focus()
+    }
     /**
      * load in current running project if one exists
      */
@@ -188,6 +226,23 @@ export default {
       } else {
       }
     },
+    restartedAt() {
+      let getYesterday = moment()
+        .subtract(2, 'day')
+        .format('YYYY-MM-DD HH:mm:ss')
+
+      let date = datetimeToJS(this.timer.status_changed_at)
+        .toString()
+        .split(' ')
+      let yesterday = datetimeToJS(getYesterday)
+        .toString()
+        .split(' ')
+
+      if (date[0] === yesterday[0] && date[1] === yesterday[1] && date[2] === yesterday[2] && date[3] === yesterday[3]) {
+        return 'Yesterday'
+      }
+      return format_report_at(datetimeToJS(this.timer.status_changed_at))
+    },
     reportAt: function() {
       return format_report_at(datetimeToJS(this.timer.report_at))
     },
@@ -214,10 +269,122 @@ export default {
     pauseTimer: function() {
       this.$store.dispatch('timers/pauseTimer', this.timer)
     },
-    saveNotes: function(event) {
-      this.timer.notes = event.target.innerHTML
-      this.$store.dispatch('timers/saveTimer', this.timer)
+    saveNotes: async function(event) {
+      let notes = this.timer.notes
+      // Check for ABC: //TODO: move somewhere else to common area?
+      const projectRegex = /^([A-Z]+):\s*/ //TODO: fix the :[:space] not being captured
+      const acronym_match = notes ? notes.match(projectRegex) : null
+      // console.log('saveNotes', acronym_match)
+      // We have an acronym. Look for a matching project
+      if (acronym_match && acronym_match[1]) {
+        const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === acronym_match[1])
+        if (projects_by_acronym.length === 1) {
+          console.log('match found: ', projects_by_acronym[0].name)
+          //TODO: update history
+          this.timer.project_id = projects_by_acronym[0].id
+          notes = notes.replace(acronym_match[0], '')
+          console.log('acronym', acronym_match[0], notes.replace(acronym_match[0], ''))
+        }
+      }
+      // this.timer.notes = notes
+      // event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
+      await this.$store.dispatch('timers/saveTimer', this.timer)
     }
   }
 }
 </script>
+
+<style lang="scss">
+.sidebar-timer {
+  // min-width: 200px;
+  // width: 100%;
+  padding: 5px 15px;
+  color: white;
+  margin-bottom: 7px;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.sidebar-timer-acronym {
+  padding: 5px 10px;
+  white-space: nowrap;
+  // background-color: green;
+  cursor: pointer;
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20px;
+}
+.sidebar-timer-client-name {
+  font-size: 12px;
+  font-weight: bold;
+}
+.sidebar-timer-client-project {
+  margin-bottom: 0 !important;
+  font-size: 15px;
+}
+.sidebar-timer-client-no-project-title {
+  font-weight: bold;
+  padding-left: 2px;
+  font-size: 17px;
+  margin-bottom: 0 !important;
+  color: red;
+}
+.sidebar-timer-report-at {
+  font-weight: bold;
+  font-size: 12px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+.sidebar-timer-notes > .timer-task {
+  background-color: rgba(0, 0, 0, 0) !important;
+}
+.sidebar-timer-timer {
+  font-size: 20px;
+}
+.status-icon-with-timer {
+  display: flex;
+  align-items: center;
+  margin-left: -5px;
+}
+.sidebar-timer-timer-task {
+  border: 0px;
+  border-left: 1px solid white;
+  width: 100%;
+  padding: 0 5px;
+  font-weight: 600;
+  color: white;
+
+  &::placeholder {
+    color: rgba($color: #ffffff, $alpha: 0.5);
+  }
+}
+// .side-timer-timer-active {
+//   box-shadow: 0px 0px 5px rgba($color: lightgreen, $alpha: 1) !important;
+// }
+// .side-timer-less-work {
+//   box-shadow: 0px 0px 5px rgba($color: red, $alpha: 0.7);
+// }
+</style>
+<style lang="scss" scoped>
+.status-icons {
+  display: flex;
+  margin-right: 5px;
+}
+.icon-class {
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  color: green;
+}
+li {
+  list-style: none;
+}
+.sidebar-timer-timer-id {
+  font-size: 12px;
+}
+.sidebar-timer {
+  background-color: rgba($color: #000000, $alpha: 0.4);
+  box-shadow: 0px 0px 16px -7px rgba($color: #ffffff, $alpha: 1);
+}
+</style>

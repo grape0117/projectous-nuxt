@@ -1,17 +1,41 @@
 <template id="mytimer-sidebar-template">
   <div>
-    <sidebar-timer v-bind:running_timers="running_timers" v-bind:projects="projects" v-bind:users="users" v-for="timer in mytimers()" v-bind:timer="timer" :key="'sidebar-' + timer.id"></sidebar-timer>
+    <pre></pre>
+    <!-- {{ timerEmptyFields }} -->
+    <!-- <sidebar-timer v-bind:running_timers="running_timers" v-bind:projects="projects" v-bind:users="users" v-for="timer in mytimers()" v-bind:timer="timer" :key="'sidebar-' + timer.id"></sidebar-timer> -->
+    <sidebar-timer v-bind:running_timers="running_timers" v-bind:projects="projects" v-bind:users="users" v-for="(timer, timerIndex) in mytimers" v-bind:timer="timer" :key="'sidebar-' + timer.id" :index="timerIndex"> </sidebar-timer>
   </div>
 </template>
 
 <script>
-import SidebarTimer from './SidebarTimer.vue'
+import { EventBus } from '@/components/event-bus'
+import moment from 'moment'
+import { datetimeToJS } from '../utils/util-functions'
 export default {
   name: 'my-sidebar-timer',
+  data: function() {
+    return {
+      running_timers: {}
+    }
+  },
   components: {
-    SidebarTimer
+    SidebarTimer: () => import('./SidebarTimer.vue')
+  },
+  created() {
+    this.$watch('timerEmptyFields', async count => {
+      await EventBus.$emit('timerEmptyFields', this.timerEmptyFields)
+    })
   },
   computed: {
+    timerEmptyFields() {
+      let totalCount = 0
+      this.mytimers.forEach(timer => {
+        if (timer.project_id === null || timer.notes === null) {
+          totalCount++
+        }
+      })
+      return totalCount
+    },
     timers: function() {
       console.log('trigger!')
       return this.$store.state.timers.timers
@@ -30,14 +54,7 @@ export default {
     },
     user_id: function() {
       return this.$store.state.settings.current_user_id
-    }
-  },
-  data: function() {
-    return {
-      running_timers: {}
-    }
-  },
-  methods: {
+    },
     mytimers: function() {
       const self = this
       if (this.$store.state.settings.current_company_user.id == 36) {
@@ -50,7 +67,8 @@ export default {
             if (self.$store.getters['projects/getById'](timer.project_id).status == 'closed') {
               return false
             }
-            return timer.user_id == self.$store.state.settings.current_user_id //TODO: company_user_id
+            return timer.user_id === self.$store.state.settings.current_user_id //TODO: company_user_id
+            // return timer.company_user_id === this.$store.state.settings.current_company_user_id
           })
           .sort(function(a, b) {
             let aClientKey = ''
@@ -89,13 +107,33 @@ export default {
       }
       console.log('getting timers')
       return this.timers
-        .filter(function(timer) {
-          return true
-          return timer.company_user_id === self.$store.state.settings.current_company_user.id
+        .filter(timer => {
+          // return true
+          return timer.company_user_id === this.$store.state.settings.current_company_user_id
+        })
+        .filter(timer => {
+          let getToday = moment().format('YYYY-MM-DD HH:mm:ss')
+          let getYesterday = moment()
+            .subtract(1, 'day')
+            .format('YYYY-MM-DD HH:mm:ss')
+
+          let date = datetimeToJS(timer.status_changed_at)
+            .toString()
+            .split(' ')
+          let today = datetimeToJS(getToday)
+            .toString()
+            .split(' ')
+          let yesterday = datetimeToJS(getYesterday)
+            .toString()
+            .split(' ')
+
+          if ((date[0] === yesterday[0] && date[1] === yesterday[1] && date[2] === yesterday[2] && date[3] === yesterday[3]) || (date[0] === today[0] && date[1] === today[1] && date[2] === today[2] && date[3] === today[3])) {
+            return true
+          }
         })
         .sort(function(a, b) {
-          let aDate = new Date(a.report_at)
-          let bDate = new Date(b.report_at)
+          let aDate = new Date(a.status_changed_at)
+          let bDate = new Date(b.status_changed_at)
           if (aDate > bDate) return -1
           if (aDate < bDate) return 1
           return 0

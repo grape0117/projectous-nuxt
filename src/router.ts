@@ -1,86 +1,98 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Projects from './views/Projects.vue'
-import Custom from './views/Custom.vue'
-import CompanyUsers from './views/CompanyUsers.vue'
-import Login from '@/views/Login.vue'
 import checkAuth from '@/middlewares/checkAuth'
-import InvoiceableTemplate from './views/InvoiceableTemplate.vue'
-import InvoicesTemplate from './views/InvoicesTemplate.vue'
-import ClientsTemplate from './views/ClientsTemplate.vue'
-import Tasks from './views/AllTaskFilipTemplate.vue'
-import UsersTemplate from './views/UsersTemplate.vue'
-import AcceptInvite from './views/AcceptInvite.vue'
-import store from 'vuex'
+
+import store from '@/store'
 
 Vue.use(Router)
 //TODO: lazy load https://blog.logrocket.com/lazy-loading-in-vue-js/
 
 const router = new Router({
+  mode: 'history',
   routes: [
-    {
-      path: '/',
-      name: 'home',
-      redirect: '/custom'
-    },
+    { path: '/', name: 'home', redirect: '/kanban' },
     {
       path: '/login',
       name: 'Login',
-      component: Login
+      component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
     },
     {
       path: '/accept-invite',
       name: 'AcceptInvite',
-      component: AcceptInvite
+      component: () => import(/* webpackChunkName: "AcceptInvite" */ '@/views/AcceptInvite.vue')
     },
     {
       path: '/tasks',
-      name: 'Tasks',
-      component: Tasks
+      name: 'Task Cloud',
+      component: () => import(/* webpackChunkName: "Tasks" */ '@/views/AllTaskFilipTemplate.vue')
     },
     {
-      path: '/projects',
-      name: 'Projects',
-      component: Custom
+      path: '/tasks/:task_id',
+      name: 'Task_Detail',
+      // props: true,
+      // component: () => import(/* webpackChunkName: "Tasks-detail" */ '@/components/draggable/TaskDetails.vue')
+      component: () => import(/* webpackChunkName: "Tasks-detail" */ '@/views/AllTaskFilipTemplate.vue')
     },
     {
-      path: '/custom',
-      name: 'Custom',
-      component: Custom
+      // for test
+      path: '/message',
+      name: 'MessageSideBar',
+      component: () => import(/* webpackChunkName: "Message-sidebar" */ '@/views/TaskSideBar.vue')
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: () => import(/* webpackChunkName: "Profile" */ '@/views/Profile.vue')
+    },
+    {
+      path: '/kanban',
+      name: 'Kanban',
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/Kanban.vue')
     },
     {
       path: '/users',
       name: 'Company Users',
-      component: CompanyUsers
+      meta: { adminOnly: true },
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/CompanyUsers.vue')
     },
     {
       path: '/clients',
       name: 'Clients',
-      component: ClientsTemplate
+      meta: { adminOnly: true },
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/ClientsTemplate.vue')
     },
-    {
-      path: '/users',
-      name: 'Users',
-      component: UsersTemplate
-    },
+    // {
+    //   path: '/users',
+    //   name: 'Users',
+    //   component: () => import(/* webpackChunkName: "Custom" */ '@/views/UsersTemplate.vue')
+    // },
     {
       path: '/reports',
       name: 'Reports',
-      component: InvoiceableTemplate
+      meta: { adminOnly: true },
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoiceableTemplate.vue')
     },
     {
       path: '/invoices',
       name: 'Invoices',
-      component: InvoicesTemplate
+      meta: { adminOnly: true },
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoicesTemplate.vue')
     }
   ]
 })
 
 const unGuardedRoutes = ['Login', 'AcceptInvite', 'Register']
 
-router.beforeEach((to, from, next) => {
-  const guardedRoute = !unGuardedRoutes.find(route => route === to.name)
-  checkAuth(guardedRoute, next)
-})
+setTimeout(() => {
+  let checkStore = setInterval(async () => {
+    if (!!store && store.state.initialDataLoaded) {
+      clearInterval(checkStore)
+      router.beforeEach((to, from, next) => {
+        const guardedRoute = !unGuardedRoutes.find(route => route === to.name)
+        checkAuth(guardedRoute, to, next, store)
+      })
+    }
+  }, 0)
+}, 0)
 
 export default router

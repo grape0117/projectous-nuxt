@@ -5,6 +5,9 @@ import { idbKeyval } from '@/plugins/idb'
 import { has } from 'lodash'
 
 export const mutations: MutationTree<IRootState> = {
+  // async SET_CURRENT_USER(state: IRootState, user_id: number) {
+  //   state.current_user = await user_id
+  // },
   /**
    * Adds multiple entities all stores checking for duplicates, updating lookup tables as needed.
    * @param {IRootState} state
@@ -12,7 +15,7 @@ export const mutations: MutationTree<IRootState> = {
    * @param {any} entities
    * @constructor
    */
-  ADD_MANY(state: IRootState, { module, entities }: any) {
+  async ADD_MANY(state: IRootState, { module, entities }: any) {
     console.log('ADD_MANY ' + module)
     if (!state[module]) {
       console.error('Module ' + module + ' does not exist.')
@@ -53,6 +56,8 @@ export const mutations: MutationTree<IRootState> = {
     // @ts-ignore
     this.commit('LOOKUP', { module })
 
+    state.loading = false
+
     // @ts-ignore
     if (this._mutations[module + '/ADD_MANY']) {
       // @ts-ignore
@@ -77,6 +82,7 @@ export const mutations: MutationTree<IRootState> = {
     //@Mikhail is there a faster way to find the index? Can I search from the bottom of the array first?
     //@ts-ignore
     console.log(state[module][module])
+    //TODO: call LOOKUP
     state[module][module].forEach((item: any, key: any) => {
       state[module].lookup[item.id] = key
     })

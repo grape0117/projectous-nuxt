@@ -1,20 +1,28 @@
 <template>
-  <div id="task-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh;">
-    <div class="topSelectionBox">
-      <select id="selectCompanyUser" v-model="selectedCompanyUserId">
-        <option v-for="(companyUser, i) in sortedCompanyUsers" :value="companyUser.id" :id="'company_user-' + companyUser.id" :key="`${companyUser.id}-${i}`">
-          {{ companyUser.name }}
-        </option>
-      </select>
-      <button class="closebtnLeft" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button>
+  <div id="task-tray">
+    <div class="task-tray-wrapper">
+      <div class="task-tray-top-div">
+        <div class="task-tray-title">
+          <span>TASKS</span>
+        </div>
+        <div class="task-tray-selection-box">
+          <select id="selectCompanyUser" v-model="selectedCompanyUserId">
+            <option v-for="(companyUser, i) in sortedCompanyUsers" :value="companyUser.id" :id="'company_user-' + companyUser.id" :key="`${companyUser.id}-${i}`">
+              {{ companyUser.name }}
+            </option>
+          </select>
+          <!-- <button class="closebtnLeft" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
+        </div>
+      </div>
+      <pj-draggable class="task-tray-draggable" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" :selectedCompanyUserId="selectedCompanyUserId" :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" />
+      <new-list-form v-if="selectedCompanyUserId" :user-id="selectedCompanyUserId" />
     </div>
-    <pj-draggable :listsBlockName="listsBlockNames.TASKS_USERS" :data="tasksUsers" :lists="lists" @createItem="createTaskUser" @update="updateTaskUser" @delete="deleteTaskUser" @taskTimerToggled="onTaskTimerToggled" @updateSortOrders="updateTaskUserSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.TASKS_USERS" />
-    <new-list-form v-if="selectedCompanyUserId" :user-id="selectedCompanyUserId" />
-    <div :class="'chat-hide-btn ' + trayClass()">
+    <!-- <div
+    :class="'chat-hide-btn ' + trayClass()">
       <button @click="trayToggle()" type="button" id="chat-tray-btn" :class="'btn btn-purple ' + trayClass()">
         tasks
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
 <script lang="ts">
@@ -29,6 +37,7 @@ import NewListForm from '@/components/draggable/NewListForm.vue'
 import TimerTab from './TimerTab.vue'
 import { ITimer } from '../store/modules/timers/types'
 import uuid from 'uuid'
+import { getCookie } from '@/utils/util-functions'
 
 const TaskUsers = namespace('task_users')
 const Lists = namespace('lists')
@@ -252,123 +261,107 @@ export default class Custom extends Vue {
   //TODO: pass only ids instead of whole objects?
   private updateTaskUserSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.$store.dispatch('task_users/updateSortOrders', parsedTasks.map(({ id }: { id: number }) => id))
+    this.$store.dispatch(
+      'task_users/updateSortOrders',
+      parsedTasks.map(({ id }: { id: number }) => id)
+    )
+  }
+
+  private getCompanyUser() {
+    const id = this.$store.state.settings.current_user_id
+    // let user = this.sortedCompanyUsers.find((user: any) => user.user_id === 345)
+    let user = this.sortedCompanyUsers.find((user: any) => user.user_id === id)
+    // console.log('[USER]')
+    // console.log(user)
+    this.selectedCompanyUserId = user.id
   }
 
   @Watch('selectedCompanyUserId')
   private changeRouteQueryParams(value: any) {
+    if (!getCookie('auth_token')) return
     if (value) {
-      this.$router.push({ query: { user: value } }).catch(e => {})
+      // this.$router.push({ query: { user: value } }).catch(e => {})
+      // will only delete the "task" in $router.query
+      let query = Object.assign({}, this.$route.query)
+      query.user = value
+      // delete query.task
+      this.$router.replace({ query }).catch(e => {})
     }
   }
   @Watch('sortedCompanyUsers')
-  private onSortedCompanyUsersChanged(users: any) {
+  private onSortedCompanyUsersChanged(users: any, oldVal: any) {
     const query = this.$route.query.user
+
+    if (oldVal.length === 0) {
+      this.getCompanyUser()
+    }
+
     if (query) {
       const user = users.find(({ id }: any) => id === +query)
       if (user && !this.selectedCompanyUserId) this.selectedCompanyUserId = user.id
     }
   }
+  // mounted() {
+  //   let companyUsers = this.sortedCompanyUsers
+  //   console.log('[companyUsers]')
+  //   // let result = companyUsers.find(async (user: any) => user.user_id === await getCookie('id'))
+  //   console.log(this.sortedCompanyUsers)
+  // }
 }
 </script>
 
 <style lang="scss">
 #task-tray {
-  width: 0;
-  background: #993399;
-  -webkit-transition: all 0.5s ease-in;
-  -o-transition: all 0.5s ease-in;
-  -moz-transition: all 0.5s ease-in;
-  transition: all 0.5s ease-in;
-  &.expanded {
-    width: 300px;
-  }
-  @media (max-width 800px) {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-  &::-webkit-scrollbar {
-    background-color: red;
-    width: 5px;
-  }
-  &::-webkit-scrollbar-track {
-    background-color: #993399;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: white;
-    outline: 1px solid slategrey;
-  }
-  .topSelectionBox {
-    padding: 10px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    background: #993399;
-    z-index: 100;
-    select {
-      padding: 3px 10px;
-      border-radius: 5px;
-      border: 1px solid #333;
-      color: #333;
-    }
-  }
+  min-width: 280px;
+  max-width: 300px;
+  // width: 100%;
+  height: calc(100vh - 50px);
+  overflow-y: scroll;
+  // background-color: #616161;
+  background-color: rgba(0, 0, 0, 0.5);
 }
-.closebtnLeft {
-  font-size: 30px;
-  background: transparent;
-  color: #ffffff;
-  cursor: pointer;
-  border: none;
-  position: absolute;
-  right: 0;
-  top: -3px;
-  outline: none;
+.task-tray-selection-box {
+  align-self: center;
 }
-.chat-hide-btn {
-  margin-left: 0;
+.task-tray-top-div {
+  display: flex;
+  // flex-direction: column;
+  top: 0;
+  font-weight: bold;
+  position: sticky;
+  padding: 10px;
+  z-index: 1;
+  background-color: rgba($color: #000000, $alpha: 0.5);
 }
-.chat-hide-btn .expanded {
-  margin-left: 300px;
+.task-tray-draggable {
+  width: 87%;
+  align-self: center;
 }
-.project-item__name {
-  cursor: pointer;
+.task-tray-draggable .list__group {
+  width: auto !important;
+  padding: 0;
+}
+.task-tray-title {
+  color: white;
+  margin-right: 30px;
+  // margin-top: 10px;
+  // margin-left: 15px;
+  // color: white;
+  // font-weight: bold;
+}
+.task-tray-wrapper {
+  display: flex;
+  flex-direction: column;
+  // align-items: center;
 }
 
-.project-item__name:hover {
-  color: blue;
+.task-tray-wrapper .list__wrapper > .list > .list__group {
+  max-width: 100% !important;
+  padding-right: 10px;
+  justify-content: flex-start;
 }
-.project-item__status {
-  float: left;
-  clear: both;
-  padding-right: 1rem;
-  cursor: pointer;
-  text-align: right;
-}
-.scroll-col {
-  height: calc(100vh - 170px);
-  overflow-y: scroll;
-}
-#task-tray button.btn.btn-purple {
-  color: #ffffff !important;
-  background-color: #993399;
-  border-color: #993399;
-  position: fixed;
-  bottom: 26px;
-  left: -32px;
-  transform: rotate(-90deg);
-  font-size: 16px;
-  text-transform: uppercase;
-  padding: 8px 25px;
-  border-radius: 0 0 5px 0;
-  z-index: 999;
-  -webkit-transition: all 0.5s ease-in;
-  -o-transition: all 0.5s ease-in;
-  -moz-transition: all 0.5s ease-in;
-  transition: all 0.5s ease-in;
-}
-.chat-hide-btn {
-  position: relative;
+
+.task-tray-wrapper .list__wrapper .list {
+  align-items: inherit !important;
 }
 </style>

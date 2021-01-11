@@ -1,28 +1,45 @@
 <template>
-  <div>
-    Project Filter: <input v-model="project_search" /> <input type="checkbox" v-model="show_all_active_projects" /> Show all active projects
-    <hr />
+  <div class="kanban-page">
+    <!-- Project Filter: <input v-model="project_search" /> <input type="checkbox" v-model="show_all_active_projects" /> Show all active projects
+    <hr /> -->
+    <!-- <pre>{{ $store.state.projects.projects }}</pre> -->
     <b-container fluid>
-      <b-row>
-        <b-col cols="2" class="scroll-col">
-          <div v-if="clientVisible(client)" v-for="client in activeClients">
-            <!--            Todo: change client id to client name-->
-            <div style="background: #666666; color: white; padding-left: 5px; text-transform: uppercase">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
-            <div v-for="{ name, id } in openClientProjects(client)">
-              <div @click="setPinnedProject(id)" class="project-item__status">
+      <b-row class="kanban-page-innerwrapper">
+        <b-col class="client-section scroll-col">
+          <div class="d-flex justify-content-center mb-3">
+            <select v-model="selectedClient" style="width: 100px">
+              <option :value="null" selected>All Clients</option>
+              <option :value="id" v-for="{ id, name } in activeClients" :key="id">{{ name }}</option>
+            </select>
+          </div>
+
+          <div v-if="clientVisible(client)" v-for="(client, index) in selectedClient ? filteredClient : activeClients" :key="index">
+            <div class="client-name">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
+            <div class="client-project-name" v-for="{ name, id, acronym } in openClientProjects(client)" :key="id" @click="setProjectId(id)">
+              <div @click="setPinnedProject(id)" class="project-item-status">
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
                 <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
               </div>
-              <div class="project-item__name" @click="setProjectId(id)">
-                {{ name }}
-              </div>
+              <p style="margin-bottom: 0 !important">
+                <!-- <pre>{{ client }}</pre> -->
+                <span class="client-section-acronym" :style="{ 'background-color': client.color }" v-if="acronym">{{ acronym }}</span>
+                <span class="client-project-name__name">{{ name }}</span>
+              </p>
             </div>
           </div>
         </b-col>
-        <b-col v-if="selectedProjectId" style="flex-grow: 1">
-          <h4 v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
+
+        <b-col v-if="selectedProjectId" class="kanban-draggable custom-width">
+          <div class="kanban_title-part">
+            <h4 class="kanban-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
+          </div>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
+        <!-- <div class="right-fixed">
+          <task-tray v-show="showTask" />
+          <task-side-bar v-show="showChat" />
+          <timer-tab v-show="showTimer" />
+        </div> -->
       </b-row>
     </b-container>
     <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
@@ -37,8 +54,11 @@ import TaskDetails from '@/components/draggable/TaskDetails.vue'
 import { IProject } from '@/store/modules/projects/types'
 import { ITask } from '@/store/modules/tasks/types'
 import NewListForm from '@/components/draggable/NewListForm.vue'
+import TaskTray from './TaskTray.vue'
 import TimerTab from './TimerTab.vue'
+import TaskSideBar from './TaskSideBar.vue'
 import uuid from 'uuid'
+import { EventBus } from '@/components/event-bus'
 
 const CompanyClients = namespace('clients')
 const CompanyUsers = namespace('company_users')
@@ -63,10 +83,26 @@ enum listsBlockNames {
   components: {
     NewListForm,
     TaskDetails,
-    TimerTab
+    TimerTab,
+    TaskTray,
+    TaskSideBar
   }
 })
 export default class Custom extends Vue {
+  @Projects.Mutation('projects/SET_SELECTED_PROJECT') public setProjectId!: any
+  @Projects.Action public pinProject!: any
+  @Projects.State(state => state.selectedProjectId) public selectedProjectId!: string | number | null
+  @Projects.State(state => state.pinnedProjects)
+  public pinnedProjects!: number[]
+  private showTask: boolean = true
+  private showTimer: boolean = true
+  private showChat: boolean = false
+  private selectedClient: string = ''
+
+  get filteredClient() {
+    return this.activeClients.filter((client: any) => client.id === this.selectedClient)
+  }
+
   get listsBlockNames() {
     return listsBlockNames
   }
@@ -131,11 +167,7 @@ export default class Custom extends Vue {
       initiallyExpanded: true
     }))
   }
-  @Projects.Mutation('projects/SET_SELECTED_PROJECT') public setProjectId!: any
-  @Projects.Action public pinProject!: any
-  @Projects.State(state => state.selectedProjectId) public selectedProjectId!: string | number | null
-  @Projects.State(state => state.pinnedProjects)
-  public pinnedProjects!: number[]
+
   @TaskUsers.Getter('getById') private getTaskUserById!: any
   @TaskUsers.Getter private sortedByDays!: any
   @TaskUsers.Action('createTaskUser') private createTaskUserVuex!: any
@@ -203,7 +235,7 @@ export default class Custom extends Vue {
     console.log('CREATE TASK CUSTOM')
     item.project_id = this.selectedProjectId
 
-    console.log(item)
+    console.log('createTask', item)
     this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: item })
   }
 
@@ -229,7 +261,10 @@ export default class Custom extends Vue {
   //TODO: pass only ids instead of whole objects?
   private updateTaskSortOrders(tasks: any): void {
     const parsedTasks = JSON.parse(tasks)
-    this.$store.dispatch('tasks/updateSortOrders', parsedTasks.map(({ id }: { id: string }) => id))
+    this.$store.dispatch(
+      'tasks/updateSortOrders',
+      parsedTasks.map(({ id }: { id: string }) => id)
+    )
   }
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {
@@ -269,26 +304,98 @@ export default class Custom extends Vue {
     this.$store.commit('settings/setCurrentEditTask', cloneDeep(task))
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
+
+  // created() {
+  //   EventBus.$on('toggle_tasks', () => {
+  //     this.showTask = !this.showTask
+  //   })
+  //   EventBus.$on('toggle_timers', () => {
+  //     this.showTimer = !this.showTimer
+  //   })
+  //   EventBus.$on('toggle_chat', () => {
+  //     this.showChat = !this.showChat
+  //   })
+  // }
 }
 </script>
-
-<style>
-.project-item__name {
-  cursor: pointer;
+<style lang="scss">
+.kanban_title-part {
+  display: flex;
+  justify-content: space-between;
+  /* border: 1px solid red;
+  padding: 0 5px; */
 }
-
-.project-item__name:hover {
-  color: blue;
+.kanban-page {
+  /* background-color: rgba(0, 0, 0, 0.3); */
+  overflow-y: initial;
 }
-.project-item__status {
-  float: left;
-  clear: both;
-  padding-right: 1rem;
-  cursor: pointer;
-  text-align: right;
+.kanban-draggable {
+  width: 100px;
+  height: calc(100vh - 50px);
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+.client-section-acronym {
+  /* display: flex;
+  align-items: center;
+  justify-content: center; */
+  color: white;
+  font-size: 10px;
+  white-space: nowrap;
+  padding: 5px 5px;
+  margin-right: 5px;
+}
+.kanban-page-innerwrapper {
+  display: flex;
+  justify-content: space-between;
+}
+</style>
+
+<style scoped>
+.client-section {
+  /* max-width: 350px; */
+  max-width: 240px;
+  /* border: 5px solid red; */
+  flex-grow: 0 !important;
+  flex-basis: 260px !important;
+  padding-top: 10px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: calc(100vh - 50px) !important;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.project-item-status {
 }
 .scroll-col {
-  height: calc(100vh - 170px);
-  overflow-y: scroll;
+  height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+.custom-width {
+  width: 50% !important;
+}
+.kanban-page-title {
+  color: white;
+}
+.client-name {
+  font-weight: bold;
+  font-size: 15px;
+  text-transform: uppercase;
+  color: white;
+}
+.client-project-name {
+  padding: 5px 0;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+}
+.client-project-name:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+.client-project-name__name {
+  width: 100%;
+  height: 100%;
+  color: white;
 }
 </style>

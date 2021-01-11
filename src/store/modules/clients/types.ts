@@ -35,4 +35,5 @@ export interface IClient {
   email: string
   accounting_email: string
   history: []
+  color: string
 }

@@ -36,7 +36,9 @@ function createDefaultTask(): ITask {
     title: '',
     users: [],
     workflowy_id: null,
-    settings: {}
+    settings: {},
+    last_task_message_id: null,
+    last_task_message_created_at: null
   }
 }
 

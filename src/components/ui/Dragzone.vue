@@ -1,21 +1,59 @@
 <template>
-  <div class="dragzone" @dragover.prevent @dragenter="moveToNewList" @drop="drop($event)">
+  <div class="dragzone" @dragover.prevent @dragenter="moveToNewList($event)" @drop="drop($event)">
     <div v-if="isListExpandable" @click="expandedList = !expandedList" class="dragzone__item-icon">
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
-    <div class="dragzone__content">
-      <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
+    <!-- <pre>{{ tasks }}</pre> -->
+    <div class="dragzone__content" ref="dragzone_wrapper">
+      <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
         <div class="dragzone__item-block">
+          <!-- <pre>{{ item }}</pre> -->
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
-            <div class="dragzone__item-block-content-text">
-              <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
-                <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
-                <span v-else class="dragzone__item-tracker-icon-triangle" />
+            <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px">
+              <div class="burger-icon-wrapper" v-if="!item.project.acronym">
+                <div style="padding-left: 5px; padding-right: 5px; margin-top: 5px" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
               </div>
-              <div class="dragzone__item-subtext">
+
+              <div class="dragzone__item-info">
+                <!-- <p style="margin-bottom: 0 !important;">
+                  <span class="dragzone-project-acronym" v-if="item.project.acronym">{{ item.project.acronym }}</span>
+                  <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
+                  <span class="dragzone__item-text" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id">{{ item.title }}</span>
+                </p> -->
+                <div class="dragzone-project-acronym-wrapper" v-if="item.project.acronym">
+                  <div class="dragzone-project-acronym" :style="{ 'background-color': clientColor(item) }" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
+                    {{ item.project.acronym }}
+                  </div>
+                  <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
+                </div>
+                <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
+
+                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
+              </div>
+              <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
+                <span v-if="timerId === item.id" class="icon-stop" style="font-size: 25px; color: red" />
+                <span v-else class="icon-play_arrow" style="font-size: 25px; color: green" />
+              </div>
+            </div>
+            <!-- <div class="dragzone__item-block-content-text">
+              <div class="dragzone__item-subtext mt-2">
                 <img v-if="project_url(item)" :src="project_url(item)" />
-                {{ projectName(item.project_id) }}
+                <div class="d-flex align-items-center">
+                  <span class="dragzone-project-acronym" v-if="item.project.acronym">
+                    {{ item.project.acronym }}
+                  </span>
+                  <span v-else>{{ projectName(item.project_id) }}</span>
+                  <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
+                    <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
+                    <span v-else class="dragzone__item-tracker-icon-triangle" />
+                  </div>
+                </div>
               </div>
               <div class="dragzone__item-dragbox dragzone__item-dragbox--active" @click="editTask(item.task_id || item.id)">
                 <span />
@@ -25,16 +63,23 @@
               <div class="dragzone__add-task dragzone__add-task--item" @click="createTempItem(index, item.id)">
                 +
               </div>
-              <div class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
+              <div class="">
+                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
+              </div>
+            </div> -->
+            <div v-if="show_debug()" style="padding: 0 10px">
+              <small>
+                <span style="color: red">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}
+              </small>
             </div>
             <div class="dragzone__task-users">
-              <small v-if="show_debug()"
-                ><span style="color: red;">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}</small
-              >
-              <b-badge v-if="task_user.company_user_id !== current_company_user_id" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" :variant="task_user.role === 'assigned' ? 'info' : 'secondary'" v-bind:task_user="task_user">{{ getCompanyUserName(task_user.company_user_id) }} </b-badge>
+              <b-badge v-if="task_user.company_user_id !== selectedCompanyUserId || !verticalAlignment" class="dragzone_badge" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" v-bind:task_user="task_user">
+                {{ getCompanyUser(task_user.company_user_id).name | abbrName }}
+              </b-badge>
             </div>
           </div>
           <div v-if="index == tasks.length - 1" class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
+
           <!-- <div
             v-if="true || editedItemId === item.id"
             class="dragzone__item-tracker"
@@ -62,9 +107,7 @@
         </div>
       </div>
 
-      <div v-if="tasks.length === 0" class="dragzone__add-task" @click="createTempItem(-1)">
-        +
-      </div>
+      <div v-if="tasks.length === 0" class="dragzone__add-task" @click="createTempItem(-1)">+</div>
     </div>
     <!--<div v-if="!expandedList && isListExpandable" class="pl-2">
       ...
@@ -75,11 +118,23 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
+import { EventBus } from '@/components/event-bus'
 import uuid from 'uuid'
 
 const Tasks = namespace('tasks')
 
-@Component
+@Component({
+  filters: {
+    abbrName(name: string) {
+      if (!name) return ''
+      let matches = name.match(/\b(\w)/g) // ['J','S','O','N']
+      if (matches) {
+        let acronym = matches.join('') // JSON
+        return acronym.toUpperCase()
+      }
+    }
+  }
+})
 export default class Dragzone extends Vue {
   private get isListExpandable() {
     return this.tasks.length > this.numberOfExpandedItems
@@ -89,10 +144,12 @@ export default class Dragzone extends Vue {
   @Prop({ required: true, default: () => [] }) public tasks!: any
   @Prop({ required: true }) public isListDragged!: boolean
   @Prop({ required: true }) public group!: any
+  @Prop({ required: true }) public verticalAlignment!: boolean
+  @Prop({ required: true }) private selectedCompanyUserId!: number
   @Prop({ required: false, default: false }) public initiallyExpanded!: boolean
   @Prop({ required: false, default: false })
-  public selectedCompanyUserId!: number
-  @Tasks.Getter public getById!: any
+  @Tasks.Getter
+  public getById!: any
 
   private current_company_user_id: any = this.$store.state.settings.current_company_user_id
   private expandedList: boolean = this.initiallyExpanded
@@ -101,6 +158,7 @@ export default class Dragzone extends Vue {
   private timerId: number | string | null = null
   private editedItemId: number | string | null = null
   private currentListsBlockName: string | null = null
+  private showPlusIcon: object = { task_id: null, visible: false }
 
   @Watch('tasks')
   public onTaskChanged(newTasks: any, oldTasks: any) {
@@ -122,6 +180,14 @@ export default class Dragzone extends Vue {
     }
   }
 
+  private clientColor(item: any) {
+    return this.$store.state.clients.clients.find((client: any) => client.client_company_id === item.project.client_company_id).color
+  }
+
+  private show_plusIcon(task_id: any, visibility: boolean) {
+    this.showPlusIcon = { task_id: task_id, visible: visibility }
+  }
+
   private show_debug() {
     return process.env.VUE_APP_SHOW_DEBUG === 'on'
   }
@@ -141,10 +207,10 @@ export default class Dragzone extends Vue {
   private getTaskUsers(task_id: any) {
     return this.$store.getters['task_users/getByTaskId'](task_id)
   }
-  private getCompanyUserName(company_user_id: any) {
+  private getCompanyUser(company_user_id: any) {
     let company_user = this.$store.getters['company_users/getById'](company_user_id)
     //console.log(company_user)
-    return company_user ? company_user.name : ''
+    return company_user ? company_user : []
   }
   private getTaskDueDate(task_id: any) {
     let task = this.$store.getters['tasks/getById'](task_id)
@@ -178,7 +244,7 @@ export default class Dragzone extends Vue {
   /**
    * Triggers only on destination list
    */
-  private drop() {
+  private async drop() {
     console.log('************* DROP *************')
     const item = JSON.parse(localStorage.getItem('item') as string)
     if (item) {
@@ -191,6 +257,8 @@ export default class Dragzone extends Vue {
         this.$emit('updateSortOrders', JSON.stringify(this.tasks))
       }
     }
+
+    await EventBus.$emit('updateDraggableHeight')
   }
 
   /**
@@ -325,10 +393,68 @@ export default class Dragzone extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss">
+.dragzone_badge {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-radius: 50% !important;
+  width: 25px;
+  height: 25px;
+  color: black !important;
+  font-size: 10px !important;
+  margin-right: 3px;
+  box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 5px;
+  margin-left: 0px;
+}
+.dragzone-project-project-name {
+  font-size: 10px;
+  font-weight: bold;
+  max-width: 80px;
+  color: green;
+  // background-color: orange;
+  // text-decoration: underline;
+}
+.dragzone__item-wrapper {
+  display: flex;
+  // height: 100%;
+  // align-items: center;
+  // justify-content: center;
+  // border: 1px solid red;
+}
+.dragzone__item-info {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.burger-icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  // align-items: flex-start;
+  // border: 1px solid red;
+}
+.burger-icon span {
+  display: block;
+  width: 15px;
+  height: 2px;
+  background: #cccccf;
+  margin: 2px 0;
+}
+.dragzone-project-acronym {
+  padding: 3px 5px;
+  white-space: nowrap;
+  color: white;
+  font-size: 10px;
+  max-height: 20px;
+}
+.dragzon-icon-dehaze {
+  cursor: all-scroll;
+  font-size: 20px;
+}
 .dragzone {
   width: 100%;
-  /*width: calc(100% - 121px);*/
   min-height: 40px;
   height: auto;
 }
@@ -379,9 +505,14 @@ export default class Dragzone extends Vue {
   width: 100%;
 }
 .dragzone__item-block-content {
-  /*display: flex;*/
+  /* display: flex; */
+  padding: 2px 0;
   align-items: center;
   clear: both;
+  color: white;
+  background-color: rgba($color: #000000, $alpha: 0.4);
+  box-shadow: 0px 0px 16px -7px rgba($color: #ffffff, $alpha: 1);
+  border-radius: 5px;
 }
 .dragzone__item-block-content-text {
   flex-grow: 1;
@@ -409,20 +540,22 @@ export default class Dragzone extends Vue {
   background: lightgrey; /*#cef3f7;*/
 }
 .dragzone__item-text {
-  margin-left: 30px;
+  margin-left: 5px;
   flex-grow: 1;
   min-height: 1.459em;
   font-size: 0.9rem;
-  color: #595b60;
+  color: white;
+  margin-bottom: 0 !important;
 }
 .dragzone__item-subtext {
   margin-left: 30px;
   width: calc(100% - 30px);
-  margin-bottom: -0.1rem;
+  /* margin-top: 10rem; */
+  margin-bottom: 0.5rem;
   line-height: 0.8rem;
   font-size: 0.7rem;
   font-weight: lighter;
-  color: #949598;
+  color: white;
 }
 .dragzone__item-tracker-icon {
   float: right;
@@ -430,7 +563,7 @@ export default class Dragzone extends Vue {
   height: 20px;
   margin-left: auto;
   border-radius: 100%;
-  background: #c5c5c8;
+  // background: #c5c5c8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -439,25 +572,26 @@ export default class Dragzone extends Vue {
 .dragzone__item-tracker-icon--active {
   background: #5cd8e2;
 }
-.dragzone__item-tracker-icon-triangle {
-  width: 8px;
-  height: 0;
-  margin-left: 3px;
-  border-left: solid 8px #ffffff;
-  border-bottom: solid 6px transparent;
-  border-top: solid 6px transparent;
-}
+// .dragzone__item-tracker-icon-triangle {
+//   width: 8px;
+//   height: 0;
+//   margin-left: 3px;
+//   border-left: solid 8px #ffffff;
+//   border-bottom: solid 6px transparent;
+//   border-top: solid 6px transparent;
+// }
 .dragzone__item-tracker-icon-square {
   width: 8px;
   height: 8px;
   background: #ffffff;
   border-radius: 3px;
 }
-.dragzone__item-tracker-icon:hover span {
-  transform: scale(0.8);
-  transform-origin: 50% 50%;
-  transition: transform 200ms ease-out;
-}
+// .dragzone__item-tracker-icon .icon-play_arrow:hover {
+//   color: white;
+//   // transform: scale(0.8);
+//   // transform-origin: 50% 50%;
+//   // transition: transform 200ms ease-out;
+// }
 .dragzone__item-tracker {
   width: 100%;
   padding: 0.25rem 0.5rem;
@@ -504,7 +638,14 @@ export default class Dragzone extends Vue {
 }
 
 .dragzone__task-users {
-  margin-left: 25px;
+  // margin-left: 25px;
+  margin: 2px 0 2px 25px;
+  display: flex;
+}
+.dragzone-project-acronym-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 *:focus {

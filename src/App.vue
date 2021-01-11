@@ -1,35 +1,57 @@
 <template>
-  <div id="app">
-    <task-tray />
-    <main style="flex-grow: 1">
-      <div class="container-fluid">
-        <div class="row-no-padding">
-          <router-view />
+  <div id="app" style="position: relative" class="app-class" :class="bgStyle && bgTheme === 'Colors' ? bgStyle : 'paletteDefault'" :style="{ background: bgTheme === 'Images' ? `url(${this.bgStyle})` : '' }">
+    <b-overlay :show="$store.state.loading" rounded="sm" style="flex-grow: 1">
+      <!-- Loading area -->
+      <template #overlay>
+        <div class="text-center">
+          <b-spinner label="Spinning"></b-spinner>
+          <p>Loading data...</p>
+        </div>
+      </template>
+
+      <div class="row-no-padding">
+        <Header />
+        <div class="d-flex justify-content-between">
+          <!-- <task-details v-if="show_task"></task-details> -->
+          <div class="router-view-class">
+            <task-detail v-if="Object.keys(showTask).length > 0" class="app_task-detail" :task="showTask" />
+            <router-view style="width: 100%; height: 100%" />
+          </div>
+          <div class="d-flex">
+            <task-tray v-show="showTasks" />
+            <task-side-bar v-show="showChat" />
+            <timer-tab v-show="showTimer" />
+          </div>
         </div>
       </div>
-    </main>
-    <timer-tab />
+    </b-overlay>
+
     <task-modal />
     <edit-client-modal id="edit-client-modal" />
     <edit-user-modal id="edit-user-modal" />
     <invite-user-modal id="invite-user-modal" />
     <edit-timer-modal id="edit-timer-modal" />
     <edit-project-modal id="edit-project-modal" />
-    <div id="update-data-button" @click="storeDataInIndexedDb" />
-    <b-nav vertical>
-      <b-navbar-brand to="/">Projectous</b-navbar-brand>
-      <b-nav-item to="/tasks">Tasks</b-nav-item>
-      <b-nav-item to="/projects">Projects</b-nav-item>
-      <b-nav-item to="/clients">Clients</b-nav-item>
-      <b-nav-item to="/users">Users</b-nav-item>
-      <b-nav-item to="/profile">Profile</b-nav-item>
-      <b-nav-item to="/logout">Log Out</b-nav-item>
-    </b-nav>
+
+    <!-- <div id="update-data-button" @click="storeDataInIndexedDb" /> -->
+
+    <!-- <b-nav vertical>
+        <b-navbar-brand to="/">Projectous</b-navbar-brand>
+        <b-nav-item to="/tasks">Tasks</b-nav-item>
+        <b-nav-item to="/projects">Projects</b-nav-item>
+        <b-nav-item to="/clients">Clients</b-nav-item>
+        <b-nav-item to="/users">Users</b-nav-item>
+        <b-nav-item to="/profile">Profile</b-nav-item>
+        <b-nav-item to="/logout">Log Out</b-nav-item>
+      </b-nav> -->
   </div>
 </template>
 
 <script>
-import TimerTab from './views/TimerTab'
+import '@/assets/icons/fontello/css/fontello.css'
+
+import Header from '@/components/Header.vue'
+
 import EditClientModal from './views/EditClientModal.vue'
 import EditUserModal from './views/EditUserModal'
 import InviteUserModal from './views/InviteUserModal'
@@ -40,15 +62,18 @@ import { createListsByDays, createUserLists, getCookie } from '@/utils/util-func
 import Vue from 'vue'
 import { idbKeyval, idbGetAll } from '@/plugins/idb.ts'
 import { modulesNames, modulesNamesList } from './store/modules-names'
-import TaskTray from './views/TaskTray'
 import uuid from 'uuid'
 import AllTaskFilipTemplate from './views/AllTaskFilipTemplate'
+import { EventBus } from '@/components/event-bus'
 
 export default {
   components: {
+    Header,
     AllTaskFilipTemplate,
-    TimerTab,
-    TaskTray,
+    TimerTab: () => import('./views/TimerTab.vue'),
+    TaskTray: () => import('./views/TaskTray.vue'),
+    TaskSideBar: () => import('./views/TaskSideBar.vue'),
+    TaskDetail: () => import('./views/TaskDetail.vue'),
     EditClientModal,
     EditUserModal,
     InviteUserModal,
@@ -56,7 +81,30 @@ export default {
     EditTimerModal,
     EditProjectModal
   },
+  data() {
+    return {
+      loading: false,
+      showTasks: false,
+      showChat: false,
+      showTimer: false,
+      bgStyle: '',
+      bgTheme: '',
+      showTask: {}
+    }
+  },
   computed: {
+    // backgroundStyle() {
+    //   if(this.bgTheme === 'Images') {
+    //     return `
+    //       background: url(${this.bgStyle}),
+    //     `
+    //       // 'background-repeat': no-repeat,
+    //       // 'background-size': cover,
+    //     // background: url(https://images.pexels.com/photos/38537/woodland-road-falling-leaf-natural-38537.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260);
+    //     // background-repeat: no-repeat;
+    //     // background-size: cover;
+    //   }
+    // },
     current_edit_task: function() {
       return this.$store.getters['settings/get_current_edit_task']
     },
@@ -64,6 +112,16 @@ export default {
       console.log('cureent edit projec')
       return this.$store.getters['settings/get_current_edit_project']
     }
+    // getBackground() {
+    //   if(this.bgStyle) return this.bgStyle
+
+    //   if(!getCookie('bg-color')) {
+
+    //     return false
+    //   } else {
+    //     return getCookie('bg-color')
+    //   }
+    // },
   },
   watch: {
     current_edit_task: function(value) {
@@ -120,8 +178,88 @@ export default {
      */
     if (getCookie('auth_token')) {
       await this.getAppData()
+      this.$store.state.initialDataLoaded = true
+
+      if (!this.$store.getters['settings/isAdmin'] && this.$route.meta.adminOnly) {
+        alert('Only admin can access.')
+        this.$router.push({ path: '/' })
+      }
+
       setInterval(this.getNewData, 3000)
     }
+
+    EventBus.$on('showTask', task => {
+      this.showTask = task
+    })
+  },
+
+  created() {
+    let getTaskFromQuery = 0
+    this.$watch('$route.query', async val => {
+      if (getTaskFromQuery > 2) return
+      if (!!val.task && this.$store.state.tasks.tasks && this.$store.state.tasks.tasks.length > 0) {
+        const task = await this.$store.state.tasks.tasks.find(task => task.id === val.task)
+        this.showTask = task
+        getTaskFromQuery += 1
+      }
+    })
+
+    if (getCookie('tasks') === 'true') {
+      this.showTasks = true
+    } else {
+      this.showTasks = false
+    }
+    if (getCookie('chat') === 'true') {
+      this.showChat = true
+    } else {
+      this.showChat = false
+    }
+    if (getCookie('timers') === 'true') {
+      this.showTimer = true
+    } else {
+      this.showTimer = false
+    }
+
+    EventBus.$on('toggle_task', () => {
+      this.showTaskDetail = !this.showTaskDetail
+      document.cookie = `task=${this.showTaskDetail}`
+    })
+    EventBus.$on('toggle_tasks', () => {
+      this.showTasks = !this.showTasks
+      document.cookie = `tasks=${this.showTasks}`
+    })
+    EventBus.$on('toggle_timers', () => {
+      this.showTimer = !this.showTimer
+      document.cookie = `timers=${this.showTimer}`
+    })
+    EventBus.$on('toggle_chat', () => {
+      this.showChat = !this.showChat
+      document.cookie = `chat=${this.showChat}`
+    })
+
+    if (getCookie('bg-style')) {
+      this.bgStyle = getCookie('bg-style')
+    }
+    if (getCookie('bg-theme')) {
+      this.bgTheme = getCookie('bg-theme')
+    }
+    // background
+    EventBus.$on('changeBackground', ({ option, styleTheme }) => {
+      this.bgStyle = option
+      this.bgTheme = styleTheme
+
+      document.cookie = `bg-style=${option}`
+      document.cookie = `bg-theme=${styleTheme}`
+    })
+  },
+  beforeDestroy() {
+    // to avoid memory leak
+
+    EventBus.$off('toggle_tasks')
+    EventBus.$off('toggle_timers')
+    EventBus.$off('toggle_chat')
+    EventBus.$off('changeBackground')
+    EventBus.$off('showTask')
   },
   methods: {
     getNewData() {
@@ -139,6 +277,7 @@ export default {
       }
     },
     async getAppData() {
+      this.$store.state.loading = true
       let indexDBExists = false
       let request = window.indexedDB.open('projectous-data')
 
@@ -164,7 +303,6 @@ export default {
       } else {
         data = await this.storeDataInIndexedDb()
       }
-      //this.setAppData(data)
       this.$store.dispatch('PROCESS_INCOMING_DATA', data)
       //TODO
       const userLists = createUserLists(data.lists)
@@ -187,30 +325,6 @@ export default {
         }
       }
       return valid
-    },
-    async setAppData({ client_users, clients, company_users, task_users, tasks, projects, project_users, user_task_lists, current_company_id, current_company_user_id, timers, user_id }) {
-      // this.$bvModal.show('edit-user-modal')
-      Vue.set(this.$store.state.settings, 'current_user_id', user_id)
-      Vue.set(this.$store.state.settings, 'current_company_user_id', current_company_user_id)
-      Vue.set(this.$store.state.settings, 'current_company_id', current_company_id)
-
-      this.$store.commit('ADD_MANY', { module: 'client_users', entities: client_users }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'task_users', entities: task_users }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'tasks', entities: tasks }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'timers', entities: timers }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'projects', entities: projects }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'project_users', entities: project_users }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'company_users', entities: company_users }, { root: true })
-      this.$store.commit('ADD_MANY', { module: 'clients', entities: clients }, { root: true })
-      const userLists = createUserLists(user_task_lists)
-      this.$store.commit('lists/lists/CREATE_LISTS', {
-        listName: 'userLists',
-        lists: userLists
-      })
-      /*      this.dateInterval()
-      setInterval(this.dateInterval, 1800000)*/
-
-      //TODO: companies
     },
     async storeDataInIndexedDb() {
       const appData = await this.getAppDataFromApi()
@@ -244,9 +358,13 @@ export default {
 </script>
 
 <style lang="scss">
+.modal-content {
+  max-height: calc(100vh - 70px);
+}
 #app {
   display: flex;
-  margin-bottom: 60px;
+  // background-color: rgba(0, 0, 0, 0.3);
+  // background-color: rgba($color: orange, $alpha: 0.6);
 }
 #update-data-button {
   position: absolute;
@@ -256,5 +374,48 @@ export default {
   height: 30px;
   cursor: pointer;
   background: url('assets/icons/refresh-icon.svg');
+}
+.right-fixed {
+  display: flex;
+}
+.router-view-class {
+  position: relative;
+  height: calc(100vh - 50px);
+  // overflow-y: hidden;
+  flex: 1;
+}
+.app_task-detail {
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+// background-color options
+.paletteDefault {
+  background: rgba($color: orange, $alpha: 0.6);
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+}
+.paletteRed {
+  background: rgba($color: red, $alpha: 0.6);
+}
+.paletteGreen {
+  background: rgba($color: green, $alpha: 0.6);
+}
+.paletteBlue {
+  background: rgba($color: blue, $alpha: 0.6);
+}
+.paletteOrange {
+  background: rgba($color: orange, $alpha: 0.6);
+}
+.palettePink {
+  background: rgba($color: pink, $alpha: 0.6);
+}
+.paletteViolet {
+  background: rgba($color: violet, $alpha: 0.6);
+}
+.paletteYellow {
+  background: rgba($color: yellow, $alpha: 0.6);
 }
 </style>

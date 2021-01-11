@@ -1,18 +1,24 @@
 <template>
-  <div id="timer-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh; position: fixed;">
-    <div class="trayTopBtn">
-      <button class="closebtn" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button>
-      <button class="makeBtn" @click="addTimer()" style="margin-left: 30px;">Modal</button>
-      <button class="makeBtn" @click="startTimer()" style="margin-left: 10px;">Start New</button>
-      {{ total_time_today }}
+  <!-- <div id="timer-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh; position: fixed;"> -->
+  <div id="timer-tray">
+    <div class="timer-tray-top-div">
+      <span class="timer-tray-title">TIMERS</span>
+      <div class="trayTopBtn">
+        <!-- <button class="closebtn" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
+        <span class="makeBtn" @click="addTimer()">Modal</span>
+        <span class="makeBtn" @click="startTimer()">Start New</span>
+        <span>{{ total_time_today }}</span>
+      </div>
     </div>
 
-    <my-sidebar-timer :class="getSidebarClass()" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
-    <div :class="'chat-hide-btn ' + trayClass()">
+    <div class="timer-tray-timer-card">
+      <my-sidebar-timer :class="getSidebarClass()" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
+    </div>
+    <!-- <div :class="'chat-hide-btn ' + trayClass()">
       <button @click="trayToggle()" type="button" :class="'btn btn-gray ' + trayClass()">
         timers
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
@@ -22,7 +28,8 @@ export default {
   data: function() {
     return {
       tray_expanded: true,
-      timer_filter: ''
+      timer_filter: '',
+      keys: []
     }
   },
   computed: {
@@ -54,6 +61,9 @@ export default {
     'my-sidebar-timer': MySideBarTimer
   },
   methods: {
+    keyUpTest() {
+      console.log('working')
+    },
     trayClass: function() {
       return this.tray_expanded ? 'expanded' : ''
     },
@@ -69,134 +79,87 @@ export default {
     addTimer: function() {
       this.$store.dispatch('timers/addTimer') //timers/addTimer2 signature
     },
-    startTimer: function() {
-      this.$store.dispatch('timers/startTimer', {
-        current_company_id: this.$store.state.settings.current_company.id,
-        client_id: '',
-        project_id: '',
-        task_id: '',
-        is_billable: 1,
-        report_at: ''
-      })
+    startTimer: function(e) {
+      let start = () => {
+        this.$store.dispatch('timers/startTimer', {
+          current_company_id: this.$store.state.settings.current_company.id,
+          client_id: '',
+          project_id: '',
+          task_id: '',
+          is_billable: 1,
+          report_at: ''
+        })
+      }
+
+      if (e) {
+        let key = e.key || keyCode
+        this.keys.push(key)
+        if ((this.keys.includes('n') && this.keys.includes('Alt')) || (this.keys.includes('N') && this.keys.includes('Alt'))) {
+          this.keys = []
+          start()
+        }
+        return
+      }
+      start()
     }
+  },
+  mounted() {
+    window.addEventListener('keyup', this.startTimer)
+  },
+  beforeDestroy() {
+    window.removeEventListener('keyup', this.startTimer)
   }
 }
 </script>
 
 <style lang="scss">
 #timer-tray {
-  width: 300px;
-  -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
-  transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
-  background-color: #993399;
-  transition: 0.5s;
-  right: -300px;
-  &.expanded {
-    right: 0;
-  }
-  .project-item {
-    list-style-type: none;
-    padding: 10px 15px;
-    background: #e9d2e9;
-    width: 260px;
-    min-height: 130px;
-    margin: 0 auto;
-    border-radius: 5px;
-    margin: 10px;
-    -webkit-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
-    box-shadow: 0px 0px 16px -7px rgba(0, 0, 0, 0.75);
-  }
-  .timer-task {
-    background-color: #e9d2e9;
-  }
-  button.btn.btn-purple {
-    color: #ffffff !important;
-    background-color: #993399;
-    border-color: #993399;
-    position: fixed;
-    bottom: 37px;
-    right: -38px;
-    transform: rotate(-90deg);
-    font-size: 20px;
-    text-transform: uppercase;
-    padding: 8px 25px;
-    border-radius: 0 5px 0 0;
-    z-index: 999;
-    -webkit-transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
-    transition: all 600ms cubic-bezier(0.22, 1, 0.19, 1);
-  }
-  button.btn.btn-gray {
-    color: #ffffff !important;
-    background-color: #993399;
-    color: white;
-    position: fixed;
-    bottom: 31px;
-    right: -31px;
-    transform: rotate(-90deg);
-    font-size: 16px;
-    text-transform: uppercase;
-    padding: 8px 25px;
-    border-radius: 0 5px 0 0;
-    z-index: 999;
-    -webkit-transition: 0.5s;
-    transition: 0.5s;
-  }
-  button.btn.btn-gray:active {
-    box-shadow: none;
-  }
-  .closebtn {
-    font-size: 30px;
-    background: transparent;
-    color: #ffffff;
-    cursor: pointer;
-    border: none;
-    position: absolute;
-    left: 0;
-    top: -3px;
-    outline: none;
-  }
-  .trayTopBtn {
-    position: sticky;
-    top: 0px;
-    padding: 10px;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    background: #993399;
-    z-index: 100;
-    color: #fff;
-
-    .makeBtn {
-      border: 1px solid #652d65;
-      border-radius: 5px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      background: #652d65;
-    }
-  }
-  @media (max-width 800px) {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
+  height: 100%;
+  min-width: 252px;
+  // padding: 0 15px;
+  // max-width: 300px;
+  height: calc(100vh - 50px);
+  overflow: hidden auto;
+  // background-color: #616161;
+  background-color: rgba(0, 0, 0, 0.5);
+  // overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
 }
-
-.chat-hide-btn {
-  margin-right: 0;
-}
-.chat-hide-btn .expanded {
-  margin-right: 300px;
-}
-
-.timer-tab {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  min-height: 150px;
-  min-width: 100px;
-  max-width: 200px;
-  opacity: 0.99;
+.timer-tray-top-div {
+  top: 0;
+  // font-weight: bold;
+  position: sticky;
+  padding: 10px;
   z-index: 1;
+  background-color: rgba($color: #000000, $alpha: 0.5);
+}
+.timer-tray-timer-card {
+  width: 100%;
+  padding: 0 10px;
+  align-self: center;
+  // margin-top: 10px;
+}
+.timer-tray-title {
+  margin-top: 10px;
+  color: white;
+  font-weight: bold;
+}
+.trayTopBtn {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  color: white;
+}
+.makeBtn {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 8px 15px;
+  margin-right: 5px;
+  border-radius: 5px;
+  // background-color: rgb(0, 0, 255);
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.makeBtn:hover {
+  background-color: rgba(0, 0, 0, 0.7);
 }
 </style>

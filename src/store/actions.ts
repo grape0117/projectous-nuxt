@@ -2,6 +2,9 @@ import { IRootState } from '@/store/types'
 import { ActionTree } from 'vuex'
 
 export const actions: ActionTree<IRootState, IRootState> = {
+  // SET_CURRENT_USER({ commit }, user_id) {
+  //   commit('SET_CURRENT_USER', user_id)
+  // },
   ADD_MANY({ commit, dispatch }, { module, entities }) {
     //TODO: rename to load?
     commit('ADD_MANY', { module, entities })
@@ -29,6 +32,10 @@ export const actions: ActionTree<IRootState, IRootState> = {
       return
     }
 
+    // console.log('MY CONSOLE.LOG')
+    // console.log(state[module])
+
+    // console.log(state.client_users.lookup)
     // @ts-ignore
     let key = state[module].lookup[entity.id]
     console.log('key', key, state[module][module][key])
@@ -77,7 +84,7 @@ export const actions: ActionTree<IRootState, IRootState> = {
     this._vm.$http().delete('/' + module + '/', entity.id)
   },
   PROCESS_INCOMING_DATA({ commit, rootState }, data) {
-    console.log('PROCESS_INCOMING_DATA', data)
+    // console.log('PROCESS_INCOMING_DATA', data)
     // @ts-ignore
     for (const module in data) {
       if (rootState[module]) {
