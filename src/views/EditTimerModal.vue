@@ -33,7 +33,7 @@
               <select id="timer-modal-project-id" class="form-control" name="project_id" v-model="timer.project_id">
                 <option :value="null">***** Select Project *****</option>
                 <option value="create">Create New Project</option>
-                <option v-for="project in openprojects()" v-bind:project="project" :value="project.id">
+                <option v-for="(project, projectIndex) in openprojects()" :key="projectIndex" v-bind:project="project" :value="project.id">
                   {{ client_name(project.client_company_id) }} -
                   {{ project.name }}
                 </option>

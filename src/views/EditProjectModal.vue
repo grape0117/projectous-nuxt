@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="project-modal" class="modal fade" role="dialog" @ok="saveProject">
+  <b-modal id="project-modal" title="Edit Project" class="modal fade" role="dialog" @ok="saveProject">
     <form id="editProjectForm" class="form-horizontal">
       <input id="projectIDEdit" class="form-control" type="hidden" name="id" v-model="project.id" />
       <div class="form-group">
