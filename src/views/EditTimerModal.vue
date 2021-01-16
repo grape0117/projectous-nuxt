@@ -14,6 +14,8 @@
         </div>
       </div> -->
     </template>
+    <!-- <span>{{ timer.invoice_notes }}</span>
+    <span>{{ timer.admin_notes }}</span> -->
     <!-- <pre>{{ timer }}</pre> -->
     <!--<ul id="timerModalTabs" class="nav nav-tabs" role="tablist">-->
     <!--<li role="presentation" class="active">-->
@@ -54,17 +56,33 @@
             </div>
           </div>
 
-          [ Set Invoice Notes ] [ Set Admin Notes (internal company notes, not visible to client) ]
-          <div v-if="isAdmin()" class="form-group">
-            <label class="control-label col-sm-4" for="timerInvoiceNotes">Invoice Notes: </label>
-            <div class="col-sm-8">
-              <div contenteditable="true" id="timerInvoiceNotes" class="form-control" style="height: auto; min-height: 35px" v-html="checkNotes(timer.invoice_notes)" @blur="setInvoiceNotes"></div>
+          <div class="form-group">
+            <span class="set-button" :style="{ 'background-color': !showInvoiceNotes ? '#6c8eff' : '#231F20' }" @click="clearInvoiceNotes()">
+              Set Invoice Notes
+            </span>
+            <span class="set-button" :style="{ 'background-color': !showAdminNotes ? '#6c8eff' : '#231F20' }" @click="clearAdminNotes()">
+              Set Admin Notes
+            </span>
+          </div>
+          <!-- [ Set Invoice Notes ] [ Set Admin Notes (internal company notes, not visible to client) ] -->
+          <div v-if="isAdmin" class="form-group">
+            <label v-if="showInvoiceNotes" class="control-label col-sm-4" for="timerInvoiceNotes">Invoice Notes: </label>
+            <div v-if="showInvoiceNotes" class="col-sm-12 invoice-notes" style="padding-right: 0;">
+              <div contenteditable="true" id="timerInvoiceNotes" class="form-control" style="min-height: 60px; max-height: 90px; overflow-y: auto;" v-html="getInvoiceNotes" @blur="setInvoiceNotes"></div>
+              <div class="clear-set-input">
+                <a href="javascript:void(0)" @click="clearInvoiceNotes">Clear and hide</a>
+              </div>
             </div>
           </div>
-          <div v-if="isAdmin()" class="form-group">
-            <label class="control-label col-sm-4" for="timerInvoiceNotes">Admin Notes: (visible to users, not clients)</label>
-            <div class="col-sm-8">
-              <div contenteditable="true" id="timerAdminNotes" class="form-control" style="height: auto; min-height: 35px" v-html="checkNotes(timer.admin_notes)" @blur="setAdminNotes"></div>
+
+          <!-- Admin Notes: (visible to users, not clients) -->
+          <div v-if="isAdmin" class="form-group">
+            <label v-if="showAdminNotes" class="control-label col-sm-4" for="timerInvoiceNotes">Admin Notes:</label>
+            <div v-if="showAdminNotes" class="col-sm-12" style="padding-right: 0;">
+              <div contenteditable="true" id="timerAdminNotes" class="form-control" style="min-height: 60px; max-height: 90px; overflow-y: auto" v-html="getAdminNotes" @blur="setAdminNotes"></div>
+              <div class="clear-set-input">
+                <a href="javascript:void(0)" @click="clearAdminNotes">Clear and hide</a>
+              </div>
             </div>
           </div>
           <div class="form-group">
@@ -76,8 +94,7 @@
               </select>
             </div>
           </div>
-          <!-- <pre>{{ users }}</pre> -->
-          <div v-if="isAdmin()" class="form-group">
+          <div v-if="isAdmin" class="form-group">
             <label class="control-label col-sm-4" for="timerUserSelect">User: </label>
             <div class="col-sm-8">
               <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer.company_user_id">
@@ -89,7 +106,7 @@
               </select>
             </div>
           </div>
-          <div v-if="isAdmin()" class="form-group">
+          <div v-if="isAdmin" class="form-group">
             <label class="control-label col-sm-4" for="timerUserTime">Is billable? </label>
             <div class="col-sm-8">
               <div class="checkbox">
@@ -99,13 +116,13 @@
               </div>
             </div>
           </div>
-          <div v-if="isAdmin()" class="form-group">
+          <div v-if="isAdmin" class="form-group">
             <label class="control-label col-sm-4" for="report_at">User Rate: </label>
             <div class="col-sm-8">
               <input name="user_rate" type="datetime" id="user_rate" :placeholder="user_rate_placeholder()" class="form-control" :value="user_rate_value()" />
             </div>
           </div>
-          <div v-if="isAdmin()" class="form-group">
+          <div v-if="isAdmin" class="form-group">
             <label class="control-label col-sm-4" for="client_rate">Client Rate: </label>
             <div class="col-sm-8">
               <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value()" />
@@ -189,8 +206,7 @@
       <button class="btn btn-info" @click="ok()">Save</button>
       <button class="btn" @click="cancel()">Cancel</button>
     </template>
-    <!-- /.modal-dialog --> </b-modal
-  ><!-- /.modal -->
+  </b-modal>
 </template>
 
 <script>
@@ -202,7 +218,28 @@ export default {
     'timer-modal-time-standard': TimerModalTimeStandard,
     'timer-fifteen-template': TimerFifteenTemplate
   },
+  data: function() {
+    return {
+      startSeconds: '',
+      endSeconds: '',
+      showInvoiceNotes: false,
+      showAdminNotes: false
+    }
+  },
   computed: {
+    getInvoiceNotes() {
+      let invoice_notes = this.timer.invoice_notes
+      if (invoice_notes) return invoice_notes
+      return ''
+    },
+    getAdminNotes() {
+      let admin_notes = this.timer.admin_notes
+      if (admin_notes) return admin_notes
+      return ''
+    },
+    isAdmin: function() {
+      return this.$store.getters['settings/isAdmin']
+    },
     timer: function() {
       return this.$store.state.settings.current_edit_timer
     },
@@ -232,12 +269,6 @@ export default {
       return clients
     }
   },
-  data: function() {
-    return {
-      startSeconds: '',
-      endSeconds: ''
-    }
-  },
   mounted: function() {
     // let self = this
     // $('#timer-modal').on('hidden.bs.modal', function() {
@@ -258,6 +289,14 @@ export default {
     }
   },
   methods: {
+    clearInvoiceNotes() {
+      this.showInvoiceNotes = !this.showInvoiceNotes
+      this.timer.invoice_notes = null
+    },
+    clearAdminNotes() {
+      this.showAdminNotes = !this.showAdminNotes
+      this.timer.admin_notes = null
+    },
     client_rate_placeholder: function() {
       return this.timer.default_client_rate
     },
@@ -300,9 +339,6 @@ export default {
         return ''
       }
       return Math.floor(this.timer.invoice_duration % 60)
-    },
-    isAdmin: function() {
-      return this.$store.getters['settings/isAdmin']
     },
     isIHI: function() {
       return this.$store.getters['settings/isIHI']
@@ -402,13 +438,15 @@ export default {
     },
     setInvoiceNotes(e) {
       let invoiceNotes = e.target.innerHTML
-      this.task.invoice_notes = invoiceNotes
+      if (!invoiceNotes) return (this.timer.invoice_notes = '')
+      this.timer.invoice_notes = invoiceNotes
     },
     setAdminNotes(e) {
       let adminNotes = e.target.innerHTML
-      this.task.admin_notes = adminNotes
+      if (!adminNotes) return (this.timer.admin_notes = '')
+      this.timer.admin_notes = adminNotes
     },
-    saveTimer: function(callback) {
+    saveTimer(callback) {
       if (this.timer.project_id) {
         let project = this.$store.getters['projects/getById'](this.timer.project_id)
         if (project) {
@@ -434,10 +472,6 @@ export default {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  // border: 1px solid red !important;
-}
-.timer-modal_notes {
-  // width: 100px;
 }
 
 .edit-ClientProject {
@@ -449,5 +483,19 @@ export default {
     font-size: 14px;
     white-space: nowrap;
   }
+}
+.clear-set-input {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 14px;
+}
+.set-button {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 8px;
+  margin-left: 14px;
+  border-radius: 50px;
+  color: white;
 }
 </style>
