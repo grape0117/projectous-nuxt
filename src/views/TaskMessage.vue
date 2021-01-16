@@ -1,19 +1,7 @@
 <template>
   <div class="message-panel">
-    <!-- <b-list-group class="message-panel_inner" style="height:calc(100vh - 450px); overflow-y: auto;"> -->
     <b-list-group class="message-panel_inner">
-      <!-- <pre style="color: white;">{{ getMessages }}</pre> -->
-      <b-list-group-item class="message-panel_inner-message" v-for="(message, index) in getMessages" :key="index">
-        <div class="msg-header">
-          <span>{{ getUserNameWithCompanyUserId(message.company_user_id) }}</span> /
-          <span v-if="message.timestamp">{{ formatTime(message.timestamp) }}</span>
-        </div>
-        <pre class="msg-content" style="color: white;">{{ message.message }}</pre>
-        <div class="msg-action" v-if="current_company_user_id == message.company_user_id">
-          <b-button variant="primary" @click="editMessage(message)" style="margin-right: 10px;">Edit</b-button>
-          <b-button variant="warning" @click="deleteMessage(message)">Delete</b-button>
-        </div>
-      </b-list-group-item>
+      <task-message-item :message="message" v-for="message in getMessages" :key="message.id" @edit-message="editMessage" @delete-message="deleteMessage" />
     </b-list-group>
     <div>
       <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3"> </b-form-textarea>
@@ -34,6 +22,9 @@ export default {
       selected_message: null
     }
   },
+  components: {
+    'task-message-item': () => import('./TaskMessageItem.vue')
+  },
   props: ['task_id'],
   /* Load surveys and questionnaired on page load. */
   created() {},
@@ -51,14 +42,6 @@ export default {
   },
   mounted() {},
   methods: {
-    getUserNameWithCompanyUserId(company_user_id) {
-      let company_user = this.$store.state.company_users.company_users[this.$store.state.company_users.lookup[company_user_id]]
-      if (company_user) return company_user.name
-      else return ''
-    },
-    formatTime(datetime) {
-      return moment(datetime).format('MM-DD HH:mm:ss')
-    },
     editMessage(message) {
       this.selected_message = message
       this.s_message = message.message
@@ -144,17 +127,7 @@ export default {
   flex-direction: column;
 }
 
-.msg-content {
-  padding: 8px 12px;
-  border: solid 1px grey;
-  border-radius: 8px;
-  margin-top: 5px;
-}
 .message-panel_inner {
   background-color: rgba($color: #000000, $alpha: 0.7);
-}
-.message-panel_inner-message {
-  background-color: rgba($color: #000000, $alpha: 0) !important;
-  border-bottom: 1px solid white;
 }
 </style>

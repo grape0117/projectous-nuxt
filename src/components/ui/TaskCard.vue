@@ -1,13 +1,14 @@
 <template>
-  <div @click="$emit('showTask', task)" style="" :style="'background-color: ' + backgroundColor">
+  <div @click="$emit('showTask', task)" :style="'background-color: ' + backgroundColor">
     <!-- <img :src="'//www.projectous.com/api/projects/' + task.project_id + '/favicon.png'" /> -->
     <!-- <img src="https://dummyimage.com/30x30/000/fff" /> -->
     <!-- <pre>{{ task }}</pre> -->
     <div class="task-img" v-if="task.project.acronym">
       <!-- <b-avatar variant="primary" :text="task.project.acronym" class="task-card-avatar mr-3"></b-avatar> -->
-      <div class="task-card-avatar mr-1">
+      <div class="task-card-avatar mr-1" :style="clientColor">
         {{ task.project.acronym }}
       </div>
+
       <div class="task-card_task-title" style="max-width: 130px;">
         <span>{{ task.title }}</span>
       </div>
@@ -53,6 +54,10 @@ export default {
     //   let project = this.$store.getters['projects/getById'](this.task.project_id)
     //   return project
     // },
+    clientColor() {
+      let client = this.$store.state.clients.clients.find(({ id }) => Number(id) === this.task.project.client_company_id)
+      return { backgroundColor: client && client.color ? client.color : 'gray' }
+    },
     backgroundColor() {
       //no due date and older than 2 weeks => yellow
       //due tomorrow: yellow
@@ -164,10 +169,13 @@ export default {
 }
 
 .task-img .task-card-avatar {
-  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  padding: 0px 10px;
   height: 30px !important;
+  white-space: nowrap;
+  font-size: 10px !important;
   font-weight: 500;
-  background-color: green !important;
   color: white;
   border-radius: 0 !important;
 }
