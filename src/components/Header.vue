@@ -165,42 +165,44 @@ export default Vue.extend({
     },
     async toggle(iconName) {
       if (iconName === 'reload') {
-        return await this.storeDataInIndexedDb()
+        this.$emit('reload')
+        // let data = await this.storeDataInIndexedDb()
+        // return this.$store.dispatch('PROCESS_INCOMING_DATA', data)
       }
       this.toggles[iconName] = !this.toggles[iconName]
       await EventBus.$emit(`toggle_${iconName}`)
-    },
-    async getAppDataFromApi() {
-      try {
-        return await this.$http().get('/test-tasks')
-      } catch (e) {
-        console.log(e)
-      }
-    },
-    async storeDataInIndexedDb() {
-      const appData = await this.getAppDataFromApi()
-      console.log('appData', appData)
-      for (let key in appData) {
-        if (Array.isArray(appData[key])) {
-          appData[key].forEach(async entity => {
-            try {
-              if (key === 'lists') {
-                key = 'user_task_lists' //TODO: fix name
-              }
-              await idbKeyval.set(entity.id, entity, key)
-            } catch (e) {
-              console.error('---------------------')
-              console.error(e)
-              console.error(entity)
-              console.error('---------------------')
-            }
-          })
-        } else {
-          await idbKeyval.set(key, appData[key], 'properties')
-        }
-      }
-      return appData
     }
+    // async getAppDataFromApi() {
+    //   try {
+    //     return await this.$http().get('/test-tasks')
+    //   } catch (e) {
+    //     console.log(e)
+    //   }
+    // },
+    // async storeDataInIndexedDb() {
+    //   const appData = await this.getAppDataFromApi()
+    //   console.log('appData', appData)
+    //   for (let key in appData) {
+    //     if (Array.isArray(appData[key])) {
+    //       appData[key].forEach(async entity => {
+    //         try {
+    //           if (key === 'lists') {
+    //             key = 'user_task_lists' //TODO: fix name
+    //           }
+    //           await idbKeyval.set(entity.id, entity, key)
+    //         } catch (e) {
+    //           console.error('---------------------')
+    //           console.error(e)
+    //           console.error(entity)
+    //           console.error('---------------------')
+    //         }
+    //       })
+    //     } else {
+    //       await idbKeyval.set(key, appData[key], 'properties')
+    //     }
+    //   }
+    //   return appData
+    // }
   },
   created() {
     if (getCookie('tasks') === 'true') {

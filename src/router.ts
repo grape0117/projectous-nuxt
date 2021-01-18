@@ -16,6 +16,11 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
     },
     {
+      path: '/reset-password/:api_token',
+      name: 'Reset Password',
+      component: () => import(/* webpackChunkName: "login" */ '@/views/ResetPassword.vue')
+    },
+    {
       path: '/accept-invite',
       name: 'AcceptInvite',
       component: () => import(/* webpackChunkName: "AcceptInvite" */ '@/views/AcceptInvite.vue')

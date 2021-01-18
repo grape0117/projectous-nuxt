@@ -5,12 +5,12 @@
       <template #overlay>
         <div class="text-center">
           <b-spinner label="Spinning"></b-spinner>
-          <p>Loading data...</p>
+          <p>Loading ...</p>
         </div>
       </template>
 
       <div class="row-no-padding">
-        <Header />
+        <Header v-on:reload="reload" />
         <div class="d-flex justify-content-between">
           <!-- <task-details v-if="show_task"></task-details> -->
           <div class="router-view-class">
@@ -150,7 +150,7 @@ export default {
     },
     '$route.path': {
       handler(newRoute, oldRoute) {
-        if (oldRoute === '/login') {
+        if (oldRoute === '/login' && newRoute.indexOf('password') < 0) {
           this.getAppData()
         }
       },
@@ -251,6 +251,55 @@ export default {
       document.cookie = `bg-style=${option}`
       document.cookie = `bg-theme=${styleTheme}`
     })
+
+    //listener
+    var user_id = getCookie('user_id')
+    var that = this
+
+    if (user_id)
+      window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', function(e) {
+        console.log('-----Called getNewData!----' + e.data.data.item_type, e.data.data)
+        let body = ''
+        let title = ''
+        let data = e.data
+        switch (data.data.item_type) {
+          case 'timelog':
+            title = ''
+            body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
+            break
+          case 'tasks':
+            title = ''
+            body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
+            break
+          case 'task_messages':
+            title = data.data.value.taskname
+            body = JSON.stringify(data.data.value.sender + ' : ' + data.data.value.message)
+            break
+        }
+        if (body)
+          // @ts-ignore
+          that.$notification.show(
+            title,
+            {
+              body: body
+            },
+            {
+              onerror: function() {
+                console.log('Custom error event was called')
+              },
+              onclick: function() {
+                console.log('Custom click event was called')
+              },
+              onclose: function() {
+                console.log('Custom close event was called')
+              },
+              onshow: function() {
+                console.log('Custom show event was called')
+              }
+            }
+          )
+        that.$store.dispatch('GET_NEW_DATA')
+      })
   },
   beforeDestroy() {
     // to avoid memory leak
@@ -262,13 +311,14 @@ export default {
     EventBus.$off('showTask')
   },
   methods: {
-    getNewData() {
-      this.$http()
-        .get('/get-new-data/' + window.sessionStorage.last_poll_timestamp)
-        .then(response => {
-          this.$store.dispatch('PROCESS_INCOMING_DATA', response)
-        })
-    },
+    // getNewData() {
+    //   console.log('-getNewData--app.vue---')
+    //   this.$http()
+    //     .get('/get-new-data/' + window.sessionStorage.last_poll_timestamp)
+    //     .then(response => {
+    //       this.$store.dispatch('PROCESS_INCOMING_DATA', response)
+    //     })
+    // },
     async getAppDataFromApi() {
       try {
         return await this.$http().get('/test-tasks')
@@ -278,18 +328,19 @@ export default {
     },
     async getAppData() {
       this.$store.state.loading = true
-      let indexDBExists = false
+      let indexDBExists = true
       let request = window.indexedDB.open('projectous-data')
 
       request.onupgradeneeded = function(e) {
         e.target.transaction.abort()
         indexDBExists = false
       }
-
-      const dataValidation = await this.checkDataInIndexDB()
+      let dataValidation = false
+      if (indexDBExists) dataValidation = await this.checkDataInIndexDB()
       let data = {}
       //TODO: find out why adding a table breaks
       if (indexDBExists && dataValidation) {
+        console.log('----------------loading from IDB!------------------')
         for (let propertyName of modulesNamesList) {
           const allEntities = await idbGetAll(propertyName)
           if (propertyName === 'properties') {
@@ -301,6 +352,7 @@ export default {
           }
         }
       } else {
+        console.log('----------------loading from API (/test-tasks) !------------------')
         data = await this.storeDataInIndexedDb()
       }
       this.$store.dispatch('PROCESS_INCOMING_DATA', data)
@@ -349,6 +401,13 @@ export default {
         }
       }
       return appData
+    },
+    async reload() {
+      this.$store.state.loading = true
+      let data = {}
+      data = await this.storeDataInIndexedDb()
+      //this.$store.dispatch('PROCESS_INCOMING_DATA', data)
+      this.$store.state.loading = false
     },
     dateInterval() {
       this.$store.commit('lists/createListsByDays')
