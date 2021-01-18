@@ -3,9 +3,10 @@
     <div v-if="isListExpandable" @click="expandedList = !expandedList" class="dragzone__item-icon">
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
-    <!-- <pre>{{ tasks }}</pre> -->
+    <!-- <pre style="color: white;">{{ tasks }}</pre> -->
     <div class="dragzone__content" ref="dragzone_wrapper">
       <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
+        <!-- <pre>{{ item }}</pre> -->
         <div class="dragzone__item-block">
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
@@ -32,7 +33,7 @@
                   <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
                 </div>
                 <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
-                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
+                <div class="dragzone__item-text d-fl@ex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
               <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
                 <span v-if="timerId === item.id" class="icon-stop" style="font-size: 25px; color: red" />
@@ -352,12 +353,16 @@ export default class Dragzone extends Vue {
   }
 
   private async updateTaskTitle(event: any, item: any) {
-    let title = event.target.innerHTML
+    let titleWithAcronym = event.target.innerHTML
+
     const id = item.task_id ? item.task_id : item.id
     console.log('update title', item, id)
 
     const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
-    const acronym_match = title ? title.match(projectRegex) : null
+    const acronym_match = titleWithAcronym ? titleWithAcronym.match(projectRegex) : null
+
+    console.log('[acronym_match] :')
+    console.log(acronym_match)
 
     if (acronym_match && acronym_match[1]) {
       const projects_by_acronym = this.$store.state.projects.projects.filter((project: any) => project.acronym === acronym_match[1])
@@ -366,9 +371,12 @@ export default class Dragzone extends Vue {
         await this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
         // console.log('match found: ', projects_by_acronym[0].name)
       }
-    } else {
-      await this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: '' }, { root: true })
     }
+    // else {
+    //   await this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: '' }, { root: true })
+    // }
+
+    let title = titleWithAcronym.split(': ')[1] || titleWithAcronym
 
     event.target.innerHTML = title
 
@@ -405,6 +413,11 @@ export default class Dragzone extends Vue {
     const timerId = this.timerId === null ? itemId : null
     this.timerId = timerId
     this.$emit('taskTimerToggled', { taskId, timerId })
+
+    // console.log('[this.timerId]');
+    // console.log(this.timerId);
+    // console.log('[itemId]');
+    // console.log(itemId);
   }
 }
 </script>
