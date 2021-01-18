@@ -33,7 +33,7 @@
                   <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
                 </div>
                 <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
-                <div class="dragzone__item-text d-fl@ex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
+                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
               </div>
               <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
                 <span v-if="timerId === item.id" class="icon-stop" style="font-size: 25px; color: red" />
@@ -361,9 +361,6 @@ export default class Dragzone extends Vue {
     const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
     const acronym_match = titleWithAcronym ? titleWithAcronym.match(projectRegex) : null
 
-    console.log('[acronym_match] :')
-    console.log(acronym_match)
-
     if (acronym_match && acronym_match[1]) {
       const projects_by_acronym = this.$store.state.projects.projects.filter((project: any) => project.acronym === acronym_match[1])
       if (projects_by_acronym.length === 1) {
@@ -413,11 +410,6 @@ export default class Dragzone extends Vue {
     const timerId = this.timerId === null ? itemId : null
     this.timerId = timerId
     this.$emit('taskTimerToggled', { taskId, timerId })
-
-    // console.log('[this.timerId]');
-    // console.log(this.timerId);
-    // console.log('[itemId]');
-    // console.log(itemId);
   }
 }
 </script>
