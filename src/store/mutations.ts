@@ -16,12 +16,12 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   async ADD_MANY(state: IRootState, { module, entities }: any) {
-    console.log('ADD_MANY ' + module)
+    //console.log('ADD_MANY ' + module)
     if (!state[module]) {
       console.error('Module ' + module + ' does not exist.')
       return
     }
-    console.log(module, entities)
+    //console.log(module, entities)
     //@ts-ignore
     entities.forEach((entity, index) => {
       try {

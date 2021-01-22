@@ -37,7 +37,7 @@
     </td>
     <td @click="editTimer(timer)" style="white-space: nowrap;">
       {{ Math.trunc(timer.duration / 3600) }}:{{ ('00' + Math.trunc((timer.duration % 3600) / 60)).slice(-2) }}
-      <div v-if="isAdmin() && timer.duration != timer.invoice_duration" style="color:red;">{{ Math.trunc(timer.invoice_duration / 3600) }}:{{ ('00' + Math.trunc((timer.invoice_duration % 3600) / 60)).slice(-2) }}</div>
+      <div v-if="isAdmin() && timer.duration !== timer.invoice_duration" style="color:red;">{{ Math.trunc(timer.invoice_duration / 3600) }}:{{ ('00' + Math.trunc((timer.invoice_duration % 3600) / 60)).slice(-2) }}</div>
     </td>
     <td @click="editTimer(timer)">
       <div v-if="isAdmin() && timer.invoice_notes" v-html="timer.invoice_notes"></div>
@@ -61,21 +61,21 @@ export default {
   },
   methods: {
     getClientNameFromProjectId(project_id) {
-      let project = this.$store.getters['projects/getProjectById'](project_id)
+      let project = this.$store.getters['projects/getById'](project_id)
       if (project) {
-        let client = this.$store.getters['clients/getCompanyClientByClientId'](project.client_company_id)
+        let client = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
+        return client ? client.name : ''
       }
-      return client ? client.name : ''
     },
     getProjectName(project_id) {
-      let project = this.$store.getters['projects/getProjectById'](project_id)
+      let project = this.$store.getters['projects/getById'](project_id)
       if (project) return project.name
     },
     getTaskTitle(task_id) {
       if (task_id) {
-        let task = this.$store.getters['tasks/getTaskById'](task_id)
+        let task = this.$store.getters['tasks/getById'](task_id)
+        if (task) return task.title
       }
-      if (task) return task.title
     },
     isTecharound() {
       return this.$store.getters['settings/isTecharound']
@@ -84,7 +84,12 @@ export default {
       return this.$store.getters['settings/isAdmin']
     },
     timerUser(user_id) {
-      return this.$store.getters['company_users/getUserById'](user_id).name
+      if (user_id) {
+        const user = this.$store.getters['company_users/getById'](user_id)
+        if (user) {
+          return user.name
+        }
+      }
     },
     editTimer() {
       this.$store.dispatch('timers/editTimer', this.timer)

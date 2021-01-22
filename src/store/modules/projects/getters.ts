@@ -161,7 +161,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       if (project.status != 'open') {
         return false
       }
-      console.log('project', project)
+      //console.log('project', project)
       let client = rootGetters['clients/getByClientCompanyId'](project.client_company_id)
       if (client && client.status != 'active') {
         return false

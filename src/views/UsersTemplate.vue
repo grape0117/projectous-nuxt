@@ -49,7 +49,7 @@ export default {
       return this.$store.state.company_users.company_users
     },
     filteredusers: function() {
-      return this.$store.getters['company_users/getActiveUsers']
+      return this.$store.getters['company_users/getActive']
     }
   },
   mounted() {

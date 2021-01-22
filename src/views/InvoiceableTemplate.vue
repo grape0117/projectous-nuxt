@@ -18,7 +18,7 @@
             <br />
             <select id="client" name="client[]" style="height: 200px;" multiple="" v-model="chosen_clients">
               <option value="0">All Clients</option>
-              <option v-for="client in filtered_clients(current_company.id)" v-bind:client="client" :value="client.id" @click="onOffSelect">{{ client.name }} (#{{ client.id }})</option>
+              <option v-for="client in clients" v-bind:client="client" :value="client.id" @click="onOffSelect">{{ client.name }}</option>
             </select>
           </div>
           <div style="display: inline-block">
@@ -27,7 +27,7 @@
             <select id="project" name="project[]" style="height: 200px;" multiple="" v-model="chosen_projects">
               <option value="0">All Projects</option>
               <optgroup v-for="client in filteredclients(chosen_clients)" v-bind:client="client" :label="client.name">
-                <option v-for="project in client_projects(client)" v-bind:project="project" :value="project.id">{{ project.name }} (#{{ project.id }})</option>
+                <option v-for="project in client_projects(client)" v-bind:project="project" :value="project.id">{{ project.name }}</option>
               </optgroup>
             </select>
           </div>
@@ -36,14 +36,14 @@
             <!--<input type="checkbox" id="show-inactive-users" value="1" @click="toggleUsers"> Show Inactive--><br />
             <select name="user[]" style="height: 200px;" multiple="" v-model="chosen_users">
               <option value="0">All Users</option>
-              <option v-for="user in filteredusers()" v-bind:user="user" :value="user.id">{{ user.name }}</option>
+              <option v-for="user in users" v-bind:user="user" :value="user.id">{{ user.name }}</option>
             </select>
           </div>
           <div style="display: inline-block;">
             <div class=" form-inline">
               {{ start }}
-              <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart(e.target.value)" class="mb-2"></b-form-datepicker>
-              <b-form-datepicker name="end" id="end-datepicker" v-model="end" class="mb-2"></b-form-datepicker>
+              <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2"></b-form-datepicker>
+              <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2"></b-form-datepicker>
               <label for="anytime" style="font-weight: normal;"><input type="checkbox" name="anytime" id="anytime" v-model="anytime" /> Anytime</label>
               <label v-if="isAdmin() && isTecharound()" for="paid" style="font-weight: normal;"><input type="checkbox" name="is_paid" id="show_paid" v-model="show_paid" /> Show paid</label>
               <input v-else="" type="hidden" name="is_paid" value="1" />
@@ -76,11 +76,11 @@
               </tr>
               <tr class="row-date">
                 <td>
-                  <input class="uncheck" type="checkbox" onclick="toggleCheckboxes($(this),'.timer-action');" />
+                  <input class="uncheck" type="checkbox" onclick="toggleCheckboxes(this,'.timer-action');" />
                 </td>
                 <td colspan="100">
                   <select id="action">
-                    <option v-if="isWHMCS()" value="create-whmcs-billable-items">Create Billable Item</option>
+                    <!--<option v-if="isWHMCS()" value="create-whmcs-billable-items">Create Billable Item</option>-->
                     <!--<option value="mark-entries-reviewed">Mark Entries as Reviewed</option>-->
                     <option v-if="isTecharound()" value="markpaid">Mark Paid</option>
                     <option v-if="isTecharound()" value="markunpaid">Mark Unpaid</option>
@@ -116,12 +116,12 @@
             </tbody>
             <tbody>
               <tr v-bind:item="item" v-for="item in invoice_items" :key="item.id" is="invoiceable-item-row"></tr>
-              <tr v-bind:timer="timer" v-for="timer in timers" :key="timer.id" is="report-timer-row"></tr>
+              <tr v-bind:timer="timer" v-for="(timer, index) in timers" :key="index" is="report-timer-row"></tr>
             </tbody>
             <tbody>
               <tr>
                 <td>
-                  <input class="uncheck" type="checkbox" onclick="toggleCheckboxes($(this),'.item-action');" />
+                  <input class="uncheck" type="checkbox" onclick="toggleCheckboxes(this,'.item-action');" />
                 </td>
                 <td colspan="100"></td>
               </tr>
@@ -134,6 +134,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
 export default {
@@ -141,23 +142,6 @@ export default {
   components: {
     'invoiceable-timer-row': InvoiceableTimerRow,
     'report-timer-row': ReportTimerRow
-  },
-  computed: {
-    clients: function() {
-      return this.$store.state.clients.clients
-    },
-    current_company: function() {
-      return this.$store.state.settings.current_company
-    },
-    users: function() {
-      return this.$store.state.company_users.company_users
-    },
-    current_company_user: function() {
-      return this.$store.state.settings.current_company_user
-    },
-    timer_watch() {
-      return this.$store.state.settings.timer_watch
-    }
   },
   data: function() {
     return {
@@ -184,6 +168,31 @@ export default {
       timers: [],
       invoice_items: [],
       settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false }
+    }
+  },
+  computed: {
+    clients: function() {
+      let self = this
+      return this.$store.state.clients.clients
+        .filter(function(client) {
+          if (!self.settings.show_all_clients && (client.status === 'archived' || client.status === 'inactive')) {
+            return false
+          }
+          return true //client.company_id === company_id
+        })
+        .sort(Vue.nameSort)
+    },
+    current_company: function() {
+      return this.$store.state.settings.current_company
+    },
+    users: function() {
+      return this.$store.getters['company_users/getActive']
+    },
+    current_company_user: function() {
+      return this.$store.state.settings.current_company_user
+    },
+    timer_watch() {
+      return this.$store.state.settings.timer_watch
     }
   },
   watch: {
@@ -246,10 +255,11 @@ export default {
     //labeledConsole('beforeCreate', $('#project').val())
     if (sessionStorage.getItem('invoiceable')) {
       //labeledConsole('invoiceable',sessionStorage.getItem('invoiceable'))
-      this.$router.push({ path: '/invoiceable?' + sessionStorage.getItem('invoiceable') })
+      //this.$router.push({ path: '/invoiceable?' + sessionStorage.getItem('invoiceable') })
     }
   },
   mounted() {
+    console.log('reports mounted', this.$route.query, this.$route, this.chosen_clients, this.total_time, 'test')
     this.getData()
   },
   methods: {
@@ -265,88 +275,90 @@ export default {
       this.start = start
       this.getData('start')
     },
+    setEnd(end) {
+      this.end = end
+      this.getData('end')
+    },
     isNotDiseno() {
       return !this.$store.getters['settings/isDiseno']
     },
-    addInvoiceableItem() {
-      this.$store.dispatch('invoices/editInvoiceableItem')
-    },
-    applyAction() {
-      let self = this
-      let action = $('#action').val()
+    //   addInvoiceableItem() {
+    //     this.$store.dispatch('invoices/editInvoiceableItem')
+    //   },
+    //   applyAction() {
+    //     let self = this
+    //     let action = document.getElementById('action').value
+    //
+    //     let timers = document.querySelector('.timer-action:checked').serialize() //TODO: remove jquery
+    //     //alert(timers)
+    //     let itemIds = document.querySelector('.item-action:checked').serialize() //TODO: remove jquery
+    //     if (action == 'create_invoice') {
+    //       //TODO: $invoice_id = Invoice::max('invoice_id') + 1
+    //       ajax('/get_invoice_id', {}, function(response) {
+    //         let invoice_id = prompt('What ID?', response.invoice_id)
+    //         if (document.querySelector('#client option:selected').length != 1) {
+    //           //alert('you must choose only one client'+ $('#client option:selected').length)
+    //           //return
+    //         }
+    //         if (!timers) {
+    //           alert('Please choose 1 or more timers.')
+    //           return
+    //         }
+    //         $.post('/invoice/create', timers + '&invoice_id=' + invoice_id + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value + '&client=' + document.getElementById('client').value + '&' + itemIds, function(r) {
+    //           document.getElementById('actionLink').innerHTML('<a style="background: red; color: white;" target="_blank" href="/invoice/' + invoice_id + '">View Invoice</a>')
+    //           console.log('Response', r)
+    //           self.$store.dispatch('invoices/clearInvoiceableItems', r[0])
+    //         })
+    //       })
+    //       return
+    //     } else if (action == 'adjust-invoice-rate') {
+    //       let new_client_rate = prompt('What rate?', '')
+    //       if (new_client_rate == '') {
+    //         alert('Try again.')
+    //         return
+    //       }
+    //       $.post('/timers/adjust-client-rate', timers + '&client_rate=' + new_client_rate, function() {
+    //         alert('Done, reload page.')
+    //       })
+    //       return
+    //     } else if (action == 'adjust-user-rate') {
+    //       let new_user_rate = prompt('What rate?', '')
+    //       if (new_user_rate == '') {
+    //         alert('Try again.')
+    //         return
+    //       }
+    //       $.post('/timers/adjust-user-rate', timers + '&user_rate=' + new_user_rate, function() {
+    //         alert('Done, reload page.')
+    //       })
+    //       return
+    //     } else if (action == 'assigntotask') {
+    //       let task_id = prompt('What task ID?', '')
+    //       if (task_id == '') {
+    //         alert('Try again.')
+    //         return
+    //       }
+    //       $.post('/timers/' + action, timers + '&task_id=' + task_id, function() {
+    //         alert('Done, reload page.')
+    //       })
+    //       return
+    //     } else if (action == 'download-csv') {
+    //       window.open('/timers/' + action + '?' + timers)
+    //       return
+    //     } else if (action == 'download-xls') {
+    //       window.open('/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
+    //       return
+    //     } else if (action == 'custom-xls') {
+    //       //$.get( "/test/set/modaldata/"+timers)
+    //       //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
+    //       return
+    //     }
+    //
+    //     $.post('/timers/' + action, timers, function() {
+    //       //TODO: update checked timers? reload page?
+    //       self.getData('applyaction')
+    //     })
+    //   },
 
-      let timers = $('.timer-action:checked').serialize()
-      //alert(timers)
-      let itemIds = $('.item-action:checked').serialize()
-      if (action == 'create_invoice') {
-        //TODO: $invoice_id = Invoice::max('invoice_id') + 1
-        ajax('/get_invoice_id', {}, function(response) {
-          let invoice_id = prompt('What ID?', response.invoice_id)
-          if ($('#client option:selected').length != 1) {
-            //alert('you must choose only one client'+ $('#client option:selected').length)
-            //return
-          }
-          if (!timers) {
-            alert('Please choose 1 or more timers.')
-            return
-          }
-          $.post('/invoice/create', timers + '&invoice_id=' + invoice_id + '&start=' + $('#start').val() + '&end=' + $('#end').val() + '&client=' + $('#client').val() + '&' + itemIds, function(r) {
-            $('#actionLink').html('<a style="background: red; color: white;" target="_blank" href="/invoice/' + invoice_id + '">View Invoice</a>')
-            console.log('Response', r)
-            self.$store.dispatch('invoices/clearInvoiceableItems', r[0])
-          })
-        })
-        return
-      } else if (action == 'adjust-invoice-rate') {
-        let new_client_rate = prompt('What rate?', '')
-        if (new_client_rate == '') {
-          alert('Try again.')
-          return
-        }
-        $.post('/timers/adjust-client-rate', timers + '&client_rate=' + new_client_rate, function() {
-          alert('Done, reload page.')
-        })
-        return
-      } else if (action == 'adjust-user-rate') {
-        let new_user_rate = prompt('What rate?', '')
-        if (new_user_rate == '') {
-          alert('Try again.')
-          return
-        }
-        $.post('/timers/adjust-user-rate', timers + '&user_rate=' + new_user_rate, function() {
-          alert('Done, reload page.')
-        })
-        return
-      } else if (action == 'assigntotask') {
-        let task_id = prompt('What task ID?', '')
-        if (task_id == '') {
-          alert('Try again.')
-          return
-        }
-        $.post('/timers/' + action, timers + '&task_id=' + task_id, function() {
-          alert('Done, reload page.')
-        })
-        return
-      } else if (action == 'download-csv') {
-        window.open('/timers/' + action + '?' + timers)
-        return
-      } else if (action == 'download-xls') {
-        window.open('/timers/' + action + '?' + timers + '&start=' + $('#start').val() + '&end=' + $('#end').val())
-        return
-      } else if (action == 'custom-xls') {
-        //$.get( "/test/set/modaldata/"+timers)
-        $('.projectous_modal').trigger('click')
-        return
-      }
-
-      $.post('/timers/' + action, timers, function() {
-        //TODO: update checked timers? reload page?
-        self.getData('applyaction')
-      })
-    },
-    isWHMCS: function() {
-      return this.$store.getters['settings/isWHMCS']
-    },
     isTecharound: function() {
       return this.$store.getters['settings/isTecharound']
     },
@@ -369,19 +381,19 @@ export default {
     isAdmin: function() {
       return this.$store.getters['settings/isAdmin']
     },
-    searchMe(event) {
-      let force = this.search
-      Vue.set(this.settings, 'search', event.target.value)
-    },
-    toggleUsers(event) {
-      //console.log('toggle users'+ event.target.checked)
-      Vue.set(this.settings, 'show_inactive_users', event.target.checked)
-    },
+    //   searchMe(event) {
+    //     let force = this.search
+    //     Vue.set(this.settings, 'search', event.target.value)
+    //   },
+    //   toggleUsers(event) {
+    //     //console.log('toggle users'+ event.target.checked)
+    //     Vue.set(this.settings, 'show_inactive_users', event.target.checked)
+    //   },
     filteredusers() {
       /*if(self.settings.show_inactive_users) {
             return this.$store.getters['company_users/getCompanyUsers']
         } else {*/
-      return this.$store.getters['company_users/getActiveUsers']
+      return this.$store.getters['company_users/getActive']
       //}
     },
     client_projects(client) {
@@ -392,35 +404,10 @@ export default {
     },
     filteredclients(chosen_clients) {
       let self = this
-      //return self.clients
-
-      //labeledConsole('chosen_clients', chosen_clients)
-      /*                let selecteds = []
-                        let all_clients_selected = false
-                        //console.log('filtering clients')
-                        $("#client option:selected").each(function(index, option){
-                            if($(option).val() == 0){
-                                all_clients_selected = true
-                                return
-                            }
-                            selecteds.push($(option).val())
-                        })*/
-      //labeledConsole('selecteds', selecteds)
-      //labeledConsole('chosen_clients', chosen_clients)
-      /*if(all_clients_selected || selecteds.length == 0){
-            //return self.clients
-        }*/
+      return this.clients //TODO: make this work:
       return self.clients.filter(function(client) {
-        if (!self.settings.show_all_clients && client.status == 'archived') {
-          return false
-        }
-        if (client.company_id != self.current_company.id) {
-          //alert(client.name)
-          return false
-        }
-
-        if (chosen_clients.indexOf('0') == -1) {
-          if (typeof chosen_clients[0] != 'number') {
+        if (chosen_clients.indexOf('0') === -1) {
+          if (typeof chosen_clients[0] !== 'number') {
             return chosen_clients.indexOf(client.id.toString()) !== -1
           } else {
             return chosen_clients.indexOf(client.id) !== -1
@@ -429,17 +416,17 @@ export default {
         return true
       })
     },
-    filtered_clients(company_id) {
-      let self = this
-      return self.clients.filter(function(client) {
-        if (!self.settings.show_all_clients && (client.status == 'archived' || client.status == 'inactive')) {
-          return false
-        }
-        return client.company_id == company_id
-      })
-    },
+    // filtered_clients() {
+    //   let self = this
+    //   return self.clients.filter(function(client) {
+    //     if (!self.settings.show_all_clients && (client.status === 'archived' || client.status === 'inactive')) {
+    //       return false
+    //     }
+    //     return true//client.company_id === company_id
+    //   }).sort(Vue.nameSort)
+    // },
     onOffSelect(e) {
-      let index = $.inArray(e.target.value, this.chosen_clients)
+      let index = this.chosen_clients.findIndex(client => client.id === e.target.value)
       if (index !== -1) {
         //this.chosen_clients.splice(index, 1)
       } else {
@@ -448,6 +435,7 @@ export default {
       //console.log(this.chosen_clients)
     },
     getData(where) {
+      //TODO use: new URLSearchParams(new FormData(formElement)).toString()
       console.log(where)
       //labeledConsole('where',where)
       let self = this
@@ -471,54 +459,60 @@ export default {
         return
       }
       console.log(where)
+      //console.log('url', new URLSearchParams(new FormData(formElement)).toString())
       //this.$router.push({ path: '/invoiceable?' + data})
       //labeledConsole('project', $('#project').val())
       sessionStorage.setItem('invoiceable', data)
       //$('.uncheck').attr('checked', false)
       if (self.isAdmin()) {
-        this.$http().post('/invoiceable-timers', data, function(response) {
-          self.invoice_items = response.invoice_items
-          self.timers = response.timers
-          console.log('getting data')
-          console.log(response)
-          self.total_time = 0
-          self.total_earned = 0
-          self.total_unpaid = 0
-          self.total_unbillable = 0
-          self.total_invoiceable = 0
-          self.timers.forEach(function(key, timer) {
-            console.log(timer.id, timer.duration, timer.notes)
+        this.$http()
+          .post('/invoiceable-timers', data)
+          .then(response => {
+            console.log('response')
+            self.invoice_items = response.invoice_items
+            self.timers = response.timers
+            console.log('getting data')
+            console.log(response)
+            self.total_time = 0
+            self.total_earned = 0
+            self.total_unpaid = 0
+            self.total_unbillable = 0
+            self.total_invoiceable = 0
+            self.timers.forEach(function(key, timer) {
+              console.log(timer.id, timer.duration, timer.notes)
 
-            self.total_time += timer.duration
-            self.total_earned += (timer.duration / 3600) * timer.user_rate
-            if (!timer.is_paid) {
-              self.total_unpaid += (timer.duration / 3600) * timer.user_rate
-            }
-            if (!timer.is_billable) {
-              self.total_unbillable++
-            } else {
-              self.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
-            }
+              self.total_time += timer.duration
+              self.total_earned += (timer.duration / 3600) * timer.user_rate
+              if (!timer.is_paid) {
+                self.total_unpaid += (timer.duration / 3600) * timer.user_rate
+              }
+              if (!timer.is_billable) {
+                self.total_unbillable++
+              } else {
+                self.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
+              }
+            })
           })
-        })
       } else {
-        this.$http().post('payable-timers', data, function(response) {
-          self.timers = response.timers
-          self.total_time = 0
-          self.total_earned = 0
-          self.total_unpaid = 0
-          self.total_unbillable = 0
-          $.each(self.timers, function(key, timer) {
-            self.total_time += timer.duration
-            self.total_earned += (timer.duration / 3600) * timer.user_rate
-            if (!timer.is_paid) {
-              self.total_unpaid += (timer.duration / 3600) * timer.user_rate
-            }
-            if (!timer.is_billable) {
-              self.total_unbillable++
-            }
+        this.$http()
+          .post('payable-timers', data)
+          .then(response => {
+            self.timers = response.timers
+            self.total_time = 0
+            self.total_earned = 0
+            self.total_unpaid = 0
+            self.total_unbillable = 0
+            self.timers.forEach(function(key, timer) {
+              self.total_time += timer.duration
+              self.total_earned += (timer.duration / 3600) * timer.user_rate
+              if (!timer.is_paid) {
+                self.total_unpaid += (timer.duration / 3600) * timer.user_rate
+              }
+              if (!timer.is_billable) {
+                self.total_unbillable++
+              }
+            })
           })
-        })
       }
     }
   }

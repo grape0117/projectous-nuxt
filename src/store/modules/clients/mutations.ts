@@ -17,6 +17,5 @@ export const mutations: MutationTree<IModuleState> = {
       //@ts-ignore
       Vue.set(state.lookup_by_client_company_id, client.client_company_id, key) //TODO: risk of having more than one client with the same company id?
     })
-    console.log('lookup', state.lookup_by_client_company_id)
   }
 }
