@@ -71,7 +71,6 @@ export default {
 
 <style lang="scss">
 .bar {
-  border: 1px solid red;
   max-width: 600px;
   margin: 150px auto;
   display: flex;
