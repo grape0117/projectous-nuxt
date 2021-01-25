@@ -16,14 +16,19 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
     },
     {
+      path: '/graph',
+      name: 'Graph',
+      component: () => import(/* webpackChunkName: "graph" */ '@/views/Graph.vue')
+    },
+    {
       path: '/reset-password/:api_token',
       name: 'Reset Password',
-      component: () => import(/* webpackChunkName: "login" */ '@/views/ResetPassword.vue')
+      component: () => import(/* webpackChunkName: "reset-password" */ '@/views/ResetPassword.vue')
     },
     {
       path: '/accept-invite',
       name: 'AcceptInvite',
-      component: () => import(/* webpackChunkName: "AcceptInvite" */ '@/views/AcceptInvite.vue')
+      component: () => import(/* webpackChunkName: "accept-invite" */ '@/views/AcceptInvite.vue')
     },
     {
       path: '/tasks',

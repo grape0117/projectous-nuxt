@@ -422,6 +422,7 @@ export default {
 }
 #app {
   display: flex;
+  overflow-y: auto;
   // background-color: rgba(0, 0, 0, 0.3);
   // background-color: rgba($color: orange, $alpha: 0.6);
 }
