@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { BaseHttp } from '@/http/BaseHttp'
 import { IHttp } from './types'
+import Store from '@/store'
 
 export class AxiosHttp extends BaseHttp implements IHttp {
   /*public async fetch(url: string): Promise<any> {
@@ -47,8 +48,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       })
       return response
     } catch (e) {
-      alert('An error occured. Your previous action may not have completed successfully.')
-      console.log(e)
+      return (Store.state.popAlert = true)
     }
   }
   public async put(url: string, id: number | string, data: any) {
@@ -67,8 +67,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       })
       return response.data
     } catch (e) {
-      alert('An error occured. Your previous action may not have completed successfully.')
-      console.log(e)
+      return (Store.state.popAlert = true)
     }
   }
 
@@ -87,8 +86,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       })
       return response.data
     } catch (e) {
-      alert('An error occured. Your previous action may not have completed successfully.')
-      console.log(e)
+      return (Store.state.popAlert = true)
     }
   }
 
@@ -106,8 +104,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
         headers: this.headers
       })
     } catch (e) {
-      alert('An error occured. Your previous action may not have completed successfully.')
-      console.log(e)
+      return (Store.state.popAlert = true)
     }
   }
 }

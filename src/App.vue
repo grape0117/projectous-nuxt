@@ -44,6 +44,9 @@
         <b-nav-item to="/profile">Profile</b-nav-item>
         <b-nav-item to="/logout">Log Out</b-nav-item>
       </b-nav> -->
+    <b-modal v-model="$store.state.popAlert" title="Error" ok-only>
+      An error occured. Your previous action may not have completed successfully.
+    </b-modal>
   </div>
 </template>
 
@@ -422,6 +425,7 @@ export default {
 }
 #app {
   display: flex;
+  overflow-y: auto;
   // background-color: rgba(0, 0, 0, 0.3);
   // background-color: rgba($color: orange, $alpha: 0.6);
 }
