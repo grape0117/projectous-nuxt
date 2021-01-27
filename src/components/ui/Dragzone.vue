@@ -179,22 +179,20 @@ export default class Dragzone extends Vue {
   }
 
   private async showTaskDetail(item: any) {
-    let task = await this.$store.state.tasks.tasks
-      .find((tsk: any) => {
-        if (item.task_id) {
-          return tsk.id === item.task_id
-        } else {
-          return tsk.id === item.id
-        }
-      })
+    // editTask(item.task_id || item.id)
 
-      await this.$router.push({ query: { task: task.id } })
-      EventBus.$emit('showTask', task)
-    
-    
+    let task = await this.$store.state.tasks.tasks.find((tsk: any) => {
+      if (item.task_id) {
+        return tsk.id === item.task_id
+      } else {
+        return tsk.id === item.id
+      }
+    })
 
+    await this.$router.push({ query: { task: task.id } })
+    EventBus.$emit('showTask', task)
   }
-  
+
   private clientColor(item: any) {
     return this.$store.state.clients.clients.find((client: any) => client.client_company_id === item.project.client_company_id).color
   }
@@ -237,24 +235,24 @@ export default class Dragzone extends Vue {
     return task.settings ? task.settings.task_type : null
   }
 
-  private editTask(task_id: any) {
-    let task = this.$store.getters['tasks/getById'](task_id)
-    console.log('edit task', task)
-    this.$store.state.settings.current_edit_task = cloneDeep(task)
-    this.$store.dispatch('settings/openModal', 'task')
-  }
-  private projectName(project_id: any) {
-    const project = this.$store.getters['projects/getById'](project_id)
-    return project ? project.name : project_id
-  }
-  private dragstart(e: any, item: any) {
-    e.dataTransfer.setData('application/node type', this)
-    e.dataTransfer.setDragImage(e.target, 0, 0)
-    localStorage.setItem('item', JSON.stringify(item))
-    setTimeout(() => {
-      this.$emit('setDraggedItemId', item.id)
-    }, 0)
-  }
+  // private editTask(task_id: any) {
+  //   let task = this.$store.getters['tasks/getById'](task_id)
+  //   console.log('edit task', task)
+  //   this.$store.state.settings.current_edit_task = cloneDeep(task)
+  //   this.$store.dispatch('settings/openModal', 'task')
+  // }
+  // private projectName(project_id: any) {
+  //   const project = this.$store.getters['projects/getById'](project_id)
+  //   return project ? project.name : project_id
+  // }
+  // private dragstart(e: any, item: any) {
+  //   e.dataTransfer.setData('application/node type', this)
+  //   e.dataTransfer.setDragImage(e.target, 0, 0)
+  //   localStorage.setItem('item', JSON.stringify(item))
+  //   setTimeout(() => {
+  //     this.$emit('setDraggedItemId', item.id)
+  //   }, 0)
+  // }
 
   /**
    * Triggers only on destination list
