@@ -241,18 +241,18 @@ export default class Dragzone extends Vue {
   //   this.$store.state.settings.current_edit_task = cloneDeep(task)
   //   this.$store.dispatch('settings/openModal', 'task')
   // }
-  // private projectName(project_id: any) {
-  //   const project = this.$store.getters['projects/getById'](project_id)
-  //   return project ? project.name : project_id
-  // }
-  // private dragstart(e: any, item: any) {
-  //   e.dataTransfer.setData('application/node type', this)
-  //   e.dataTransfer.setDragImage(e.target, 0, 0)
-  //   localStorage.setItem('item', JSON.stringify(item))
-  //   setTimeout(() => {
-  //     this.$emit('setDraggedItemId', item.id)
-  //   }, 0)
-  // }
+  private projectName(project_id: any) {
+    const project = this.$store.getters['projects/getById'](project_id)
+    return project ? project.name : project_id
+  }
+  private dragstart(e: any, item: any) {
+    e.dataTransfer.setData('application/node type', this)
+    e.dataTransfer.setDragImage(e.target, 0, 0)
+    localStorage.setItem('item', JSON.stringify(item))
+    setTimeout(() => {
+      this.$emit('setDraggedItemId', item.id)
+    }, 0)
+  }
 
   /**
    * Triggers only on destination list
