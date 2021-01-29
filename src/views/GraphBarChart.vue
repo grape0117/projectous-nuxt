@@ -3,7 +3,7 @@
     <bar-chart :chart-data="datacollection" :options="chartOptions"></bar-chart>
     <div class="buttons">
       <button @click="fillData()">Randomize</button>
-      <button @click="fillData(50)">test</button>
+      <!-- <button @click="fillData(50)">test</button> -->
     </div>
   </div>
 </template>
@@ -29,17 +29,47 @@ export default {
     fillData(num = 0) {
       this.datacollection = {
         // labels: [this.getRandomInt(), this.getRandomInt()],
-        labels: ['Data One', 'Data Two'],
+        labels: ['Greenbite', 'Diseno', 'Client', 'Client', 'Client', 'Client', 'Client', 'Client'],
         datasets: [
           {
-            label: 'Red',
-            backgroundColor: '#f87979',
-            data: [this.getRandomInt() + num, this.getRandomInt()]
+            label: 'Dark Turquoise',
+            backgroundColor: '#00D7DB',
+            data: [this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt()]
           },
           {
-            label: 'Black',
-            backgroundColor: '#000000',
-            data: [this.getRandomInt(), this.getRandomInt()]
+            label: 'Medium Sea Green',
+            backgroundColor: '#39C85E',
+            data: [this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt()]
+          },
+          {
+            label: 'Radical Red',
+            backgroundColor: '#FF464A',
+            data: [this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt()]
+          },
+          {
+            label: 'Coral',
+            backgroundColor: '#FF794C',
+            data: [this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt()]
+          },
+          {
+            label: 'Your Pink',
+            backgroundColor: '#FFC8B6',
+            data: [this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt()]
+          },
+          {
+            label: 'Wood Bark',
+            backgroundColor: '#2A221E',
+            data: [this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt()]
+          },
+          {
+            label: 'Persimmon',
+            backgroundColor: '#E34708',
+            data: [this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt()]
+          },
+          {
+            label: 'Electric Indigo',
+            backgroundColor: '#7A05F3',
+            data: [this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt(), this.getRandomInt()]
           }
         ]
       }
