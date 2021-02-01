@@ -112,8 +112,8 @@ export default Vue.extend({
         { name: 'tasks', icon: 'icon-library_books' },
         { name: 'chat', icon: 'icon-chat' },
         { name: 'timers', icon: 'icon-timer' },
-        { name: 'paint', icon: 'icon-format_paint' }
-        // { name: 'reload', icon: 'icon-cached' }
+        { name: 'paint', icon: 'icon-format_paint' },
+        { name: 'reload', icon: 'icon-cached' }
       ],
       toggles: {
         tasks: false,
