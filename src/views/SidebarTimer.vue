@@ -173,19 +173,13 @@ export default {
     async bumpItUp() {
       const timer = await _.cloneDeep(this.timer)
       timer.duration = 600
-      console.log(timer)
 
-      // await this.saveTimer()
-      await this.$store.dispatch('timers/saveTimer', timer)
-
-      // let timer = _.cloneDeep(this.timer)
-
-      // timer.duration = 600
-      // console.log(this.timer);
-      // console.log(this.timer.duration);
-      // if(this.timer.duration === 600) {
-      // await this.$store.dispatch('timers/stopTimer', timer)
-      // }
+      await this.$store.dispatch('UPDATE_ATTRIBUTE', {
+        module: 'timers',
+        id: timer.id,
+        attribute: 'duration',
+        value: timer.duration
+      })
     },
     tasktitle: function() {
       const self = this
