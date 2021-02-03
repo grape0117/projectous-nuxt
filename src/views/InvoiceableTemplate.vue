@@ -18,7 +18,7 @@
             <br />
             <select id="client" name="client[]" style="height: 200px;" multiple="" v-model="chosen_clients">
               <option value="0">All Clients</option>
-              <option v-for="client in clients" v-bind:client="client" :value="client.id" @click="onOffSelect">{{ client.name }}</option>
+              <option v-for="client in clients" v-bind:client="client" :key="client.id" :value="client.id" @click="onOffSelect">{{ client.name }}</option>
             </select>
           </div>
           <div style="display: inline-block">
@@ -26,8 +26,8 @@
             <br />
             <select id="project" name="project[]" style="height: 200px;" multiple="" v-model="chosen_projects">
               <option value="0">All Projects</option>
-              <optgroup v-for="client in filteredclients(chosen_clients)" v-bind:client="client" :label="client.name">
-                <option v-for="project in client_projects(client)" v-bind:project="project" :value="project.id">{{ project.name }}</option>
+              <optgroup v-for="client in filteredclients(chosen_clients)" :key="client.id" v-bind:client="client" :label="client.name">
+                <option v-for="project in client_projects(client)" v-bind:project="project" :key="project.id" :value="project.id">{{ project.name }}</option>
               </optgroup>
             </select>
           </div>
@@ -36,7 +36,7 @@
             <!--<input type="checkbox" id="show-inactive-users" value="1" @click="toggleUsers"> Show Inactive--><br />
             <select name="user[]" style="height: 200px;" multiple="" v-model="chosen_users">
               <option value="0">All Users</option>
-              <option v-for="user in users" v-bind:user="user" :value="user.id">{{ user.name }}</option>
+              <option v-for="user in users" v-bind:user="user" :key="user.id" :value="user.id">{{ user.name }}</option>
             </select>
           </div>
           <div style="display: inline-block;">
@@ -94,11 +94,13 @@
                     <option v-if="isTecharound()" value="create_invoice">Create Invoice</option>
                   </select>
                   <input type="button" class="btn btn-default" value="go" @click="applyAction()" /> <span id="actionLink"></span>
-                  <div style="float:right;"><button class="btn btn-primary" @click="addInvoiceableItem()" v-if="isAdmin()">Add Invoiceable Item</button></div>
+                  <div style="float:right;">
+                    <button class="btn btn-primary" @click="addInvoiceableItem" v-if="isAdmin()">Add Invoiceable Item</button>
+                  </div>
                 </td>
               </tr>
             </tbody>
-            <tbody v-else="" class="row-2017-2-18">
+            <tbody v-else class="row-2017-2-18">
               <tr class="row-date">
                 <td colspan="100">
                   <span style="color: darkblue">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }}</span
@@ -130,6 +132,23 @@
         </div>
       </div>
     </div>
+    <b-modal id="add-invoiceable-item" class="add-invoiceable-item" scrollable title="Add Invoiceable Item">
+      <b-dropdown :text="Object.keys(selectedInvoiceableItem).length ? selectedInvoiceableItem.name : 'Select Invoiceable Item'" block split split-variant="outline-primary" variant="primary" class="m-2 invoicable-items" menu-class="w-100">
+        <div class="client-name-wrapper" v-for="client in filteredclients(chosen_clients)" :key="client.id">
+          <span class="client-name">{{ client.name }}</span>
+          <b-dropdown-item href="#" class="project-name-wrapper" v-for="project in client_projects(client)" :key="project.id" @click="selectedInvoiceableItem = project">
+            {{ project.name }}
+          </b-dropdown-item>
+        </div>
+      </b-dropdown>
+      <div class="clear-invoiceable-item" @click="clearInvoicableItem">
+        <span>Clear</span>
+      </div>
+      <div class="add-description" v-if="Object.keys(selectedInvoiceableItem).length">
+        <b-form-input placeholder="Enter description"></b-form-input>
+        <b-form-input type="number" placeholder="Enter amount"></b-form-input>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -145,6 +164,7 @@ export default {
   },
   data: function() {
     return {
+      selectedInvoiceableItem: {},
       total_time: 0,
       total_earned: 0,
       total_unpaid: 0,
@@ -282,9 +302,13 @@ export default {
     isNotDiseno() {
       return !this.$store.getters['settings/isDiseno']
     },
-    //   addInvoiceableItem() {
-    //     this.$store.dispatch('invoices/editInvoiceableItem')
-    //   },
+    addInvoiceableItem() {
+      // this.$store.dispatch('invoices/editInvoiceableItem')
+      this.$bvModal.show('add-invoiceable-item')
+    },
+    clearInvoicableItem() {
+      this.selectedInvoiceableItem = {}
+    },
     //   applyAction() {
     //     let self = this
     //     let action = document.getElementById('action').value
@@ -527,5 +551,58 @@ export default {
 
 a.active {
   background: transparent;
+}
+</style>
+
+<style lang="scss">
+#add-invoiceable-item {
+  .modal-content {
+    height: calc(100vh - 50px) !important;
+    max-height: 700px;
+  }
+
+  .invoicable-items .dropdown-menu {
+    height: calc(100vh - 280px) !important;
+    max-height: 550px;
+    position: relative;
+    overflow-y: auto;
+
+    .client-name-wrapper {
+      margin-bottom: 10px;
+
+      .client-name {
+        font-weight: 600;
+      }
+    }
+    .project-name-wrapper {
+      cursor: pointer;
+      &:hover {
+        background-color: rgba($color: #000000, $alpha: 1);
+      }
+
+      .project-name {
+        margin-left: 20px;
+      }
+    }
+  }
+
+  .clear-invoiceable-item {
+    text-align: right;
+
+    span {
+      color: #007bff;
+      font-size: 14px;
+      cursor: pointer;
+      margin-right: 7px;
+    }
+  }
+
+  .add-description {
+    padding: 0 7px;
+
+    input {
+      margin-top: 10px;
+    }
+  }
 }
 </style>
