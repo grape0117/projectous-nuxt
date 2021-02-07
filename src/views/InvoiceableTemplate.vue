@@ -296,12 +296,6 @@ export default {
     hideAddInvoiceable() {
       this.isShowAddInvoiceable = false
     },
-    clearDropdown(option) {
-      if (option === 'invoicableItem') {
-        return (this.invoiceable_item.item_selected = {})
-      }
-      this.invoiceable_item.repeat_option = null
-    },
     //   applyAction() {
     //     let self = this
     //     let action = document.getElementById('action').value

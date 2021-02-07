@@ -18,7 +18,7 @@
         Repeat
       </b-form-checkbox>
       <div v-if="invoiceable_item.repeat">
-        <b-dropdown :text="invoiceable_item.repeat_option ? invoiceable_item.repeat_option : 'choose repeat option'" block split split-variant="outline-primary" variant="primary" class="mt-2 invoicable-items" menu-class="w-100">
+        <b-dropdown :text="invoiceable_item.repeat_option ? invoiceable_item.repeat_option : 'Choose Repeat Option'" block split split-variant="outline-primary" variant="primary" class="mt-2 invoicable-items" menu-class="w-100">
           <b-dropdown-item href="#" class="project-name-wrapper" @click="invoiceable_item.repeat_option = option" v-for="(option, option_key) in invoiceable_item.repeat_options" :key="option_key">
             {{ option }}
           </b-dropdown-item>
@@ -74,6 +74,12 @@ export default {
       //   }
       //   return true
       // })
+    },
+    clearDropdown(option) {
+      if (option === 'invoicableItem') {
+        return (this.invoiceable_item.item_selected = {})
+      }
+      this.invoiceable_item.repeat_option = null
     }
   }
 }
