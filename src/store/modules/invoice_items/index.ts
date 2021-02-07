@@ -6,9 +6,9 @@ import { mutations } from './mutations'
 import { IModuleState } from './types'
 
 const state = {
-  invoice_items: [],
-  lookup: {},
-  lookup_by_client_company_id: {}
+  invoice_items: []
+  // lookup: {},
+  // lookup_by_client_company_id: {}
 }
 export const invoice_items: Module<IModuleState, IRootState> = {
   namespaced: true,

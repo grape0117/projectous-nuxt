@@ -46,9 +46,9 @@
               <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2"></b-form-datepicker>
               <label for="anytime" style="font-weight: normal;"><input type="checkbox" name="anytime" id="anytime" v-model="anytime" /> Anytime</label>
               <label v-if="isAdmin() && isTecharound()" for="paid" style="font-weight: normal;"><input type="checkbox" name="is_paid" id="show_paid" v-model="show_paid" /> Show paid</label>
-              <input v-else="" type="hidden" name="is_paid" value="1" />
+              <input v-else type="hidden" name="is_paid" value="1" />
               <label v-if="isAdmin() && isTecharound()" for="is_invoiced" style="font-weight: normal;"> <input type="checkbox" id="is_invoiced" name="is_invoiced" v-model="show_invoiced" /> Show Invoiced? </label>
-              <input v-else="" type="hidden" name="is_invoiced" value="1" />
+              <input v-else type="hidden" name="is_invoiced" value="1" />
               <a class="btn btn-default btn-sm" @click="lastMonth()">Last Month</a>
               <a class="btn btn-default btn-sm" @click="thisMonth()">This Month</a>
               <input v-if="isTecharound()" placeholder="task ID" type="text" name="task_id" />
@@ -95,7 +95,7 @@
                   </select>
                   <input type="button" class="btn btn-default" value="go" @click="applyAction()" /> <span id="actionLink"></span>
                   <div style="float:right;">
-                    <button class="btn btn-primary" @click="addInvoiceableItem" v-if="isAdmin()">Add Invoiceable Item</button>
+                    <button class="btn btn-primary" @click="showAddInvoiceable" v-if="isAdmin()">Add Invoiceable Item</button>
                   </div>
                 </td>
               </tr>
@@ -132,23 +132,8 @@
         </div>
       </div>
     </div>
-    <b-modal id="add-invoiceable-item" class="add-invoiceable-item" scrollable title="Add Invoiceable Item">
-      <b-dropdown :text="Object.keys(selectedInvoiceableItem).length ? selectedInvoiceableItem.name : 'Select Invoiceable Item'" block split split-variant="outline-primary" variant="primary" class="m-2 invoicable-items" menu-class="w-100">
-        <div class="client-name-wrapper" v-for="client in filteredclients(chosen_clients)" :key="client.id">
-          <span class="client-name">{{ client.name }}</span>
-          <b-dropdown-item href="#" class="project-name-wrapper" v-for="project in client_projects(client)" :key="project.id" @click="selectedInvoiceableItem = project">
-            {{ project.name }}
-          </b-dropdown-item>
-        </div>
-      </b-dropdown>
-      <div class="clear-invoiceable-item" @click="clearInvoicableItem">
-        <span>Clear</span>
-      </div>
-      <div class="add-description" v-if="Object.keys(selectedInvoiceableItem).length">
-        <b-form-input placeholder="Enter description"></b-form-input>
-        <b-form-input type="number" placeholder="Enter amount"></b-form-input>
-      </div>
-    </b-modal>
+    <!-- Add Invoiceable Item Modal -->
+    <invoiceable-add-item :show="isShowAddInvoiceable" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
   </div>
 </template>
 
@@ -160,11 +145,13 @@ export default {
   name: 'invoiceable-template',
   components: {
     'invoiceable-timer-row': InvoiceableTimerRow,
-    'report-timer-row': ReportTimerRow
+    'report-timer-row': ReportTimerRow,
+    'invoiceable-add-item': () => import('./InvoiceableAddItem.vue')
   },
   data: function() {
     return {
-      selectedInvoiceableItem: {},
+      isShowAddInvoiceable: false,
+
       total_time: 0,
       total_earned: 0,
       total_unpaid: 0,
@@ -302,12 +289,18 @@ export default {
     isNotDiseno() {
       return !this.$store.getters['settings/isDiseno']
     },
-    addInvoiceableItem() {
+    showAddInvoiceable() {
       // this.$store.dispatch('invoices/editInvoiceableItem')
-      this.$bvModal.show('add-invoiceable-item')
+      this.isShowAddInvoiceable = true
     },
-    clearInvoicableItem() {
-      this.selectedInvoiceableItem = {}
+    hideAddInvoiceable() {
+      this.isShowAddInvoiceable = false
+    },
+    clearDropdown(option) {
+      if (option === 'invoicableItem') {
+        return (this.invoiceable_item.item_selected = {})
+      }
+      this.invoiceable_item.repeat_option = null
     },
     //   applyAction() {
     //     let self = this
@@ -557,12 +550,13 @@ a.active {
 <style lang="scss">
 #add-invoiceable-item {
   .modal-content {
-    height: calc(100vh - 50px) !important;
-    max-height: 700px;
+    min-height: 400px;
+    // height: calc(100vh - 50px) !important;
+    // max-height: 700px;
   }
 
   .invoicable-items .dropdown-menu {
-    height: calc(100vh - 280px) !important;
+    height: 240px !important;
     max-height: 550px;
     position: relative;
     overflow-y: auto;

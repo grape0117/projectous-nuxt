@@ -4,10 +4,10 @@ import { IRootState } from '@/store/types'
 import uuid from 'uuid'
 
 export const actions: ActionTree<IModuleState, IRootState> = {
-  createClient(context) {
-    context.commit('settings/setCurrentEditClient', { id: uuid.v4() }, { root: true })
-    context.dispatch('settings/openModal', 'client')
-  }
+  // createClient(context) {
+  //   context.commit('settings/setCurrentEditClient', { id: uuid.v4() }, { root: true })
+  //   context.dispatch('settings/openModal', 'client')
+  // }
   // editClient(context, client_id) {
   //   const client = context.getters['getById'](client_id)
   //   console.log('client', client)

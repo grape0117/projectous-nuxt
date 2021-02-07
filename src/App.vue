@@ -10,9 +10,9 @@
       </template>
 
       <div class="row-no-padding">
-        <pre>
+        <!-- <pre>
           {{ $store.state.invoice_items }}
-        </pre>
+        </pre> -->
         <Header v-on:reload="reload" />
         <div class="d-flex justify-content-between">
           <!-- <task-details v-if="show_task"></task-details> -->

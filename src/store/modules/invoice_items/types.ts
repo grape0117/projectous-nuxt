@@ -1,7 +1,7 @@
 export interface IModuleState {
   invoice_items: INVOICE_ITEMS[]
-  lookup: any
-  lookup_by_client_company_id: any
+  // lookup?: any
+  // lookup_by_client_company_id?: any
 }
 
 export interface INVOICE_ITEMS {
