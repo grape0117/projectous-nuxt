@@ -10,13 +10,13 @@
     </td>
     <td v-if="isAdmin()" @click="editTimer(timer)">
       <div v-if="timer.client_rate > 0">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
-      <div v-else="" style="color: red;">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
+      <div v-else style="color: red;">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
       <!--<div v-if="isTecharound()">${{ Math.trunc((timer.client_rate * timer.invoice_duration / 3600 - timer.user_rate * timer.duration / 3600) * 100) / 100 }} (${{ timer.client_rate - timer.user_rate }})</div>-->
       <div v-if="isAdmin()">
-        <span v-if="timer.user_rate > 0">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span><span v-else="" style="color: red;">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span>
+        <span v-if="timer.user_rate > 0">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span><span v-else style="color: red;">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span>
       </div>
     </td>
-    <td v-else="">
+    <td v-else>
       $<span>{{ parseFloat(Math.trunc((timer.user_rate * timer.duration) / 36) / 100).toFixed(2) }}</span>
       <div v-if="timer.is_paid" style="color: green;">Paid</div>
     </td>
@@ -26,7 +26,7 @@
         <div class="timer-row-project">{{ getProjectName(timer.project_id) }}</div>
         <div class="timer-row-task">{{ getTaskTitle(timer.task_id) }}</div>
       </div>
-      <span v-else="" style="color: red">No Project</span>
+      <span v-else style="color: red">No Project</span>
       <div v-if="isAdmin()" class="timer-row-user">{{ timerUser(timer.user_id) }}</div>
     </td>
     <td @click="editTimer(timer)">
@@ -41,13 +41,18 @@
     </td>
     <td @click="editTimer(timer)">
       <div v-if="isAdmin() && timer.invoice_notes" v-html="timer.invoice_notes"></div>
-      <div v-else="" v-html="timer.notes"></div>
+      <div v-else v-html="timer.notes"></div>
       <div v-html="timer.admin_notes"></div>
+    </td>
+    <td>
+      <button class="btn btn-primary" v-if="isAdmin()" @click="applyPayment">Apply Payment</button>
     </td>
   </tr>
 </template>
 
 <script>
+import { EventBus } from '@/components/event-bus'
+
 export default {
   name: 'report-timer-row',
   props: ['timer'],
@@ -60,6 +65,9 @@ export default {
     }
   },
   methods: {
+    applyPayment() {
+      EventBus.$emit('apply-payment')
+    },
     getClientNameFromProjectId(project_id) {
       let project = this.$store.getters['projects/getById'](project_id)
       if (project) {

@@ -130,6 +130,8 @@
         </div>
       </div>
     </div>
+    <!-- Apply Payment Modal -->
+    <invoiceable-apply-payment />
   </div>
 </template>
 
@@ -137,11 +139,14 @@
 import Vue from 'vue'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
+import InvoiceableApplyPayment from './InvoiceableApplyPayment.vue'
+
 export default {
   name: 'invoiceable-template',
   components: {
     'invoiceable-timer-row': InvoiceableTimerRow,
-    'report-timer-row': ReportTimerRow
+    'report-timer-row': ReportTimerRow,
+    'invoiceable-apply-payment': InvoiceableApplyPayment
   },
   data: function() {
     return {
@@ -381,7 +386,7 @@ export default {
     isAdmin: function() {
       return this.$store.getters['settings/isAdmin']
     },
-    //   searchMe(event) {
+    //   searchMe(nt) {
     //     let force = this.search
     //     Vue.set(this.settings, 'search', event.target.value)
     //   },
