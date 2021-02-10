@@ -346,7 +346,7 @@ export default Vue.extend({
 .header-nav {
   display: flex;
   align-items: center;
-  padding-left: 20px;
+  padding-left: 30px;
 }
 .logo-name {
   display: flex;

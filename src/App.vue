@@ -439,7 +439,8 @@ export default {
 }
 .router-view-class {
   position: relative;
-  height: calc(100vh - 50px);
+  // height: calc(100vh - 50px);
+  min-height: calc(100vh - 50px);
   // overflow-y: hidden;
   flex: 1;
 }

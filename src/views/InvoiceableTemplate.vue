@@ -1,54 +1,73 @@
-<template id="invoiceable-template">
+<template>
   <div id="invoiceable" class="container-fluid">
     <div class="row">
       <div class="col-sm-12">
         <form method="get" id="invoiceable-form" action="/invoiceable">
-          <div style="display: inline-block">
-            <input type="checkbox" name="not_client" v-model="not_clients" /> Not
-            <div style="float: right">
-              <ul class="nav nav-pills nav-pills-sm">
-                <li class="nav-item">
-                  <a :class="!settings.show_all_clients ? 'nav-link active' : 'nav-link'" @click="settings.show_all_clients = false" href="#">Active</a>
-                </li>
-                <li class="nav-item">
-                  <a :class="settings.show_all_clients ? 'nav-link active' : 'nav-link'" @click="settings.show_all_clients = true" href="#">All</a>
-                </li>
-              </ul>
+          <div class="top-selects">
+            <!-- here -->
+            <div class="client-select">
+              <div class="d-flex justify-content-between align-items-end mb-2">
+                <div class="">
+                  <b-form-checkbox v-model="not_clients" name="not_client" class="mr-2">
+                    Not
+                  </b-form-checkbox>
+                </div>
+                <div>
+                  <ul class="nav nav-pills nav-pills-sm">
+                    <li class="nav-item">
+                      <a :class="!settings.show_all_clients ? 'nav-link active' : 'nav-link'" @click="settings.show_all_clients = false" href="javascript:void(0)">Active</a>
+                    </li>
+                    <li class="nav-item">
+                      <a :class="settings.show_all_clients ? 'nav-link active' : 'nav-link'" @click="settings.show_all_clients = true" href="javascript:void(0)">All</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <select id="client" name="client[]" multiple="" v-model="chosen_clients">
+                <option value="0">All Clients</option>
+                <option v-for="client in clients" v-bind:client="client" :value="client.id" @click="onOffSelect">{{ client.name }}</option>
+              </select>
             </div>
-            <br />
-            <select id="client" name="client[]" style="height: 200px;" multiple="" v-model="chosen_clients">
-              <option value="0">All Clients</option>
-              <option v-for="client in clients" v-bind:client="client" :value="client.id" @click="onOffSelect">{{ client.name }}</option>
-            </select>
+            <!-- here -->
+            <div class="project-select">
+              <div class="mb-2 mt-1">
+                <b-form-checkbox v-model="not_projects" name="not_project" class="mr-2">
+                  Not
+                </b-form-checkbox>
+              </div>
+              <select id="project" name="project[]" multiple="" v-model="chosen_projects">
+                <option value="0">All Projects</option>
+                <optgroup v-for="client in filteredclients(chosen_clients)" v-bind:client="client" :label="client.name">
+                  <option v-for="project in client_projects(client)" v-bind:project="project" :value="project.id">{{ project.name }}</option>
+                </optgroup>
+              </select>
+            </div>
+            <!-- here -->
+            <div v-if="isAdmin()" class="user-select">
+              <div class="mb-2 mt-1">
+                <b-form-checkbox v-model="not_users" name="not_user" class="mr-2">
+                  Not
+                </b-form-checkbox>
+              </div>
+              <!--<input type="checkbox" id="show-inactive-users" value="1" @click="toggleUsers"> Show Inactive-->
+              <select name="user[]" multiple="" v-model="chosen_users">
+                <option value="0">All Users</option>
+                <option v-for="user in users" v-bind:user="user" :value="user.id">{{ user.name }}</option>
+              </select>
+            </div>
           </div>
-          <div style="display: inline-block">
-            <input type="checkbox" name="not_project" v-model="not_projects" /> Not
-            <br />
-            <select id="project" name="project[]" style="height: 200px;" multiple="" v-model="chosen_projects">
-              <option value="0">All Projects</option>
-              <optgroup v-for="client in filteredclients(chosen_clients)" v-bind:client="client" :label="client.name">
-                <option v-for="project in client_projects(client)" v-bind:project="project" :value="project.id">{{ project.name }}</option>
-              </optgroup>
-            </select>
-          </div>
-          <div v-if="isAdmin()" style="display: inline-block">
-            <input type="checkbox" name="not_user" v-model="not_users" /> Not
-            <!--<input type="checkbox" id="show-inactive-users" value="1" @click="toggleUsers"> Show Inactive--><br />
-            <select name="user[]" style="height: 200px;" multiple="" v-model="chosen_users">
-              <option value="0">All Users</option>
-              <option v-for="user in users" v-bind:user="user" :value="user.id">{{ user.name }}</option>
-            </select>
-          </div>
-          <div style="display: inline-block;">
+          <div class="bottom-selects">
             <div class=" form-inline">
-              {{ start }}
-              <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2"></b-form-datepicker>
-              <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2"></b-form-datepicker>
-              <label for="anytime" style="font-weight: normal;"><input type="checkbox" name="anytime" id="anytime" v-model="anytime" /> Anytime</label>
+              <!-- {{ start }} -->
+              <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2 mr-2"></b-form-datepicker>
+              <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2 mr-2"></b-form-datepicker>
+              <b-form-checkbox v-model="anytime" name="anytime" class="mr-2">
+                Anytime
+              </b-form-checkbox>
               <label v-if="isAdmin() && isTecharound()" for="paid" style="font-weight: normal;"><input type="checkbox" name="is_paid" id="show_paid" v-model="show_paid" /> Show paid</label>
-              <input v-else="" type="hidden" name="is_paid" value="1" />
+              <input v-else type="hidden" name="is_paid" value="1" />
               <label v-if="isAdmin() && isTecharound()" for="is_invoiced" style="font-weight: normal;"> <input type="checkbox" id="is_invoiced" name="is_invoiced" v-model="show_invoiced" /> Show Invoiced? </label>
-              <input v-else="" type="hidden" name="is_invoiced" value="1" />
+              <input v-else type="hidden" name="is_invoiced" value="1" />
               <a class="btn btn-default btn-sm" @click="lastMonth()">Last Month</a>
               <a class="btn btn-default btn-sm" @click="thisMonth()">This Month</a>
               <input v-if="isTecharound()" placeholder="task ID" type="text" name="task_id" />
@@ -75,30 +94,32 @@
                 </td>
               </tr>
               <tr class="row-date">
-                <td>
+                <td style="width: 20px">
                   <input class="uncheck" type="checkbox" onclick="toggleCheckboxes(this,'.timer-action');" />
                 </td>
                 <td colspan="100">
-                  <select id="action">
-                    <!--<option v-if="isWHMCS()" value="create-whmcs-billable-items">Create Billable Item</option>-->
-                    <!--<option value="mark-entries-reviewed">Mark Entries as Reviewed</option>-->
-                    <option v-if="isTecharound()" value="markpaid">Mark Paid</option>
-                    <option v-if="isTecharound()" value="markunpaid">Mark Unpaid</option>
-                    <option v-if="isTecharound()" value="resavetimers">Resave Timers</option>
-                    <!--<option value="assigntotask">Assign to Task</option>-->
-                    <option value="adjust-invoice-rate">Adjust Invoice Rate</option>
-                    <option value="adjust-user-rate">Adjust User Rate</option>
-                    <option value="download-csv">Download CSV</option>
-                    <option value="download-xls">Download XLS</option>
-                    <!--<option>Display as Basic Table (useful for copy-pasting)</option>-->
-                    <option v-if="isTecharound()" value="create_invoice">Create Invoice</option>
-                  </select>
-                  <input type="button" class="btn btn-default" value="go" @click="applyAction()" /> <span id="actionLink"></span>
-                  <div style="float:right;"><button class="btn btn-primary" @click="addInvoiceableItem()" v-if="isAdmin()">Add Invoiceable Item</button></div>
+                  <div class="d-flex justify-content-between">
+                    <!-- to add: the :value="null" must be replaced with v-model="" inside b-form-select -->
+                    <div class="d-flex">
+                      <b-form-select id="action" :value="null" class="mr-3">
+                        <b-form-select-option v-if="isTecharound()" value="markpaid">Mark Paid</b-form-select-option>
+                        <b-form-select-option v-if="isTecharound()" value="markunpaid">Mark Unpaid</b-form-select-option>
+                        <b-form-select-option v-if="isTecharound()" value="resavetimers">Resave Timers</b-form-select-option>
+
+                        <b-form-select-option :value="null">Adjust Invoice Rate</b-form-select-option>
+                        <b-form-select-option value="adjust-user-rate">Adjust User Rate</b-form-select-option>
+                        <b-form-select-option value="download-csv">Download CSV</b-form-select-option>
+                        <b-form-select-option value="download-xls">Download XLS</b-form-select-option>
+                      </b-form-select>
+                      <b-button variant="primary" @click="applyAction()">Go</b-button>
+                      <span id="actionLink"></span>
+                    </div>
+                    <button class="btn btn-primary" @click="addInvoiceableItem()" v-if="isAdmin()">Add Invoiceable Item</button>
+                  </div>
                 </td>
               </tr>
             </tbody>
-            <tbody v-else="" class="row-2017-2-18">
+            <tbody v-else class="row-2017-2-18">
               <tr class="row-date">
                 <td colspan="100">
                   <span style="color: darkblue">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }}</span
@@ -519,7 +540,77 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss">
+#invoiceable {
+  /* border: 100px solid red; */
+  padding: 20px 50px 0 50px;
+
+  .top-selects {
+    // border: 10px solid white;
+    display: flex;
+    justify-content: space-between;
+    height: 300px;
+    margin-bottom: 20px;
+
+    select {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid rgba($color: #acabab, $alpha: 1);
+      box-shadow: 0 0px 10px rgba($color: #000000, $alpha: 0.2);
+    }
+
+    .client-select {
+      display: flex;
+      flex-direction: column;
+      flex: 2;
+      padding-right: 50px;
+
+      select {
+        flex: 1;
+
+        option {
+          white-space: pre-wrap;
+        }
+      }
+    }
+    .project-select {
+      display: flex;
+      flex-direction: column;
+      flex: 2;
+      padding-right: 50px;
+
+      select {
+        flex: 1;
+
+        optgroup {
+          white-space: pre-wrap;
+        }
+      }
+    }
+    .user-select {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      select {
+        flex: 1;
+      }
+    }
+  }
+  .table-responsive {
+    box-shadow: 0 0px 10px rgba($color: #000000, $alpha: 0.2);
+  }
+
+  .bottom-selects {
+    // border: 10px solid green;
+    margin-bottom: 20px;
+  }
+
+  .row-date {
+    background-color: rgba($color: #000000, $alpha: 0.7) !important;
+  }
+}
+
 .nav > li > a {
   padding-top: 3px;
   padding-bottom: 3px;
