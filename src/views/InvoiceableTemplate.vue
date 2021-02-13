@@ -46,9 +46,9 @@
               <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2"></b-form-datepicker>
               <label for="anytime" style="font-weight: normal;"><input type="checkbox" name="anytime" id="anytime" v-model="anytime" /> Anytime</label>
               <label v-if="isAdmin() && isTecharound()" for="paid" style="font-weight: normal;"><input type="checkbox" name="is_paid" id="show_paid" v-model="show_paid" /> Show paid</label>
-              <input v-else="" type="hidden" name="is_paid" value="1" />
+              <input v-else type="hidden" name="is_paid" value="1" />
               <label v-if="isAdmin() && isTecharound()" for="is_invoiced" style="font-weight: normal;"> <input type="checkbox" id="is_invoiced" name="is_invoiced" v-model="show_invoiced" /> Show Invoiced? </label>
-              <input v-else="" type="hidden" name="is_invoiced" value="1" />
+              <input v-else type="hidden" name="is_invoiced" value="1" />
               <a class="btn btn-default btn-sm" @click="lastMonth()">Last Month</a>
               <a class="btn btn-default btn-sm" @click="thisMonth()">This Month</a>
               <input v-if="isTecharound()" placeholder="task ID" type="text" name="task_id" />
@@ -98,7 +98,7 @@
                 </td>
               </tr>
             </tbody>
-            <tbody v-else="" class="row-2017-2-18">
+            <tbody v-else class="row-2017-2-18">
               <tr class="row-date">
                 <td colspan="100">
                   <span style="color: darkblue">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }}</span
@@ -131,7 +131,7 @@
       </div>
     </div>
     <!-- Apply Payment Modal -->
-    <invoiceable-apply-payment />
+    <!-- <invoiceable-apply-payment /> -->
   </div>
 </template>
 
@@ -139,14 +139,14 @@
 import Vue from 'vue'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
-import InvoiceableApplyPayment from './InvoiceableApplyPayment.vue'
+// import InvoiceableApplyPayment from './InvoiceableApplyPayment.vue'
 
 export default {
   name: 'invoiceable-template',
   components: {
     'invoiceable-timer-row': InvoiceableTimerRow,
-    'report-timer-row': ReportTimerRow,
-    'invoiceable-apply-payment': InvoiceableApplyPayment
+    'report-timer-row': ReportTimerRow
+    // 'invoiceable-apply-payment': InvoiceableApplyPayment
   },
   data: function() {
     return {

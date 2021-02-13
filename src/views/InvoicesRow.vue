@@ -10,23 +10,30 @@
     <td>{{ invoice.date }}</td>
     <td>
       <b>{{ invoice.client.name }}</b>
-      <div v-for="project in invoice.projects" v-bind:project="project" style="font-size: smaller;">{{ project.name }}</div>
+      <div v-for="(project, project_index) in invoice.projects" :key="project_index" v-bind:project="project" style="font-size: smaller;">{{ project.name }}</div>
     </td>
     <td>{{ invoice.invoice_id }}</td>
     <td>{{ invoice.total }}</td>
     <td style="padding: 3px;">{{ invoice.start_date }}</td>
     <td style="padding: 3px;">{{ invoice.end_date }}</td>
     <td>
-      <a class="btn btn-xs btn-info" target="_blank" :href="'/invoice/' + invoice.invoice_id">View</a> <a class="btn btn-xs btn-primary" target="_blank" :href="'/export/csv/invoice/' + invoice.invoice_id">CSV</a
-      ><!--<a class="btn btn-xs btn-default">Export</a>-->
+      <a class="btn btn-xs btn-info" target="_blank" :href="'/invoice/' + invoice.invoice_id">
+        View
+      </a>
+      <a class="btn btn-xs btn-primary" target="_blank" :href="'/export/csv/invoice/' + invoice.invoice_id">
+        CSV
+      </a>
+      <!--<a class="btn btn-xs btn-default">Export</a>-->
       <a class="btn btn-xs btn-danger" @click="deleteInvoice(invoice)">Delete</a>
       <!--<div data-toggle="popover" :data-content="'select projects.name, round(invoice_duration/3600,2) as time, client_rate, report_at, notes from timelog left join projects on project_id = projects.id where invoice_id = '+invoice.invoice_id">Query</div>-->
     </td>
-    <td><button type="button" class="btn btn-primary" v-on:click="applyPayment()" v-if="isAdmin()">Apply Payment</button></td>
+    <td><button type="button" class="btn btn-primary" @click="applyPayment()" v-if="isAdmin() && invoice.status === 'open'">Payment</button></td>
   </tr>
 </template>
 
 <script>
+import { EventBus } from '@/components/event-bus'
+
 export default {
   name: 'invoices-row',
   props: ['invoice'],
@@ -42,10 +49,12 @@ export default {
       return this.$store.getters['settings/isAdmin']
     },
     applyPayment() {
-      this.$store.commit('settings/setCurrentEditInvoice', this.invoice)
-      let current_edit_payment = { invoice_id: this.invoice['id'], amount: this.invoice['total'], check_no: '', note: '' }
-      this.$store.commit('settings/setCurrentEditPayment', current_edit_payment)
-      this.$store.dispatch('invoices/applyPayment')
+      EventBus.$emit('apply-payment')
+      // this.$emit('payment')
+      // this.$store.commit('settings/setCurrentEditInvoice', this.invoice)
+      // let current_edit_payment = { invoice_id: this.invoice['id'], amount: this.invoice['total'], check_no: '', note: '' }
+      // this.$store.commit('settings/setCurrentEditPayment', current_edit_payment)
+      // this.$store.dispatch('invoices/applyPayment')
     },
     deleteInvoice(invoice) {
       let self = this

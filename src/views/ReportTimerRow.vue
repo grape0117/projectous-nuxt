@@ -44,9 +44,9 @@
       <div v-else v-html="timer.notes"></div>
       <div v-html="timer.admin_notes"></div>
     </td>
-    <td>
+    <!-- <td>
       <button class="btn btn-primary" v-if="isAdmin()" @click="applyPayment">Payment</button>
-    </td>
+    </td> -->
   </tr>
 </template>
 

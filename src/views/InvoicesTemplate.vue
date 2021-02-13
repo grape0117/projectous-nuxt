@@ -29,6 +29,7 @@
               </tr>
             </tbody>
             <tr :key="invoice.id" v-for="invoice in openinvoices()" v-bind:invoice="invoice" is="invoices-row"></tr>
+            <!-- <tr :key="invoice" v-for="invoice in [1,2,3]" is="invoices-row"></tr> -->
           </table>
         </div>
       </div>
@@ -53,15 +54,19 @@
         </div>
       </div>
     </div>
+    <invoiceable-apply-payment />
   </div>
 </template>
 
 <script>
 import InvoicesRow from './InvoicesRow.vue'
+import InvoiceableApplyPayment from './InvoiceableApplyPayment.vue'
+
 export default {
   name: 'invoices-template',
   components: {
-    'invoices-row': InvoicesRow
+    'invoices-row': InvoicesRow,
+    'invoiceable-apply-payment': InvoiceableApplyPayment
   },
   computed: {
     current_company: function() {
@@ -74,7 +79,7 @@ export default {
     }
   },
   mounted: function() {
-    alert('mounting invoices')
+    // alert('mounting invoices')
     if (this.current_company.id) {
       this.getData()
     }
@@ -82,7 +87,7 @@ export default {
   },
   watch: {
     current_company() {
-      alert('new company!')
+      // alert('new company!')
       this.getData()
     }
   },
@@ -112,11 +117,13 @@ export default {
     },
     getData() {
       let self = this
-      this.$http()
+      const invoices = this.$http()
         .get('/getInvoices')
         .then(response => {
           self.invoices = response.invoices
         })
+
+      console.log(invoices)
     }
   }
 }
