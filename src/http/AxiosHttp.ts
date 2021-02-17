@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { BaseHttp } from '@/http/BaseHttp'
 import { IHttp } from './types'
+import Store from '@/store'
 
 export class AxiosHttp extends BaseHttp implements IHttp {
   /*public async fetch(url: string): Promise<any> {
@@ -37,6 +38,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
     }
   }
   public async post(url: string, data: any) {
+    Store.state.totalActiveRequests++
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)
       return
@@ -45,11 +47,13 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       const { data: response } = await axios.post(`${this.baseUrl}${url}`, data, {
         headers: this.headers
       })
+      Store.state.totalActiveRequests--
       return response
     } catch (e) {
       alert('An error occured. Your previous action may not have completed successfully.')
       console.log(e)
     }
+    Store.state.totalActiveRequests--
   }
   public async put(url: string, id: number | string, data: any) {
     console.log('put', data)

@@ -46,6 +46,9 @@
             </div>
           </div>
         </div>
+        <div class="request-spinner">
+          <b-spinner label="Spinning" v-show="$store.state.totalActiveRequests"></b-spinner>
+        </div>
 
         <div class="header-paint" v-if="toggles.paint">
           <div class="mb-3" v-for="(style, styleIndex) in backgroundStyle" :key="styleIndex">
@@ -392,6 +395,12 @@ export default Vue.extend({
   padding-right: 30px;
   color: rgba(255, 255, 255, 0.5);
   position: relative;
+
+  .request-spinner {
+    width: 35px;
+    height: 35px;
+    margin-left: 15px;
+  }
 }
 .nav-icons-active {
   color: white;
