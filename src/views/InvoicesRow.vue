@@ -66,7 +66,7 @@ export default {
     },
     getData() {
       let self = this
-      ajax('getInvoices', {}, function(response) {
+      this.$http().get('getInvoices', {}, function(response) {
         Vue.set(self, 'invoices', response.invoices)
       })
     }

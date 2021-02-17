@@ -79,10 +79,10 @@ export default {
     }
   },
   mounted: function() {
-    // alert('mounting invoices')
-    if (this.current_company.id) {
-      this.getData()
-    }
+    //alert('mounting invoices')
+    //if (this.current_company.id) {
+    this.getData()
+    //}
     //initBindings()
   },
   watch: {
