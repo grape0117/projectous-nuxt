@@ -1,8 +1,8 @@
 <template>
   <b-modal @ok="save" id="apply-payment-modal" class="apply-payment-modal" title="Apply Payment" style="min-height: 500px;">
-    <pre>
+    <!-- <pre>
       {{ invoice }}
-    </pre>
+    </pre> -->
     <b-card no-body>
       <b-tabs v-model="active_tab" pills card>
         <!-- Apply -->
