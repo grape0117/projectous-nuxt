@@ -36,7 +36,7 @@
                 </div>
               </div>
 
-              <div v-if="form_index === apply_form.length - 1" class="add-icon" v-b-tooltip.hover.top="'Add Form'" @click="addApplyForm">
+              <div v-if="form_index === apply_form.length - 1 && !form.removeForm" class="add-icon" v-b-tooltip.hover.top="'Add Form'" @click="addApplyForm">
                 <b-icon icon="plus-circle" />
               </div>
             </div>
