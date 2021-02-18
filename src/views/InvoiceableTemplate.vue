@@ -64,18 +64,18 @@
               <b-form-checkbox v-model="anytime" name="anytime" class="mr-2">
                 Anytime
               </b-form-checkbox>
-              <label v-if="isAdmin() && isTecharound()" for="paid" style="font-weight: normal;"><input type="checkbox" name="is_paid" id="show_paid" v-model="show_paid" /> Show paid</label>
+              <label v-if="isAdmin()" for="paid" style="font-weight: normal;"><input type="checkbox" name="is_paid" id="show_paid" v-model="show_paid" /> Show paid</label>
               <input v-else type="hidden" name="is_paid" value="1" />
-              <label v-if="isAdmin() && isTecharound()" for="is_invoiced" style="font-weight: normal;"> <input type="checkbox" id="is_invoiced" name="is_invoiced" v-model="show_invoiced" /> Show Invoiced? </label>
+              <label v-if="isAdmin()" for="is_invoiced" style="font-weight: normal;"> <input type="checkbox" id="is_invoiced" name="is_invoiced" v-model="show_invoiced" /> Show Invoiced </label>
               <input v-else type="hidden" name="is_invoiced" value="1" />
               <a class="btn btn-default btn-sm" @click="lastMonth()">Last Month</a>
               <a class="btn btn-default btn-sm" @click="thisMonth()">This Month</a>
-              <input v-if="isTecharound()" placeholder="task ID" type="text" name="task_id" />
-              <input v-if="isTecharound()" placeholder="Paid Check #" type="text" name="paid_check_number" />
-              <input v-if="isTecharound()" placeholder="Received Check #" type="text" name="check_number" />
-              <input v-if="isTecharound()" placeholder="Client Rate" type="text" name="client_rate" />
-              <input v-if="isTecharound()" placeholder="User Rate" type="text" name="user_rate" />
-              <input v-if="isTecharound()" placeholder="Invoice #" type="text" name="invoice_id" />
+              <input placeholder="task ID" type="text" name="task_id" />
+              <input placeholder="Paid Check #" type="text" name="paid_check_number" />
+              <input placeholder="Received Check #" type="text" name="check_number" />
+              <input placeholder="Client Rate" type="text" name="client_rate" />
+              <input placeholder="User Rate" type="text" name="user_rate" />
+              <input placeholder="Invoice #" type="text" name="invoice_id" />
             </div>
             <!--<input type="checkbox" name="UTC"> UTC?<br>-->
             <!--<a href="/invoiceable?start=2017-01-01&amp;end=2017-01-31">Last Month</a>--><!-- <a onclick="$('#start').val('')">Last Week</a><br><br>-->
@@ -89,8 +89,12 @@
             <tbody v-if="isAdmin()" class="row-2017-2-18">
               <tr class="row-date">
                 <td colspan="100">
-                  <span style="color: darkblue">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }}</span
-                  >&nbsp;<span v-if="isNotDiseno()" style="color: orange;">Entries: {{ timers.length }}</span> <span v-if="isNotDiseno()" style="color: olive;">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</span> <span v-if="isNotDiseno() && total_unbillable" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span> <span v-if="isTecharound() && isAdmin()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span> <span v-if="isNotDiseno() && isAdmin()" style="color: lightseagreen;">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</span>
+                  <span style="color: darkblue"> Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} </span>&nbsp;
+                  <span style="color: orange;">Entries: {{ timers.length }}</span>
+                  <span style="color: olive;">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</span>
+                  <span v-if="total_unbillable" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span>
+                  <span v-if="isAdmin()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span>
+                  <span v-if="isAdmin()" style="color: lightseagreen;">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</span>
                 </td>
               </tr>
               <tr class="row-date">
@@ -102,9 +106,9 @@
                     <!-- to add: the :value="null" must be replaced with v-model="" inside b-form-select -->
                     <div class="d-flex">
                       <b-form-select id="action" :value="null" class="mr-3">
-                        <b-form-select-option v-if="isTecharound()" value="markpaid">Mark Paid</b-form-select-option>
-                        <b-form-select-option v-if="isTecharound()" value="markunpaid">Mark Unpaid</b-form-select-option>
-                        <b-form-select-option v-if="isTecharound()" value="resavetimers">Resave Timers</b-form-select-option>
+                        <b-form-select-option value="markpaid">Mark Paid</b-form-select-option>
+                        <b-form-select-option value="markunpaid">Mark Unpaid</b-form-select-option>
+                        <b-form-select-option value="resavetimers">Resave Timers</b-form-select-option>
 
                         <b-form-select-option :value="null">Adjust Invoice Rate</b-form-select-option>
                         <b-form-select-option value="adjust-user-rate">Adjust User Rate</b-form-select-option>
