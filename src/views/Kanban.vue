@@ -332,7 +332,7 @@ export default class Custom extends Vue {
 .kanban-draggable {
   width: 100px;
   height: calc(100vh - 50px);
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: hidden;
 }
 .client-section-acronym {

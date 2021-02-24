@@ -25,7 +25,7 @@
               </div>
               <select id="client" name="client[]" multiple="" v-model="chosen_clients">
                 <option value="0">All Clients</option>
-                <option v-for="client in clients" v-bind:client="client" :value="client.id" @click="onOffSelect">{{ client.name }}</option>
+                <option v-for="(client, client_index) in clients" :client="client" :key="client_index" :value="client.id" @click="onOffSelect">{{ client.name }}</option>
               </select>
             </div>
             <!-- here -->
@@ -37,8 +37,8 @@
               </div>
               <select id="project" name="project[]" multiple="" v-model="chosen_projects">
                 <option value="0">All Projects</option>
-                <optgroup v-for="client in filteredclients(chosen_clients)" v-bind:client="client" :label="client.name">
-                  <option v-for="project in client_projects(client)" v-bind:project="project" :value="project.id">{{ project.name }}</option>
+                <optgroup v-for="(client, client_index) in filteredclients(chosen_clients)" :key="client_index" :client="client" :label="client.name">
+                  <option v-for="(project, project_index) in client_projects(client)" :key="project_index" :project="project" :value="project.id">{{ project.name }}</option>
                 </optgroup>
               </select>
             </div>
@@ -52,30 +52,51 @@
               <!--<input type="checkbox" id="show-inactive-users" value="1" @click="toggleUsers"> Show Inactive-->
               <select name="user[]" multiple="" v-model="chosen_users">
                 <option value="0">All Users</option>
-                <option v-for="user in users" v-bind:user="user" :value="user.id">{{ user.name }}</option>
+                <option v-for="(user, user_index) in users" :key="user_index" :user="user" :value="user.id">{{ user.name }}</option>
               </select>
             </div>
           </div>
           <div class="bottom-selects">
-            <div class=" form-inline">
+            <div class="form-inline">
               <!-- {{ start }} -->
-              <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2 mr-2"></b-form-datepicker>
-              <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2 mr-2"></b-form-datepicker>
-              <b-form-checkbox v-model="anytime" name="anytime" class="mr-2">
-                Anytime
-              </b-form-checkbox>
-              <label v-if="isAdmin()" for="paid" style="font-weight: normal;"><input type="checkbox" name="is_paid" id="show_paid" v-model="show_paid" /> Show paid</label>
-              <input v-else type="hidden" name="is_paid" value="1" />
-              <label v-if="isAdmin()" for="is_invoiced" style="font-weight: normal;"> <input type="checkbox" id="is_invoiced" name="is_invoiced" v-model="show_invoiced" /> Show Invoiced </label>
-              <input v-else type="hidden" name="is_invoiced" value="1" />
-              <a class="btn btn-default btn-sm" @click="lastMonth()">Last Month</a>
-              <a class="btn btn-default btn-sm" @click="thisMonth()">This Month</a>
-              <input placeholder="task ID" type="text" name="task_id" />
-              <input placeholder="Paid Check #" type="text" name="paid_check_number" />
-              <input placeholder="Received Check #" type="text" name="check_number" />
-              <input placeholder="Client Rate" type="text" name="client_rate" />
-              <input placeholder="User Rate" type="text" name="user_rate" />
-              <input placeholder="Invoice #" type="text" name="invoice_id" />
+              <div class="d-flex justify-content-between w-100 flex-wrap">
+                <div class="d-flex">
+                  <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2 mr-2"></b-form-datepicker>
+                  <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2 mr-2"></b-form-datepicker>
+                </div>
+                <div class="d-flex align-items-center flex-wrap">
+                  <b-form-checkbox v-model="anytime" name="anytime" class="mr-2">
+                    Anytime
+                  </b-form-checkbox>
+                  <b-form-checkbox v-if="isAdmin()" v-model="show_paid" name="show_paid" class="mr-2">
+                    Show paid
+                  </b-form-checkbox>
+                  <b-form-checkbox v-if="isAdmin()" v-model="show_invoiced" name="show_invoiced">
+                    Show Invoiced
+                  </b-form-checkbox>
+                  <input v-else type="hidden" name="is_invoiced" value="1" />
+                </div>
+
+                <div class="d-flex flex-wrap">
+                  <b-button variant="primary" @click="lastMonth()" class="mr-3">Last Month</b-button>
+                  <b-button variant="primary" @click="thisMonth()">This Month</b-button>
+                </div>
+              </div>
+              <div class="inputs d-flex justify-content-between flex-wrap w-100">
+                <b-form-input class="mt-3" placeholder="task ID"></b-form-input>
+                <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
+                <b-form-input class="mt-3" placeholder="Received Check #"></b-form-input>
+                <b-form-input class="mt-3" placeholder="Client Rate"></b-form-input>
+                <b-form-input class="mt-3" placeholder="User Rate"></b-form-input>
+                <b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>
+
+                <!-- <input placeholder="task ID" type="text" name="task_id" />
+                <input placeholder="Paid Check #" type="text" name="paid_check_number" />
+                <input placeholder="Received Check #" type="text" name="check_number" />
+                <input placeholder="Client Rate" type="text" name="client_rate" />
+                <input placeholder="User Rate" type="text" name="user_rate" />
+                <input placeholder="Invoice #" type="text" name="invoice_id" /> -->
+              </div>
             </div>
             <!--<input type="checkbox" name="UTC"> UTC?<br>-->
             <!--<a href="/invoiceable?start=2017-01-01&amp;end=2017-01-31">Last Month</a>--><!-- <a onclick="$('#start').val('')">Last Week</a><br><br>-->
@@ -118,7 +139,7 @@
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
                       <span id="actionLink"></span>
                     </div>
-                    <button class="btn btn-primary" @click="addInvoiceableItem()" v-if="isAdmin()">Add Invoiceable Item</button>
+                    <button class="btn btn-primary" @click="showAddInvoiceable()" v-if="isAdmin()">Add Invoiceable Item</button>
                   </div>
                 </td>
               </tr>
@@ -127,7 +148,7 @@
               <tr class="row-date">
                 <td colspan="100">
                   <span style="color: darkblue">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }}</span
-                  >&nbsp; Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }} <span v-if="total_unbillable && isNotDiseno()" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span> <span v-if="isTecharound()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span>
+                  >&nbsp; Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }} <span v-if="total_unbillable" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span> <span v-if="isTecharound()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span>
                 </td>
               </tr>
               <tr class="row-date">
@@ -140,8 +161,8 @@
               </tr>
             </tbody>
             <tbody>
-              <tr v-bind:item="item" v-for="item in invoice_items" :key="item.id" is="invoiceable-item-row"></tr>
-              <tr v-bind:timer="timer" v-for="(timer, index) in timers" :key="index" is="report-timer-row"></tr>
+              <tr :item="item" v-for="item in invoice_items" :key="item.id" is="invoiceable-item-row"></tr>
+              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" is="report-timer-row"></tr>
             </tbody>
             <tbody>
               <tr>
@@ -155,6 +176,8 @@
         </div>
       </div>
     </div>
+    <!-- Add Invoiceable Item Modal -->
+    <invoiceable-add-item :show="isShowAddInvoiceable" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
   </div>
 </template>
 
@@ -166,10 +189,13 @@ export default {
   name: 'invoiceable-template',
   components: {
     'invoiceable-timer-row': InvoiceableTimerRow,
-    'report-timer-row': ReportTimerRow
+    'report-timer-row': ReportTimerRow,
+    'invoiceable-add-item': () => import('./InvoiceableAddItem.vue')
   },
   data: function() {
     return {
+      isShowAddInvoiceable: false,
+
       total_time: 0,
       total_earned: 0,
       total_unpaid: 0,
@@ -304,12 +330,16 @@ export default {
       this.end = end
       this.getData('end')
     },
-    isNotDiseno() {
-      return !this.$store.getters['settings/isDiseno']
+    // isNotDiseno() {
+    //   return !this.$store.getters['settings/isDiseno']
+    // },
+    showAddInvoiceable() {
+      // this.$store.dispatch('invoices/editInvoiceableItem')
+      this.isShowAddInvoiceable = true
     },
-    //   addInvoiceableItem() {
-    //     this.$store.dispatch('invoices/editInvoiceableItem')
-    //   },
+    hideAddInvoiceable() {
+      this.isShowAddInvoiceable = false
+    },
     //   applyAction() {
     //     let self = this
     //     let action = document.getElementById('action').value
@@ -553,21 +583,25 @@ export default {
     // border: 10px solid white;
     display: flex;
     justify-content: space-between;
-    height: 300px;
+    // height: 300px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 30px;
 
     select {
       padding: 10px;
       border-radius: 6px;
       border: 1px solid rgba($color: #acabab, $alpha: 1);
       box-shadow: 0 0px 10px rgba($color: #000000, $alpha: 0.2);
+      min-height: 235px;
     }
 
     .client-select {
       display: flex;
       flex-direction: column;
       flex: 2;
-      padding-right: 50px;
+      // padding-right: 50px;
+      min-width: 290px;
 
       select {
         flex: 1;
@@ -581,7 +615,8 @@ export default {
       display: flex;
       flex-direction: column;
       flex: 2;
-      padding-right: 50px;
+      min-width: 466px;
+      // padding-right: 50px;
 
       select {
         flex: 1;
@@ -595,6 +630,7 @@ export default {
       display: flex;
       flex-direction: column;
       flex: 1;
+      min-width: 177px;
 
       select {
         flex: 1;
@@ -606,8 +642,16 @@ export default {
   }
 
   .bottom-selects {
-    // border: 10px solid green;
     margin-bottom: 20px;
+
+    .form-inline {
+      .inputs {
+        gap: 10px;
+        input {
+          flex: 1;
+        }
+      }
+    }
   }
 
   .row-date {
@@ -622,5 +666,59 @@ export default {
 
 a.active {
   background: transparent;
+}
+</style>
+
+<style lang="scss">
+#add-invoiceable-item {
+  .modal-content {
+    min-height: 400px;
+    // height: calc(100vh - 50px) !important;
+    // max-height: 700px;
+  }
+
+  .invoicable-items .dropdown-menu {
+    height: 240px !important;
+    max-height: 550px;
+    position: relative;
+    overflow-y: auto;
+
+    .client-name-wrapper {
+      margin-bottom: 10px;
+
+      .client-name {
+        font-weight: 600;
+      }
+    }
+    .project-name-wrapper {
+      cursor: pointer;
+      &:hover {
+        background-color: rgba($color: #000000, $alpha: 1);
+      }
+
+      .project-name {
+        margin-left: 20px;
+      }
+    }
+  }
+
+  .clear-invoiceable-item {
+    text-align: right;
+
+    span {
+      color: #007bff;
+      font-size: 14px;
+      cursor: pointer;
+      margin-right: 7px;
+    }
+  }
+
+  .add-description {
+    padding: 0 7px;
+
+    input {
+      margin-top: 10px;
+    }
+  }
 }
 </style>
