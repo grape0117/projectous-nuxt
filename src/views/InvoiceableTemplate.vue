@@ -139,7 +139,7 @@
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
                       <span id="actionLink"></span>
                     </div>
-                    <button class="btn btn-primary" @click="showAddInvoiceable()" v-if="isAdmin()">Add Invoiceable Item</button>
+                    <button class="btn btn-primary" @click="showAddInvoiceable" v-if="isAdmin()">Add Invoiceable Item</button>
                   </div>
                 </td>
               </tr>

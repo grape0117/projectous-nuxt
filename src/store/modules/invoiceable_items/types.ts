@@ -1,10 +1,10 @@
 export interface IModuleState {
-  invoice_items: INVOICE_ITEMS[]
+  invoiceable_items: INVOICEABLE_ITEMS[]
   // lookup?: any
   // lookup_by_client_company_id?: any
 }
 
-export interface INVOICE_ITEMS {
+export interface INVOICEABLE_ITEMS {
   id?: string
   description?: string
   date: string

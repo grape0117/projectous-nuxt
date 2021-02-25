@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="add-invoiceable-item" class="add-invoiceable-item" scrollable title="Add Invoiceable Item" @hidden="hide">
+  <b-modal id="add-invoiceable-item" class="add-invoiceable-item" scrollable title="Add Invoiceable Item" @hidden="hide" @ok="saveInvoiceable">
     <b-dropdown :text="Object.keys(invoiceable_item.item_selected).length ? invoiceable_item.item_selected.name : 'Select Invoiceable Item'" block split split-variant="outline-primary" variant="primary" class="m-2 invoicable-items" menu-class="w-100">
       <div class="client-name-wrapper" v-for="client in filteredclients(chosen_clients)" :key="client.id">
         <span class="client-name">{{ client.name }}</span>
@@ -11,9 +11,15 @@
     <div class="clear-invoiceable-item" @click="clearDropdown('invoicableItem')">
       <span>Clear</span>
     </div>
-    <div class="add-description" v-if="Object.keys(invoiceable_item.item_selected).length">
-      <b-form-input placeholder="Enter description"></b-form-input>
-      <b-form-input type="number" placeholder="Enter rate"></b-form-input>
+    <div class="inputs" v-if="Object.keys(invoiceable_item.item_selected).length">
+      <div class="input-description">
+        <span class="input-warning" v-if="saving_status === 'failed' && !invoiceable_item.description">* Description must have value</span>
+        <b-form-input class="form-input" placeholder="Enter description" v-model="invoiceable_item.description" />
+      </div>
+      <div class="input-rate">
+        <span class="input-warning" v-if="saving_status === 'failed' && !invoiceable_item.rate">* Rate must have value</span>
+        <b-form-input type="number" class="form-input" placeholder="Enter rate" v-model="invoiceable_item.rate" />
+      </div>
       <b-form-checkbox id="invoiceable_repeat" v-model="invoiceable_item.repeat" name="invoiceable_repeat" class="mt-2">
         Repeat
       </b-form-checkbox>
@@ -36,9 +42,13 @@ export default {
   props: ['show', 'clients', 'chosen_clients'],
   data() {
     return {
+      saving_status: '',
       invoiceable_item: {
-        repeat: false,
         item_selected: {},
+        description: null,
+        rate: null,
+        // repeat
+        repeat: false,
         repeat_option: null,
         repeat_options: ['Daily', 'Weekly', 'Monthly', 'Annually', 'Every weekday (Monday to Friday)', 'Custom...']
       }
@@ -54,6 +64,36 @@ export default {
   methods: {
     hide() {
       this.$emit('hide')
+    },
+    async saveInvoiceable(bvModalEvt) {
+      this.saving_status = 'saving'
+      bvModalEvt.preventDefault()
+      if (!this.invoiceable_item.description || !this.invoiceable_item.rate) {
+        this.saving_status = 'failed'
+        return
+      }
+
+      this.$nextTick(async () => {
+        console.log('save invoiceable here')
+
+        const invoiceable_item = {
+          description: this.invoiceable_item.description,
+          date: 'test date',
+          company_id: this.invoiceable_item.item_selected,
+          client_id: 'test client id',
+          project_id: 'test project id',
+          invoice_amount: this.invoiceable_item.rate,
+          paid_amount: 0,
+          company_user_id: 'test company_user_id',
+          recurs: this.invoiceable_item.repeat_option
+        }
+
+        await this.$store.dispatch('invoiceable_items/createInvoiceableItem', invoiceable_item)
+
+        this.saving_status = 'saved'
+        this.$bvModal.hide('add-invoiceable-item')
+      })
+      // this.$store.dispatch('clients/createClient')
     },
     client_projects(client) {
       //labeledConsole('client', client)
@@ -85,4 +125,21 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.inputs {
+  .input-description,
+  .input-rate {
+    .input-warning {
+      font-size: 14px;
+      color: red;
+    }
+  }
+  .input-rate {
+    // border: 1px solid red;
+    margin-top: 5px;
+  }
+  .form-input {
+    margin-top: 0px !important;
+  }
+}
+</style>

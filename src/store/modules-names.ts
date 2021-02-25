@@ -11,7 +11,7 @@ export const modulesNames: object = {
   TIMERS: 'timers',
   PROPERTIES: 'properties',
   COMPANIES: 'companies',
-  INVOICE_ITEMS: 'invoice_items'
+  INVOICEABLE_ITEMS: 'invoiceable_items'
 }
 
 export const modulesNamesList = Object.values(modulesNames)

@@ -4,6 +4,12 @@ import { IRootState } from '@/store/types'
 import uuid from 'uuid'
 
 export const actions: ActionTree<IModuleState, IRootState> = {
+  createInvoiceableItem(context, invoiceable_item) {
+    // dispatch('ADD_ONE', { module: 'project_users', entity: project_user })
+    console.log('test save from vuex')
+
+    context.commit('UPSERT', { module: 'invoiceable_item', entity: invoiceable_item }, { root: true })
+  }
   // createClient(context) {
   //   context.commit('settings/setCurrentEditClient', { id: uuid.v4() }, { root: true })
   //   context.dispatch('settings/openModal', 'client')
