@@ -46,9 +46,6 @@
             </div>
           </div>
         </div>
-        <!-- <div class="request-spinner">
-          <b-spinner label="Spinning" v-show="$store.state.totalActiveRequests"></b-spinner>
-        </div> -->
 
         <div class="header-paint" v-if="toggles.paint">
           <div class="mb-3" v-for="(style, styleIndex) in backgroundStyle" :key="styleIndex">
