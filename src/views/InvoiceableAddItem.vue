@@ -81,12 +81,12 @@ export default {
         const invoiceable_item = {
           description: this.invoiceable_item.description,
           date: this.invoiceable_item.date,
-          company_id: this.invoiceable_item.item_selected,
-          client_id: 'test client id',
-          project_id: 'test project id',
+          company_id: this.$store.state.settings.current_company_id,
+          client_id: this.$store.getters['clients/getByClientCompanyId'](this.invoiceable_item.item_selected.client_company_id),
+          project_id: this.invoiceable_item.item_selected.id,
           invoice_amount: this.invoiceable_item.rate,
           paid_amount: 0,
-          company_user_id: 'test company_user_id',
+          company_user_id: 1, //TODO: figure out what to set here
           recurs: this.invoiceable_item.repeat ? this.invoiceable_item.repeat_option : null
         }
         // console.log(invoiceable_item);
