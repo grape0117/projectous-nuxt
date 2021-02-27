@@ -26,7 +26,7 @@
         <i class="nav-icon icon-arrow_forward_ios nav-icons-active"></i>
         <div class="d-flex" :class="toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index">
           <div class="nav-icon" @click="toggle(icon.name)">
-            <i class="nav-icon__icon" :class="icon.icon" :style="icon.name == 'reload' ? 'color: white;' : ''"></i>
+            <i class="nav-icon__icon" :class="[icon.icon, icon.name == 'reload' && $store.state.totalActiveRequests ? 'reload-rotate' : null]" :style="icon.name == 'reload' ? 'color: white;' : ''" />
             <span class="nav-icon__name" :style="icon.name == 'reload' ? 'color: white;' : ''">
               {{ icon.name | toUpperCase }}
             </span>
@@ -45,9 +45,6 @@
               <span class="red-circle-icon-text">{{ timerEmptyFields }}</span>
             </div>
           </div>
-        </div>
-        <div class="request-spinner">
-          <b-spinner label="Spinning" v-show="$store.state.totalActiveRequests"></b-spinner>
         </div>
 
         <div class="header-paint" v-if="toggles.paint">
@@ -247,6 +244,28 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+@-moz-keyframes spin {
+  100% {
+    -moz-transform: rotate(-360deg);
+  }
+}
+@-webkit-keyframes spin {
+  100% {
+    -webkit-transform: rotate(-360deg);
+  }
+}
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(-360deg);
+    transform: rotate(-360deg);
+  }
+}
+
+.reload-rotate {
+  -webkit-animation: spin 1s linear infinite;
+  -moz-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
+}
 .header_menu-wrapper {
   // border: 1px solid red;
   position: relative;
@@ -418,6 +437,7 @@ export default Vue.extend({
 }
 .nav-icon__icon {
   font-size: 24px;
+  display: flex;
 }
 .nav-icon__name {
   font-size: 10px;
