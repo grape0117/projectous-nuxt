@@ -11,6 +11,11 @@ const router = new Router({
   routes: [
     { path: '/', name: 'home', redirect: '/kanban' },
     {
+      path: '/profit',
+      name: 'Profit',
+      component: () => import(/* webpackChunkName: "Profit" */ '@/views/Profit.vue')
+    },
+    {
       path: '/login',
       name: 'Login',
       component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
