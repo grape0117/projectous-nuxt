@@ -20,6 +20,9 @@
         <span class="input-warning" v-if="saving_status === 'failed' && !invoiceable_item.rate">* Rate must have value</span>
         <b-form-input type="number" class="form-input" placeholder="Enter rate" v-model="invoiceable_item.rate" />
       </div>
+      <div style="margin-top: 5px;">
+        <b-form-datepicker id="example-datepicker" disabled :value="invoiceable_item.date" class="mb-2"></b-form-datepicker>
+      </div>
       <b-form-checkbox id="invoiceable_repeat" v-model="invoiceable_item.repeat" name="invoiceable_repeat" class="mt-2">
         Repeat
       </b-form-checkbox>
@@ -46,10 +49,11 @@ export default {
       invoiceable_item: {
         item_selected: {},
         description: null,
+        date: new Date(),
         rate: null,
         // repeat
         repeat: false,
-        repeat_option: null,
+        repeat_option: 'Monthly',
         repeat_options: ['Daily', 'Weekly', 'Monthly', 'Annually', 'Every weekday (Monday to Friday)', 'Custom...']
       }
     }
@@ -74,23 +78,32 @@ export default {
       }
 
       this.$nextTick(async () => {
-        console.log('save invoiceable here')
-
         const invoiceable_item = {
           description: this.invoiceable_item.description,
-          date: 'test date',
+          date: this.invoiceable_item.date,
           company_id: this.invoiceable_item.item_selected,
           client_id: 'test client id',
           project_id: 'test project id',
           invoice_amount: this.invoiceable_item.rate,
           paid_amount: 0,
           company_user_id: 'test company_user_id',
-          recurs: this.invoiceable_item.repeat_option
+          recurs: this.invoiceable_item.repeat ? this.invoiceable_item.repeat_option : null
         }
-
+        // console.log(invoiceable_item);
         await this.$store.dispatch('invoiceable_items/createInvoiceableItem', invoiceable_item)
 
-        this.saving_status = 'saved'
+        // reset
+        this.invoiceable_item = {
+          item_selected: {},
+          description: null,
+          date: new Date(),
+          rate: null,
+          // repeat
+          repeat: false,
+          repeat_option: 'Monthly',
+          repeat_options: ['Daily', 'Weekly', 'Monthly', 'Annually', 'Every weekday (Monday to Friday)', 'Custom...']
+        }
+        this.saving_status = ''
         this.$bvModal.hide('add-invoiceable-item')
       })
       // this.$store.dispatch('clients/createClient')

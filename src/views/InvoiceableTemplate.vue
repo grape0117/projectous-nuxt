@@ -82,7 +82,7 @@
                   <b-button variant="primary" @click="thisMonth()">This Month</b-button>
                 </div>
               </div>
-              <div class="inputs d-flex justify-content-between flex-wrap w-100">
+              <div class="inputs d-flex justify-content-start flex-wrap align-items-start w-100">
                 <b-form-input class="mt-3" placeholder="task ID"></b-form-input>
                 <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
                 <b-form-input class="mt-3" placeholder="Received Check #"></b-form-input>
@@ -647,9 +647,9 @@ export default {
     .form-inline {
       .inputs {
         gap: 10px;
-        input {
-          flex: 1;
-        }
+        // input {
+        //   flex: 1;
+        // }
       }
     }
   }
