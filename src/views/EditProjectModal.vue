@@ -21,6 +21,10 @@
         </div>
       </div>
       <div class="form-group">
+        <label class="control-label col-sm-4" for="projectTargetEdit">Project Monthly Invoice Target: </label>
+        <div class="col-sm-8">$<input id="projectTargetEdit" class="form-control" type="text" name="url" placeholder="Project Target" v-model="project.monthly_target" /></div>
+      </div>
+      <div class="form-group">
         <label class="control-label col-sm-4" for="companyClientSelect">Client: </label>
         <div class="col-sm-6">
           <select class="form-control" id="client-modal-client-id" name="client_id" v-model="project.client_company_id" v-on:change="isCreateClient()">
