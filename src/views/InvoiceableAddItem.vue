@@ -65,7 +65,18 @@ export default {
       }
     }
   },
+  mounted() {
+    this.init()
+  },
   methods: {
+    init() {
+      //TODO: KG make a way to edit these items
+      this.$http()
+        .get('/invoiceable_items')
+        .then(function(response) {
+          this.invoiceable_items = response.invoiceable_items
+        })
+    },
     hide() {
       this.$emit('hide')
     },

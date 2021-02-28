@@ -5,7 +5,7 @@ import uuid from 'uuid'
 
 export const actions: ActionTree<IModuleState, IRootState> = {
   createInvoiceableItem(context, invoiceable_item) {
-    context.commit('ADD_ONE', { module: 'invoiceable_item', entity: invoiceable_item }, { root: true })
+    context.dispatch('ADD_ONE', { module: 'invoiceable_items', entity: invoiceable_item }, { root: true })
   }
   // createClient(context) {
   //   context.commit('settings/setCurrentEditClient', { id: uuid.v4() }, { root: true })
