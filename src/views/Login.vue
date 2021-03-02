@@ -42,14 +42,14 @@ export default class Login extends Vue {
         document.cookie = 'user_id=' + user_id
         // @ts-ignore
         window.Echo.leave('addentryevent_channel_' + user_id)
-        var that = this
+        let that = this
         // @ts-ignore
-        window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', e => {
+        window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', evnt => {
           // @ts-ignore
-          console.log('-----Called getNewData!----' + e.data.data.item_type, e.data.data)
+          console.log('-----Called getNewData!----' + evnt.data.data.item_type, evnt.data.data)
           let body = ''
           let title = ''
-          let data = e.data
+          let data = evnt.data
           switch (data.data.item_type) {
             case 'timelog':
               title = ''
@@ -101,7 +101,7 @@ export default class Login extends Vue {
   private async forgotpassword(e: any) {
     //send the request to get the reset password link.
     // @ts-ignore
-    var email = document.getElementById('email')['value']
+    let email = document.getElementById('email')['value']
     if (!email) {
       alert('please enter the email')
       return
@@ -113,7 +113,7 @@ export default class Login extends Vue {
       email: document.getElementById('email')['value']
     })
     this.$store.state.loading = false
-    var sent = res ? res.flag : null
+    let sent = res ? res.flag : null
 
     if (sent) {
       alert('We have just sent the reset link to your email. Please check your email!')

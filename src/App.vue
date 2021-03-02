@@ -198,7 +198,7 @@ export default {
     this.$watch('$route.query', async val => {
       if (getTaskFromQuery > 2) return
       if (!!val.task && this.$store.state.tasks.tasks && this.$store.state.tasks.tasks.length > 0) {
-        const task = await this.$store.state.tasks.tasks.find(task => task.id === val.task)
+        const task = await this.$store.state.tasks.tasks.find(t => t.id === val.task)
         this.showTask = task
         getTaskFromQuery += 1
       }
@@ -253,8 +253,8 @@ export default {
     })
 
     //listener
-    var user_id = getCookie('user_id')
-    var that = this
+    let user_id = getCookie('user_id')
+    let that = this
 
     if (user_id)
       window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', function(e) {

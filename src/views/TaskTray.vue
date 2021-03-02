@@ -270,7 +270,7 @@ export default class Custom extends Vue {
   private getCompanyUser() {
     const id = this.$store.state.settings.current_user_id
     // let user = this.sortedCompanyUsers.find((user: any) => user.user_id === 345)
-    let user = this.sortedCompanyUsers.find((user: any) => user.user_id === id)
+    let user = this.sortedCompanyUsers.find((u: any) => u.user_id === id)
     // console.log('[USER]')
     // console.log(user)
     this.selectedCompanyUserId = user.id
