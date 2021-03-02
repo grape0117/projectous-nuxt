@@ -25,7 +25,7 @@
       <div class="nav-icons">
         <i class="nav-icon icon-arrow_forward_ios nav-icons-active"></i>
         <div class="d-flex" :class="toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index">
-          <div class="nav-icon" @click="toggle(icon.name)">
+          <div class="nav-icon" :style="icon.name == 'paint' ? 'margin-left: 12px;' : ''" @click="toggle(icon.name)">
             <i class="nav-icon__icon" :class="icon.icon" :style="icon.name == 'reload' ? 'color: white;' : ''"></i>
             <span class="nav-icon__name" :style="icon.name == 'reload' ? 'color: white;' : ''">
               {{ icon.name | toUpperCase }}
@@ -401,7 +401,7 @@ export default Vue.extend({
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding-left: 15px;
+  padding-left: 5px;
 }
 
 .nav-icon:hover {
