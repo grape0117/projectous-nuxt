@@ -100,7 +100,7 @@ export default Vue.extend({
         { name: 'users', path: '/users' },
         { name: 'invoices', path: '/invoices' },
         { name: 'reports', path: '/reports' },
-        { name: 'graph', path: '/graph' }
+        { name: 'graph', path: '/graph' },
         { name: 'profit', path: '/profit' }
       ],
       colors: {

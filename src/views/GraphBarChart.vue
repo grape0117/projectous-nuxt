@@ -18,14 +18,29 @@ export default {
   data() {
     return {
       datacollection: {},
-      chartOptions: {}
+      chartOptions: {},
+      month_to_date_per_project: [],
+      month_to_date_per_user: [],
+      yesterday: []
     }
   },
   mounted() {
+    this.getData()
     this.fillData()
     this.fillChartOptions()
   },
   methods: {
+    getData() {
+      let self = this
+      this.$http()
+        .get('/profitability')
+        .then(function(response) {
+          self.yesterday = response.yesterday
+          self.month_to_date_per_project = response.month_to_date_per_project
+          self.month_to_date_per_user = response.month_to_date_per_user
+        })
+    },
+    fillRealData() {},
     fillData(num = 0) {
       this.datacollection = {
         // labels: [this.getRandomInt(), this.getRandomInt()],
