@@ -8,7 +8,6 @@
       <div class="project-details" @click="editTimer()">
         <p v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</p>
         <p v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</p>
-        <!-- <div style="color: #666666; font-size: 10px;">{{ tasktitle() }}</div>-->
       </div>
     </div>
 
@@ -262,11 +261,11 @@ export default {
       this.$store.dispatch('timers/pauseTimer', this.timer)
     },
     saveNotes: async function(event) {
-      let notes = event.target.innerHTML
+      let notesWithAcronym = event.target.innerHTML
 
       // Check for ABC: //TODO: move somewhere else to common area?
       const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
-      const acronym_match = notes ? notes.match(projectRegex) : null
+      const acronym_match = notesWithAcronym ? notesWithAcronym.match(projectRegex) : null
       // console.log('saveNotes', acronym_match)
       // We have an acronym. Look for a matching project
       if (acronym_match && acronym_match[1]) {
@@ -276,11 +275,11 @@ export default {
           //TODO: update history
           this.timer.project_id = projects_by_acronym[0].id
           // notes = notes.replace(acronym_match[0], '')
-          console.log('acronym', acronym_match[0], notes.replace(acronym_match[0], ''))
+          console.log('acronym', acronym_match[0], notesWithAcronym.replace(acronym_match[0], ''))
         }
-      } else {
-        this.timer.project_id = 0
       }
+
+      let notes = notesWithAcronym.split(': ')[1] || notesWithAcronym
 
       this.timer.notes = notes
       event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
