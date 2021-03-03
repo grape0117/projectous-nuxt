@@ -84,10 +84,10 @@
               </div>
               <div class="inputs d-flex justify-content-start flex-wrap align-items-start w-100">
                 <b-form-input class="mt-3" placeholder="task ID"></b-form-input>
-                <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
+                <!-- <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
                 <b-form-input class="mt-3" placeholder="Received Check #"></b-form-input>
                 <b-form-input class="mt-3" placeholder="Client Rate"></b-form-input>
-                <b-form-input class="mt-3" placeholder="User Rate"></b-form-input>
+                <b-form-input class="mt-3" placeholder="User Rate"></b-form-input> -->
                 <b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>
 
                 <!-- <input placeholder="task ID" type="text" name="task_id" />
@@ -139,7 +139,7 @@
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
                       <span id="actionLink"></span>
                     </div>
-                    <button class="btn btn-primary" @click="showAddInvoiceable" v-if="isAdmin()">Add Invoiceable Item</button>
+                    <button class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
                   </div>
                 </td>
               </tr>
@@ -177,7 +177,7 @@
       </div>
     </div>
     <!-- Add Invoiceable Item Modal -->
-    <invoiceable-add-item :show="isShowAddInvoiceable" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
+    <invoiceable-add-item :show="isShowInvoiceableItems" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
   </div>
 </template>
 
@@ -194,7 +194,7 @@ export default {
   },
   data: function() {
     return {
-      isShowAddInvoiceable: false,
+      isShowInvoiceableItems: false,
 
       total_time: 0,
       total_earned: 0,
@@ -333,12 +333,12 @@ export default {
     // isNotDiseno() {
     //   return !this.$store.getters['settings/isDiseno']
     // },
-    showAddInvoiceable() {
+    showInvoiceableItems() {
       // this.$store.dispatch('invoices/editInvoiceableItem')
-      this.isShowAddInvoiceable = true
+      this.isShowInvoiceableItems = true
     },
     hideAddInvoiceable() {
-      this.isShowAddInvoiceable = false
+      this.isShowInvoiceableItems = false
     },
     //   applyAction() {
     //     let self = this
