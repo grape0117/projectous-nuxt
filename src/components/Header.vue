@@ -268,6 +268,11 @@ export default Vue.extend({
   -moz-animation: spin 1s linear infinite;
   animation: spin 1s linear infinite;
 }
+.header {
+  // border: 10px solid red !important;
+  // flex-wrap: wrap;
+  // border: 1px solid
+}
 .header_menu-wrapper {
   // border: 1px solid red;
   position: relative;
@@ -370,7 +375,7 @@ export default Vue.extend({
 .header-nav {
   display: flex;
   align-items: center;
-  padding-left: 20px;
+  padding-left: 30px;
 }
 .logo-name {
   display: flex;

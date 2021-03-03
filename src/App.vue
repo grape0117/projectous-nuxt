@@ -10,6 +10,9 @@
       </template>
 
       <div class="row-no-padding">
+        <!-- <pre>
+          {{ $store.state.invoice_items }}
+        </pre> -->
         <Header v-on:reload="reload" />
         <div class="d-flex justify-content-between">
           <!-- <task-details v-if="show_task"></task-details> -->
@@ -440,7 +443,8 @@ export default {
 }
 .router-view-class {
   position: relative;
-  height: calc(100vh - 50px);
+  // height: calc(100vh - 50px);
+  min-height: calc(100vh - 50px);
   // overflow-y: hidden;
   flex: 1;
 }

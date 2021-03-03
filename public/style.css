@@ -619,7 +619,7 @@ body .sidebar:nth-child(2){
 
 .table-row-hover:hover,
 .timer-form:hover {
-    background: #dddddd;
+    background-color: rgba(0, 0, 0, 0.1);
     cursor: pointer;
 }
 
