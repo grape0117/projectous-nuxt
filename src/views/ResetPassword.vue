@@ -25,9 +25,9 @@ export default class ResetPassword extends Vue {
     e.preventDefault()
     //validation.
     // @ts-ignore
-    var password = document.getElementById('password')['value']
+    let password = document.getElementById('password')['value']
     // @ts-ignore
-    var password_confirm = document.getElementById('password_confirm')['value']
+    let password_confirm = document.getElementById('password_confirm')['value']
 
     if (password == '') {
       alert('Please enter password!')
@@ -42,7 +42,7 @@ export default class ResetPassword extends Vue {
       return
     }
     //get api_token from route params.
-    var api_token = this.$route.params.api_token
+    let api_token = this.$route.params.api_token
     // @ts-ignore
     const res = await this.$http().post('/resetpassword', {
       // @ts-ignore
@@ -53,7 +53,7 @@ export default class ResetPassword extends Vue {
       password_confirm: password_confirm
     })
 
-    var flag = res ? res.flag : null
+    let flag = res ? res.flag : null
 
     if (flag) {
       alert('Password has been reset successfully! Please try to login.')
