@@ -11,7 +11,7 @@
           <div class="dragzone__item-block-content">
             <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px">
               <div class="burger-icon-wrapper" v-if="!item.project.acronym">
-                <div style="padding-left: 5px; padding-right: 5px; margin-top: 5px" class="burger-icon" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
+                <div style="padding-left: 5px; padding-right: 5px; margin-top: 5px" class="burger-icon" @click="showTaskDetail(item)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
                   <span></span>
                   <span></span>
                   <span></span>
@@ -26,7 +26,7 @@
                   <span class="dragzone__item-text" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id">{{ item.title }}</span>
                 </p> -->
                 <div class="dragzone-project-acronym-wrapper" v-if="item.project.acronym">
-                  <div class="dragzone-project-acronym" :style="{ 'background-color': clientColor(item) }" @click="editTask(item.task_id || item.id)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
+                  <div class="dragzone-project-acronym" :style="{ 'background-color': clientColor(item) }" @click="showTaskDetail(item)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
                     {{ item.project.acronym }}
                   </div>
                   <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
@@ -178,6 +178,21 @@ export default class Dragzone extends Vue {
     }
   }
 
+  private async showTaskDetail(item: any) {
+    // editTask(item.task_id || item.id)
+
+    let task = await this.$store.state.tasks.tasks.find((tsk: any) => {
+      if (item.task_id) {
+        return tsk.id === item.task_id
+      } else {
+        return tsk.id === item.id
+      }
+    })
+
+    await this.$router.push({ query: { task: task.id } })
+    EventBus.$emit('showTask', task)
+  }
+
   private clientColor(item: any) {
     return this.$store.state.clients.clients.find((client: any) => client.client_company_id === item.project.client_company_id).color
   }
@@ -220,12 +235,12 @@ export default class Dragzone extends Vue {
     return task.settings ? task.settings.task_type : null
   }
 
-  private editTask(task_id: any) {
-    let task = this.$store.getters['tasks/getById'](task_id)
-    console.log('edit task', task)
-    this.$store.state.settings.current_edit_task = cloneDeep(task)
-    this.$store.dispatch('settings/openModal', 'task')
-  }
+  // private editTask(task_id: any) {
+  //   let task = this.$store.getters['tasks/getById'](task_id)
+  //   console.log('edit task', task)
+  //   this.$store.state.settings.current_edit_task = cloneDeep(task)
+  //   this.$store.dispatch('settings/openModal', 'task')
+  // }
   private projectName(project_id: any) {
     const project = this.$store.getters['projects/getById'](project_id)
     return project ? project.name : project_id
