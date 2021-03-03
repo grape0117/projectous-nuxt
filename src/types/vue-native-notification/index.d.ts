@@ -6,10 +6,10 @@ interface VueChartJS {
   mixins: any
 }
 
-declare module 'vue-chartjs' {
-  const chartJs: VueChartJS
-  export = chartJs
-}
+// declare module 'vue-chartjs' {
+//   const chartJs: VueChartJS
+//   export = chartJs
+// }
 declare module 'vue-moment' {
   const vueMoment: any
   export = vueMoment
