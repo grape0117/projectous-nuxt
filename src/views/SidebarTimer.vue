@@ -12,13 +12,20 @@
     </div>
 
     <div class="status-icon-with-timer">
+      <!-- {{ typeof totalDuration }} -->
+      <!-- {{ Number(durationHours()) === 0 }} -->
+      <!-- {{ Number(durationMinutes()) < 10 }}  -->
+      <!-- <pre style="color: white;">{{ timer }}</pre> -->
       <div v-if="isCurrentUser()" class="status-icons">
         <i class="icon-pause icon-class" v-if="timer.status === 'running'" v-on:click="pauseTimer"></i>
         <i class="icon-stop icon-class" style="color: red" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
         <i class="icon-play_arrow icon-class" v-else @click="restartTimer"></i>
       </div>
       <div class="sidebar-timer-timer">
-        <span :style="timer.status === 'running' ? 'font-weight: bold;' : ''">{{ durationDisplay() }}</span>
+        <span :style="timer.status === 'running' ? 'font-weight: bold;' : ''">{{ durationDisplay }}</span>
+      </div>
+      <div class="bump-button" v-if="showBumpButton">
+        <span @click="bumpItUp">Bump it up</span>
       </div>
     </div>
 
@@ -42,6 +49,7 @@ import { format_report_at, datetimeToJS } from '../utils/util-functions'
 
 import { EventBus } from '@/components/event-bus'
 import { IProject } from '../store/modules/projects/types'
+import { cloneDeep } from 'lodash'
 
 export default {
   name: 'sidebar-timer',
@@ -64,6 +72,43 @@ export default {
     }
   },
   computed: {
+    durationDisplay: function() {
+      const totalDuration = this.timer.duration
+      if (totalDuration > this.totalDuration && this.timer.status == 'running') this.totalDuration = totalDuration
+      else if (this.timer.status != 'running') this.totalDuration = this.timer.duration
+
+      //if(this.timer.status == 'running'){
+      return this.durationHours + ':' + this.durationMinutes + ':' + this.durationSeconds
+      //} else {
+      //    return this.durationHours()+':'+this.durationMinutes();
+      //}
+    },
+    durationHours: function() {
+      this.totalDuration = this.totalDuration ? this.totalDuration : 0
+      return Math.floor(this.totalDuration / 3600)
+    },
+    durationMinutes: function() {
+      this.totalDuration = this.totalDuration ? this.totalDuration : 0
+      return ('00' + Math.floor((this.totalDuration % 3600) / 60)).slice(-2)
+    },
+    invoiceDurationHours: function() {
+      this.invoiceDuration = this.invoiceDuration ? this.invoiceDuration : 0
+      return Math.floor(this.invoiceDuration / 3600)
+    },
+    invoiceDurationMinutes: function() {
+      this.invoiceDuration = this.invoiceDuration ? this.invoiceDuration : 0
+      return ('00' + Math.floor((this.invoiceDuration % 3600) / 60)).slice(-2)
+    },
+    durationSeconds: function() {
+      this.totalDuration = this.totalDuration ? this.totalDuration : 0
+      return ('00' + Math.floor(this.totalDuration % 60)).slice(-2)
+    },
+    showBumpButton() {
+      if (Number(this.durationHours) === 0 && Number(this.durationMinutes) < 10 && this.timer.status === 'stopped') {
+        return true
+      }
+      return false
+    },
     clientColor() {
       return this.$store.state.clients.clients.find(client => client.client_company_id === this.project.client_company_id).color
     },
@@ -124,6 +169,17 @@ export default {
     this.incrementDuration()
   },
   methods: {
+    async bumpItUp() {
+      const timer = await _.cloneDeep(this.timer)
+      timer.duration = 600
+
+      await this.$store.dispatch('UPDATE_ATTRIBUTE', {
+        module: 'timers',
+        id: timer.id,
+        attribute: 'duration',
+        value: timer.duration
+      })
+    },
     tasktitle: function() {
       const self = this
       if (this.timer.task_id) {
@@ -143,37 +199,27 @@ export default {
             > works because without it, the same value would get set over and over again.
 
              */
-    durationDisplay: function() {
-      const totalDuration = this.timer.duration
-      if (totalDuration > this.totalDuration && this.timer.status == 'running') this.totalDuration = totalDuration
-      else if (this.timer.status != 'running') this.totalDuration = this.timer.duration
 
-      //if(this.timer.status == 'running'){
-      return this.durationHours() + ':' + this.durationMinutes() + ':' + this.durationSeconds()
-      //} else {
-      //    return this.durationHours()+':'+this.durationMinutes();
-      //}
-    },
-    durationHours: function() {
-      this.totalDuration = this.totalDuration ? this.totalDuration : 0
-      return Math.floor(this.totalDuration / 3600)
-    },
-    durationMinutes: function() {
-      this.totalDuration = this.totalDuration ? this.totalDuration : 0
-      return ('00' + Math.floor((this.totalDuration % 3600) / 60)).slice(-2)
-    },
-    invoiceDurationHours: function() {
-      this.invoiceDuration = this.invoiceDuration ? this.invoiceDuration : 0
-      return Math.floor(this.invoiceDuration / 3600)
-    },
-    invoiceDurationMinutes: function() {
-      this.invoiceDuration = this.invoiceDuration ? this.invoiceDuration : 0
-      return ('00' + Math.floor((this.invoiceDuration % 3600) / 60)).slice(-2)
-    },
-    durationSeconds: function() {
-      this.totalDuration = this.totalDuration ? this.totalDuration : 0
-      return ('00' + Math.floor(this.totalDuration % 60)).slice(-2)
-    },
+    // durationHours: function() {
+    //   this.totalDuration = this.totalDuration ? this.totalDuration : 0
+    //   return Math.floor(this.totalDuration / 3600)
+    // },
+    // durationMinutes: function() {
+    //   this.totalDuration = this.totalDuration ? this.totalDuration : 0
+    //   return ('00' + Math.floor((this.totalDuration % 3600) / 60)).slice(-2)
+    // },
+    // invoiceDurationHours: function() {
+    //   this.invoiceDuration = this.invoiceDuration ? this.invoiceDuration : 0
+    //   return Math.floor(this.invoiceDuration / 3600)
+    // },
+    // invoiceDurationMinutes: function() {
+    //   this.invoiceDuration = this.invoiceDuration ? this.invoiceDuration : 0
+    //   return ('00' + Math.floor((this.invoiceDuration % 3600) / 60)).slice(-2)
+    // },
+    // durationSeconds: function() {
+    //   this.totalDuration = this.totalDuration ? this.totalDuration : 0
+    //   return ('00' + Math.floor(this.totalDuration % 60)).slice(-2)
+    // },
     isCurrentUser: function() {
       return this.current_user_id === this.timer.user_id
     },
@@ -260,6 +306,9 @@ export default {
     pauseTimer: function() {
       this.$store.dispatch('timers/pauseTimer', this.timer)
     },
+    async saveTimer() {
+      await this.$store.dispatch('timers/saveTimer', this.timer)
+    },
     saveNotes: async function(event) {
       let notesWithAcronym = event.target.innerHTML
 
@@ -283,7 +332,8 @@ export default {
 
       this.timer.notes = notes
       event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
-      await this.$store.dispatch('timers/saveTimer', this.timer)
+      // await this.$store.dispatch('timers/saveTimer', this.timer)
+      await this.saveTimer()
     }
   }
 }
@@ -338,9 +388,18 @@ export default {
   font-size: 20px;
 }
 .status-icon-with-timer {
+  // border: 1px solid red;
   display: flex;
   align-items: center;
   margin-left: -5px;
+
+  .bump-button {
+    font-size: 14px;
+    margin-left: 10px;
+    border: 1px solid white;
+    padding: 3px 5px;
+    cursor: pointer;
+  }
 }
 .sidebar-timer-timer-task {
   border: 0px;
