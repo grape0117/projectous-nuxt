@@ -32,10 +32,6 @@ export const actions: ActionTree<IRootState, IRootState> = {
       return
     }
 
-    // console.log('MY CONSOLE.LOG')
-    // console.log(state[module])
-
-    // console.log(state.client_users.lookup)
     // @ts-ignore
     let key = state[module].lookup[entity.id]
     console.log('key', key, state[module][module][key])

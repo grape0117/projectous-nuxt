@@ -2,7 +2,7 @@
   <b-modal id="add-invoiceable-item" class="add-invoiceable-item" scrollable title="Invoiceable Items" :size="tab_index === 0 ? 'lg' : 'md'" @hidden="hide" @ok="saveInvoiceable">
     <b-tabs content-class="mt-3" v-model="tab_index" lazy>
       <b-tab title="List">
-        <b-table striped hover :sticky-header="true" :items="invoiceable_items" :fields="['Description', 'Rate', 'Cost', 'Date', 'Edit']">
+        <b-table striped hover :sticky-header="true" :items="table_items" :fields="table_fields">
           <template #cell(Edit)="row">
             <b-button size="sm" @click="row.toggleDetails" class="mr-2"> {{ row.detailsShowing ? 'Hide' : 'Show' }} Details </b-button>
 
@@ -16,22 +16,33 @@
             <b-card>
               <b-row class="mb-2">
                 <b-col sm="3" class="text-sm-right"><b>Description:</b></b-col>
-                <b-col>{{ row.item.Description }}</b-col>
+                <!-- <b-col>{{ row.item.Description }}</b-col> -->
+                <b-col sm="9">
+                  <b-form-input type="text" v-model="row.item.Description"></b-form-input>
+                </b-col>
               </b-row>
               <b-row class="mb-2">
                 <b-col sm="3" class="text-sm-right"><b>Rate:</b></b-col>
-                <b-col>{{ row.item.Rate }}</b-col>
+                <b-col sm="9">
+                  <b-form-input type="number" v-model="row.item.Rate"></b-form-input>
+                </b-col>
               </b-row>
               <b-row class="mb-2">
                 <b-col sm="3" class="text-sm-right"><b>Cost:</b></b-col>
-                <b-col>{{ row.item.Cost }}</b-col>
+                <b-col sm="9">
+                  <b-form-input type="number" v-model="row.item.Cost"></b-form-input>
+                </b-col>
               </b-row>
               <b-row class="mb-2">
                 <b-col sm="3" class="text-sm-right"><b>Date:</b></b-col>
-                <b-col>{{ row.item.Date }}</b-col>
+                <b-col sm="9">
+                  <b-form-input type="date" v-model="row.item.Date"></b-form-input>
+                </b-col>
               </b-row>
+
+              <!-- Save -->
               <b-row class="mb-2 px-4 d-flex justify-content-end">
-                <b-button size="sm" variant="outline-primary">Save</b-button>
+                <b-button size="sm" variant="outline-primary" @click="editInvoiceable(row.item)">Save</b-button>
               </b-row>
 
               <!-- <b-row class="mb-2">
@@ -100,6 +111,14 @@ export default {
     return {
       tab_index: 0,
       saving_status: '',
+      table_fields: [
+        { key: 'Description', sortable: true },
+        { key: 'Rate', sortable: true },
+        { key: 'Cost', sortable: true },
+        { key: 'Date', sortable: true },
+        { key: 'Edit', sortable: false }
+      ],
+      table_items: [],
       invoiceable_items: [],
       invoiceable_item: {
         item_selected: {},
@@ -131,56 +150,67 @@ export default {
 
       for (const invoiceable_item of invoiceable_items) {
         const items = {
+          id: invoiceable_item.id,
           Description: invoiceable_item.description,
           Rate: invoiceable_item.invoice_amount,
           Cost: invoiceable_item.paid_amount,
-          Date: invoiceable_item.date,
-          // setting
-          sortable: true
+          Date: invoiceable_item.date
         }
-        this.invoiceable_items.push(items)
+        this.table_items.push(items)
       }
+      this.invoiceable_items = invoiceable_items
     },
     hide() {
       this.$emit('hide')
     },
+    async editInvoiceable(item) {
+      const { Description, Rate, Cost, Date } = item
+      let invoiceable_item = this.invoiceable_items.find(itm => itm.id === item.id)
+      invoiceable_item.description = Description
+      invoiceable_item.invoice_amount = Rate
+      invoiceable_item.paid_amount = Cost
+      invoiceable_item.date = Date
+
+      this.$store.dispatch('UPDATE', { module: 'invoiceable_items', entity: invoiceable_item }, { root: true })
+    },
     async saveInvoiceable(bvModalEvt) {
-      this.saving_status = 'saving'
-      bvModalEvt.preventDefault()
-      if (!this.invoiceable_item.description || !this.invoiceable_item.rate || !this.invoiceable_item.paid_amount) {
-        this.saving_status = 'failed'
-        return
+      if (this.tab_index === 1) {
+        this.saving_status = 'saving'
+        bvModalEvt.preventDefault()
+        if (!this.invoiceable_item.description || !this.invoiceable_item.rate || !this.invoiceable_item.paid_amount) {
+          this.saving_status = 'failed'
+          return
+        }
+
+        this.$nextTick(async () => {
+          const invoiceable_item = {
+            description: this.invoiceable_item.description,
+            date: this.invoiceable_item.date,
+            company_id: this.$store.state.settings.current_company_id,
+            client_id: this.$store.getters['clients/getByClientCompanyId'](this.invoiceable_item.item_selected.client_company_id),
+            project_id: this.invoiceable_item.item_selected.id,
+            invoice_amount: this.invoiceable_item.rate,
+            paid_amount: this.invoiceable_item.paid_amount,
+            company_user_id: 1, //TODO: figure out what to set here
+            recurs: this.invoiceable_item.repeat ? this.invoiceable_item.repeat_option : null
+          }
+          await this.$store.dispatch('ADD_ONE', { module: 'invoiceable_items', entity: invoiceable_item })
+
+          // reset
+          this.invoiceable_item = {
+            item_selected: {},
+            description: null,
+            date: new Date(),
+            rate: null,
+            // repeat
+            repeat: false,
+            repeat_option: 'Monthly',
+            repeat_options: ['Daily', 'Weekly', 'Monthly', 'Annually', 'Every weekday (Monday to Friday)', 'Custom...']
+          }
+          this.saving_status = ''
+          this.$bvModal.hide('add-invoiceable-item')
+        })
       }
-
-      this.$nextTick(async () => {
-        const invoiceable_item = {
-          description: this.invoiceable_item.description,
-          date: this.invoiceable_item.date,
-          company_id: this.$store.state.settings.current_company_id,
-          client_id: this.$store.getters['clients/getByClientCompanyId'](this.invoiceable_item.item_selected.client_company_id),
-          project_id: this.invoiceable_item.item_selected.id,
-          invoice_amount: this.invoiceable_item.rate,
-          paid_amount: this.invoiceable_item.paid_amount,
-          company_user_id: 1, //TODO: figure out what to set here
-          recurs: this.invoiceable_item.repeat ? this.invoiceable_item.repeat_option : null
-        }
-        await this.$store.dispatch('ADD_ONE', { module: 'invoiceable_items', entity: invoiceable_item })
-
-        // reset
-        this.invoiceable_item = {
-          item_selected: {},
-          description: null,
-          date: new Date(),
-          rate: null,
-          // repeat
-          repeat: false,
-          repeat_option: 'Monthly',
-          repeat_options: ['Daily', 'Weekly', 'Monthly', 'Annually', 'Every weekday (Monday to Friday)', 'Custom...']
-        }
-        this.saving_status = ''
-        this.$bvModal.hide('add-invoiceable-item')
-      })
-      // this.$store.dispatch('clients/createClient')
     },
     client_projects(client) {
       //labeledConsole('client', client)
