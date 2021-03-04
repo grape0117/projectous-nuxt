@@ -50,8 +50,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       Store.state.totalActiveRequests--
       return response
     } catch (e) {
-      alert('An error occured. Your previous action may not have completed successfully.')
-      console.log(e)
+      return (Store.state.popAlert = true)
     }
     Store.state.totalActiveRequests--
   }
@@ -71,8 +70,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       })
       return response.data
     } catch (e) {
-      alert('An error occured. Your previous action may not have completed successfully.')
-      console.log(e)
+      return (Store.state.popAlert = true)
     }
   }
 
@@ -91,8 +89,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       })
       return response.data
     } catch (e) {
-      alert('An error occured. Your previous action may not have completed successfully.')
-      console.log(e)
+      return (Store.state.popAlert = true)
     }
   }
 
@@ -110,8 +107,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
         headers: this.headers
       })
     } catch (e) {
-      alert('An error occured. Your previous action may not have completed successfully.')
-      console.log(e)
+      return (Store.state.popAlert = true)
     }
   }
 }
