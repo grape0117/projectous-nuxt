@@ -153,13 +153,6 @@
         </div>
       </div>
     </div>
-    <<<<<<< HEAD
-    <!-- Add Invoiceable Item Modal -->
-    <invoiceable-add-item :show="isShowAddInvoiceable" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
-    =======
-    <!-- Apply Payment Modal -->
-    <!-- <invoiceable-apply-payment /> -->
-    >>>>>>> KG-invoicePayment
   </div>
 </template>
 
@@ -173,13 +166,8 @@ export default {
   name: 'invoiceable-template',
   components: {
     'invoiceable-timer-row': InvoiceableTimerRow,
-<<<<<<< HEAD
-    'report-timer-row': ReportTimerRow,
-    'invoiceable-add-item': () => import('./InvoiceableAddItem.vue')
-=======
     'report-timer-row': ReportTimerRow
     // 'invoiceable-apply-payment': InvoiceableApplyPayment
->>>>>>> KG-invoicePayment
   },
   data: function() {
     return {
