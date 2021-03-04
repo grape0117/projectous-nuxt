@@ -300,33 +300,36 @@ export default Vue.extend({
       mypostparameters.append('task_id', this.task.id)
       this.$http().post('/files/add', mypostparameters)
     },
-    switchAssignedUser(company_user_id) {
-      const task_user = {
-        id: uuid.v4(), //TODO: check for existing record?
-        task_id: this.task.id,
-        company_user_id: company_user_id,
-        role: 'assigned'
-      }
-      //
-      // if (role) {
-      //   this.$emit('change', { message: this.user.name + ' given role of ' + role + ' by current user' })
-      //   this.$store.dispatch('UPSERT', { module: 'task_users', entity: task_user }, { root: true })
-      // } else {
-      //   this.$emit('change', { message: this.user.name + ' removed from task by current user' })
-      //   this.$store.dispatch('DELETE', { module: 'task_users', entity: task_user }, { root: true })
-      // }
+    // I just commented this for now since this function is not used but showing terminal warnings
+    // switchAssignedUser(company_user_id) {
+    //   const task_user = {
+    //     id: uuid.v4(), //TODO: check for existing record?
+    //     task_id: this.task.id,
+    //     company_user_id: company_user_id,
+    //     role: 'assigned'
+    //   }
+    //   //
+    //   // if (role) {
+    //   //   this.$emit('change', { message: this.user.name + ' given role of ' + role + ' by current user' })
+    //   //   this.$store.dispatch('UPSERT', { module: 'task_users', entity: task_user }, { root: true })
+    //   // } else {
+    //   //   this.$emit('change', { message: this.user.name + ' removed from task by current user' })
+    //   //   this.$store.dispatch('DELETE', { module: 'task_users', entity: task_user }, { root: true })
+    //   // }
 
-      // Get all elements with class="tablinks" and remove the class "active"
-      let tablinks = document.getElementsByClassName('tablinks')
-      for (let i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(' active', '')
-        console.log(tablinks[i].innerHTML.trim(), resourceName)
-        if (tablinks[i].innerHTML.trim() == resourceName) {
-          tablinks[i].className += ' active'
-        }
-      }
-      this.$store.dispatch('UPSERT', { module: 'task_users', entity: task_user }, { root: true })
-    },
+    //   // Get all elements with class="tablinks" and remove the class "active"
+    //   let tablinks = document.getElementsByClassName('tablinks')
+    //   console.log(tablinks)
+
+    //   for (let i = 0; i < tablinks.length; i++) {
+    //     tablinks[i].className = tablinks[i].className.replace(' active', '')
+    //     console.log(tablinks[i].innerHTML.trim(), resourceName)
+    //     if (tablinks[i].innerHTML.trim() == resourceName) {
+    //       tablinks[i].className += ' active'
+    //     }
+    //   }
+    //   this.$store.dispatch('UPSERT', { module: 'task_users', entity: task_user }, { root: true })
+    // },
     toggleUser(user) {
       //only add each entry once into changed_task_users
       const task_user_index = this.changed_task_users.findIndex(changed_task_user => {

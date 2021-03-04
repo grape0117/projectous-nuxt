@@ -47,6 +47,9 @@
         <b-nav-item to="/profile">Profile</b-nav-item>
         <b-nav-item to="/logout">Log Out</b-nav-item>
       </b-nav> -->
+    <b-modal v-model="$store.state.popAlert" title="Error" ok-only>
+      An error occured. Your previous action may not have completed successfully.
+    </b-modal>
   </div>
 </template>
 
@@ -201,7 +204,7 @@ export default {
     this.$watch('$route.query', async val => {
       if (getTaskFromQuery > 2) return
       if (!!val.task && this.$store.state.tasks.tasks && this.$store.state.tasks.tasks.length > 0) {
-        const task = await this.$store.state.tasks.tasks.find(task => task.id === val.task)
+        const task = await this.$store.state.tasks.tasks.find(t => t.id === val.task)
         this.showTask = task
         getTaskFromQuery += 1
       }
@@ -256,8 +259,8 @@ export default {
     })
 
     //listener
-    var user_id = getCookie('user_id')
-    var that = this
+    let user_id = getCookie('user_id')
+    let that = this
 
     if (user_id)
       window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', function(e) {
@@ -425,6 +428,7 @@ export default {
 }
 #app {
   display: flex;
+  overflow-y: auto;
   // background-color: rgba(0, 0, 0, 0.3);
   // background-color: rgba($color: orange, $alpha: 0.6);
 }
@@ -442,7 +446,6 @@ export default {
 }
 .router-view-class {
   position: relative;
-  // height: calc(100vh - 50px);
   min-height: calc(100vh - 50px);
   // overflow-y: hidden;
   flex: 1;

@@ -185,6 +185,7 @@
 import Vue from 'vue'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
+
 export default {
   name: 'invoiceable-template',
   components: {
@@ -436,7 +437,7 @@ export default {
     isAdmin: function() {
       return this.$store.getters['settings/isAdmin']
     },
-    //   searchMe(event) {
+    //   searchMe(nt) {
     //     let force = this.search
     //     Vue.set(this.settings, 'search', event.target.value)
     //   },
@@ -670,6 +671,9 @@ a.active {
 </style>
 
 <style lang="scss">
+.b-table-sticky-header {
+  max-height: 500px !important;
+}
 #add-invoiceable-item {
   .modal-content {
     min-height: 400px;
