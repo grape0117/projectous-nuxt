@@ -56,47 +56,24 @@
               </select>
             </div>
           </div>
-          <div class="bottom-selects">
-            <div class="form-inline">
-              <!-- {{ start }} -->
-              <div class="d-flex justify-content-between w-100 flex-wrap">
-                <div class="d-flex">
-                  <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2 mr-2"></b-form-datepicker>
-                  <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2 mr-2"></b-form-datepicker>
-                </div>
-                <div class="d-flex align-items-center flex-wrap">
-                  <b-form-checkbox v-model="anytime" name="anytime" class="mr-2">
-                    Anytime
-                  </b-form-checkbox>
-                  <b-form-checkbox v-if="isAdmin()" v-model="show_paid" name="show_paid" class="mr-2">
-                    Show paid
-                  </b-form-checkbox>
-                  <b-form-checkbox v-if="isAdmin()" v-model="show_invoiced" name="show_invoiced">
-                    Show Invoiced
-                  </b-form-checkbox>
-                  <input v-else type="hidden" name="is_invoiced" value="1" />
-                </div>
-
-                <div class="d-flex flex-wrap">
-                  <b-button variant="primary" @click="lastMonth()" class="mr-3">Last Month</b-button>
-                  <b-button variant="primary" @click="thisMonth()">This Month</b-button>
-                </div>
-              </div>
-              <div class="inputs d-flex justify-content-start flex-wrap align-items-start w-100">
-                <b-form-input class="mt-3" placeholder="task ID"></b-form-input>
-                <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
-                <b-form-input class="mt-3" placeholder="Received Check #"></b-form-input>
-                <b-form-input class="mt-3" placeholder="Client Rate"></b-form-input>
-                <b-form-input class="mt-3" placeholder="User Rate"></b-form-input>
-                <b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>
-
-                <!-- <input placeholder="task ID" type="text" name="task_id" />
-                <input placeholder="Paid Check #" type="text" name="paid_check_number" />
-                <input placeholder="Received Check #" type="text" name="check_number" />
-                <input placeholder="Client Rate" type="text" name="client_rate" />
-                <input placeholder="User Rate" type="text" name="user_rate" />
-                <input placeholder="Invoice #" type="text" name="invoice_id" /> -->
-              </div>
+          <div style="display: inline-block;">
+            <div class=" form-inline">
+              {{ start }}
+              <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2"></b-form-datepicker>
+              <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2"></b-form-datepicker>
+              <label for="anytime" style="font-weight: normal;"><input type="checkbox" name="anytime" id="anytime" v-model="anytime" /> Anytime</label>
+              <label v-if="isAdmin() && isTecharound()" for="paid" style="font-weight: normal;"><input type="checkbox" name="is_paid" id="show_paid" v-model="show_paid" /> Show paid</label>
+              <input v-else type="hidden" name="is_paid" value="1" />
+              <label v-if="isAdmin() && isTecharound()" for="is_invoiced" style="font-weight: normal;"> <input type="checkbox" id="is_invoiced" name="is_invoiced" v-model="show_invoiced" /> Show Invoiced? </label>
+              <input v-else type="hidden" name="is_invoiced" value="1" />
+              <a class="btn btn-default btn-sm" @click="lastMonth()">Last Month</a>
+              <a class="btn btn-default btn-sm" @click="thisMonth()">This Month</a>
+              <input v-if="isTecharound()" placeholder="task ID" type="text" name="task_id" />
+              <input v-if="isTecharound()" placeholder="Paid Check #" type="text" name="paid_check_number" />
+              <input v-if="isTecharound()" placeholder="Received Check #" type="text" name="check_number" />
+              <input v-if="isTecharound()" placeholder="Client Rate" type="text" name="client_rate" />
+              <input v-if="isTecharound()" placeholder="User Rate" type="text" name="user_rate" />
+              <input v-if="isTecharound()" placeholder="Invoice #" type="text" name="invoice_id" />
             </div>
             <!--<input type="checkbox" name="UTC"> UTC?<br>-->
             <!--<a href="/invoiceable?start=2017-01-01&amp;end=2017-01-31">Last Month</a>--><!-- <a onclick="$('#start').val('')">Last Week</a><br><br>-->
@@ -176,8 +153,13 @@
         </div>
       </div>
     </div>
+    <<<<<<< HEAD
     <!-- Add Invoiceable Item Modal -->
     <invoiceable-add-item :show="isShowAddInvoiceable" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
+    =======
+    <!-- Apply Payment Modal -->
+    <!-- <invoiceable-apply-payment /> -->
+    >>>>>>> KG-invoicePayment
   </div>
 </template>
 
@@ -185,12 +167,19 @@
 import Vue from 'vue'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
+// import InvoiceableApplyPayment from './InvoiceableApplyPayment.vue'
+
 export default {
   name: 'invoiceable-template',
   components: {
     'invoiceable-timer-row': InvoiceableTimerRow,
+<<<<<<< HEAD
     'report-timer-row': ReportTimerRow,
     'invoiceable-add-item': () => import('./InvoiceableAddItem.vue')
+=======
+    'report-timer-row': ReportTimerRow
+    // 'invoiceable-apply-payment': InvoiceableApplyPayment
+>>>>>>> KG-invoicePayment
   },
   data: function() {
     return {
@@ -436,7 +425,7 @@ export default {
     isAdmin: function() {
       return this.$store.getters['settings/isAdmin']
     },
-    //   searchMe(event) {
+    //   searchMe(nt) {
     //     let force = this.search
     //     Vue.set(this.settings, 'search', event.target.value)
     //   },
