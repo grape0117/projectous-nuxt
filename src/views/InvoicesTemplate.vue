@@ -15,6 +15,11 @@
         </li>
       </ul>
     </div>
+    <div>
+      <!-- <pre>
+        {{ invoices.filter(invoice => invoice.payments.length > 0) }}
+      </pre> -->
+    </div>
     <div class="tab-content">
       <div role="tabpanel" id="open" class="tab-pane active">
         <invoices-row :invoices="openinvoices()" />
@@ -86,14 +91,12 @@ export default {
         return 'selected'
       }
     },
-    getData() {
-      let self = this
-      const invoices = this.$http()
-        .get('/getInvoices')
-        .then(response => {
-          self.invoices = response.invoices
-        })
+    async getData() {
+      const { invoices } = await this.$http().get('/getInvoices')
 
+      this.invoices = invoices
+
+      console.log('[invoices] :')
       console.log(invoices)
     }
   }

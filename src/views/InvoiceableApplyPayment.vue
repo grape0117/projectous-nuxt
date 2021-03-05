@@ -4,7 +4,7 @@
       {{ invoice }}
     </pre> -->
     <b-card no-body>
-      <b-tabs v-model="active_tab" pills card>
+      <b-tabs v-model="active_tab" pills card v-if="invoice">
         <!-- Apply -->
         <b-tab title="Apply" active class="forms">
           <div class="form" v-for="(form, form_index) in apply_form" :key="form_index">
@@ -181,8 +181,14 @@ export default Vue.extend({
 
       apply_form.splice(index, 1)
     }
+    // async init() {
+    //   //@ts-ignore
+    //   const payments = await this.$http().get('/payments')
+    //   console.log(payments)
+    // }
   },
   mounted() {
+    // this.init()
     EventBus.$on('apply-payment', (invoice: any) => {
       this.invoice = invoice
       this.$bvModal.show('apply-payment-modal')

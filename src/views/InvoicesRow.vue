@@ -42,6 +42,7 @@
           <!--<div data-toggle="popover" :data-content="'select projects.name, round(invoice_duration/3600,2) as time, client_rate, report_at, notes from timelog left join projects on project_id = projects.id where invoice_id = '+invoice.invoice_id">Query</div>-->
         </div>
         <div class="payment">
+          <span v-if="invoice.payments.length > 0">payment available</span>
           <button type="button" class="btn btn-primary" @click="applyPayment(invoice)" v-if="isAdmin() && invoice.status === 'open'">Payment</button>
         </div>
       </div>
