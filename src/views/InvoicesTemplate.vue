@@ -36,13 +36,12 @@
 
 <script>
 import InvoicesRow from './InvoicesRow.vue'
-import InvoiceableApplyPayment from './InvoiceableApplyPayment.vue'
 
 export default {
   name: 'invoices-template',
   components: {
     'invoices-row': InvoicesRow,
-    'invoiceable-apply-payment': InvoiceableApplyPayment
+    'invoiceable-apply-payment': () => import('./InvoiceableApplyPayment.vue')
   },
   computed: {
     current_company: function() {
@@ -95,9 +94,6 @@ export default {
       const { invoices } = await this.$http().get('/getInvoices')
 
       this.invoices = invoices
-
-      console.log('[invoices] :')
-      console.log(invoices)
     }
   }
 }
