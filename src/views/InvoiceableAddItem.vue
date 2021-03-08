@@ -18,25 +18,31 @@
                 <b-col sm="3" class="text-sm-right"><b>Description:</b></b-col>
                 <!-- <b-col>{{ row.item.Description }}</b-col> -->
                 <b-col sm="9">
-                  <b-form-input type="text" v-model="row.item.Description"></b-form-input>
+                  <b-form-input type="text" placeholder="Enter Description" v-model="row.item.Description"></b-form-input>
                 </b-col>
               </b-row>
               <b-row class="mb-2">
                 <b-col sm="3" class="text-sm-right"><b>Rate:</b></b-col>
                 <b-col sm="9">
-                  <b-form-input type="number" v-model="row.item.Rate"></b-form-input>
+                  <b-form-input type="number" placeholder="Enter Rate" v-model="row.item.Rate"></b-form-input>
                 </b-col>
               </b-row>
               <b-row class="mb-2">
                 <b-col sm="3" class="text-sm-right"><b>Cost:</b></b-col>
                 <b-col sm="9">
-                  <b-form-input type="number" v-model="row.item.Cost"></b-form-input>
+                  <b-form-input type="number" placeholder="Enter Cost" v-model="row.item.Cost"></b-form-input>
+                </b-col>
+              </b-row>
+              <b-row class="mb-2">
+                <b-col sm="3" class="text-sm-right"><b>Quantity:</b></b-col>
+                <b-col sm="9">
+                  <b-form-input type="number" placeholder="Enter Quantity" v-model="row.item.Quantity"></b-form-input>
                 </b-col>
               </b-row>
               <b-row class="mb-2">
                 <b-col sm="3" class="text-sm-right"><b>Date:</b></b-col>
                 <b-col sm="9">
-                  <b-form-input type="date" v-model="row.item.Date"></b-form-input>
+                  <b-form-input type="date" placeholder="Enter Date" v-model="row.item.Date"></b-form-input>
                 </b-col>
               </b-row>
 
@@ -80,6 +86,10 @@
             <span class="input-warning" v-if="saving_status === 'failed' && !invoiceable_item.paid_amount">* Cost must have value</span>
             <b-form-input type="number" class="form-input" placeholder="Enter cost" v-model="invoiceable_item.paid_amount" />
           </div>
+          <div class="input-cost">
+            <span class="input-warning" v-if="saving_status === 'failed' && !invoiceable_item.quantity">* Quantity must have value</span>
+            <b-form-input type="number" class="form-input" placeholder="Enter quantity" v-model="invoiceable_item.quantity" />
+          </div>
           <div style="margin-top: 5px;">
             <b-form-datepicker id="example-datepicker" :value="invoiceable_item.date" class="mb-2"></b-form-datepicker>
           </div>
@@ -98,13 +108,11 @@
           </div>
         </div>
       </b-tab>
-      <!-- <b-tab title="Disabled" disabled><p>I'm a disabled tab!</p></b-tab> -->
     </b-tabs>
   </b-modal>
 </template>
 
 <script>
-import { forEach } from 'lodash'
 export default {
   props: ['show', 'clients', 'chosen_clients'],
   data() {
@@ -154,6 +162,7 @@ export default {
           Description: invoiceable_item.description,
           Rate: invoiceable_item.invoice_amount,
           Cost: invoiceable_item.paid_amount,
+          Quantity: invoiceable_item.quantity,
           Date: invoiceable_item.date
         }
         this.table_items.push(items)
@@ -191,6 +200,7 @@ export default {
             project_id: this.invoiceable_item.item_selected.id,
             invoice_amount: this.invoiceable_item.rate,
             paid_amount: this.invoiceable_item.paid_amount,
+            quantity: this.invoiceable_item.quantity,
             company_user_id: 1, //TODO: figure out what to set here
             recurs: this.invoiceable_item.repeat ? this.invoiceable_item.repeat_option : null
           }
