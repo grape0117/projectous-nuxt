@@ -1,21 +1,20 @@
 <template>
-  <b-modal id="apply-payment-modal" :size="(invoice && !invoice.payments.length) || active_tab === 1 ? 'md' : 'lg'" class="apply-payment-modal" :title="(invoice && !invoice.payments.length) || active_tab === 1 ? 'Apply Payment' : 'Payments'" style="min-height: 500px;" @ok="save" @hidden="hide" :hide-footer="this.invoice.payments.length > 0 && active_tab === 0 ? true : false">
+  <b-modal id="apply-payment-modal" class="apply-payment-modal" style="min-height: 500px;" :size="(invoice && !invoice.payments.length) || active_tab === 1 ? 'md' : 'lg'" :title="(invoice && !invoice.payments.length) || active_tab === 1 ? 'Apply Payment' : 'Payments'" @ok="savePayment" @hidden="hide" :hide-footer="invoice && invoice.payments.length > 0 && active_tab === 0 ? true : false">
     <div no-body v-if="invoice && invoice.payments.length > 0">
       <b-tabs content-class="mt-3" v-model="active_tab" lazy>
         <b-tab title="List">
-          <pre>
-            {{ invoice.payments }}
-          </pre>
           <b-table striped hover :items="invoice.payments" :fields="table_fields">
             <template #cell(Options)="row">
               <div v-if="!row.item.toDelete">
                 <b-button size="sm" @click="row.toggleDetails" class="mr-2"> {{ row.detailsShowing ? 'Hide' : 'Edit' }}</b-button>
                 <b-button size="sm" class="mr-2" variant="danger" @click="toDeleteRow(row.item)"> Delete</b-button>
               </div>
-              <div v-else>
+              <div v-else class="d-flex flex-column align-items-end">
                 <span>Are you sure you want to delete?</span>
-                <b-button size="sm" variant="outline-primary mr-3" @click="removeToDelete(row.item)">No</b-button>
-                <b-button size="sm" variant="outline-danger" @click="deleteRow(row.item)">Yes</b-button>
+                <div>
+                  <b-button size="sm" variant="outline-primary mr-3" @click="removeToDelete(row.item)">No</b-button>
+                  <b-button size="sm" variant="outline-danger" @click="deleteRow(row.item)">Yes</b-button>
+                </div>
               </div>
             </template>
 
@@ -24,22 +23,25 @@
                 <div class="mt-2">
                   <span class="label">Check #</span>
                   <b-form-input v-model="row.item.check_no"></b-form-input>
+                  <span class="label error" v-if="edit_status === 'failed' && !row.item.check_no">* Check # must have value</span>
                 </div>
                 <div class="mt-2">
                   <span class="label">Amount</span>
                   <b-form-input type="number" v-model="row.item.amount"></b-form-input>
+                  <span class="label error" v-if="edit_status === 'failed' && !row.item.amount">* Amount must have value</span>
                 </div>
                 <div class="mt-2">
                   <span class="label">Image</span>
                   <b-form-file v-model="image" :state="Boolean(image)" placeholder="Choose a file or drop it here..." drop-placeholder="Drop file here..."></b-form-file>
                 </div>
                 <div class="mt-2">
-                  <span class="label">Date</span>
+                  <span class="label">Date..</span>
                   <b-form-datepicker v-model="row.item.check_date"></b-form-datepicker>
+                  <span class="label error" v-if="edit_status === 'failed' && !row.item.check_date">* Date must have value</span>
                 </div>
 
                 <b-row class="my-2 px-4 d-flex justify-content-end">
-                  <b-button size="sm" variant="outline-primary" @click="saveEdit(row.item)">Save</b-button>
+                  <b-button size="sm" variant="outline-primary" @click="saveEdit($event, row.item)">Save</b-button>
                 </b-row>
               </b-card>
             </template>
@@ -129,12 +131,12 @@
 <script lang="ts">
 import Vue from 'vue'
 import { EventBus } from '@/components/event-bus'
-import { lowerFirst } from 'lodash'
 
 export default Vue.extend({
   data() {
     return {
       saving_status: null as null | string,
+      edit_status: null as null | string,
       table_fields: [{ key: 'check_no', label: 'Check Number', sortable: true }, { key: 'amount', sortable: true }, { key: 'image', sortable: false }, { key: 'check_date', label: 'Date', sortable: true }, { key: 'Options' }],
       image: [], // NOTE: Only temporary as "image" property is not available in the db table yet
       apply_form: [
@@ -142,7 +144,7 @@ export default Vue.extend({
           check_number: '',
           amount: '',
           image: [], // Must be null to make form-input red
-          date: '',
+          date: new Date(),
           toDelete: false, // Only for Delete
           removeForm: false // Only for Apply
         }
@@ -152,40 +154,50 @@ export default Vue.extend({
     }
   },
   methods: {
-    saveEdit(row_item: any) {},
-    save(bvModalEvt: any) {
+    async saveEdit(bvModalEvt: any, row_item: any) {
       bvModalEvt.preventDefault()
-      this.saving_status = 'saving'
+      this.edit_status = 'saving'
 
-      // const tab_index = this.active_tab
-      const [{ check_number, amount, date }] = this.apply_form
+      const { id, check_no, amount, check_date } = row_item
 
-      if (!check_number || !amount || !date) {
-        this.saving_status = 'failed'
+      if (!check_no || !amount || !check_date) {
+        this.edit_status = 'failed'
         return
       }
 
-      if (check_number && amount && date) {
-        console.log('passed')
+      // @ts-ignore
+      await this.$http().put('/invoice_payments/', id, row_item)
+    },
+    savePayment(bvModalEvt: any) {
+      bvModalEvt.preventDefault()
+      this.saving_status = 'saving'
 
-        this.$nextTick(async () => {
-          this.saving_status = 'success'
-          const payments = {
-            id: 1,
-            invoice_id: 657,
-            company_user_id: 1,
-            amount: '1',
-            check_no: '1',
-            note: 0,
-            check_date: null
-          }
-          // TODO: to continue as I am not sure what route to send payments data
-          // @ts-ignore
-          await this.$http().post('/apply_payments', payments)
-
-          this.$bvModal.hide('apply-payment-modal')
-        })
+      for (const p of this.apply_form) {
+        if (!p.check_number || !p.amount || !p.date) {
+          this.saving_status = 'failed'
+          return
+        }
       }
+
+      this.$nextTick(async () => {
+        this.saving_status = 'success'
+        for (const pay of this.apply_form) {
+          const payments = {
+            invoice_id: this.invoice.id,
+            company_user_id: this.$store.state.settings.current_company_user_id,
+            amount: pay.amount,
+            check_no: pay.check_number,
+            note: 0,
+            check_date: pay.date
+          }
+
+          // @ts-ignore
+          const { payemnt } = await this.$http().post('/invoice_payments', payments)
+          this.invoice.payments.push(payemnt)
+        }
+
+        this.$bvModal.hide('apply-payment-modal')
+      })
     },
     hide() {
       // reset
@@ -200,7 +212,7 @@ export default Vue.extend({
           check_number: '',
           amount: '',
           image: [], // Must be null to make form-input red
-          date: '',
+          date: new Date(),
           toDelete: false, // Only for Delete
           removeForm: false // Only for Apply
         }
@@ -210,8 +222,9 @@ export default Vue.extend({
       const index = this.invoice.payments.indexOf(row_item)
       Vue.set(this.invoice.payments[index], 'toDelete', true)
     },
-    deleteRow(row_item: any) {
-      // ...
+    async deleteRow(row_item: any) {
+      // @ts-ignore
+      await this.$http().delete('/invoice_payments/', row_item.id, row_item)
 
       this.removeToDelete(row_item)
     },
@@ -229,7 +242,7 @@ export default Vue.extend({
       return index
     },
     addApplyForm() {
-      const APPLY_FORM: any = { check_number: '', amount: '', image: [], date: '', toDelete: false, removeForm: false }
+      const APPLY_FORM: any = { check_number: '', amount: '', image: [], date: new Date(), toDelete: false, removeForm: false }
       this.apply_form.push(APPLY_FORM)
     },
     removeApplyForm(form: any) {
