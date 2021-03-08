@@ -163,9 +163,8 @@ export default {
   height: calc(100vh - 160px) !important;
 }
 .task-side-bar_task-message .message-panel_inner {
-  max-height: calc(100vh - 300px);
-  min-height: calc(100vh - 300px);
-  overflow-y: scroll;
+  height: calc(100vh - 325px);
+  overflow-y: auto;
   overflow-x: hidden;
 }
 .message-sidebar_new-task {

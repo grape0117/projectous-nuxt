@@ -38,6 +38,7 @@ import TimerTab from './TimerTab.vue'
 import { ITimer } from '../store/modules/timers/types'
 import uuid from 'uuid'
 import { getCookie } from '@/utils/util-functions'
+import { projects } from '@/store/modules/projects'
 
 const TaskUsers = namespace('task_users')
 const Lists = namespace('lists')
@@ -241,6 +242,8 @@ export default class Custom extends Vue {
 
   private onTaskTimerToggled(payload: ITaskTimerToggle) {
     const { taskId, timerId } = payload
+    const RUNNING = 'running'
+
     const task = this.$store.getters['tasks/getById'](taskId)
     console.log('task', task)
     let timer = {
@@ -253,6 +256,16 @@ export default class Custom extends Vue {
       timer['project_id'] = project.id
       console.log(timer)
     }
+    let hasActiveTimer = this.$store.state.timers.timers.find((proj: any) => proj.task_id === taskId && proj.status === RUNNING)
+    console.log(hasActiveTimer)
+
+    if (hasActiveTimer) {
+      this.$store.dispatch('timers/stopTimer', hasActiveTimer)
+      this.editedTaskId = taskId
+      this.editedTaskTimerId = timerId
+      return
+    }
+
     this.$store.dispatch('timers/startTimer', timer)
     this.editedTaskId = taskId
     this.editedTaskTimerId = timerId
@@ -270,7 +283,7 @@ export default class Custom extends Vue {
   private getCompanyUser() {
     const id = this.$store.state.settings.current_user_id
     // let user = this.sortedCompanyUsers.find((user: any) => user.user_id === 345)
-    let user = this.sortedCompanyUsers.find((user: any) => user.user_id === id)
+    let user = this.sortedCompanyUsers.find((u: any) => u.user_id === id)
     // console.log('[USER]')
     // console.log(user)
     this.selectedCompanyUserId = user.id

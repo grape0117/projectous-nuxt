@@ -6,7 +6,7 @@
       <a v-if="item.invoice_id" href="">{{ timer.invoice_id }}</a>
     </td>
     <td v-if="isAdmin()" @click="editItem(item)"></td>
-    <td v-else="">
+    <td v-else>
       $<span>{{ item.invoice_amount }}</span>
     </td>
     <td @click="editItem(item)">
@@ -14,7 +14,7 @@
         <div class="timer-row-client">{{ getClientNameFromProjectId(item.project_id) }}</div>
         <div class="timer-row-project">{{ getProjectName(item.project_id) }}</div>
       </div>
-      <span v-else="" style="color: red">No Project</span>
+      <span v-else style="color: red">No Project</span>
     </td>
     <td @click="editItem(item)">
       {{ item.date }}

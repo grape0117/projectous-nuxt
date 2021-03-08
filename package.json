@@ -18,6 +18,7 @@
     "@types/uuid": "^3.4.9",
     "axios": "^0.19.2",
     "bootstrap-vue": "^2.8.0",
+    "chart.js": "^2.9.4",
     "core-js": "^2.6.11",
     "husky": "^3.1.0",
     "idb": "^5.0.4",
@@ -27,6 +28,7 @@
     "normalizr": "^3.6.0",
     "pretty-quick": "^2.0.2",
     "vue": "^2.6.12",
+    "vue-chartjs": "^3.5.1",
     "vue-class-component": "^7.2.5",
     "vue-cli": "^2.9.6",
     "vue-moment": "^4.1.0",
@@ -49,11 +51,11 @@
     "eslint-loader": "^3.0.4",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-vue": "^5.2.3",
-    "tailwindcss": "^1.7.6",
-    "typescript": "^3.9.7",
-    "vue-template-compiler": "^2.6.12",
     "prettier": "^1.19.1",
     "sass": "^1.26.10",
-    "sass-loader": "^8.0.2"
+    "sass-loader": "^8.0.2",
+    "tailwindcss": "^1.7.6",
+    "typescript": "^3.9.7",
+    "vue-template-compiler": "^2.6.12"
   }
 }
