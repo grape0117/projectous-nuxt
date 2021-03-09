@@ -32,7 +32,7 @@
               </div>
             </div>
             <div class="form-group">
-              <b-form-radio-group v-model="user.status" :options="status_options" class="mb-3" value-field="item" text-field="name"></b-form-radio-group>
+              <b-form-radio-group v-model="user.status" :options="status_options" class="mb-3 ml-3" value-field="item" text-field="name"></b-form-radio-group>
             </div>
             <div class="form-group">
               <label class="control-label col-sm-4" for="userAliases">Aliases: </label>
