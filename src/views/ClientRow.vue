@@ -23,6 +23,6 @@ export default {
   color: white;
 }
 .client-row:hover {
-  background: rgba($color: #000000, $alpha: 0.6);
+  background: rgba($color: #000000, $alpha: 0.5);
 }
 </style>
