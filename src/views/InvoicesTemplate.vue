@@ -9,9 +9,7 @@
           <a href="#open" aria-controls="open" role="tab" data-toggle="tab"> Open<!-- <span class="badge" v-html="openinvoices.length"></span>--> </a>
         </li>
         <li role="presentation" data-tab="closed">
-          <a href="#closed" aria-controls="open" role="tab" data-toggle="tab">
-            Closed
-          </a>
+          <a href="#closed" aria-controls="open" role="tab" data-toggle="tab"> Closed </a>
         </li>
       </ul>
     </div>
@@ -30,7 +28,7 @@
         </div>
       </div>
     </div>
-    <invoiceable-apply-payment />
+    <invoices-apply-payment />
   </div>
 </template>
 
@@ -41,7 +39,7 @@ export default {
   name: 'invoices-template',
   components: {
     'invoices-row': InvoicesRow,
-    'invoiceable-apply-payment': () => import('./InvoiceableApplyPayment.vue')
+    'invoices-apply-payment': () => import('./InvoicesApplyPayment.vue')
   },
   computed: {
     current_company: function() {
