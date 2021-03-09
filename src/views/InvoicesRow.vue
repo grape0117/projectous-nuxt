@@ -12,36 +12,31 @@
     </div>
     <div class="invoices-items" v-for="invoice in invoices" :key="invoice.id">
       <div>
-        <select v-on:change="updateInvoiceStatus(invoice.id, invoice.status)" v-model="invoice.status">
-          <option value="open">Open</option>
-          <option value="paid">Paid</option>
-          <option value="voided">Voided</option>
-        </select>
+        <b-button size="sm" variant="primary" class="d-block" @click="updateInvoiceStatus(invoice.id, 'open')">Open</b-button>
+        <b-button size="sm" variant="success" class="mt-1 d-block" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</b-button>
+        <b-button size="sm" variant="danger" class="mt-1 d-block" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</b-button>
       </div>
       <div>{{ invoice.date }}</div>
       <div>
         <b v-if="invoice && invoice.client">{{ invoice.client.name }}</b>
-        <div v-for="(project, project_index) in invoice.projects" :key="project_index" v-bind:project="project" style="font-size: smaller;">
+        <div v-for="(project, project_index) in invoice.projects" :key="project_index" v-bind:project="project" style="font-size: smaller">
           <span v-if="project">{{ project.name }}</span>
         </div>
       </div>
       <div>{{ invoice.invoice_id }}</div>
       <div>{{ invoice.total }}</div>
-      <div style="padding: 3px;">{{ invoice.start_date }}</div>
-      <div style="padding: 3px;">{{ invoice.end_date }}</div>
+      <div style="padding: 3px">{{ invoice.start_date }}</div>
+      <div style="padding: 3px">{{ invoice.end_date }}</div>
       <div class="buttons">
         <div class="options">
-          <a class="btn btn-xs btn-info" target="_blank" :href="'/invoice/' + invoice.invoice_id">
-            View
-          </a>
-          <a class="btn btn-xs btn-primary" target="_blank" :href="'/export/csv/invoice/' + invoice.invoice_id">
-            CSV
-          </a>
+          <a class="btn btn-xs btn-info" target="_blank" :href="'/invoice/' + invoice.invoice_id"> View </a>
+          <a class="btn btn-xs btn-primary" target="_blank" :href="'/export/csv/invoice/' + invoice.invoice_id"> CSV </a>
           <!--<a class="btn btn-xs btn-default">Export</a>-->
           <a class="btn btn-xs btn-danger" @click="deleteInvoice(invoice)">Delete</a>
           <!--<div data-toggle="popover" :data-content="'select projects.name, round(invoice_duration/3600,2) as time, client_rate, report_at, notes from timelog left join projects on project_id = projects.id where invoice_id = '+invoice.invoice_id">Query</div>-->
         </div>
         <div class="payment">
+          <span v-if="invoice.payments.length > 0">payment available</span>
           <button type="button" class="btn btn-primary" @click="applyPayment(invoice)" v-if="isAdmin() && invoice.status === 'open'">Payment</button>
         </div>
       </div>
