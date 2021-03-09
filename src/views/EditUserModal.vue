@@ -32,6 +32,9 @@
               </div>
             </div>
             <div class="form-group">
+              <b-form-radio-group v-model="user.status" :options="status_options" class="mb-3" value-field="item" text-field="name"></b-form-radio-group>
+            </div>
+            <div class="form-group">
               <label class="control-label col-sm-4" for="userAliases">Aliases: </label>
               <div class="col-sm-8">
                 <input id="userAliases" class="form-control" type="text" name="aliases" placeholder="Aliases" v-model="user.aliases" />
@@ -72,18 +75,10 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">
-            Close
-          </button>
-          <button type="button" class="btn btn-primary" v-on:click="saveUser()" v-if="isAdmin">
-            Save
-          </button>
-          <button type="button" class="btn btn-primary" v-on:click="makeInactive()" v-if="isAdmin">
-            Make Inactive
-          </button>
-          <button type="button" class="btn btn-primary" v-on:click="removeUser()" v-if="isAdmin && false">
-            Remove from Company
-          </button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" v-on:click="saveUser()" v-if="isAdmin">Save</button>
+          <button type="button" class="btn btn-primary" v-on:click="makeInactive()" v-if="isAdmin">Make Inactive</button>
+          <button type="button" class="btn btn-primary" v-on:click="removeUser()" v-if="isAdmin && false">Remove from Company</button>
         </div>
       </div>
       <!-- /.modal-content -->
@@ -106,6 +101,10 @@ export default {
   },
   data() {
     return {
+      status_options: [
+        { item: 'active', name: 'Active' },
+        { item: 'inactive', name: 'Inactive' }
+      ],
       colors: [
         'lightsalmon',
         'salmon',
