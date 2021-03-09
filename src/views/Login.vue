@@ -9,7 +9,7 @@
           <label class="control-label">Email</label>
           <input type="text" id="email" class="form-control" />
           <label class="control-label">Password</label>
-          <input type="password" id="password" class="form-control" />
+          <input type="password" id="password" class="form-control" @keyup.enter="login" />
           <button type="button" @click="login">Login</button>
           <button class="right" type="button" @click="forgotpassword">Reset Password</button>
         </form>
