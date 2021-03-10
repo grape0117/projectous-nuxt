@@ -11,7 +11,9 @@ import NavBar from './views/NavBar.vue'
 // @ts-ignore
 import ProjectousPlugin from './projectous.js'
 Vue.use(ProjectousPlugin)
-Vue.use(require('vue-moment'))
+// Vue.use(require('vue-moment'))
+import VueMoment from 'vue-moment'
+Vue.use(VueMoment)
 
 Vue.component('nav-bar', NavBar)
 Vue.component('task-modal', EditTaskModal)
