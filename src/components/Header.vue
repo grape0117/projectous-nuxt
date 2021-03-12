@@ -2,10 +2,13 @@
   <div class="header">
     <!-- <div class="header-top" :style="`background-image: linear-gradient(to right, rgba(${headerBgColor},0.2), rgba(${headerBgColor},0.9), rgba(${headerBgColor},1));`"> -->
     <div class="header-nav">
-      <router-link class="logo-name" to="/">
-        <!-- {{ projectName | toUpperCase }} -->
-        <img src="/apple-touch-icon.png" width="30" height="30" alt="logo" />
-      </router-link>
+      <div style="width: 30px;">
+        <img @mouseenter="setReload(true)" v-if="!showReload" src="/apple-touch-icon.png" width="30" height="30" alt="logo" @click="goTo('kanban')" />
+        <div v-else class="reload-icon" @mouseleave="setReload(false)">
+          <i class="icon-cached" :class="$store.state.totalActiveRequests ? 'reload-rotate' : null" />
+          <span class="reload-text">RELOAD</span>
+        </div>
+      </div>
       <div class="nav-buttons">
         <!-- <b-nav horizntal>
           <b-navbar-brand to="/">Projectous</b-navbar-brand>
@@ -23,11 +26,11 @@
     </div>
     <div class="header-bottom">
       <div class="nav-icons">
-        <i class="nav-icon icon-arrow_forward_ios nav-icons-active"></i>
+        <!-- <i class="nav-icon icon-arrow_forward_ios nav-icons-active"></i> -->
         <div class="d-flex" :class="toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index">
           <div class="nav-icon" @click="toggle(icon.name)">
-            <i class="nav-icon__icon" :class="[icon.icon, icon.name == 'reload' && $store.state.totalActiveRequests ? 'reload-rotate' : null]" :style="icon.name == 'reload' ? 'color: white;' : ''" />
-            <span class="nav-icon__name" :style="icon.name == 'reload' ? 'color: white;' : ''">
+            <i class="nav-icon__icon" :class="icon.icon" />
+            <span class="nav-icon__name">
               {{ icon.name | toUpperCase }}
             </span>
           </div>
@@ -40,7 +43,8 @@
             </div>
           </div>
           <div class="timers-right-icons" v-if="icon.name === 'timers' && (timerRunning || timerEmptyFields > 0)">
-            <i class="icon-play_arrow" style="font-size: 20px;" :style="{ color: timerRunning ? '#20d420' : 'rgba(0,0,0,0)' }" />
+            <!-- <i class="icon-play_arrow" style="font-size: 20px;" :style="{ color: timerRunning ? '#20d420' : 'rgba(0,0,0,0)' }" /> -->
+            <i class="icon-play_arrow" style="font-size: 20px;" :style="{ color: timerRunning ? '#20d420' : '#20d420' }" />
             <div class="red-circle-icon" v-if="timerEmptyFields > 0">
               <span class="red-circle-icon-text">{{ timerEmptyFields }}</span>
             </div>
@@ -111,8 +115,8 @@ export default Vue.extend({
         { name: 'tasks', icon: 'icon-library_books' },
         { name: 'chat', icon: 'icon-chat' },
         { name: 'timers', icon: 'icon-timer' },
-        { name: 'paint', icon: 'icon-format_paint' },
-        { name: 'reload', icon: 'icon-cached' }
+        { name: 'paint', icon: 'icon-format_paint' }
+        // { name: 'reload', icon: 'icon-cached' }
       ],
       toggles: {
         tasks: false,
@@ -138,19 +142,39 @@ export default Vue.extend({
             'https://images.pexels.com/photos/719609/pexels-photo-719609.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260'
           ]
         }
-      ]
+      ],
+      isShowReload: false
     }
   },
   computed: {
     headerBgColor() {
       let rgb = this.colors.backgroundColor
       return `${rgb[0]}, ${rgb[0]}, ${rgb[0]}`
+    },
+    showReload() {
+      // <!-- {{ !$store.state.totalActiveRequests ? !$store.state.totalActiveRequests : !isShowReload}} -->
+      if (this.$store.state.totalActiveRequests > 0 || this.isShowReload) {
+        return true
+      }
+      return false
     }
   },
   mounted() {
-    // window.$_app = this
+    EventBus.$on('timerEmptyFields', count => {
+      this.timerEmptyFields = count
+    })
+    EventBus.$on('timerStatus', status => {
+      if (status === 'running') {
+        return (this.timerRunning = true)
+      }
+      this.timerRunning = false
+    })
   },
   methods: {
+    setReload(state) {
+      console.log(state)
+      this.isShowReload = state
+    },
     goTo(path) {
       this.showMenu = false
       if (this.$route.path === `/${path}`) return
@@ -222,16 +246,6 @@ export default Vue.extend({
     } else {
       this.toggles.timers = false
     }
-    EventBus.$on('timerEmptyFields', count => {
-      this.timerEmptyFields = count
-    })
-    EventBus.$on('timerStatus', status => {
-      if (status === 'running') {
-        return (this.timerRunning = true)
-      }
-      this.timerRunning = false
-    })
-    //
   },
   filters: {
     toUpperCase(val) {
@@ -272,6 +286,37 @@ export default Vue.extend({
   // border: 10px solid red !important;
   // flex-wrap: wrap;
   // border: 1px solid
+  .reload-icon {
+    height: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    cursor: pointer;
+
+    .icon-cached {
+      font-size: 24px;
+      color: white;
+      display: flex;
+      // width: 10px;
+      width: 24px;
+      height: 24px;
+
+      &::before {
+        width: 100%;
+        height: 100%;
+        margin: 0 !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+    .reload-text {
+      font-size: 10px;
+      line-height: 10px;
+      color: white;
+    }
+  }
 }
 .header_menu-wrapper {
   // border: 1px solid red;
@@ -313,11 +358,21 @@ export default Vue.extend({
   margin-right: 5px;
 }
 .timers-right-icons {
-  // border: 1px solid red;
   display: flex;
   flex-direction: column;
-  // justify-content: center;
   align-items: center;
+  justify-content: space-around;
+  margin-left: 5px;
+
+  .icon-play_arrow:before {
+    content: '\EAC9';
+    margin: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px !important;
+    height: 10px !important;
+  }
 }
 .chat-right-icons {
   display: flex;
@@ -436,7 +491,7 @@ export default Vue.extend({
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding-left: 5px;
+  padding-left: 15px;
 }
 
 .nav-icon:hover {
@@ -448,7 +503,7 @@ export default Vue.extend({
 }
 .nav-icon__name {
   font-size: 10px;
-  margin-top: -5px;
+  line-height: 10px;
 }
 .header-paint {
   position: absolute;
@@ -461,6 +516,7 @@ export default Vue.extend({
   z-index: 10;
   color: #1d2228;
   background-color: #f7f8ff;
+  width: 305px;
 }
 
 .header-paint-style {
