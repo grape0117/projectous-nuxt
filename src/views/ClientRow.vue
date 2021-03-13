@@ -1,5 +1,5 @@
 <template>
-  <tr @click="editClient(client)" class="client-row">
+  <tr @click="editClient(client)" class="client-row" :style="{ 'background-color': client.color ? client.color : null }">
     <td>{{ client.name }}</td>
   </tr>
 </template>
