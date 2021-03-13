@@ -61,8 +61,8 @@ export default {
     }
   },
   watch: {
-    async 'timer.status'(status) {
-      await EventBus.$emit('timerStatus', status)
+    'timer.status'(status) {
+      EventBus.$emit('timerStatus', status)
     },
     'timer.notes'(notes) {
       if (notes === null) return

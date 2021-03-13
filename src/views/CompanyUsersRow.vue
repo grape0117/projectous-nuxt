@@ -1,7 +1,6 @@
 <template>
   <tr @click="editCompanyUser" class="company-user-row">
     <td :style="{ background: user.color }" :class="{ 'color-black': !!user.color }">{{ user.name }}</td>
-    <!-- <td> <pre>{{ user }}</pre> </td> -->
     <td>{{ user.user_role }}</td>
     <td>{{ user.address }}</td>
   </tr>
