@@ -1,52 +1,34 @@
 <template>
-  <div id="invoices-row">
-    <div class="invoices-header">
-      <span>Status</span>
-      <span>Date Created</span>
-      <span>Recipient</span>
-      <span>Invoice ID</span>
-      <span>Amount</span>
-      <span>Start Date</span>
-      <span>End Date</span>
-      <span>Options</span>
+  <div class="invoices-items">
+    <div>
+      <b-button-group>
+        <b-button variant="primary" @click="updateInvoiceStatus(invoice.id, 'open')">Open</b-button>
+        <b-button variant="success" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</b-button>
+        <b-button variant="danger" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</b-button>
+      </b-button-group>
     </div>
-    <div class="invoices-items" v-for="invoice in invoices" :key="invoice.id">
-      <div>
-        <b-button-group>
-          <b-button variant="primary" @click="updateInvoiceStatus(invoice.id, 'open')">Open</b-button>
-          <b-button variant="success" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</b-button>
-          <b-button variant="danger" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</b-button>
-        </b-button-group>
+    <div>{{ invoice.date }}</div>
+    <div>
+      <b v-if="invoice && invoice.client">{{ invoice.client.name }}</b>
+      <div v-for="(project, project_index) in invoice.projects" :key="project_index" v-bind:project="project" style="font-size: smaller">
+        <span v-if="project">{{ project.name }}</span>
       </div>
-
-      <!-- <div class="">
-        <b-button size="sm" variant="primary" class="d-block" @click="updateInvoiceStatus(invoice.id, 'open')">Open</b-button>
-        <b-button size="sm" variant="success" class="mt-1 d-block" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</b-button>
-        <b-button size="sm" variant="danger" class="mt-1 d-block" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</b-button>
-      </div> -->
-      <div>{{ invoice.date }}</div>
-      <div>
-        <b v-if="invoice && invoice.client">{{ invoice.client.name }}</b>
-        <div v-for="(project, project_index) in invoice.projects" :key="project_index" v-bind:project="project" style="font-size: smaller">
-          <span v-if="project">{{ project.name }}</span>
-        </div>
+    </div>
+    <div>{{ invoice.invoice_id }}</div>
+    <div>{{ invoice.total }}</div>
+    <div style="padding: 3px">{{ invoice.start_date }}</div>
+    <div style="padding: 3px">{{ invoice.end_date }}</div>
+    <div class="buttons">
+      <div class="options">
+        <a class="btn btn-xs btn-info" target="_blank" :href="'/invoice/' + invoice.invoice_id"> View </a>
+        <a class="btn btn-xs btn-primary" target="_blank" :href="'/export/csv/invoice/' + invoice.invoice_id"> CSV </a>
+        <!--<a class="btn btn-xs btn-default">Export</a>-->
+        <a class="btn btn-xs btn-danger" @click="deleteInvoice(invoice)">Delete</a>
+        <!--<div data-toggle="popover" :data-content="'select projects.name, round(invoice_duration/3600,2) as time, client_rate, report_at, notes from timelog left join projects on project_id = projects.id where invoice_id = '+invoice.invoice_id">Query</div>-->
       </div>
-      <div>{{ invoice.invoice_id }}</div>
-      <div>{{ invoice.total }}</div>
-      <div style="padding: 3px">{{ invoice.start_date }}</div>
-      <div style="padding: 3px">{{ invoice.end_date }}</div>
-      <div class="buttons">
-        <div class="options">
-          <a class="btn btn-xs btn-info" target="_blank" :href="'/invoice/' + invoice.invoice_id"> View </a>
-          <a class="btn btn-xs btn-primary" target="_blank" :href="'/export/csv/invoice/' + invoice.invoice_id"> CSV </a>
-          <!--<a class="btn btn-xs btn-default">Export</a>-->
-          <a class="btn btn-xs btn-danger" @click="deleteInvoice(invoice)">Delete</a>
-          <!--<div data-toggle="popover" :data-content="'select projects.name, round(invoice_duration/3600,2) as time, client_rate, report_at, notes from timelog left join projects on project_id = projects.id where invoice_id = '+invoice.invoice_id">Query</div>-->
-        </div>
-        <div class="payment">
-          <span v-if="invoice.payments.length > 0">payment available</span>
-          <button type="button" class="btn btn-primary" @click="applyPayment(invoice)" v-if="isAdmin() && invoice.status === 'open'">Payment</button>
-        </div>
+      <div class="payment">
+        <!--<span v-if="invoice.payments.length > 0">payment available</span>-->
+        <button type="button" class="btn btn-primary" @click="applyPayment()" v-if="invoice.status === 'open'">Payment</button>
       </div>
     </div>
   </div>
@@ -57,44 +39,20 @@ import { EventBus } from '@/components/event-bus'
 
 export default {
   name: 'invoices-row',
-  props: ['invoices'],
+  props: ['invoice'],
   methods: {
-    async updateInvoiceStatus(invoice_id, status) {
-      // console.log(status)
-      // $('/invoice/update-status', { id: invoice, status: status }, function(response) {
-      //   let invoiceKey = store.invoiceLookup[reponse.invoice.id]
-      //   Vue.set(store.invoices[invoiceKey], status, status)
-      // })
-
-      // Not sure if "/invoice/update-status" is a valid route
-      // invoices/id { attribute: 'status', value: 'open' }
-      // await this.$http().patch('/invoice/update-status', invoice_id, { status })
-      await this.$http().patch(`/invoices/${invoice_id}`, { attribute: 'status', value: status })
+    async updateInvoiceStatus(id, status) {
+      const { invoice } = await this.$http().patch('/invoices/', id, { attribute: 'status', value: status })
+      this.invoice = invoice
     },
-    isAdmin() {
-      return this.$store.getters['settings/isAdmin']
+    applyPayment() {
+      EventBus.$emit('apply-payment', this.invoice)
     },
-    applyPayment(invoice) {
-      EventBus.$emit('apply-payment', invoice)
-      // this.$emit('payment')
-      // this.$store.commit('settings/setCurrentEditInvoice', this.invoice)
-      // let current_edit_payment = { invoice_id: this.invoice['id'], amount: this.invoice['total'], check_no: '', note: '' }
-      // this.$store.commit('settings/setCurrentEditPayment', current_edit_payment)
-      // this.$store.dispatch('invoices/applyPayment')
-    },
-    deleteInvoice(invoice) {
-      let self = this
-      if (confirm('Are you sure you want to delete invoice ' + invoice.invoice_id + '?')) {
-        ajax('/invoice/delete/' + invoice.id, {}, function(response) {
-          self.getData()
-        })
+    async deleteInvoice() {
+      if (confirm('Are you sure you want to delete invoice ' + this.invoice.invoice_id + '?')) {
+        const { invoice } = await this.$http().delete('/invoices', this.invoice.id)
+        this.invoice = invoice
       }
-    },
-    getData() {
-      let self = this
-      this.$http().get('getInvoices', {}, function(response) {
-        Vue.set(self, 'invoices', response.invoices)
-      })
     }
   }
 }

@@ -20,11 +20,35 @@
     </div>
     <div class="tab-content">
       <div role="tabpanel" id="open" class="tab-pane active">
-        <invoices-row :invoices="openinvoices()" />
+        <div class="invoices-header">
+          <span>Status</span>
+          <span>Date Created</span>
+          <span>Recipient</span>
+          <span>Invoice ID</span>
+          <span>Amount</span>
+          <span>Start Date</span>
+          <span>End Date</span>
+          <span>Options</span>
+        </div>
+        <div class="invoices-items" v-for="invoice in openinvoices()" :key="invoice.id">
+          <invoices-row v-bind:invoice="invoice" />
+        </div>
       </div>
       <div role="tabpanel" id="closed" class="tab-pane">
         <div class="table-responsive">
-          <invoices-row :invoices="closedinvoices()" />
+          <div class="invoices-header">
+            <span>Status</span>
+            <span>Date Created</span>
+            <span>Recipient</span>
+            <span>Invoice ID</span>
+            <span>Amount</span>
+            <span>Start Date</span>
+            <span>End Date</span>
+            <span>Options</span>
+          </div>
+          <div class="invoices-items" v-for="invoice in closedinvoices()" :key="invoice.id">
+            <invoices-row v-bind:invoice="invoice" />
+          </div>
         </div>
       </div>
     </div>
@@ -67,30 +91,16 @@ export default {
   methods: {
     closedinvoices() {
       return this.invoices.filter(function(invoice) {
-        return invoice.status !== 'open'
+        return invoice.status !== 'open' && !invoice.deleted_at
       })
     },
     openinvoices() {
       return this.invoices.filter(function(invoice) {
-        return invoice.status === 'open'
+        return invoice.status === 'open' && !invoice.deleted_at
       })
     },
-    deleteInvoice(invoice) {
-      let self = this
-      if (confirm('Are you sure you want to delete invoice ' + invoice.invoice_id + '?')) {
-        ajax('/invoice/delete/' + invoice.id, {}, function(response) {
-          self.getData()
-        })
-      }
-    },
-    isSelected(invoice, value) {
-      if (this.invoice[value]) {
-        return 'selected'
-      }
-    },
     async getData() {
-      const { invoices } = await this.$http().get('/getInvoices')
-
+      const { invoices } = await this.$http().get('/invoices')
       this.invoices = invoices
     }
   }
