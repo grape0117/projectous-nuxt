@@ -196,7 +196,6 @@ export default {
   data: function() {
     return {
       isShowInvoiceableItems: false,
-
       total_time: 0,
       total_earned: 0,
       total_unpaid: 0,
@@ -490,7 +489,7 @@ export default {
       }
       //console.log(this.chosen_clients)
     },
-    getData(where) {
+    async getData(where) {
       //TODO use: new URLSearchParams(new FormData(formElement)).toString()
       console.log(where)
       //labeledConsole('where',where)
@@ -520,55 +519,47 @@ export default {
       //labeledConsole('project', $('#project').val())
       sessionStorage.setItem('invoiceable', data)
       //$('.uncheck').attr('checked', false)
-      if (self.isAdmin()) {
-        this.$http()
-          .post('/invoiceable-timers', data)
-          .then(response => {
-            console.log('response')
-            self.invoice_items = response.invoice_items
-            self.timers = response.timers
-            console.log('getting data')
-            console.log(response)
-            self.total_time = 0
-            self.total_earned = 0
-            self.total_unpaid = 0
-            self.total_unbillable = 0
-            self.total_invoiceable = 0
-            self.timers.forEach(function(key, timer) {
-              console.log(timer.id, timer.duration, timer.notes)
+      if (this.isAdmin()) {
+        const { invoice_items, timers } = await this.$http().post('/invoiceable-timers', data)
 
-              self.total_time += timer.duration
-              self.total_earned += (timer.duration / 3600) * timer.user_rate
-              if (!timer.is_paid) {
-                self.total_unpaid += (timer.duration / 3600) * timer.user_rate
-              }
-              if (!timer.is_billable) {
-                self.total_unbillable++
-              } else {
-                self.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
-              }
-            })
-          })
+        this.invoice_items = invoice_items
+        this.timers = timers
+        this.total_time = 0
+        this.total_earned = 0
+        this.total_unpaid = 0
+        this.total_unbillable = 0
+        this.total_invoiceable = 0
+
+        for (const timer of this.timers) {
+          this.total_time += timer.duration
+          this.total_earned += (timer.duration / 3600) * timer.user_rate
+          if (!timer.is_paid) {
+            this.total_unpaid += (timer.duration / 3600) * timer.user_rate
+          }
+          if (!timer.is_billable) {
+            this.total_unbillable++
+          } else {
+            this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
+          }
+        }
       } else {
-        this.$http()
-          .post('payable-timers', data)
-          .then(response => {
-            self.timers = response.timers
-            self.total_time = 0
-            self.total_earned = 0
-            self.total_unpaid = 0
-            self.total_unbillable = 0
-            self.timers.forEach(function(key, timer) {
-              self.total_time += timer.duration
-              self.total_earned += (timer.duration / 3600) * timer.user_rate
-              if (!timer.is_paid) {
-                self.total_unpaid += (timer.duration / 3600) * timer.user_rate
-              }
-              if (!timer.is_billable) {
-                self.total_unbillable++
-              }
-            })
-          })
+        const { timers } = await this.$http().post('payable-timers', data)
+        this.timers = response.timers
+        this.total_time = 0
+        this.total_earned = 0
+        this.total_unpaid = 0
+        this.total_unbillable = 0
+
+        for (const timer of timers) {
+          this.total_time += timer.duration
+          this.total_earned += (timer.duration / 3600) * timer.user_rate
+          if (!timer.is_paid) {
+            this.total_unpaid += (timer.duration / 3600) * timer.user_rate
+          }
+          if (!timer.is_billable) {
+            this.total_unbillable++
+          }
+        }
       }
     }
   }

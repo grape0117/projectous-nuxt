@@ -113,6 +113,8 @@
 </template>
 
 <script>
+import moment from 'moment'
+
 export default {
   props: ['show', 'clients', 'chosen_clients'],
   data() {
@@ -131,7 +133,7 @@ export default {
       invoiceable_item: {
         item_selected: {},
         description: null,
-        date: new Date(),
+        date: moment(new Date()).format('YYYY-MM-DD'),
         rate: null,
         paid_amount: null,
         // repeat
@@ -196,7 +198,7 @@ export default {
             description: this.invoiceable_item.description,
             date: this.invoiceable_item.date,
             company_id: this.$store.state.settings.current_company_id,
-            client_id: this.$store.getters['clients/getByClientCompanyId'](this.invoiceable_item.item_selected.client_company_id),
+            client_id: this.$store.getters['clients/getByClientCompanyId'](this.invoiceable_item.item_selected.client_company_id).id,
             project_id: this.invoiceable_item.item_selected.id,
             invoice_amount: this.invoiceable_item.rate,
             paid_amount: this.invoiceable_item.paid_amount,
@@ -204,13 +206,14 @@ export default {
             company_user_id: 1, //TODO: figure out what to set here
             recurs: this.invoiceable_item.repeat ? this.invoiceable_item.repeat_option : null
           }
+          console.log(invoiceable_item)
           await this.$store.dispatch('ADD_ONE', { module: 'invoiceable_items', entity: invoiceable_item })
 
           // reset
           this.invoiceable_item = {
             item_selected: {},
             description: null,
-            date: new Date(),
+            date: moment(new Date()).format('YYYY-MM-DD'),
             rate: null,
             // repeat
             repeat: false,
