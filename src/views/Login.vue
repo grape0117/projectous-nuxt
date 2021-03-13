@@ -7,9 +7,9 @@
       <div class="login-page__block-form">
         <form>
           <label class="control-label">Email</label>
-          <input type="text" id="email" class="form-control" />
+          <input type="text" id="email" v-model="email" class="form-control" />
           <label class="control-label">Password</label>
-          <input type="password" id="password" class="form-control" />
+          <input type="password" id="password" v-model="password" class="form-control" />
           <button type="button" @click="login">Login</button>
           <button class="right" type="button" @click="forgotpassword">Reset Password</button>
         </form>
@@ -22,14 +22,15 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class Login extends Vue {
+  private email = '' as string
+  private password = '' as string
+
   private async login(e: any) {
     e.preventDefault()
     // @ts-ignore
     const res = await this.$http().post('/login', {
-      // @ts-ignore
-      email: document.getElementById('email')['value'],
-      // @ts-ignore
-      password: document.getElementById('password')['value']
+      email: this.email,
+      password: this.password
     })
 
     const auth_token = res ? res.auth_token : null
