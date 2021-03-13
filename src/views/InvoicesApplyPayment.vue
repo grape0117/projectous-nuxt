@@ -132,6 +132,8 @@
 import Vue from 'vue'
 import { EventBus } from '@/components/event-bus'
 
+import moment from 'moment'
+
 export default Vue.extend({
   data() {
     return {
@@ -144,7 +146,7 @@ export default Vue.extend({
           check_number: '',
           amount: '',
           image: [], // Must be null to make form-input red
-          date: new Date(),
+          date: moment(new Date()).format('YYYY-MM-DD'),
           toDelete: false, // Only for Delete
           removeForm: false // Only for Apply
         }
@@ -152,6 +154,11 @@ export default Vue.extend({
       invoice: null as any,
       active_tab: 0
     }
+  },
+  computed: {
+    // currentDate() {
+    //   return moment(new Date()).format("YYYY-MM-DD")
+    // }
   },
   methods: {
     async saveEdit(bvModalEvt: any, row_item: any) {
@@ -192,8 +199,8 @@ export default Vue.extend({
           }
 
           // @ts-ignore
-          const { payemnt } = await this.$http().post('/invoice_payments', payments)
-          this.invoice.payments.push(payemnt)
+          const { invoice_payments } = await this.$http().post('/invoice_payments', payments)
+          this.invoice.payments.push(invoice_payments)
         }
 
         this.$bvModal.hide('apply-payment-modal')
@@ -212,7 +219,7 @@ export default Vue.extend({
           check_number: '',
           amount: '',
           image: [], // Must be null to make form-input red
-          date: new Date(),
+          date: moment(new Date()).format('YYYY-MM-DD'),
           toDelete: false, // Only for Delete
           removeForm: false // Only for Apply
         }
@@ -258,7 +265,7 @@ export default Vue.extend({
     //   console.log(payments)
     // }
   },
-  mounted() {
+  async mounted() {
     // this.init()
     EventBus.$on('apply-payment', (invoice: any) => {
       this.invoice = invoice

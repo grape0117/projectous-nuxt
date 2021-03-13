@@ -12,10 +12,18 @@
     </div>
     <div class="invoices-items" v-for="invoice in invoices" :key="invoice.id">
       <div>
+        <b-button-group>
+          <b-button variant="primary" @click="updateInvoiceStatus(invoice.id, 'open')">Open</b-button>
+          <b-button variant="success" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</b-button>
+          <b-button variant="danger" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</b-button>
+        </b-button-group>
+      </div>
+
+      <!-- <div class="">
         <b-button size="sm" variant="primary" class="d-block" @click="updateInvoiceStatus(invoice.id, 'open')">Open</b-button>
         <b-button size="sm" variant="success" class="mt-1 d-block" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</b-button>
         <b-button size="sm" variant="danger" class="mt-1 d-block" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</b-button>
-      </div>
+      </div> -->
       <div>{{ invoice.date }}</div>
       <div>
         <b v-if="invoice && invoice.client">{{ invoice.client.name }}</b>
@@ -51,12 +59,17 @@ export default {
   name: 'invoices-row',
   props: ['invoices'],
   methods: {
-    updateInvoiceStatus(invoice, status) {
-      console.log(status)
-      $.post('/invoice/update-status', { id: invoice, status: status }, function(response) {
-        let invoiceKey = store.invoiceLookup[reponse.invoice.id]
-        Vue.set(store.invoices[invoiceKey], status, status)
-      })
+    async updateInvoiceStatus(invoice_id, status) {
+      // console.log(status)
+      // $('/invoice/update-status', { id: invoice, status: status }, function(response) {
+      //   let invoiceKey = store.invoiceLookup[reponse.invoice.id]
+      //   Vue.set(store.invoices[invoiceKey], status, status)
+      // })
+
+      // Not sure if "/invoice/update-status" is a valid route
+      // invoices/id { attribute: 'status', value: 'open' }
+      // await this.$http().patch('/invoice/update-status', invoice_id, { status })
+      await this.$http().patch(`/invoices/${invoice_id}`, { attribute: 'status', value: status })
     },
     isAdmin() {
       return this.$store.getters['settings/isAdmin']
@@ -105,32 +118,32 @@ export default {
 
     span:nth-child(1) {
       width: 100%;
-      max-width: calc(100vw / 12);
+      max-width: calc(100vw / 6);
     }
     span:nth-child(2) {
       width: 100%;
-      max-width: calc(100vw / 10);
+      max-width: calc(100vw / 12);
     }
     span:nth-child(3) {
       width: 100%;
-      max-width: calc(100vw / 5);
+      max-width: calc(100vw / 6);
       min-width: 100px;
     }
     span:nth-child(4) {
       width: 100%;
-      max-width: calc(100vw / 12);
+      max-width: calc(100vw / 14);
     }
     span:nth-child(5) {
       width: 100%;
-      max-width: calc(100vw / 12);
+      max-width: calc(100vw / 14);
     }
     span:nth-child(6) {
       width: 100%;
-      max-width: calc(100vw / 12);
+      max-width: calc(100vw / 14);
     }
     span:nth-child(7) {
       width: 100%;
-      max-width: calc(100vw / 12);
+      max-width: calc(100vw / 14);
     }
     span:last-child {
       width: 100%;
@@ -152,33 +165,33 @@ export default {
 
     > div:nth-child(1) {
       width: 100%;
-      max-width: calc(100vw / 12);
+      max-width: calc(100vw / 6);
       // flex-grow: 10;
     }
     > div:nth-child(2) {
       width: 100%;
-      max-width: calc(100vw / 10);
+      max-width: calc(100vw / 12);
     }
     > div:nth-child(3) {
       width: 100%;
-      max-width: calc(100vw / 5);
+      max-width: calc(100vw / 6);
       min-width: 100px;
     }
     > div:nth-child(4) {
       width: 100%;
-      max-width: calc(100vw / 12);
+      max-width: calc(100vw / 14);
     }
     > div:nth-child(5) {
       width: 100%;
-      max-width: calc(100vw / 12);
+      max-width: calc(100vw / 14);
     }
     > div:nth-child(6) {
       width: 100%;
-      max-width: calc(100vw / 12);
+      max-width: calc(100vw / 14);
     }
     > div:nth-child(7) {
       width: 100%;
-      max-width: calc(100vw / 12);
+      max-width: calc(100vw / 14);
     }
     > div:last-child {
       width: 100%;
