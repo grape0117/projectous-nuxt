@@ -28,16 +28,14 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class Login extends Vue {
-  private email = ''
-  private password = ''
+  private email = '' as string
+  private password = '' as string
 
   private async login(e: any) {
     e.preventDefault()
     // @ts-ignore
     const res = await this.$http().post('/login', {
-      // @ts-ignore
       email: this.email,
-      // @ts-ignore
       password: this.password
     })
 
