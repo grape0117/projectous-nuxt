@@ -56,24 +56,47 @@
               </select>
             </div>
           </div>
-          <div style="display: inline-block;">
-            <div class=" form-inline">
-              {{ start }}
-              <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2"></b-form-datepicker>
-              <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2"></b-form-datepicker>
-              <label for="anytime" style="font-weight: normal;"><input type="checkbox" name="anytime" id="anytime" v-model="anytime" /> Anytime</label>
-              <label v-if="isAdmin() && isTecharound()" for="paid" style="font-weight: normal;"><input type="checkbox" name="is_paid" id="show_paid" v-model="show_paid" /> Show paid</label>
-              <input v-else type="hidden" name="is_paid" value="1" />
-              <label v-if="isAdmin() && isTecharound()" for="is_invoiced" style="font-weight: normal;"> <input type="checkbox" id="is_invoiced" name="is_invoiced" v-model="show_invoiced" /> Show Invoiced? </label>
-              <input v-else type="hidden" name="is_invoiced" value="1" />
-              <a class="btn btn-default btn-sm" @click="lastMonth()">Last Month</a>
-              <a class="btn btn-default btn-sm" @click="thisMonth()">This Month</a>
-              <input v-if="isTecharound()" placeholder="task ID" type="text" name="task_id" />
-              <input v-if="isTecharound()" placeholder="Paid Check #" type="text" name="paid_check_number" />
-              <input v-if="isTecharound()" placeholder="Received Check #" type="text" name="check_number" />
-              <input v-if="isTecharound()" placeholder="Client Rate" type="text" name="client_rate" />
-              <input v-if="isTecharound()" placeholder="User Rate" type="text" name="user_rate" />
-              <input v-if="isTecharound()" placeholder="Invoice #" type="text" name="invoice_id" />
+          <div class="bottom-selects">
+            <div class="form-inline">
+              <!-- {{ start }} -->
+              <div class="d-flex justify-content-between w-100 flex-wrap">
+                <div class="d-flex">
+                  <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2 mr-2"></b-form-datepicker>
+                  <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2 mr-2"></b-form-datepicker>
+                </div>
+                <div class="d-flex align-items-center flex-wrap">
+                  <b-form-checkbox v-model="anytime" name="anytime" class="mr-2">
+                    Anytime
+                  </b-form-checkbox>
+                  <b-form-checkbox v-if="isAdmin()" v-model="show_paid" name="show_paid" class="mr-2">
+                    Show paid
+                  </b-form-checkbox>
+                  <b-form-checkbox v-if="isAdmin()" v-model="show_invoiced" name="show_invoiced">
+                    Show Invoiced
+                  </b-form-checkbox>
+                  <input v-else type="hidden" name="is_invoiced" value="1" />
+                </div>
+
+                <div class="d-flex flex-wrap">
+                  <b-button variant="primary" @click="lastMonth()" class="mr-3">Last Month</b-button>
+                  <b-button variant="primary" @click="thisMonth()">This Month</b-button>
+                </div>
+              </div>
+              <div class="inputs d-flex justify-content-start flex-wrap align-items-start w-100">
+                <b-form-input class="mt-3" placeholder="task ID"></b-form-input>
+                <!-- <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
+                <b-form-input class="mt-3" placeholder="Received Check #"></b-form-input>
+                <b-form-input class="mt-3" placeholder="Client Rate"></b-form-input>
+                <b-form-input class="mt-3" placeholder="User Rate"></b-form-input> -->
+                <b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>
+
+                <!-- <input placeholder="task ID" type="text" name="task_id" />
+                <input placeholder="Paid Check #" type="text" name="paid_check_number" />
+                <input placeholder="Received Check #" type="text" name="check_number" />
+                <input placeholder="Client Rate" type="text" name="client_rate" />
+                <input placeholder="User Rate" type="text" name="user_rate" />
+                <input placeholder="Invoice #" type="text" name="invoice_id" /> -->
+              </div>
             </div>
             <!--<input type="checkbox" name="UTC"> UTC?<br>-->
             <!--<a href="/invoiceable?start=2017-01-01&amp;end=2017-01-31">Last Month</a>--><!-- <a onclick="$('#start').val('')">Last Week</a><br><br>-->
@@ -116,7 +139,7 @@
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
                       <span id="actionLink"></span>
                     </div>
-                    <button class="btn btn-primary" @click="showAddInvoiceable" v-if="isAdmin()">Add Invoiceable Item</button>
+                    <button class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
                   </div>
                 </td>
               </tr>
@@ -153,6 +176,8 @@
         </div>
       </div>
     </div>
+    <!-- Add Invoiceable Item Modal -->
+    <invoiceable-add-item :show="isShowInvoiceableItems" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
   </div>
 </template>
 
@@ -160,19 +185,17 @@
 import Vue from 'vue'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
-// import InvoiceableApplyPayment from './InvoiceableApplyPayment.vue'
 
 export default {
   name: 'invoiceable-template',
   components: {
     'invoiceable-timer-row': InvoiceableTimerRow,
-    'report-timer-row': ReportTimerRow
-    // 'invoiceable-apply-payment': InvoiceableApplyPayment
+    'report-timer-row': ReportTimerRow,
+    'invoiceable-add-item': () => import('./InvoiceableAddItem.vue')
   },
   data: function() {
     return {
-      isShowAddInvoiceable: false,
-
+      isShowInvoiceableItems: false,
       total_time: 0,
       total_earned: 0,
       total_unpaid: 0,
@@ -310,12 +333,12 @@ export default {
     // isNotDiseno() {
     //   return !this.$store.getters['settings/isDiseno']
     // },
-    showAddInvoiceable() {
+    showInvoiceableItems() {
       // this.$store.dispatch('invoices/editInvoiceableItem')
-      this.isShowAddInvoiceable = true
+      this.isShowInvoiceableItems = true
     },
     hideAddInvoiceable() {
-      this.isShowAddInvoiceable = false
+      this.isShowInvoiceableItems = false
     },
     //   applyAction() {
     //     let self = this
@@ -466,7 +489,7 @@ export default {
       }
       //console.log(this.chosen_clients)
     },
-    getData(where) {
+    async getData(where) {
       //TODO use: new URLSearchParams(new FormData(formElement)).toString()
       console.log(where)
       //labeledConsole('where',where)
@@ -496,55 +519,47 @@ export default {
       //labeledConsole('project', $('#project').val())
       sessionStorage.setItem('invoiceable', data)
       //$('.uncheck').attr('checked', false)
-      if (self.isAdmin()) {
-        this.$http()
-          .post('/invoiceable-timers', data)
-          .then(response => {
-            console.log('response')
-            self.invoice_items = response.invoice_items
-            self.timers = response.timers
-            console.log('getting data')
-            console.log(response)
-            self.total_time = 0
-            self.total_earned = 0
-            self.total_unpaid = 0
-            self.total_unbillable = 0
-            self.total_invoiceable = 0
-            self.timers.forEach(function(key, timer) {
-              console.log(timer.id, timer.duration, timer.notes)
+      if (this.isAdmin()) {
+        const { invoice_items, timers } = await this.$http().post('/invoiceable-timers', data)
 
-              self.total_time += timer.duration
-              self.total_earned += (timer.duration / 3600) * timer.user_rate
-              if (!timer.is_paid) {
-                self.total_unpaid += (timer.duration / 3600) * timer.user_rate
-              }
-              if (!timer.is_billable) {
-                self.total_unbillable++
-              } else {
-                self.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
-              }
-            })
-          })
+        this.invoice_items = invoice_items
+        this.timers = timers
+        this.total_time = 0
+        this.total_earned = 0
+        this.total_unpaid = 0
+        this.total_unbillable = 0
+        this.total_invoiceable = 0
+
+        for (const timer of this.timers) {
+          this.total_time += timer.duration
+          this.total_earned += (timer.duration / 3600) * timer.user_rate
+          if (!timer.is_paid) {
+            this.total_unpaid += (timer.duration / 3600) * timer.user_rate
+          }
+          if (!timer.is_billable) {
+            this.total_unbillable++
+          } else {
+            this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
+          }
+        }
       } else {
-        this.$http()
-          .post('payable-timers', data)
-          .then(response => {
-            self.timers = response.timers
-            self.total_time = 0
-            self.total_earned = 0
-            self.total_unpaid = 0
-            self.total_unbillable = 0
-            self.timers.forEach(function(key, timer) {
-              self.total_time += timer.duration
-              self.total_earned += (timer.duration / 3600) * timer.user_rate
-              if (!timer.is_paid) {
-                self.total_unpaid += (timer.duration / 3600) * timer.user_rate
-              }
-              if (!timer.is_billable) {
-                self.total_unbillable++
-              }
-            })
-          })
+        const { timers } = await this.$http().post('payable-timers', data)
+        this.timers = response.timers
+        this.total_time = 0
+        this.total_earned = 0
+        this.total_unpaid = 0
+        this.total_unbillable = 0
+
+        for (const timer of timers) {
+          this.total_time += timer.duration
+          this.total_earned += (timer.duration / 3600) * timer.user_rate
+          if (!timer.is_paid) {
+            this.total_unpaid += (timer.duration / 3600) * timer.user_rate
+          }
+          if (!timer.is_billable) {
+            this.total_unbillable++
+          }
+        }
       }
     }
   }
@@ -647,6 +662,9 @@ a.active {
 </style>
 
 <style lang="scss">
+.b-table-sticky-header {
+  max-height: 500px !important;
+}
 #add-invoiceable-item {
   .modal-content {
     min-height: 400px;
