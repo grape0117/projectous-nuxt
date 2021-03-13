@@ -18,5 +18,15 @@ export const getters: GetterTree<IModuleState, IRootState> = {
         // @ts-ignore
         .sort(Vue.nameSort)
     )
+  },
+  getInactive: (state: IModuleState) => {
+    return (
+      state.company_users
+        .filter(company_user => {
+          return company_user.status != 'active'
+        })
+        // @ts-ignore
+        .sort(Vue.nameSort)
+    )
   }
 }
