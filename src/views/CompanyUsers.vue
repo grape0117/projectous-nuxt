@@ -97,6 +97,7 @@ export default {
   }
 }
 .company-users {
+  max-height: calc(100vh - 50px);
   padding: 0 65px;
   display: flex;
   flex-direction: column;
