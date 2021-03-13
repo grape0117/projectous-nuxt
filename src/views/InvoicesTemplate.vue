@@ -9,11 +9,14 @@
           <a href="#open" aria-controls="open" role="tab" data-toggle="tab"> Open<!-- <span class="badge" v-html="openinvoices.length"></span>--> </a>
         </li>
         <li role="presentation" data-tab="closed">
-          <a href="#closed" aria-controls="open" role="tab" data-toggle="tab">
-            Closed
-          </a>
+          <a href="#closed" aria-controls="open" role="tab" data-toggle="tab"> Closed </a>
         </li>
       </ul>
+    </div>
+    <div>
+      <!-- <pre>
+        {{ invoices.filter(invoice => invoice.payments.length > 0) }}
+      </pre> -->
     </div>
     <div class="tab-content">
       <div role="tabpanel" id="open" class="tab-pane active">
@@ -25,19 +28,18 @@
         </div>
       </div>
     </div>
-    <invoiceable-apply-payment />
+    <invoices-apply-payment />
   </div>
 </template>
 
 <script>
 import InvoicesRow from './InvoicesRow.vue'
-import InvoiceableApplyPayment from './InvoiceableApplyPayment.vue'
 
 export default {
   name: 'invoices-template',
   components: {
     'invoices-row': InvoicesRow,
-    'invoiceable-apply-payment': InvoiceableApplyPayment
+    'invoices-apply-payment': () => import('./InvoicesApplyPayment.vue')
   },
   computed: {
     current_company: function() {
@@ -86,15 +88,10 @@ export default {
         return 'selected'
       }
     },
-    getData() {
-      let self = this
-      const invoices = this.$http()
-        .get('/getInvoices')
-        .then(response => {
-          self.invoices = response.invoices
-        })
+    async getData() {
+      const { invoices } = await this.$http().get('/getInvoices')
 
-      console.log(invoices)
+      this.invoices = invoices
     }
   }
 }

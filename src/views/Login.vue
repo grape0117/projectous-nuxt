@@ -5,14 +5,20 @@
         <span>Login</span>
       </div>
       <div class="login-page__block-form">
-        <form>
-          <label class="control-label">Email</label>
-          <input type="text" id="email" class="form-control" />
-          <label class="control-label">Password</label>
-          <input type="password" id="password" class="form-control" />
-          <button type="button" @click="login">Login</button>
-          <button class="right" type="button" @click="forgotpassword">Reset Password</button>
-        </form>
+        <b-form @submit="login">
+          <b-form-group id="input-group-1" label="Email address:" label-for="email">
+            <b-form-input id="email" v-model="email" type="email" placeholder="Enter email" required></b-form-input>
+          </b-form-group>
+
+          <b-form-group id="input-group-2" label="Your Name:" label-for="password">
+            <b-form-input id="password" v-model="password" type="password" placeholder="Enter password" required></b-form-input>
+          </b-form-group>
+
+          <div class="d-flex justify-content-end">
+            <b-button type="submit" variant="primary" class="mr-2">Submit</b-button>
+            <b-button @click="forgotpassword" variant="danger">Forgot Password</b-button>
+          </div>
+        </b-form>
       </div>
     </div>
   </div>
@@ -22,14 +28,15 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class Login extends Vue {
+  private email = '' as string
+  private password = '' as string
+
   private async login(e: any) {
     e.preventDefault()
     // @ts-ignore
     const res = await this.$http().post('/login', {
-      // @ts-ignore
-      email: document.getElementById('email')['value'],
-      // @ts-ignore
-      password: document.getElementById('password')['value']
+      email: this.email,
+      password: this.password
     })
 
     const auth_token = res ? res.auth_token : null

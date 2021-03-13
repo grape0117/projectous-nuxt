@@ -2,7 +2,17 @@
   <div class="company-users container-fluid">
     <div class="row company-users-top">
       <div class="col-sm-12 form-group form-inline"></div>
-      <div class="col-sm-12 form-group form-inline" v-if="isAdmin">
+      <div class="col-sm-12 form-group form-inline d-flex justify-content-between" v-if="isAdmin">
+        <div class="d-flex">
+          <span class="filterUsers" :class="selectedFilter === 'active' ? 'selected' : null" @click="selectedFilter = 'active'">
+            Active
+            <span class="userCount">{{ activeUsers.length }}</span>
+          </span>
+          <span class="filterUsers" :class="selectedFilter === 'inactive' ? 'selected' : null" @click="selectedFilter = 'inactive'">
+            Inactive
+            <span class="userCount">{{ inactiveUsers.length }}</span>
+          </span>
+        </div>
         <div @click="inviteUser()" class="btn btn-primary">Invite User</div>
       </div>
     </div>
@@ -14,7 +24,7 @@
             <td>Role</td>
             <td>Address</td>
           </tr>
-          <tr v-for="user in filteredusers" :key="user.id" v-bind:user="user" is="company-users-row" />
+          <div v-for="user in selectedFilter === 'active' ? activeUsers : inactiveUsers" :key="user.id" :user="user" is="company-users-row" />
         </tbody>
       </table>
     </div>
@@ -25,6 +35,11 @@
 import CompanyUsersRow from './CompanyUsersRow.vue'
 export default {
   name: 'users-template',
+  data() {
+    return {
+      selectedFilter: 'active'
+    }
+  },
   components: {
     CompanyUsersRow
   },
@@ -36,9 +51,11 @@ export default {
     company_users: function() {
       return this.$store.state.company_users.company_users
     },
-    filteredusers: function() {
-      return this.company_users
+    activeUsers: function() {
       return this.$store.getters['company_users/getActive']
+    },
+    inactiveUsers() {
+      return this.$store.getters['company_users/getInactive']
     }
   },
   methods: {
@@ -50,7 +67,37 @@ export default {
 </script>
 
 <style lang="scss">
+.userCount {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 10px;
+  font-size: 10px;
+  width: 17px;
+  height: 17px;
+  background-color: green;
+  padding: 3px;
+  border-radius: 50px;
+}
+.selected {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+.filterUsers {
+  user-select: none;
+  background-color: rgba(0, 0, 0, 0.5);
+  font-size: 18px;
+  padding: 5px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: white;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+  }
+}
 .company-users {
+  max-height: calc(100vh - 50px);
   padding: 0 65px;
   display: flex;
   flex-direction: column;

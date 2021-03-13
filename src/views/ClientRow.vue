@@ -1,5 +1,5 @@
 <template>
-  <tr @click="editClient(client)" class="client-row">
+  <tr @click="editClient(client)" class="client-row" :style="{ 'background-color': client.color ? client.color : null }">
     <td>{{ client.name }}</td>
   </tr>
 </template>
@@ -23,6 +23,6 @@ export default {
   color: white;
 }
 .client-row:hover {
-  background: rgba($color: #000000, $alpha: 0.6);
+  background: rgba($color: #000000, $alpha: 0.5);
 }
 </style>
