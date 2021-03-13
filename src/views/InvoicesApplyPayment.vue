@@ -199,8 +199,8 @@ export default Vue.extend({
           }
 
           // @ts-ignore
-          const { payment } = await this.$http().post('/invoice_payments', payments)
-          this.invoice.payments.push(payment)
+          const { invoice_payments } = await this.$http().post('/invoice_payments', payments)
+          this.invoice.payments.push(invoice_payments)
         }
 
         this.$bvModal.hide('apply-payment-modal')
@@ -265,7 +265,7 @@ export default Vue.extend({
     //   console.log(payments)
     // }
   },
-  mounted() {
+  async mounted() {
     // this.init()
     EventBus.$on('apply-payment', (invoice: any) => {
       this.invoice = invoice

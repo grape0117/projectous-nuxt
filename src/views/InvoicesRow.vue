@@ -60,7 +60,7 @@ export default {
   props: ['invoices'],
   methods: {
     async updateInvoiceStatus(invoice_id, status) {
-      console.log(status)
+      // console.log(status)
       // $('/invoice/update-status', { id: invoice, status: status }, function(response) {
       //   let invoiceKey = store.invoiceLookup[reponse.invoice.id]
       //   Vue.set(store.invoices[invoiceKey], status, status)
@@ -69,7 +69,7 @@ export default {
       // Not sure if "/invoice/update-status" is a valid route
       // invoices/id { attribute: 'status', value: 'open' }
       // await this.$http().patch('/invoice/update-status', invoice_id, { status })
-      await this.$http().patch(`/invoice/${invoice_id}`, { attribute: 'status', value: status })
+      await this.$http().patch(`/invoices/${invoice_id}`, { attribute: 'status', value: status })
     },
     isAdmin() {
       return this.$store.getters['settings/isAdmin']
