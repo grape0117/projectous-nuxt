@@ -14,6 +14,7 @@ Vue.use(ProjectousPlugin)
 // Vue.use(require('vue-moment'))
 import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
+import 'moment-timezone'
 
 Vue.component('nav-bar', NavBar)
 Vue.component('task-modal', EditTaskModal)
