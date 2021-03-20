@@ -14,9 +14,9 @@
       </ul> -->
       <div class="year-buttons">
         <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="year in invoices_years" :key="year" @click="selectYear(year)">
-          <!-- <span class="total-closed">{{ totalStatus(year, 'closed') }}</span> -->
+          <!-- <span class="total-closed">{{ totalByStatus(year, 'closed') }}</span> -->
           <span>{{ year }}</span>
-          <span class="total-open">{{ totalStatus(year, 'open') }}</span>
+          <span class="total-open">{{ totalByStatus(year, 'open') }}</span>
         </div>
       </div>
 
@@ -94,7 +94,7 @@ export default {
     invoicesByYear(year) {
       return this.invoices.filter(i => moment(i.date).format('YYYY') === year)
     },
-    totalStatus(year, status) {
+    totalByStatus(year, status) {
       let invoices = this.invoicesByYear(year)
       return this.getStatus(invoices, status).length
     },
