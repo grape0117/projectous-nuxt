@@ -10,7 +10,7 @@
             <b-form-input id="email" v-model="email" type="email" placeholder="Enter email" required></b-form-input>
           </b-form-group>
 
-          <b-form-group id="input-group-2" label="Your Name:" label-for="password">
+          <b-form-group id="input-group-2" label="Password:" label-for="password">
             <b-form-input id="password" v-model="password" type="password" placeholder="Enter password" required></b-form-input>
           </b-form-group>
 
