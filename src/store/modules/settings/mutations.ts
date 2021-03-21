@@ -25,6 +25,9 @@ export const mutations: MutationTree<IModuleState> = {
   setCurrentCompanyUser(state, user) {
     state.current_company_user = JSON.parse(JSON.stringify(user))
   },
+  setCurrentEditClient(state, id) {
+    state.current_edit_client = id
+  },
   setCurrentEditCompanyUser(state, company_user) {
     state.current_edit_company_user = JSON.parse(JSON.stringify(company_user))
   },

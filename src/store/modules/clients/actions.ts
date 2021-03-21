@@ -6,7 +6,7 @@ import uuid from 'uuid'
 export const actions: ActionTree<IModuleState, IRootState> = {
   createClient(context) {
     context.commit('settings/setCurrentEditClient', { id: uuid.v4() }, { root: true })
-    context.dispatch('settings/openModal', 'client')
+    context.dispatch('settings/openModal', 'client', { root: true })
   },
   editClient(context, client_id) {
     const client = context.getters['getById'](client_id)
