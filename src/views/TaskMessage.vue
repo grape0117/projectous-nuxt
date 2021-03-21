@@ -1,11 +1,17 @@
 <template>
   <div class="message-panel">
     <b-list-group class="message-panel_inner">
-      <task-message-item :message="message" v-for="message in getMessages" :key="message.id" @edit-message="editMessage" @delete-message="deleteMessage" />
+      <div v-for="(message, index) in getMessages" :key="message.id">
+        <!-- {{ date(getMessages[index > 0 ? index - 1 : index].created_at) }} -->
+        <div class="date" v-if="isShowDate(index, message, getMessages)">
+          {{ date(message.created_at) }}
+        </div>
+        <task-message-item :message="message" @edit-message="editMessage" @delete-message="deleteMessage" />
+      </div>
     </b-list-group>
     <div>
       <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3"> </b-form-textarea>
-      <b-button pill variant="primary" @click="saveMessage()" style="float: right; margin-top: 10px;">Save</b-button>
+      <b-button pill variant="primary" @click="saveMessage()" style="float: right; margin-top: 10px">Save</b-button>
     </div>
   </div>
 </template>
@@ -42,6 +48,12 @@ export default {
   },
   mounted() {},
   methods: {
+    isShowDate(index, message, getMessages) {
+      return getMessages && getMessages.length > 1 && this.date(message.created_at) !== this.date(getMessages[index > 0 ? index - 1 : index].created_at)
+    },
+    date(date) {
+      return moment(date).format('MMM DD, YYYY')
+    },
     editMessage(message) {
       this.selected_message = message
       this.s_message = message.message
@@ -114,10 +126,22 @@ export default {
       this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
     }
   }
+  // filters: {
+  //   date(date) {
+  //     return moment(date).format('MMM DD, YYYY')
+  //   }
+  // }
 }
 </script>
 
 <style lang="scss" scoped>
+.date {
+  display: flex;
+  justify-content: center;
+  font-size: 12px;
+  padding: 8px 0px;
+  border-top: 1px solid gray;
+}
 .message-panel {
   width: 100%;
   // height: 100%;

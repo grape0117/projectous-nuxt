@@ -64,6 +64,7 @@ export default {
       //     return task
       //   }
       // })
+      console.log(taskMessages)
       return taskMessages
     },
     // tasks() {
