@@ -1,41 +1,35 @@
 <template>
   <b-list-group-item class="task-sidebar-item">
-    <!-- <pre class="border" style="color: white;">
-      {{ getLastMessage }}
-      {{ task.last_message }}
-      {{ task.last_task_message_created_at}}
-    </pre> -->
     <div class="" @click="openChat">
       <p class="task-sidebar-item_header-part" style="margin-bottom: 8px !important">
-        <span v-if="task.project.acronym" class="task-sidebar-item_project-badge" :style="{ 'background-color': clientColor ? clientColor : '' }">{{ task.project.acronym }}</span>
-        <span v-else class="task-sidebar-item_project-name mr-2" style="color: green">{{ task.project.name }}</span>
-        <span class="task-sidebar-item_project-name">{{ task.title }}</span>
+        <span v-if="chat && chat.acronym" class="task-sidebar-item_project-badge" :style="{ 'background-color': chat.color ? chat.color : null }">{{ chat.acronym }}</span>
+        <span v-else class="task-sidebar-item_project-name mr-2" style="color: green">{{ chat.project }}</span>
+        <span class="task-sidebar-item_project-name">{{ chat.task }}</span>
       </p>
       <div class="d-flex align-items-center" style="margin-bottom: 8px !important">
         <div class="message-avatar" style="margin-right: 10px">
-          <span class="rounded-circle task-sidebar-item_badge" v-if="getLastMessageCompanyUser" :style="{ backgroundColor: getLastMessageCompanyUser.color }">
-            {{ getLastMessageCompanyUser.name | abbrName }}
+          <span class="rounded-circle task-sidebar-item_badge" v-if="chat.last_message.company_user_id" :style="{ backgroundColor: chat.last_message.user.color }">
+            {{ chat.last_message.user.name | abbrName }}
           </span>
         </div>
         <div>
-          <span class="task-sidebar-title">{{ getLastMessage.message }}</span>
+          <span class="task-sidebar-title">{{ chat.last_message.text }}</span>
         </div>
       </div>
     </div>
 
-    <!-- <pre style="color: white">{{ task }}</pre> -->
     <div class="task-sidebar-last-message-wrapper">
       <div class="task-sidebar-last-message" style="margin-top: 0 !important; padding-top: 5px !important" @click="openChat">
-        <span class="task-sidebar-date">{{ task.last_task_message_created_at | moment('MMMM Do YYYY') }}</span>
+        <span class="task-sidebar-date">{{ chat.last_message.createdAt | moment('MMMM Do YYYY') }}</span>
       </div>
-      <span class="task-sidebar_go-to-task" @click="goToTask()">[ Go to task]</span>
+      <span class="task-sidebar_go-to-task" @click="goToTask">[ Go to task]</span>
     </div>
   </b-list-group-item>
 </template>
 <script>
 import uuid from 'uuid'
 import moment from 'moment'
-// import TaskMessage from './TaskMessage.vue'
+
 import { chain, groupBy } from 'lodash'
 import { EventBus } from '@/components/event-bus'
 
@@ -44,44 +38,46 @@ export default {
     return {}
   },
   props: {
-    task: {
+    chat: {
       type: Object,
       required: true
     }
   },
   computed: {
-    clientColor() {
-      return this.$store.state.clients.clients.find(client => client.client_company_id === this.task.project.client_company_id).color
-    },
-    getLastMessageCompanyUser() {
-      return this.$store.state.company_users.company_users.find(user => user.id === this.getLastMessage.company_user_id)
-    },
-    getLastMessage() {
-      let messages = this.$store.state.task_messages.task_messages.filter(msg => msg.task_id === this.task.id)
-      messages.sort(function(a, b) {
-        return new Date(b.created_at) - new Date(a.created_at)
-      })
-      return messages.reverse()[messages.length - 1]
-    }
+    // clientColor() {
+    //   return this.$store.state.clients.clients.find(client => client.client_company_id === this.task.project.client_company_id).color
+    // },
+    // getLastMessageCompanyUser() {
+    //   return this.$store.state.company_users.company_users.find(user => user.id === this.getLastMessage.company_user_id)
+    // },
+    // getLastMessage() {
+    //   let messages = this.$store.state.task_messages.task_messages.filter(msg => msg.task_id === this.task.id)
+    //   messages.sort(function(a, b) {
+    //     return new Date(b.created_at) - new Date(a.created_at)
+    //   })
+    //   return messages.reverse()[messages.length - 1]
+    // }
   },
   mounted() {},
   methods: {
     openChat() {
-      this.$emit('openChat', this.task)
+      this.$emit('openChat', this.chat.chat_id)
     },
-    messageTime(time) {
-      if (time === null) return 'No Date'
+    // messageTime(time) {
+    //   if (time === null) return 'No Date'
 
-      let today = moment()
-      let msgTime = moment(time)
-      let diff = today.diff(msgTime, 'days')
-      if (diff == 0) return 'Today'
-      else if (diff == 1) return 'Yesterday'
-      else return msgTime.format('d/MM/YY')
-    },
+    //   let today = moment()
+    //   let msgTime = moment(time)
+    //   let diff = today.diff(msgTime, 'days')
+    //   if (diff == 0) return 'Today'
+    //   else if (diff == 1) return 'Yesterday'
+    //   else return msgTime.format('d/MM/YY')
+    // },
     async goToTask() {
-      await this.$router.push({ query: { task: this.task.id } })
-      await EventBus.$emit('showTask', this.task)
+      if (Object.keys(this.$route.query).length > 0 && this.$route.query.task === this.chat.chat_id) return
+
+      EventBus.$emit('showTask', this.chat)
+      await this.$router.push({ query: { task: this.chat.chat_id } })
     }
   },
   watch: {

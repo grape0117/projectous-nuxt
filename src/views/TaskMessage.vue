@@ -1,11 +1,11 @@
 <template>
   <div class="message-panel">
-    <b-list-group class="message-panel_inner">
-      <task-message-item :message="message" v-for="message in getMessages" :key="message.id" @edit-message="editMessage" @delete-message="deleteMessage" />
+    <b-list-group class="message-panel_inner" v-if="chat">
+      <task-message-item :message="message" v-for="message in chat.messages" :key="message.id" @edit-message="editMessage" @delete-message="deleteMessage" />
     </b-list-group>
     <div>
       <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3"> </b-form-textarea>
-      <b-button pill variant="primary" @click="saveMessage()" style="float: right; margin-top: 10px;">Save</b-button>
+      <b-button pill variant="primary" @click="saveMessage()" style="float: right; margin-top: 10px">Save</b-button>
     </div>
   </div>
 </template>
@@ -25,7 +25,7 @@ export default {
   components: {
     'task-message-item': () => import('./TaskMessageItem.vue')
   },
-  props: ['task_id'],
+  props: ['chat'],
   /* Load surveys and questionnaired on page load. */
   created() {},
   computed: {

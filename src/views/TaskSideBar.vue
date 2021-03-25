@@ -2,13 +2,14 @@
   <div class="task-side-bar">
     <div class="task-side-bar-label">
       <span>CHAT</span>
-      <span style="font-weight: normal; align-self: center; max-width: 200px" v-if="hasOpenedChat">{{ openedChat.title }}</span>
+      <span style="font-weight: normal; align-self: center; max-width: 200px" v-if="hasOpenedChat">{{ openedChat.project }}</span>
       <div class="message-sidebar_new-task" @click="createTask">+</div>
     </div>
-    <!-- <pre>{{ taskMessages }}</pre> -->
+    <!-- <pre>{{ chats }}</pre> -->
     <div class="message-sidebar" v-show="!hasOpenedChat">
-      <b-list-group v-if="taskMessages && taskMessages.length > 0" class="task-side-bar_list">
-        <task-sidebar-item @openChat="openChat" v-for="(task, index) in taskMessages" :key="index" :task="task" @setLastMessage="setLastMessage" />
+      <b-list-group v-if="chats && chats.length > 0" class="task-side-bar_list">
+        <!-- <task-sidebar-item @openChat="openChat" v-for="(task, index) in taskMessages" :key="index" :task="task" @setLastMessage="setLastMessage" /> -->
+        <task-sidebar-item @openChat="openChat" v-for="(chat, index) in chats" :key="index" :chat="chat" />
       </b-list-group>
       <div v-else class="d-flex justify-content-center">
         <span class="task-side-bar-no-messages">No messages yet.</span>
@@ -18,10 +19,10 @@
     <div class="" v-if="hasOpenedChat">
       <div class="d-flex justify-content-between">
         <b-button variant="dark" @click="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px"> <i class="icon-arrow_back" />Back </b-button>
-        <span class="task-sidebar_go-to-task" style="margin-right: 20px" @click="goToTask()">[ Go to task]</span>
+        <span class="task-sidebar_go-to-task" style="margin-right: 20px" @click="goToTask">[ Go to task]</span>
       </div>
 
-      <task-message class="task-side-bar_task-message" v-bind:task_id="openedChat.id" :task_messages="openedChat.messages"> </task-message>
+      <task-message class="task-side-bar_task-message" :chat="openedChat"> </task-message>
     </div>
   </div>
 </template>
@@ -29,43 +30,38 @@
 <script>
 import uuid from 'uuid'
 import moment from 'moment'
-// import TaskMessage from './TaskMessage.vue'
-import { chain, forEach, groupBy } from 'lodash'
-import { EventBus } from '@/components/event-bus'
 
 export default {
   data() {
     return {
       active_task: {},
-      openedChat: {}
+      openedChat: {},
+      chats: []
     }
   },
   computed: {
     hasOpenedChat() {
       return Object.keys(this.openedChat).length > 0
+      // return Object.keys(this.openedChat).length > 0
     },
     // messagesTaskIds() {
     //   return this.$store.state.task_messages.task_messages.map(message => message.task_id)
     // },
-    taskMessages() {
-      let tasks = this.$store.state.tasks.tasks
-      let projects = this.$store.state.projects.projects
-      let taskMessages = tasks.map(task => task).filter(task => task.messages && task.messages.length > 0)
+    // OLD
+    // taskMessages() {
+    //   let tasks = this.$store.state.tasks.tasks
+    //   let projects = this.$store.state.projects.projects
+    //   let taskMessages = tasks.map(task => task).filter(task => task.messages && task.messages.length > 0)
 
-      taskMessages.forEach(async taskMessage => {
-        taskMessage.project = await projects.find(project => project.id === taskMessage.project_id)
-      })
+    //   taskMessages.forEach(async taskMessage => {
+    //     taskMessage.project = await projects.find(project => project.id === taskMessage.project_id)
+    //   })
 
-      taskMessages.sort((a, b) => {
-        return new Date(b.last_task_message_created_at) - new Date(a.last_task_message_created_at)
-      })
-      // .filter(task => {
-      //   if(_.includes(this.messagesTaskIds, task.id)) {
-      //     return task
-      //   }
-      // })
-      return taskMessages
-    },
+    //   taskMessages.sort((a, b) => {
+    //     return new Date(b.last_task_message_created_at) - new Date(a.last_task_message_created_at)
+    //   })
+    //   return taskMessages
+    // },
     // tasks() {
     //   let tasks = this.$store.state.tasks.tasks
     //   let r_tasks = chain(tasks)
@@ -88,6 +84,10 @@ export default {
       return this.$store.state.settings.current_company_user_id
     }
   },
+  async created() {
+    let { chats } = await this.$http().get('/chats')
+    this.chats = chats
+  },
   mounted() {},
   methods: {
     // sortedTaskMessages() {
@@ -101,19 +101,22 @@ export default {
     //   return taskMessages
     // },
     async goToTask() {
-      await this.$router.push({ query: { task: this.openedChat.id } })
-      await EventBus.$emit('showTask', this.openedChat)
+      if (Object.keys(this.$route.query).length > 0 && this.$route.query.task === this.openedChat.chat_id) return
+
+      EventBus.$emit('showTask', this.openedChat)
+      await this.$router.push({ query: { task: this.openedChat.chat_id } })
     },
-    async setLastMessage(lastMessage) {
-      let tasks = this.$store.state.tasks.tasks
-      await tasks.forEach(async task => {
-        if (task.id === lastMessage.task_id) {
-          task.last_task_message_created_at = await lastMessage.created_at
-          task.last_task_message_id = await lastMessage.id
-        }
-      })
-    },
-    openChat(chat) {
+    // async setLastMessage(lastMessage) {
+    //   let tasks = this.$store.state.tasks.tasks
+    //   await tasks.forEach(async task => {
+    //     if (task.id === lastMessage.task_id) {
+    //       task.last_task_message_created_at = await lastMessage.created_at
+    //       task.last_task_message_id = await lastMessage.id
+    //     }
+    //   })
+    // },
+    async openChat(chat_id) {
+      const { chat } = await this.$http().get(`/chat/${chat_id}`)
       this.openedChat = chat
     },
     closeChat() {
@@ -125,7 +128,7 @@ export default {
       // this.$router.push({ name: 'Task_Detail', params: { task_id: newTask.id } })
       // this.$router.push({ name: 'Task_Detail', params: { task_id: newTask.id } })
       await this.$router.push({ query: { task: newTask.id } })
-      await EventBus.$emit('showTask', newTask)
+      EventBus.$emit('showTask', newTask)
       // await EventBus.$emit('')
     },
     messageTime(time) {
@@ -175,11 +178,6 @@ export default {
   font-size: 20px;
 }
 .task-side-bar_list {
-  // border: 1px solid red;
-  // height: 100%;
-  // height: calc(100vh - 140px);
-  // overflow-y: scroll;
-  overflow: hidden;
 }
 
 .task-side-bar {
@@ -187,13 +185,6 @@ export default {
   width: 300px;
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
-  /* justify-content: center; */
-  /* padding: 0 20px 20px 20px; */
-  color: white;
-  /* background-color: #616161; */
-  background-color: rgba(0, 0, 0, 0.5);
-  height: calc(100vh - 50px);
   overflow: hidden;
 }
 .message-sidebar {
@@ -215,14 +206,9 @@ export default {
   background-color: rgba($color: #000000, $alpha: 0.5);
   display: flex;
   justify-content: space-between;
-  // align-items: center;
-  // border: 1px solid red;
 }
 .message-avatar {
-  /* width: 50px;
-    height: 50px; */
   display: flex;
-  /* justify-content: center; */
   align-items: center;
 }
 .task-side-bar .icon-class {

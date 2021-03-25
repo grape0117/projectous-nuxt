@@ -1,11 +1,15 @@
 <template>
   <b-list-group-item class="message-panel_inner-message">
     <div class="msg-header">
-      <span>{{ getUserNameWithCompanyUserId(message.company_user_id) }}</span> /
-      <span v-if="message.timestamp">{{ formatTime(message.timestamp) }}</span>
+      <!-- <span>{{ getUserNameWithCompanyUserId(message.company_user_id) }}</span> / -->
+      <span>{{ message.user.name }}</span> /
+      <!-- <span v-if="message.timestamp">{{ formatTime(message.timestamp) }}</span> -->
     </div>
     <div class="message-wrapper">
-      <pre class="msg-content" style="color: white;">{{ message.message }}</pre>
+      <!-- <pre style="color: white;">
+        {{ message }}
+      </pre> -->
+      <pre class="msg-content" style="color: white;">{{ message.text }}</pre>
       <div class="message-actions" v-if="current_company_user_id == message.company_user_id">
         <i class="icon-more_vert" @click="open_actions = !open_actions" />
         <div class="message-actions-options" v-if="open_actions">
@@ -14,7 +18,7 @@
         </div>
       </div>
     </div>
-    <span class="message-dateTime">{{ formatTime(message.updated_at || message.created_at) }}</span>
+    <span class="message-dateTime">{{ formatTime(message.createdAt) }}</span>
   </b-list-group-item>
 </template>
 

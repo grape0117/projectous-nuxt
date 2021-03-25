@@ -4,7 +4,7 @@
     <pre style="color: white">{{ getResources() }}</pre> -->
     <div class="left-section">
       <div class="task-detail-top-buttons">
-        <button @click="saveTask()">Close (ESC)</button>
+        <button @click="saveTask">Close (ESC)</button>
         <b-button class="action-button" variant="outline-success" @click="completeTask()">
           <span>Complete</span>
         </b-button>
@@ -108,7 +108,10 @@
           <edit-task-modal-user v-for="user in active_users" :key="user.id" @toggle="toggleUser" v-bind:task_user="task_user(user)" v-bind:user="user" v-bind:task="task" />
         </b-tab>
         <b-tab title="Chat">
-          <task-message class="task-cloud_task-message" v-bind:task_id="task.id"> </task-message>
+          <!-- <pre style="color: black;">
+            {{ task }}
+          </pre> -->
+          <task-message class="task-cloud_task-message" :chat="task"> </task-message>
         </b-tab>
       </b-tabs>
     </div>
@@ -215,15 +218,23 @@ export default Vue.extend({
       console.log(this.task)
     },
     async saveTask(isRedirect = true) {
-      await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
+      // NOTE: uncommented temporarily since it fails to do the UPSERT with module tasks
+      // await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
+
+      // console.log(this.$route.query)
       if (isRedirect) {
         this.isEditResource = null
-        // will only delete the "task" in $router.query
-        let query = Object.assign({}, this.$route.query)
-        delete query.task
-        this.$router.replace({ query })
+        EventBus.$emit('showTask', {})
 
-        await EventBus.$emit('showTask', {})
+        if (this.$route.query && Object.keys(this.$route.query).length > 0) {
+          let query = Object.assign({}, this.$route.query)
+          delete query.task
+          await this.$router.replace({ query })
+        }
+        // will only delete the "task" in $router.query
+
+        // this.$router.replace({ query })
+
         // this.task = false
         // this.$router.push({ name: 'Task Cloud' })
       }
