@@ -31,6 +31,9 @@
 import uuid from 'uuid'
 import moment from 'moment'
 
+import { chain, forEach, groupBy } from 'lodash'
+import { EventBus } from '@/components/event-bus'
+
 export default {
   data() {
     return {
@@ -178,6 +181,11 @@ export default {
   font-size: 20px;
 }
 .task-side-bar_list {
+  // border: 1px solid red;
+  // height: 100%;
+  // height: calc(100vh - 140px);
+  // overflow-y: scroll;
+  overflow: hidden;
 }
 
 .task-side-bar {
@@ -185,6 +193,13 @@ export default {
   width: 300px;
   display: flex;
   flex-direction: column;
+  /* align-items: center; */
+  /* justify-content: center; */
+  /* padding: 0 20px 20px 20px; */
+  color: white;
+  /* background-color: #616161; */
+  background-color: rgba(0, 0, 0, 0.5);
+  height: calc(100vh - 50px);
   overflow: hidden;
 }
 .message-sidebar {
@@ -206,9 +221,14 @@ export default {
   background-color: rgba($color: #000000, $alpha: 0.5);
   display: flex;
   justify-content: space-between;
+  // align-items: center;
+  // border: 1px solid red;
 }
 .message-avatar {
+  /* width: 50px;
+    height: 50px; */
   display: flex;
+  /* justify-content: center; */
   align-items: center;
 }
 .task-side-bar .icon-class {
