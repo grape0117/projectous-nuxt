@@ -371,7 +371,7 @@ export default Vue.extend({
       //pop modal
       // this.show_task = task
       await this.$router.push({ query: { task: task.id } })
-      await EventBus.$emit('showTask', task)
+      // await EventBus.$emit('showTask', task)
 
       // this.t_update()
       // this.$router.push({ name: 'Task_Detail', params: { task_id: task.id } })

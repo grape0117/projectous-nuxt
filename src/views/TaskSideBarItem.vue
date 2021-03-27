@@ -1,6 +1,6 @@
 <template>
   <b-list-group-item class="task-sidebar-item">
-    <div class="" @click="openChat">
+    <div class="" @click="showTaskDetail">
       <p class="task-sidebar-item_header-part" style="margin-bottom: 8px !important">
         <span v-if="chat && chat.acronym" class="task-sidebar-item_project-badge" :style="{ 'background-color': chat.color ? chat.color : null }">{{ chat.acronym }}</span>
         <span v-else class="task-sidebar-item_project-name mr-2" style="color: green">{{ chat.project }}</span>
@@ -19,10 +19,10 @@
     </div>
 
     <div class="task-sidebar-last-message-wrapper">
-      <div class="task-sidebar-last-message" style="margin-top: 0 !important; padding-top: 5px !important" @click="openChat">
+      <div class="task-sidebar-last-message" style="margin-top: 0 !important; padding-top: 5px !important" @click="showTaskDetail">
         <span class="task-sidebar-date">{{ chat.last_message.createdAt | moment('MMMM Do YYYY') }}</span>
       </div>
-      <span class="task-sidebar_go-to-task" @click="goToTask">[ Go to task]</span>
+      <!-- <span class="task-sidebar_go-to-task" @click="showTaskDetail">[ Go to task]</span> -->
     </div>
   </b-list-group-item>
 </template>
@@ -60,9 +60,6 @@ export default {
   },
   mounted() {},
   methods: {
-    openChat() {
-      this.$emit('openChat', this.chat.chat_id)
-    },
     // messageTime(time) {
     //   if (time === null) return 'No Date'
 
@@ -73,11 +70,12 @@ export default {
     //   else if (diff == 1) return 'Yesterday'
     //   else return msgTime.format('d/MM/YY')
     // },
-    async goToTask() {
-      if (Object.keys(this.$route.query).length > 0 && this.$route.query.task === this.chat.chat_id) return
+    async showTaskDetail() {
+      const CHAT_ID = this.chat.chat_id
 
-      EventBus.$emit('showTask', this.chat)
-      await this.$router.push({ query: { task: this.chat.chat_id } })
+      if (Object.keys(this.$route.query).length > 0 && this.$route.query.task === CHAT_ID) return
+
+      await this.$router.push({ query: { task: CHAT_ID, showChat: 'true' } })
     }
   },
   watch: {

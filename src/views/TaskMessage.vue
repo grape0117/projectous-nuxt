@@ -1,6 +1,6 @@
 <template>
   <div class="message-panel">
-    <b-list-group class="message-panel_inner" v-if="chat">
+    <b-list-group class="message-panel_inner" v-if="Object.keys(chat).length > 0">
       <task-message-item :message="message" v-for="message in chat.messages" :key="message.id" @edit-message="editMessage" @delete-message="deleteMessage" />
     </b-list-group>
     <div>
@@ -25,7 +25,12 @@ export default {
   components: {
     'task-message-item': () => import('./TaskMessageItem.vue')
   },
-  props: ['chat'],
+  props: {
+    chat: {
+      type: Object,
+      require: true
+    }
+  },
   /* Load surveys and questionnaired on page load. */
   created() {},
   computed: {

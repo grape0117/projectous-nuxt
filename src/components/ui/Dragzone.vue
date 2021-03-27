@@ -191,7 +191,7 @@ export default class Dragzone extends Vue {
     })
 
     await this.$router.push({ query: { task: task.id } })
-    EventBus.$emit('showTask', task)
+    // EventBus.$emit('showTask', task)
   }
 
   private clientColor(item: any) {
