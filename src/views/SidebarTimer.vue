@@ -262,23 +262,34 @@ export default {
       } else {
       }
     },
+    checkDay(timezone_date, compare_date) {
+      const T_date = moment(timezone_date).format('YYYY-MM-DD')
+      const c_date = moment(compare_date).format('YYYY-MM-DD')
+
+      return moment(T_date).isSame(c_date)
+    },
     restartedAt() {
-      let getYesterday = moment()
-        .subtract(2, 'day')
+      const timezone = moment.tz.guess()
+      // Same timezone from database
+      const actual_date = moment.tz(this.timer.status_changed_at, 'America/Danmarkshavn')
+      // Date/Time conversion depending on current timezone
+      const timezone_date = actual_date
+        .clone()
+        .tz(timezone)
         .format('YYYY-MM-DD HH:mm:ss')
 
-      let date = datetimeToJS(this.timer.status_changed_at)
-        .toString()
-        .split(' ')
-      let yesterday = datetimeToJS(getYesterday)
-        .toString()
-        .split(' ')
+      const TODAY = moment(new Date()).format('YYYY-MM-DD')
+      const YESTERDAY = moment(timezone_date)
+        .subtract(1, 'days')
+        .format('YYYY-MM-DD')
 
-      if (date[0] === yesterday[0] && date[1] === yesterday[1] && date[2] === yesterday[2] && date[3] === yesterday[3]) {
+      if (this.checkDay(timezone_date, TODAY)) {
+        return 'Today'
+      } else if (this.checkDay(YESTERDAY, moment(TODAY).subtract(1, 'days'))) {
         return 'Yesterday'
+      } else {
+        return 'Previous Days'
       }
-      // return format_report_at(datetimeToJS(this.timer.status_changed_at))
-      return 'Today'
     },
     reportAt: function() {
       return format_report_at(datetimeToJS(this.timer.report_at))
