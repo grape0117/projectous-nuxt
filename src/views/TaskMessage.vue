@@ -1,6 +1,6 @@
 <template>
   <div class="message-panel">
-    <b-list-group class="message-panel_inner" v-if="Object.keys(chat).length > 0">
+    <b-list-group class="message-panel_inner" v-if="chat && Object.keys(chat).length > 0">
       <task-message-item :message="message" v-for="message in chat.messages" :key="message.id" @edit-message="editMessage" @delete-message="deleteMessage" />
     </b-list-group>
     <div>

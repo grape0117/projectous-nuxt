@@ -203,6 +203,10 @@ export default Vue.extend({
   },
   methods: {
     async getChat(task_id) {
+      if (!task_id) {
+        this.chat = []
+      }
+
       const { chat } = await this.$http().get(`/chat/${task_id}`)
       this.chat = chat
     },
@@ -248,6 +252,7 @@ export default Vue.extend({
           let query = Object.assign({}, this.$route.query)
           delete query.task
           delete query.showChat
+          delete query.showChatSection
           await this.$router.replace({ query })
         }
         // will only delete the "task" in $router.query
