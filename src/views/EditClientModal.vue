@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="client-modal" class="modal fade" tabindex="-1" role="dialog" title="Edit Client" @ok="saveClient">
+  <b-modal id="client-modal" class="modal fade" tabindex="-1" role="dialog" title="Add/Edit Client" @ok="saveClient">
     <div v-if="client.history !== 'null'">
       <div v-for="(event, eventIndex) in typeof client.history === 'string' ? JSON.parse(client.history) : client.history" :key="eventIndex">{{ event.message }} | {{ event.timestamp }}</div>
     </div>
