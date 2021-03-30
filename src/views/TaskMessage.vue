@@ -47,6 +47,12 @@ export default {
   },
   mounted() {},
   methods: {
+    isShowDate(index, message, getMessages) {
+      return getMessages && getMessages.length > 1 && this.date(message.created_at) !== this.date(getMessages[index > 0 ? index - 1 : index].created_at)
+    },
+    date(date) {
+      return moment(date).format('MMM DD, YYYY')
+    },
     editMessage(message) {
       this.selected_message = message
       this.s_message = message.message
@@ -119,10 +125,22 @@ export default {
       this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
     }
   }
+  // filters: {
+  //   date(date) {
+  //     return moment(date).format('MMM DD, YYYY')
+  //   }
+  // }
 }
 </script>
 
 <style lang="scss" scoped>
+.date {
+  display: flex;
+  justify-content: center;
+  font-size: 12px;
+  padding: 8px 0px;
+  border-top: 1px solid gray;
+}
 .message-panel {
   width: 100%;
   // height: 100%;

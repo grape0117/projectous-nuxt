@@ -40,7 +40,7 @@ export default {
       else return ''
     },
     formatTime(datetime) {
-      return moment(datetime).format('MMM-DD-YYYY hh:mm:ss A')
+      return moment(datetime).format('hh:mm A')
     },
     editMessage(message) {
       this.$emit('edit-message', message)
@@ -55,19 +55,22 @@ export default {
 <style lang="scss" scoped>
 .msg-content {
   padding: 8px 12px;
-  border: solid 1px grey;
-  border-radius: 8px;
+  background-color: gray;
+  // border: solid 1px grey;
+  border-radius: 4px;
   margin-top: 5px;
   margin-bottom: 0;
 }
 
 .message-panel_inner-message {
   background-color: rgba($color: #000000, $alpha: 0) !important;
-  border-bottom: 1px solid white;
+  border: 0 !important;
+  padding: 0px 20px 12px 20px;
+  // border-bottom: 1px solid white;
 
   .message-dateTime {
     font-size: 12px;
-    font-weight: bold;
+    // font-weight: bold;
   }
 }
 
