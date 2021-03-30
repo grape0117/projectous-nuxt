@@ -22,8 +22,11 @@ export class AxiosHttp extends BaseHttp implements IHttp {
   }*/
 
   public async get(url: string, id: number | string) {
+    Store.state.totalActiveRequests++
+
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)
+      Store.state.totalActiveRequests--
       return
     }
     try {
@@ -32,15 +35,19 @@ export class AxiosHttp extends BaseHttp implements IHttp {
         // @ts-ignore
         headers: this.headers
       })
+      Store.state.totalActiveRequests--
       return data
     } catch (e) {
+      Store.state.totalActiveRequests--
       console.log(e)
+      return
     }
   }
   public async post(url: string, data: any) {
     Store.state.totalActiveRequests++
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)
+      Store.state.totalActiveRequests--
       return
     }
     try {
@@ -50,63 +57,80 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       Store.state.totalActiveRequests--
       return response
     } catch (e) {
+      Store.state.totalActiveRequests--
       return (Store.state.popAlert = true)
     }
-    Store.state.totalActiveRequests--
   }
   public async put(url: string, id: number | string, data: any) {
+    Store.state.totalActiveRequests++
     console.log('put', data)
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)
+      Store.state.totalActiveRequests--
       return
     }
     try {
       if (!url.endsWith('/')) {
         this.noSlashEndError()
+        Store.state.totalActiveRequests--
         return
       }
       const response = await axios.put(`${this.baseUrl}${url}${id}`, data, {
         headers: this.headers
       })
+      Store.state.totalActiveRequests--
       return response.data
     } catch (e) {
+      Store.state.totalActiveRequests--
       return (Store.state.popAlert = true)
     }
   }
 
   public async patch(url: string, id: number | string, data: any) {
+    Store.state.totalActiveRequests++
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)
+      Store.state.totalActiveRequests--
       return
     }
     try {
       if (!url.endsWith('/')) {
         this.noSlashEndError()
+        Store.state.totalActiveRequests--
         return
       }
       const response = await axios.patch(`${this.baseUrl}${url}${id}`, data, {
         headers: this.headers
       })
+      Store.state.totalActiveRequests--
       return response.data
     } catch (e) {
+      Store.state.totalActiveRequests--
       return (Store.state.popAlert = true)
     }
   }
 
   public async delete(url: string, id: number | string) {
+    Store.state.totalActiveRequests++
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)
+      Store.state.totalActiveRequests--
       return
     }
     try {
       if (!url.endsWith('/')) {
         this.noSlashEndError()
+        Store.state.totalActiveRequests--
         return
       }
-      return await axios.delete(`${this.baseUrl}${url}${id}`, {
+      // Store.state.totalActiveRequests--
+      const response = await axios.delete(`${this.baseUrl}${url}${id}`, {
         headers: this.headers
       })
+      Store.state.totalActiveRequests--
+      return response
     } catch (e) {
+      Store.state.totalActiveRequests--
       return (Store.state.popAlert = true)
     }
   }

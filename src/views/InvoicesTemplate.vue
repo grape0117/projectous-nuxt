@@ -3,22 +3,23 @@
     <div class="row">
       <div class="col-sm-12 form-group form-inline"></div>
     </div>
-    <div>
-      <ul role="tablist" class="nav nav-tabs">
-        <li role="presentation" class="active" data-tab="open">
-          <a href="#open" aria-controls="open" role="tab" data-toggle="tab"> Open<!-- <span class="badge" v-html="openinvoices.length"></span>--> </a>
-        </li>
-        <li role="presentation" data-tab="closed">
-          <a href="#closed" aria-controls="open" role="tab" data-toggle="tab"> Closed </a>
-        </li>
-      </ul>
+    <div class="d-flex justify-content-between">
+      <div class="year-buttons">
+        <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="year in invoices_years" :key="year" @click="selectYear(year)">
+          <span>{{ year }}</span>
+          <span class="total-open">{{ totalByStatus(year, status) }}</span>
+        </div>
+      </div>
+      <div>
+        <b-dropdown :text="status" dropleft variant="outline-primary">
+          <b-dropdown-item @click="setStatus('open')">Open</b-dropdown-item>
+          <b-dropdown-item @click="setStatus('closed')">Closed</b-dropdown-item>
+          <b-dropdown-item @click="setStatus('voided')">Voided</b-dropdown-item>
+        </b-dropdown>
+      </div>
     </div>
-    <div>
-      <!-- <pre>
-        {{ invoices.filter(invoice => invoice.payments.length > 0) }}
-      </pre> -->
-    </div>
-    <div class="tab-content">
+
+    <div class="tab-content mt-2">
       <div class="invoices-table tab-pane active" role="tabpanel" id="open">
         <div class="invoices-header">
           <span>Status</span>
@@ -30,7 +31,7 @@
           <span>End Date</span>
           <span>Options</span>
         </div>
-        <div v-for="invoice in openinvoices()" :key="invoice.id">
+        <div v-for="invoice in invoice_to_show" :key="invoice.id">
           <invoices-row v-bind:invoice="invoice" />
         </div>
       </div>
@@ -46,7 +47,7 @@
             <span>End Date</span>
             <span>Options</span>
           </div>
-          <div v-for="invoice in closedinvoices()" :key="invoice.id">
+          <div class="invoices-items" v-for="invoice in invoice_to_show" :key="invoice.id">
             <invoices-row v-bind:invoice="invoice" />
           </div>
         </div>
@@ -57,6 +58,8 @@
 </template>
 
 <script>
+import moment from 'moment'
+
 import InvoicesRow from './InvoicesRow.vue'
 
 export default {
@@ -65,14 +68,24 @@ export default {
     'invoices-row': InvoicesRow,
     'invoices-apply-payment': () => import('./InvoicesApplyPayment.vue')
   },
-  computed: {
-    current_company: function() {
-      return this.$store.state.settings.current_company_user_id
-    }
-  },
   data: function() {
     return {
-      invoices: []
+      invoices: [],
+      selectedYear: moment(new Date()).format('YYYY'),
+      status: 'open'
+    }
+  },
+  computed: {
+    invoice_to_show() {
+      let invoices = this.invoicesByYear(this.selectedYear)
+      return this.getStatus(invoices, this.status)
+    },
+    current_company: function() {
+      return this.$store.state.settings.current_company_user_id
+    },
+    invoices_years() {
+      // return [...new Set(this.invoices.map(invoice => invoice.date))]
+      return [...new Set(this.invoices.map(invoice => moment(invoice.date).format('YYYY')))]
     }
   },
   mounted: function() {
@@ -89,15 +102,23 @@ export default {
     }
   },
   methods: {
-    closedinvoices() {
-      return this.invoices.filter(function(invoice) {
-        return invoice.status !== 'open' && !invoice.deleted_at
-      })
+    setStatus(status) {
+      this.status = status
     },
-    openinvoices() {
-      return this.invoices.filter(function(invoice) {
-        return invoice.status === 'open' && !invoice.deleted_at
-      })
+    getStatus(invoices, status) {
+      return invoices.filter(i => i.status === status)
+    },
+    invoicesByYear(year) {
+      return this.invoices.filter(i => moment(i.date).format('YYYY') === year)
+    },
+    totalByStatus(year, status) {
+      let invoices = this.invoicesByYear(year)
+      return this.getStatus(invoices, status).length
+    },
+    selectYear(year) {
+      if (this.selectedYear === year) return
+
+      this.selectedYear = year
     },
     async getData() {
       const { invoices } = await this.$http().get('/invoices')
@@ -110,6 +131,44 @@ export default {
 <style lang="scss" scoped>
 .row-date {
   border: 10px solid red !important;
+}
+.year-buttons {
+  display: flex;
+  border-radius: 5px;
+  overflow: hidden;
+
+  .year-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: rgba($color: #000000, $alpha: 0.4);
+    font-size: 18px;
+    padding: 5px 15px;
+    user-select: none;
+    cursor: pointer;
+
+    .total-closed {
+      background-color: red;
+    }
+    .total-open {
+      background-color: green;
+    }
+
+    .total-closed,
+    .total-open {
+      margin: 5px 5px;
+      width: 10px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      padding: 0 5px;
+    }
+  }
+
+  .year-button:hover,
+  .selected-year {
+    background-color: rgba($color: #000000, $alpha: 0.5);
+  }
 }
 </style>
 
