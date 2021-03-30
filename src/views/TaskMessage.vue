@@ -1,7 +1,12 @@
 <template>
   <div class="message-panel">
     <b-list-group class="message-panel_inner" v-if="chat && Object.keys(chat).length > 0">
-      <task-message-item :message="message" v-for="message in chat.messages" :key="message.id" @edit-message="editMessage" @delete-message="deleteMessage" />
+      <div v-for="(message, index) in chatMessages" :key="message.id">
+        <div class="date" v-if="isShowDate(index, message, chat.messages)">
+          {{ date(message.createdAt) }}
+        </div>
+        <task-message-item :message="message" @edit-message="editMessage" @delete-message="deleteMessage" />
+      </div>
     </b-list-group>
     <div>
       <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3"> </b-form-textarea>
@@ -34,21 +39,28 @@ export default {
   /* Load surveys and questionnaired on page load. */
   created() {},
   computed: {
-    getMessages() {
-      let messages = this.$store.getters['task_messages/getByTaskId'](this.task_id)
-      messages.sort(function(a, b) {
-        return new Date(b.created_at) - new Date(a.created_at)
+    chatMessages() {
+      let messages = this.chat.messages.sort(function(a, b) {
+        return new Date(b.createdAt) - new Date(a.createdAt)
       })
       return messages.reverse()
     },
+    // getMessages() {
+    //   let messages = this.$store.getters['task_messages/getByTaskId'](this.task_id)
+    //   messages.sort(function(a, b) {
+    //     return new Date(b.created_at) - new Date(a.created_at)
+    //   })
+    //   return messages.reverse()
+    // },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
     }
   },
   mounted() {},
   methods: {
-    isShowDate(index, message, getMessages) {
-      return getMessages && getMessages.length > 1 && this.date(message.created_at) !== this.date(getMessages[index > 0 ? index - 1 : index].created_at)
+    isShowDate(index, message, messages) {
+      if (index === 0) return true
+      return messages && messages.length > 0 && this.date(message.createdAt) !== this.date(messages[index > 0 ? index - 1 : index].createdAt)
     },
     date(date) {
       return moment(date).format('MMM DD, YYYY')
@@ -61,7 +73,7 @@ export default {
       if (confirm('Are you sure to delete this message?')) {
         let task = this.$store.getters['tasks/getById'](message.task_id)
         this.$store.dispatch('DELETE', { module: 'task_messages', entity: message }, { root: true })
-        let task_messages = this.getMessages
+        let task_messages = this.chatMessages
         if (task_messages.length == 0) {
           task.last_task_message_created_at = null
           task.last_task_message_id = null
@@ -125,11 +137,6 @@ export default {
       this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
     }
   }
-  // filters: {
-  //   date(date) {
-  //     return moment(date).format('MMM DD, YYYY')
-  //   }
-  // }
 }
 </script>
 

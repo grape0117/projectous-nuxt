@@ -60,16 +60,6 @@ export default {
   },
   mounted() {},
   methods: {
-    // messageTime(time) {
-    //   if (time === null) return 'No Date'
-
-    //   let today = moment()
-    //   let msgTime = moment(time)
-    //   let diff = today.diff(msgTime, 'days')
-    //   if (diff == 0) return 'Today'
-    //   else if (diff == 1) return 'Yesterday'
-    //   else return msgTime.format('d/MM/YY')
-    // },
     async showTaskDetail() {
       const CHAT_ID = this.chat.chat_id
 
