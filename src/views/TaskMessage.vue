@@ -63,7 +63,7 @@ export default {
       return messages && messages.length > 0 && this.date(message.createdAt) !== this.date(messages[index > 0 ? index - 1 : index].createdAt)
     },
     date(date) {
-      return moment(date).format('MMM DD, YYYY')
+      return moment(date).format('MMM DD, YYYY | ddd')
     },
     editMessage(message) {
       this.selected_message = message
