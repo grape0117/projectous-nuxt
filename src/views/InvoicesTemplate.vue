@@ -20,9 +20,9 @@
     </div>
 
     <div class="tab-content mt-2">
-      <div class="invoices-table tab-pane active" role="tabpanel" id="open">
+      <div class="invoices-table">
         <div class="invoices-header">
-          <span>Status</span>
+          <span class="status">Status</span>
           <span>Date Created</span>
           <span>Recipient</span>
           <span>Invoice ID</span>
@@ -35,7 +35,7 @@
           <invoices-row v-bind:invoice="invoice" />
         </div>
       </div>
-      <div class="tab-pane invoices-table" role="tabpanel" id="closed">
+      <!-- <div class="tab-pane invoices-table" role="tabpanel" id="closed">
         <div class="table-responsive">
           <div class="invoices-header">
             <span>Status</span>
@@ -51,7 +51,7 @@
             <invoices-row v-bind:invoice="invoice" />
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <invoices-apply-payment />
   </div>
@@ -191,6 +191,7 @@ export default {
     span:nth-child(1) {
       width: 100%;
       max-width: calc(100vw / 6);
+      min-width: 200px;
     }
     span:nth-child(2) {
       width: 100%;
@@ -238,6 +239,7 @@ export default {
     > div:nth-child(1) {
       width: 100%;
       max-width: calc(100vw / 6);
+      min-width: 200px;
       // flex-grow: 10;
     }
     > div:nth-child(2) {
