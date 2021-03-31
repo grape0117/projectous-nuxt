@@ -138,6 +138,7 @@ export default {
 }
 .timer-tray-timer-card {
   width: 100%;
+  max-width: 250px;
   padding: 0 10px;
   align-self: center;
   // margin-top: 10px;
