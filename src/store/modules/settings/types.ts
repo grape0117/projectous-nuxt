@@ -28,7 +28,4 @@ export interface IModuleState {
   timer_watch: number
 }
 
-enum EditTimerStatus {
-  add,
-  edit
-}
+type EditTimerStatus = 'add' | 'edit'
