@@ -10,20 +10,19 @@
       </template>
 
       <div class="row-no-padding">
-        <!-- <pre>
-          {{ $store.state.invoice_items }}
-        </pre> -->
+        <!-- {{ route_query }} -->
         <Header v-on:reload="reload" />
         <div class="d-flex justify-content-between">
           <!-- <task-details v-if="show_task"></task-details> -->
           <div class="router-view-class">
-            <task-detail v-if="Object.keys(showTask).length > 0" class="app_task-detail" :task="showTask" />
+            <!-- {{ $route.query.task }} -->
+            <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" />
             <router-view style="width: 100%; height: 100%" />
           </div>
           <div class="d-flex">
-            <task-tray v-show="showTasks" />
-            <task-side-bar v-show="showChat" />
-            <timer-tab v-show="showTimer" />
+            <task-tray v-show="showTaskSection" />
+            <task-side-bar v-show="has_route_query_showChatSection || showChatSection" />
+            <timer-tab v-show="showTimerSection" />
           </div>
         </div>
       </div>
@@ -90,15 +89,46 @@ export default {
   data() {
     return {
       loading: false,
-      showTasks: false,
-      showChat: false,
-      showTimer: false,
+      showTaskSection: false,
+      showChatSection: false,
+      showTimerSection: false,
       bgStyle: '',
       bgTheme: '',
-      showTask: {}
+      showTaskDetail: false
     }
   },
   computed: {
+    // $route.query
+    route_query() {
+      return this.$route.query
+    },
+    // check if has $route.query.task
+    has_route_query_task() {
+      return this.route_query && this.route_query.task ? true : false
+    },
+    has_route_query_showChatSection() {
+      return this.route_query.showChatSection === 'true' ? true : false
+    },
+    route_query_taskId() {
+      if (this.has_route_query_task) {
+        return this.route_query.task
+      }
+      return null
+    },
+    task() {
+      /**
+       * Getting "Task" data from Store
+       * NOTE: must be replaced when tasks API is available already
+       */
+      const task = this.$store.state.tasks.tasks.find(t => t.id === this.route_query_taskId)
+      return task
+    },
+    // getChat() {
+    //   const { chat } = await this.$http().get(`/chat/${this.task_id}`)
+    //   console.log(chat)
+
+    //   console.log(this.task)
+    // },
     // backgroundStyle() {
     //   if(this.bgTheme === 'Images') {
     //     return `
@@ -193,37 +223,23 @@ export default {
 
       setInterval(this.getNewData, 3000)
     }
-
-    EventBus.$on('showTask', task => {
-      this.showTask = task
-    })
   },
 
   created() {
-    let getTaskFromQuery = 0
-    this.$watch('$route.query', async val => {
-      if (getTaskFromQuery > 2) return
-      if (!!val.task && this.$store.state.tasks.tasks && this.$store.state.tasks.tasks.length > 0) {
-        const task = await this.$store.state.tasks.tasks.find(t => t.id === val.task)
-        this.showTask = task
-        getTaskFromQuery += 1
-      }
-    })
-
     if (getCookie('tasks') === 'true') {
-      this.showTasks = true
+      this.showTaskSection = true
     } else {
-      this.showTasks = false
+      this.showTaskSection = false
     }
     if (getCookie('chat') === 'true') {
-      this.showChat = true
+      this.showChatSection = true
     } else {
-      this.showChat = false
+      this.showChatSection = false
     }
     if (getCookie('timers') === 'true') {
-      this.showTimer = true
+      this.showTimerSection = true
     } else {
-      this.showTimer = false
+      this.showTimerSection = false
     }
 
     EventBus.$on('toggle_task', () => {
@@ -231,16 +247,16 @@ export default {
       document.cookie = `task=${this.showTaskDetail}`
     })
     EventBus.$on('toggle_tasks', () => {
-      this.showTasks = !this.showTasks
-      document.cookie = `tasks=${this.showTasks}`
+      this.showTaskSection = !this.showTaskSection
+      document.cookie = `tasks=${this.showTaskSection}`
     })
     EventBus.$on('toggle_timers', () => {
-      this.showTimer = !this.showTimer
-      document.cookie = `timers=${this.showTimer}`
+      this.showTimerSection = !this.showTimerSection
+      document.cookie = `timers=${this.showTimerSection}`
     })
     EventBus.$on('toggle_chat', () => {
-      this.showChat = !this.showChat
-      document.cookie = `chat=${this.showChat}`
+      this.showChatSection = !this.showChatSection
+      document.cookie = `chat=${this.showChatSection}`
     })
 
     if (getCookie('bg-style')) {
@@ -314,7 +330,6 @@ export default {
     EventBus.$off('toggle_timers')
     EventBus.$off('toggle_chat')
     EventBus.$off('changeBackground')
-    EventBus.$off('showTask')
   },
   methods: {
     // getNewData() {

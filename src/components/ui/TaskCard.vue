@@ -1,5 +1,6 @@
 <template>
-  <div @click="$emit('showTask', task)" :style="'background-color: ' + backgroundColor">
+  <!-- <div @click="$emit('showTask', task)" :style="'background-color: ' + backgroundColor"> -->
+  <div @click="showTaskDetail" :style="'background-color: ' + backgroundColor">
     <!-- <img :src="'//www.projectous.com/api/projects/' + task.project_id + '/favicon.png'" /> -->
     <!-- <img src="https://dummyimage.com/30x30/000/fff" /> -->
     <!-- <pre>{{ task }}</pre> -->
@@ -131,6 +132,9 @@ export default {
     }
   },
   methods: {
+    async showTaskDetail() {
+      await this.$router.push({ query: { task: this.task.id } })
+    },
     abbrName(name) {
       if (!name) return ''
       let matches = name.match(/\b(\w)/g) // ['J','S','O','N']

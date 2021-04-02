@@ -1,28 +1,25 @@
 <template>
   <b-list-group-item class="message-panel_inner-message">
-    <div class="msg-header">
-      <span>{{ getUserNameWithCompanyUserId(message.company_user_id) }}</span> /
-      <span v-if="message.timestamp">{{ formatTime(message.timestamp) }}</span>
-    </div>
-    <div class="message-wrapper">
-      <!-- <pre class="msg-content" style="color: white;">{{ message.message }}</pre> -->
-      <div class="msg-content">
-        <span>{{ message.message }}</span>
-      </div>
-      <div class="message-actions" v-if="current_company_user_id == message.company_user_id">
-        <i class="icon-more_vert" @click="open_actions = !open_actions" />
-        <div class="message-actions-options" v-if="open_actions">
-          <i class="icon-edit" @click="editMessage(message)" />
-          <i class="icon-delete" @click="deleteMessage(message)" />
+    <b-avatar class="mr-1 mb-4" :text="user_name" v-b-tooltip.hover :title="message.user.name" size="25px" />
+    <div>
+      <div class="message-wrapper">
+        <pre class="msg-content" style="color: white;">{{ message.text }}</pre>
+        <div class="message-actions" v-if="current_company_user_id == message.company_user_id">
+          <i class="icon-more_vert" @click="open_actions = !open_actions" />
+          <div class="message-actions-options" v-if="open_actions">
+            <i class="icon-edit" @click="editMessage(message)" />
+            <i class="icon-delete" @click="deleteMessage(message)" />
+          </div>
         </div>
       </div>
+      <span class="message-dateTime">{{ formatTime(message.createdAt) }}</span>
     </div>
-    <span class="message-dateTime">{{ formatTime(message.updated_at || message.created_at) }}</span>
   </b-list-group-item>
 </template>
 
 <script>
 import moment from 'moment'
+import { abbrName } from '@/utils/util-functions'
 
 export default {
   name: 'task-message-item',
@@ -33,6 +30,9 @@ export default {
   },
   props: ['message'],
   computed: {
+    user_name() {
+      return abbrName(this.message.user.name)
+    },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
     }
@@ -67,14 +67,14 @@ export default {
 }
 
 .message-panel_inner-message {
+  display: flex;
+  align-items: flex-end;
   background-color: rgba($color: #000000, $alpha: 0) !important;
   border: 0 !important;
-  padding: 0px 20px 12px 20px;
-  // border-bottom: 1px solid white;
+  padding: 0px 10px 5px 10px;
 
   .message-dateTime {
     font-size: 12px;
-    // font-weight: bold;
   }
 }
 

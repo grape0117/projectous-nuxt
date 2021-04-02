@@ -27,7 +27,7 @@
     <div class="header-bottom">
       <div class="nav-icons">
         <!-- <i class="nav-icon icon-arrow_forward_ios nav-icons-active"></i> -->
-        <div class="d-flex" :class="toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index">
+        <div class="d-flex" :class="(has_route_query_showChatSection && icon.name === 'chat') || toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index">
           <div class="nav-icon" @click="toggle(icon.name)">
             <i class="nav-icon__icon" :class="icon.icon" />
             <span class="nav-icon__name">
@@ -147,6 +147,9 @@ export default Vue.extend({
     }
   },
   computed: {
+    has_route_query_showChatSection() {
+      return this.$route.query.showChatSection === 'true' ? true : false
+    },
     headerBgColor() {
       let rgb = this.colors.backgroundColor
       return `${rgb[0]}, ${rgb[0]}, ${rgb[0]}`
@@ -181,22 +184,26 @@ export default Vue.extend({
 
       this.$router.push({ path: `/${path}` })
     },
-    async logout() {
+    logout() {
       document.cookie = 'auth_token=' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
       window.location.reload()
     },
-    async setBackground(option, styleTheme) {
+    setBackground(option, styleTheme) {
       console.log(styleTheme)
-      await EventBus.$emit('changeBackground', { option, styleTheme })
+      EventBus.$emit('changeBackground', { option, styleTheme })
     },
     async toggle(iconName) {
       if (iconName === 'reload') {
         this.$emit('reload')
-        // let data = await this.storeDataInIndexedDb()
-        // return this.$store.dispatch('PROCESS_INCOMING_DATA', data)
+      }
+      if (this.has_route_query_showChatSection) {
+        let query = Object.assign({}, this.$route.query)
+        delete query.showChatSection
+        await this.$router.replace({ query })
+        return
       }
       this.toggles[iconName] = !this.toggles[iconName]
-      await EventBus.$emit(`toggle_${iconName}`)
+      EventBus.$emit(`toggle_${iconName}`)
     }
     // async getAppDataFromApi() {
     //   try {

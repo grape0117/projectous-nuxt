@@ -98,3 +98,12 @@ export function getCookie(name: string) {
   let v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)')
   return v ? v[2] : null
 }
+
+export function abbrName(name: string) {
+  if (!name) return ''
+  let matches = name.match(/\b(\w)/g) // ['J','S','O','N']
+  if (matches) {
+    let acronym = matches.join('') // JSON
+    return acronym.toUpperCase()
+  }
+}

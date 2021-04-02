@@ -2,34 +2,34 @@
   <div class="task-side-bar">
     <div class="task-side-bar-label">
       <span>CHAT</span>
-      <span style="font-weight: normal; align-self: center; max-width: 200px" v-if="hasOpenedChat">{{ openedChat.title }}</span>
+      <!-- <span style="font-weight: normal; align-self: center; max-width: 200px" v-if="hasOpenedChat">{{ openedChat.project }}</span> -->
       <div class="message-sidebar_new-task" @click="createTask">+</div>
     </div>
-    <!-- <pre>{{ taskMessages }}</pre> -->
-    <div class="message-sidebar" v-show="!hasOpenedChat">
-      <b-list-group v-if="taskMessages && taskMessages.length > 0" class="task-side-bar_list">
-        <task-sidebar-item @openChat="openChat" v-for="(task, index) in taskMessages" :key="index" :task="task" @setLastMessage="setLastMessage" />
+    <!-- <pre>{{ chats }}</pre> -->
+    <div class="message-sidebar">
+      <b-list-group v-if="chats && chats.length > 0" class="task-side-bar_list">
+        <task-sidebar-item v-for="(chat, index) in chats" :key="index" :chat="chat" />
       </b-list-group>
       <div v-else class="d-flex justify-content-center">
         <span class="task-side-bar-no-messages">No messages yet.</span>
       </div>
     </div>
 
-    <div class="" v-if="hasOpenedChat">
+    <!-- <div class="" v-if="hasOpenedChat">
       <div class="d-flex justify-content-between">
         <b-button variant="dark" @click="closeChat" style="margin-bottom: 10px; margin-top: 10px; margin-left: 5px"> <i class="icon-arrow_back" />Back </b-button>
-        <span class="task-sidebar_go-to-task" style="margin-right: 20px" @click="goToTask()">[ Go to task]</span>
+        <span class="task-sidebar_go-to-task" style="margin-right: 20px" @click="goToTask">[ Go to task]</span>
       </div>
 
-      <task-message class="task-side-bar_task-message" v-bind:task_id="openedChat.id" :task_messages="openedChat.messages"> </task-message>
-    </div>
+      <task-message class="task-side-bar_task-message" :chat="openedChat"> </task-message>
+    </div> -->
   </div>
 </template>
 
 <script>
 import uuid from 'uuid'
 import moment from 'moment'
-// import TaskMessage from './TaskMessage.vue'
+
 import { chain, forEach, groupBy } from 'lodash'
 import { EventBus } from '@/components/event-bus'
 
@@ -37,36 +37,32 @@ export default {
   data() {
     return {
       active_task: {},
-      openedChat: {}
+      openedChatId: null,
+      chats: []
     }
   },
   computed: {
-    hasOpenedChat() {
-      return Object.keys(this.openedChat).length > 0
-    },
+    // hasOpenedChat() {
+    //   return Object.keys(this.openedChat).length > 0
+    // },
     // messagesTaskIds() {
     //   return this.$store.state.task_messages.task_messages.map(message => message.task_id)
     // },
-    taskMessages() {
-      let tasks = this.$store.state.tasks.tasks
-      let projects = this.$store.state.projects.projects
-      let taskMessages = tasks.map(task => task).filter(task => task.messages && task.messages.length > 0)
+    // OLD
+    // taskMessages() {
+    //   let tasks = this.$store.state.tasks.tasks
+    //   let projects = this.$store.state.projects.projects
+    //   let taskMessages = tasks.map(task => task).filter(task => task.messages && task.messages.length > 0)
 
-      taskMessages.forEach(async taskMessage => {
-        taskMessage.project = await projects.find(project => project.id === taskMessage.project_id)
-      })
+    //   taskMessages.forEach(async taskMessage => {
+    //     taskMessage.project = await projects.find(project => project.id === taskMessage.project_id)
+    //   })
 
-      taskMessages.sort((a, b) => {
-        return new Date(b.last_task_message_created_at) - new Date(a.last_task_message_created_at)
-      })
-      // .filter(task => {
-      //   if(_.includes(this.messagesTaskIds, task.id)) {
-      //     return task
-      //   }
-      // })
-      console.log(taskMessages)
-      return taskMessages
-    },
+    //   taskMessages.sort((a, b) => {
+    //     return new Date(b.last_task_message_created_at) - new Date(a.last_task_message_created_at)
+    //   })
+    //   return taskMessages
+    // },
     // tasks() {
     //   let tasks = this.$store.state.tasks.tasks
     //   let r_tasks = chain(tasks)
@@ -89,6 +85,10 @@ export default {
       return this.$store.state.settings.current_company_user_id
     }
   },
+  async created() {
+    let { chats } = await this.$http().get('/chats')
+    this.chats = chats
+  },
   mounted() {},
   methods: {
     // sortedTaskMessages() {
@@ -101,32 +101,34 @@ export default {
     //   });
     //   return taskMessages
     // },
-    async goToTask() {
-      await this.$router.push({ query: { task: this.openedChat.id } })
-      await EventBus.$emit('showTask', this.openedChat)
-    },
-    async setLastMessage(lastMessage) {
-      let tasks = this.$store.state.tasks.tasks
-      await tasks.forEach(async task => {
-        if (task.id === lastMessage.task_id) {
-          task.last_task_message_created_at = await lastMessage.created_at
-          task.last_task_message_id = await lastMessage.id
-        }
-      })
-    },
-    openChat(chat) {
-      this.openedChat = chat
-    },
-    closeChat() {
-      this.openedChat = {}
-    },
+    // async goToTask() {
+    //   if (Object.keys(this.$route.query).length > 0 && this.$route.query.task === this.openedChatId) return
+
+    //   EventBus.$emit('showTask', this.openedChatId)
+    //   await this.$router.push({ query: { task: this.openedChatId } })
+    // },
+    // async setLastMessage(lastMessage) {
+    //   let tasks = this.$store.state.tasks.tasks
+    //   await tasks.forEach(async task => {
+    //     if (task.id === lastMessage.task_id) {
+    //       task.last_task_message_created_at = await lastMessage.created_at
+    //       task.last_task_message_id = await lastMessage.id
+    //     }
+    //   })
+    // },
+    // async openChat(chat_id) {
+    //   this.openedChatId = chat_id
+    // },
+    // closeChat() {
+    //   this.openedChatId = null
+    // },
     async createTask() {
       let newTask = { id: uuid.v4() }
       await this.$store.dispatch('UPSERT', { module: 'tasks', entity: newTask })
       // this.$router.push({ name: 'Task_Detail', params: { task_id: newTask.id } })
       // this.$router.push({ name: 'Task_Detail', params: { task_id: newTask.id } })
       await this.$router.push({ query: { task: newTask.id } })
-      await EventBus.$emit('showTask', newTask)
+      // EventBus.$emit('showTask', newTask)
       // await EventBus.$emit('')
     },
     messageTime(time) {

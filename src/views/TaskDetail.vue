@@ -1,10 +1,8 @@
 <template>
   <div id="task-detail">
-    <!-- <button @click="saveTask()">Close (ESC)</button>
-    <pre style="color: white">{{ getResources() }}</pre> -->
     <div class="left-section">
       <div class="task-detail-top-buttons">
-        <button @click="saveTask()">Close (ESC)</button>
+        <button @click="saveTask">Close (ESC)</button>
         <b-button class="action-button" variant="outline-success" @click="completeTask()">
           <span>Complete</span>
         </b-button>
@@ -12,13 +10,13 @@
           <span>Delete</span>
         </b-button>
       </div>
-      <b-tabs content-class="mt-3" style="margin-top: 10px">
-        <b-tab title="Details" active style="color: black">
+      <b-tabs content-class="mt-3" style="margin-top: 10px" v-model="showTab">
+        <b-tab title="Details" style="color: black">
           <b-form-group label="Task">
             <b-form-textarea type="text" v-model="task.title" placeholder="Task Title" rows="2" max-rows="4"> </b-form-textarea>
           </b-form-group>
           <b-form-group label="Resources">
-            <div @click="onSelectResource(resource)" v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" :href="resource.href">
+            <div @click="onSelectResource(resource)" v-for="resource in getResources" :key="resource.id" :href="resource.href">
               <div class="resource-title">
                 <span>{{ resource.name }}</span>
               </div>
@@ -108,17 +106,20 @@
           <edit-task-modal-user v-for="user in active_users" :key="user.id" @toggle="toggleUser" v-bind:task_user="task_user(user)" v-bind:user="user" v-bind:task="task" />
         </b-tab>
         <b-tab title="Chat">
-          <task-message class="task-cloud_task-message" v-bind:task_id="task.id"> </task-message>
+          <!-- <pre style="color: black;">
+            {{ task }}
+          </pre> -->
+          <task-message class="task-cloud_task-message" :chat="chat"> </task-message>
         </b-tab>
       </b-tabs>
     </div>
     <div class="center-section">
       <draggable class="tab">
-        <button class="tablinks" :class="{ active: resource.name === selected_tab }" v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" @click="openTab(resource.name)">
+        <button class="tablinks" :class="{ active: resource.name === selected_tab }" v-for="resource in getResources" :key="resource.id" @click="openTab(resource.name)">
           {{ resource.name }}
         </button>
       </draggable>
-      <div v-for="(resource, resourceIndex) in getResources" :key="resourceIndex" :id="resource.name">
+      <div v-for="resource in getResources" :key="resource.id" :id="resource.name">
         <div v-if="resource.name === selected_tab" class="d-flex justify-content-between align-items-center">
           <label class="docs-path" style="white-space: nowrap; overflow: hidden">{{ resource.href }}</label>
           <div style="float: right; display: inline-block; margin-bottom: 8px; margin-top: 5px" v-if="resource.href != ''">
@@ -149,7 +150,8 @@ export default Vue.extend({
   props: {
     task: {
       type: Object,
-      required: false
+      required: false,
+      default: () => {}
     }
   },
   data() {
@@ -157,7 +159,9 @@ export default Vue.extend({
       selected_resource: '',
       isEditResource: null,
       selectedFile: null,
-      selected_tab: ''
+      selected_tab: '',
+      chat: {},
+      showTab: 0
     }
   },
   computed: {
@@ -183,8 +187,29 @@ export default Vue.extend({
       }
     }
   },
-  watch: {},
+  watch: {
+    '$route.query': {
+      immediate: true,
+      handler(query) {
+        if (query.task && Object.keys(query.task).length > 0) {
+          this.getChat(query.task)
+        }
+
+        if (query.showChat && query.showChat === 'true') {
+          this.showTab = 1
+        }
+      }
+    }
+  },
   methods: {
+    async getChat(task_id) {
+      if (!task_id) {
+        this.chat = []
+      }
+
+      const { chat } = await this.$http().get(`/chat/${task_id}`)
+      this.chat = chat
+    },
     async addResource() {
       // add or update action
       console.log(this.task)
@@ -215,29 +240,39 @@ export default Vue.extend({
       console.log(this.task)
     },
     async saveTask(isRedirect = true) {
-      await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
+      // NOTE: uncommented temporarily since it fails to do the UPSERT with module tasks
+      // await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
+
+      // console.log(this.$route.query)
       if (isRedirect) {
         this.isEditResource = null
-        // will only delete the "task" in $router.query
-        let query = Object.assign({}, this.$route.query)
-        delete query.task
-        this.$router.replace({ query })
+        // EventBus.$emit('showTask', null)
 
-        await EventBus.$emit('showTask', {})
+        if (this.$route.query && Object.keys(this.$route.query).length > 0) {
+          let query = Object.assign({}, this.$route.query)
+          delete query.task
+          delete query.showChat
+          delete query.showChatSection
+          await this.$router.replace({ query })
+        }
+        // will only delete the "task" in $router.query
+
+        // this.$router.replace({ query })
+
         // this.task = false
         // this.$router.push({ name: 'Task Cloud' })
       }
     },
     async deleteTask() {
       this.$store.dispatch('DELETE', { module: 'tasks', id: this.task.id })
-      await EventBus.$emit('showTask', {})
+      // await EventBus.$emit('showTask', {})
 
       // this.task = false
     },
     async completeTask() {
       this.task.status = 'completed'
       this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
-      await EventBus.$emit('showTask', {})
+      // await EventBus.$emit('showTask', {})
       // this.task = false
     },
     onSelectResource(resource) {
@@ -353,7 +388,7 @@ export default Vue.extend({
       }
     }
   },
-  created() {
+  async created() {
     if (!!this.getResources.length) {
       this.openTab(this.getResources[0].name)
     }
