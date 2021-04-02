@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="timer-modal" tabindex="-1" title="Edit Timer" class="modal fade" role="dialog" @ok="saveTimer">
+  <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close">
     <template v-slot:modal-header="{ ok, cancel }">
       <!-- <div class="timer-modal_header-section">
         <b-tabs content-class="mt-3">
@@ -227,6 +227,15 @@ export default {
     }
   },
   computed: {
+    title() {
+      if (this.editTimerStatus === 'add') {
+        return 'Add Timer'
+      }
+      return 'Edit Timer'
+    },
+    editTimerStatus() {
+      return this.$store.state.settings.current_edit_timer_status
+    },
     getInvoiceNotes() {
       let invoice_notes = this.timer.invoice_notes
       if (invoice_notes) return invoice_notes
@@ -289,6 +298,9 @@ export default {
     }
   },
   methods: {
+    close() {
+      this.$store.commit('settings/setCurrentEditTimerStatus', null)
+    },
     clearInvoiceNotes() {
       this.showInvoiceNotes = !this.showInvoiceNotes
       this.timer.invoice_notes = null
@@ -446,7 +458,20 @@ export default {
       if (!adminNotes) return (this.timer.admin_notes = '')
       this.timer.admin_notes = adminNotes
     },
-    saveTimer(callback) {
+    async startTimer() {
+      const { client_id, project_id, task_id, report_at } = this.timer
+
+      await this.$store.dispatch('timers/startTimer', {
+        current_company_id: this.$store.state.settings.current_company.id,
+        client_id: client_id,
+        project_id: project_id,
+        task_id: task_id,
+        is_billable: 1,
+        report_at: report_at
+      })
+    },
+
+    async saveTimer() {
       if (this.timer.project_id) {
         let project = this.$store.getters['projects/getById'](this.timer.project_id)
         if (project) {
@@ -458,6 +483,9 @@ export default {
       }
 
       this.$store.dispatch('timers/saveTimer', this.timer)
+      if (this.editTimerStatus === 'add') {
+        this.startTimer()
+      }
     },
     client_name: function(client_company_id) {
       let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)

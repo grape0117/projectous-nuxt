@@ -73,6 +73,13 @@ export const mutations: MutationTree<IModuleState> = {
       window.$_app.$bvModal.hide('timer-modal')
     }
   },
+  setCurrentEditTimerStatus(state, status) {
+    if (!status) {
+      state.current_edit_timer_status = null
+      return
+    }
+    state.current_edit_timer_status = status
+  },
   setCurrentEditTimerHistory: function(state, history) {
     state.current_edit_timer.histories = history
   },

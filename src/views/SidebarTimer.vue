@@ -296,6 +296,7 @@ export default {
     },
     editTimer: function() {
       console.log('editTimer')
+      this.$store.commit('settings/setCurrentEditTimerStatus', 'edit')
       Vue.set(this.$store.state.settings, 'current_edit_timer', this.timer)
       console.log(this.$store.state.settings.current_edit_timer)
       this.$bvModal.show('timer-modal')

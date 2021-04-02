@@ -3,6 +3,7 @@
   <div id="timer-tray">
     <div class="timer-tray-top-div">
       <span class="timer-tray-title">TIMERS</span>
+      <span>{{ $store.state.settings.current_edit_timer_status }}</span>
       <div class="trayTopBtn">
         <!-- <button class="closebtn" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
         <span class="makeBtn" @click="addTimer()">Modal</span>
@@ -79,7 +80,7 @@ export default {
     expandContract: function() {
       this.expanded = this.expanded ? false : true
     },
-    addTimer: function() {
+    async addTimer() {
       this.$store.dispatch('timers/addTimer') //timers/addTimer2 signature
     },
     startTimer: function(e) {
