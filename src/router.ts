@@ -9,7 +9,7 @@ Vue.use(Router)
 const router = new Router({
   mode: 'history',
   routes: [
-    { path: '/', name: 'home', redirect: '/kanban' },
+    { path: '/', name: 'home', redirect: '/project' },
     {
       path: '/profit',
       name: 'Profit',
@@ -59,21 +59,21 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "Profile" */ '@/views/Profile.vue')
     },
     {
-      path: '/kanban',
-      name: 'Kanban',
-      component: () => import(/* webpackChunkName: "Custom" */ '@/views/Kanban.vue')
+      path: '/project',
+      name: 'Project',
+      component: () => import(/* webpackChunkName: "Project" */ '@/views/Kanban.vue')
     },
     {
       path: '/users',
       name: 'Company Users',
       meta: { adminOnly: true },
-      component: () => import(/* webpackChunkName: "Custom" */ '@/views/CompanyUsers.vue')
+      component: () => import(/* webpackChunkName: "Users" */ '@/views/CompanyUsers.vue')
     },
     {
       path: '/clients',
       name: 'Clients',
       meta: { adminOnly: true },
-      component: () => import(/* webpackChunkName: "Custom" */ '@/views/ClientsTemplate.vue')
+      component: () => import(/* webpackChunkName: "Clients" */ '@/views/ClientsTemplate.vue')
     },
     // {
     //   path: '/users',
