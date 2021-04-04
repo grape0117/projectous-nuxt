@@ -195,7 +195,7 @@ export default {
   /* padding: 0 20px 20px 20px; */
   color: white;
   /* background-color: #616161; */
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   height: calc(100vh - 50px);
   overflow: hidden;
 }

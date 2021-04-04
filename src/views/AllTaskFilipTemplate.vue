@@ -491,7 +491,7 @@ export default Vue.extend({
 }
 .task-cloud_task-message {
   height: 100%;
-  height: calc(100vh - 160px) !important;
+  height: calc(100vh - 170px) !important;
 }
 .task-cloud_task-message .message-panel_inner {
   min-height: calc(100vh - 305px);
@@ -500,7 +500,7 @@ export default Vue.extend({
   overflow-x: hidden;
 }
 .active-task-card {
-  height: calc(100vh - 180px);
+  height: calc(100vh - 190px);
   overflow-y: auto;
   padding: 5px 5px;
 }

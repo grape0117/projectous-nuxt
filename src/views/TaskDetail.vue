@@ -404,7 +404,7 @@ export default Vue.extend({
 
 <style lang="scss">
 #task-detail {
-  overflow-y: scroll;
+  overflow-y: auto;
   background-color: white;
   display: flex;
 }
@@ -423,8 +423,8 @@ export default Vue.extend({
   max-width: 300px;
   width: 100%;
   padding: 0 10px;
-  height: calc(100vh - 39px);
-  overflow-y: scroll;
+  height: calc(100vh - 50px);
+  overflow-y: auto;
   color: white;
   position: relative;
 }
