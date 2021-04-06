@@ -3,7 +3,7 @@
     <!-- <div class="header-top" :style="`background-image: linear-gradient(to right, rgba(${headerBgColor},0.2), rgba(${headerBgColor},0.9), rgba(${headerBgColor},1));`"> -->
     <div class="header-nav">
       <div style="width: 30px;">
-        <img @mouseenter="setReload(true)" v-if="!showReload" src="/apple-touch-icon.png" width="30" height="30" alt="logo" @click="goTo('kanban')" />
+        <img @mouseenter="setReload(true)" v-if="!showReload" src="/apple-touch-icon.png" width="30" height="30" alt="logo" @click="goTo('project')" />
         <div v-else class="reload-icon" @mouseleave="setReload(false)">
           <i class="icon-cached" :class="$store.state.totalActiveRequests ? 'reload-rotate' : null" />
           <span class="reload-text">RELOAD</span>
@@ -99,7 +99,7 @@ export default Vue.extend({
       // projectName: 'P',
       navLinks: [
         { name: 'Task Cloud', path: '/tasks' },
-        { name: 'Kanban', path: '/kanban' },
+        { name: 'Project', path: '/project' },
         { name: 'clients', path: '/clients' },
         { name: 'users', path: '/users' },
         { name: 'invoices', path: '/invoices' },

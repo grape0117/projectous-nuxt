@@ -14,7 +14,11 @@
           </div>
 
           <div v-if="clientVisible(client)" v-for="(client, index) in selectedClient ? filteredClient : activeClients" :key="index">
-            <div class="client-name">{{ client.name }} <b-icon v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon></div>
+            <div class="client-name">
+              <span class="mr-2">{{ client.name }}</span>
+              <b-icon class="pointer mr-2" v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon>
+              <i class="icon-add add-client pointer" @click="addClient" />
+            </div>
             <div class="client-project-name" v-for="{ name, id, acronym } in openClientProjects(client)" :key="id" @click="setProjectId(id)">
               <div @click="setPinnedProject(id)" class="project-item-status">
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
@@ -292,6 +296,11 @@ export default class Custom extends Vue {
     this.$store.commit('settings/setCurrentEditProject', cloneDeep(project))
   }
 
+  private addClient() {
+    this.$store.state.settings.current_edit_project = { id: uuid.v4() }
+    this.$store.dispatch('settings/openModal', 'project')
+  }
+
   private editClient(client_id: any) {
     console.log('edit client')
     let client = this.$store.getters['clients/getById'](client_id)
@@ -319,6 +328,10 @@ export default class Custom extends Vue {
 }
 </script>
 <style lang="scss">
+.add-client {
+  color: lawngreen;
+  font-size: 16px;
+}
 .kanban_title-part {
   display: flex;
   justify-content: space-between;
@@ -352,6 +365,9 @@ export default class Custom extends Vue {
 </style>
 
 <style scoped>
+.pointer {
+  cursor: pointer;
+}
 .client-section {
   /* max-width: 350px; */
   max-width: 240px;
