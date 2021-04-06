@@ -328,7 +328,7 @@ export default class Custom extends Vue {
   width: 275px;
   height: calc(100vh - 50px);
   overflow-y: scroll;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
 }
 .task-tray-selection-box {
   align-self: center;

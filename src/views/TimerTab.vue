@@ -118,19 +118,14 @@ export default {
 <style lang="scss">
 #timer-tray {
   min-width: 252px;
-  // padding: 0 15px;
-  // max-width: 300px;
   height: calc(100vh - 50px);
   overflow: hidden auto;
-  // background-color: #616161;
-  background-color: rgba(0, 0, 0, 0.5);
-  // overflow-y: scroll;
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
 }
 .timer-tray-top-div {
   top: 0;
-  // font-weight: bold;
   position: sticky;
   padding: 10px;
   z-index: 1;
@@ -141,7 +136,6 @@ export default {
   max-width: 250px;
   padding: 0 10px;
   align-self: center;
-  // margin-top: 10px;
 }
 .timer-tray-title {
   margin-top: 10px;
