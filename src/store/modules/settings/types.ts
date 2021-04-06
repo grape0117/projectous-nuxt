@@ -20,9 +20,12 @@ export interface IModuleState {
   current_edit_client: { id: null }
   current_edit_task: ITask
   current_edit_timer: any // TODO
+  current_edit_timer_status: EditTimerStatus | null
   current_edit_task_type: {} // TODO
   insance_id: string
   last_seen_at: string
   notes: string
   timer_watch: number
 }
+
+type EditTimerStatus = 'add' | 'edit'

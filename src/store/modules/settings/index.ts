@@ -20,6 +20,7 @@ export const settings = {
     current_edit_client: { id: null },
     current_edit_task: {},
     current_edit_timer: {},
+    current_edit_timer_status: null, // Add or Edit
     current_edit_task_type: {},
     instance_id: '',
     last_poll_timestamp: null,

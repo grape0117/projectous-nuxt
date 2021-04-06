@@ -68,6 +68,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // @ts-ignore
     const response = await this._vm.$http().post('/timer/save/ajax', data)
     context.commit('UPSERT', { module: 'timers', entity: response.timer }, { root: true })
+
+    context.commit('settings/setCurrentEditTimerStatus', 'add', { root: true })
     context.commit('settings/setCurrentEditTimer', response.timer, {
       root: true
     })
