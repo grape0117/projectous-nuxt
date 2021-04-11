@@ -235,6 +235,7 @@ export default class Draggable extends Vue {
 }
 .list__wrapper.horizontal-alignment {
   display: flex;
+  min-width: 1040px;
   /* justify-content: center; */
   /* border: 5px solid red; */
 }
