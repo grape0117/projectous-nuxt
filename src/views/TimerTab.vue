@@ -2,8 +2,11 @@
   <!-- <div id="timer-tray" :class="trayClass()" style="overflow-y: scroll; z-index: 1; height: 100vh; position: fixed;"> -->
   <div id="timer-tray">
     <div class="timer-tray-top-div">
-      <span class="timer-tray-title">TIMERS</span>
-      <span>{{ $store.state.settings.current_edit_timer_status }}</span>
+      <div class="d-flex justify-content-between">
+        <span class="timer-tray-title">TIMERS</span>
+        <span class="month-stats">{{ month_stats }}</span>
+      </div>
+      <!-- <span>{{ $store.state.settings.current_edit_timer_status }}</span> -->
       <div class="trayTopBtn">
         <!-- <button class="closebtn" @click="trayToggle()"><b-icon icon="x-circle"></b-icon></button> -->
         <span class="makeBtn" @click="addTimer()">Modal</span>
@@ -24,6 +27,7 @@
 </template>
 <script>
 import moment from 'moment'
+import { EventBus } from '@/components/event-bus'
 
 // Components
 import MySideBarTimer from './MySidebarTimer.vue'
@@ -34,7 +38,9 @@ export default {
     return {
       tray_expanded: true,
       timer_filter: '',
-      keys: []
+      keys: [],
+      month_stats: 0
+      // profit
     }
   },
   computed: {
@@ -65,8 +71,9 @@ export default {
     'my-sidebar-timer': MySideBarTimer
   },
   methods: {
-    keyUpTest() {
-      console.log('working')
+    async getMonthStats() {
+      const { profit } = await this.$http().get('/stats/month')
+      this.month_stats = profit
     },
     trayClass: function() {
       return this.tray_expanded ? 'expanded' : ''
@@ -108,6 +115,9 @@ export default {
     }
   },
   mounted() {
+    EventBus.$on('toggle_timers', () => {
+      this.getMonthStats()
+    })
     window.addEventListener('keyup', this.startTimer)
   },
   beforeDestroy() {
@@ -131,6 +141,15 @@ export default {
   padding: 10px;
   z-index: 1;
   background-color: rgba($color: #000000, $alpha: 0.5);
+
+  .timer-tray-title {
+    color: white;
+    font-weight: bold;
+  }
+
+  .month-stats {
+    color: white;
+  }
 }
 .timer-tray-timer-card {
   width: 100%;
@@ -138,11 +157,7 @@ export default {
   padding: 0 10px;
   align-self: center;
 }
-.timer-tray-title {
-  margin-top: 10px;
-  color: white;
-  font-weight: bold;
-}
+
 .trayTopBtn {
   margin-top: 10px;
   margin-bottom: 15px;
