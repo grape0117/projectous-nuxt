@@ -1,30 +1,6 @@
 <template>
   <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close">
-    <template v-slot:modal-header="{ ok, cancel }">
-      <!-- <div class="timer-modal_header-section">
-        <b-tabs content-class="mt-3">
-          <b-tab title="Edit" active><p>I'm the first tab</p></b-tab>
-          <b-tab title="History"><p>I'm the second tab</p></b-tab>
-        </b-tabs>
-         <div class="">
-          <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
-          <div class="timer-modal_notes">
-            <div contenteditable="true" id="timerUserNotes" class="form-control" style="height: auto; min-height: 60px; max-height: 90px; overflow-y: scroll;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
-          </div>
-        </div>
-      </div> -->
-    </template>
-    <!-- <span>{{ timer.invoice_notes }}</span>
-    <span>{{ timer.admin_notes }}</span> -->
-    <!-- <pre>{{ timer }}</pre> -->
-    <!--<ul id="timerModalTabs" class="nav nav-tabs" role="tablist">-->
-    <!--<li role="presentation" class="active">-->
-    <!--<a href="#timerEditTabShow" aria-controls="timerEditTabShow" role="tab" data-toggle="tab" style="white-space: nowrap">Edit Timer</a>-->
-    <!--</li>-->
-    <!--<li role="presentation">-->
-    <!--<a href="#timerTableTab" aria-controls="timerTableTab" role="tab" data-toggle="tab" style="white-space: nowrap">Timer History</a>-->
-    <!--</li>-->
-    <!--</ul>-->
+    <template v-slot:modal-header="{ ok, cancel }"> </template>
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane active" id="timerEditTabShow">
         <form id="editTimerForm" class="form-horizontal">
@@ -52,7 +28,7 @@
           <div class="form-group">
             <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
             <div class="timer-modal_notes" style="padding-left: 14px">
-              <div contenteditable="true" id="timerUserNotes" class="form-control" style="min-height: 60px; max-height: 90px; overflow-y: auto" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
+              <div contenteditable="true" id="timerUserNotes" class="form-control" style="min-height: 60px; height: auto;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
             </div>
           </div>
 
