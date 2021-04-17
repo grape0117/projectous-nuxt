@@ -1,5 +1,5 @@
-<template id="invoices-template">
-  <div class="container-fluid">
+<template>
+  <div id="invoices-template">
     <div class="row">
       <div class="col-sm-12 form-group form-inline"></div>
     </div>
@@ -173,6 +173,14 @@ export default {
 </style>
 
 <style lang="scss">
+#invoices-template {
+  padding: 10px;
+  width: 100%;
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .invoices-table {
   .invoices-header {
     background-color: rgba($color: #000000, $alpha: 0.6);
