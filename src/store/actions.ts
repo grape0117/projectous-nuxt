@@ -68,6 +68,7 @@ export const actions: ActionTree<IRootState, IRootState> = {
    * Dispatch cascade deletes, commit delete then send delete to backend
    */
   DELETE({ dispatch, commit }, { module, entity }) {
+    console.log('delete')
     // @ts-ignore
     if (this._actions[module + '/CASCADE_DELETE']) {
       // @ts-ignore

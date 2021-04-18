@@ -264,7 +264,14 @@ export default Vue.extend({
       }
     },
     async deleteTask() {
-      this.$store.dispatch('DELETE', { module: 'tasks', id: this.task.id })
+      this.$store.dispatch('DELETE', { module: 'tasks', entity: this.task })
+      if (this.$route.query && Object.keys(this.$route.query).length > 0) {
+        let query = Object.assign({}, this.$route.query)
+        delete query.task
+        delete query.showChat
+        delete query.showChatSection
+        await this.$router.replace({ query })
+      }
       // await EventBus.$emit('showTask', {})
 
       // this.task = false
