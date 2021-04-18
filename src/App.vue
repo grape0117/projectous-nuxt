@@ -14,12 +14,12 @@
         <Header v-on:reload="reload" />
         <div class="d-flex justify-content-between">
           <!-- <task-details v-if="show_task"></task-details> -->
-          <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" />
           <div class="router-view-class">
             <!-- {{ $route.query.task }} -->
+            <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" />
             <router-view style="width: 100%; height: 100%" />
           </div>
-          <div class="toggle-sections">
+          <div class="d-flex">
             <task-tray v-show="showTaskSection" />
             <task-side-bar v-show="has_route_query_showChatSection || showChatSection" />
             <timer-tab v-show="showTimerSection" />
@@ -438,14 +438,6 @@ export default {
 </script>
 
 <style lang="scss">
-.toggle-sections {
-  display: flex;
-  justify-content: flex-end;
-  position: absolute;
-  right: 0;
-  z-index: 20;
-  // width: 100%;
-}
 .modal-content {
   max-height: calc(100vh - 70px);
 }
@@ -476,7 +468,7 @@ export default {
 .app_task-detail {
   z-index: 10;
   width: 100%;
-  height: calc(100vh - 50px);
+  height: 100%;
   position: absolute;
 }
 
