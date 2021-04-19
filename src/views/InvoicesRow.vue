@@ -16,6 +16,7 @@
     </div>
     <div>{{ invoice.invoice_id }}</div>
     <div>{{ invoice.total }}</div>
+    <div>{{ invoice.note ? invoice.note : 'No notes...' }}</div>
     <div>{{ invoice.start_date }}</div>
     <div>{{ invoice.end_date }}</div>
     <div class="buttons">

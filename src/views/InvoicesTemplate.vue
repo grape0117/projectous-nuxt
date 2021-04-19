@@ -27,6 +27,7 @@
           <span>Recipient</span>
           <span>Invoice ID</span>
           <span>Amount</span>
+          <span>Note</span>
           <span>Start Date</span>
           <span>End Date</span>
           <span>Options</span>
@@ -199,7 +200,7 @@ export default {
     }
     span:nth-child(3) {
       width: 100%;
-      max-width: calc(100vw / 6);
+      max-width: calc(100vw / 10);
       min-width: 100px;
     }
     span:nth-child(4) {
@@ -212,9 +213,13 @@ export default {
     }
     span:nth-child(6) {
       width: 100%;
-      max-width: calc(100vw / 14);
+      max-width: calc(100vw / 10);
     }
     span:nth-child(7) {
+      width: 100%;
+      max-width: calc(100vw / 14);
+    }
+    span:nth-child(8) {
       width: 100%;
       max-width: calc(100vw / 14);
     }
@@ -240,7 +245,6 @@ export default {
       width: 100%;
       max-width: calc(100vw / 6);
       min-width: 200px;
-      // flex-grow: 10;
     }
     > div:nth-child(2) {
       width: 100%;
@@ -248,7 +252,7 @@ export default {
     }
     > div:nth-child(3) {
       width: 100%;
-      max-width: calc(100vw / 6);
+      max-width: calc(100vw / 10);
       min-width: 100px;
     }
     > div:nth-child(4) {
@@ -261,9 +265,13 @@ export default {
     }
     > div:nth-child(6) {
       width: 100%;
-      max-width: calc(100vw / 14);
+      max-width: calc(100vw / 10);
     }
     > div:nth-child(7) {
+      width: 100%;
+      max-width: calc(100vw / 14);
+    }
+    > div:nth-child(8) {
       width: 100%;
       max-width: calc(100vw / 14);
     }
