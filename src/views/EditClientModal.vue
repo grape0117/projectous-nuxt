@@ -5,7 +5,6 @@
     </div>
 
     <form id="editClientForm" class="form-horizontal">
-      <!-- {{ client.id }} -->
       <div class="form-group">
         <label class="col-sm-3 control-label" for="inputClientName" @blur="updateClient('name')" style="white-space: nowrap">Client Name: </label>
         <div class="col-sm-9">
@@ -78,19 +77,11 @@
           <select id="color" class="form-control" type="text" name="color" placeholder="Phone" :style="{ 'background-color': client.color }" v-model="client.color">
             <option v-for="color in colors" :key="color" :style="'background-color: ' + color + ';'">{{ color }}</option>
           </select>
-          <!-- <input id="phone" class="form-control" type="text" name="phone" v-model="client.phone" /> -->
         </div>
       </div>
-      <!--<div class="form-group checkbox">
-                      <label>
-                          <input id="allUserCheck" type="checkbox" name="default_all_users"> Default All Users?
-                      </label>
-                  </div>-->
       <client-modal-user :key="user.id" @change="updateHistory" v-bind:client="client" v-for="user in active_users" v-bind:client_user="clientUser(client.id, user.id)" v-bind:user="user"> </client-modal-user>
-      <!-- <client-modal-user :key="user.id" v-bind:client="client" v-for="user in active_users" v-bind:client_user="clientUser(client.id, user.id)" v-bind:user="user"> </client-modal-user> -->
     </form>
-    <!-- /.modal-dialog --> </b-modal
-  ><!-- /.modal -->
+  </b-modal>
 </template>
 
 <script>
@@ -281,8 +272,10 @@ export default {
     },
     saveClient: async function() {
       //TODO: change Save button to Saving...
-      console.log('client save', this.client)
-      // this.client.history = null
+      if (!this.client.status) {
+        this.client.status = 'new'
+      }
+
       this.$store.dispatch('UPSERT', { module: 'clients', entity: this.client })
     }
   }
