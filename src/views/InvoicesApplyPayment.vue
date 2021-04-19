@@ -1,5 +1,16 @@
 <template>
-  <b-modal id="apply-payment-modal" class="apply-payment-modal" style="min-height: 500px;" :size="(invoice && !invoice.payments.length) || active_tab === 1 ? 'md' : 'lg'" :title="(invoice && !invoice.payments.length) || active_tab === 1 ? 'Apply Payment' : 'Payments'" @ok="savePayment" @hidden="hide" :hide-footer="invoice && invoice.payments.length > 0 && active_tab === 0 ? true : false">
+  <!-- <b-modal id="apply-payment-modal" class="apply-payment-modal" style="min-height: 500px" :size="(invoice && !invoice.payments.length) || active_tab === 1 ? 'md' : 'lg'" :title="(invoice && !invoice.payments.length) || active_tab === 1 ? 'Apply Payment' : 'Payments'" @ok="savePayment" @hidden="hide" :hide-footer="invoice && invoice.payments.length > 0 && active_tab === 0 ? true : false"> -->
+  <b-modal id="apply-payment-modal" class="apply-payment-modal" style="min-height: 500px" :size="invoice || active_tab === 1 ? 'md' : 'lg'" :title="invoice || active_tab === 1 ? 'Apply Payment' : 'Payments'" @ok="savePayment" @hidden="hide" :hide-footer="invoice ? true : false">
+    <!-- NOTE: to continue... response from backend still has no payments array -->
+    <!-- <pre v-if="invoice">
+      {{ invoice }}
+      invoice.invoice_id
+      invoice.client.name
+      invoice.payments.rate
+    </pre> -->
+    <pre>
+      {{ invoice }}
+    </pre>
     <div no-body v-if="invoice && invoice.payments.length > 0">
       <b-tabs content-class="mt-3" v-model="active_tab" lazy>
         <b-tab title="List">
@@ -88,8 +99,13 @@
         </b-tab>
       </b-tabs>
     </div>
+    <!-- No Payments yet -->
     <div class="form" v-for="(form, form_index) in apply_form" :key="form_index" v-else>
       <div>
+        <span class="label">Invoice #</span>
+        <b-form-input :value="invoice.invoice_id" disabled></b-form-input>
+      </div>
+      <div class="mt-2">
         <span class="label">Check #</span>
         <b-form-input v-model="form.check_number"></b-form-input>
         <span class="label error" v-if="saving_status === 'failed' && !form.check_number">* Check # must have value</span>
@@ -100,13 +116,21 @@
         <span class="label error" v-if="saving_status === 'failed' && !form.amount">* Amount must have value</span>
       </div>
       <div class="mt-2">
+        <span class="label">Client Name</span>
+        <b-form-input :value="invoice.client.name" disabled></b-form-input>
+      </div>
+      <div class="mt-2">
         <span class="label">Select Image</span>
         <b-form-file v-model="form.image" :state="Boolean(form.image)" placeholder="Choose a file or drop it here..." drop-placeholder="Drop file here..."></b-form-file>
       </div>
-      <div class="mt-2 mb-2">
+      <div class="mt-2">
         <span class="label">Choose a date</span>
         <b-form-datepicker v-model="form.date"></b-form-datepicker>
         <span class="label error" v-if="saving_status === 'failed' && !form.date">* Date must have value</span>
+      </div>
+      <div class="mt-2 mb-2">
+        <span class="label">Invoice date</span>
+        <b-form-datepicker :value="invoice.date" disabled></b-form-datepicker>
       </div>
       <div class="d-flex justify-content-end">
         <div v-if="apply_form.length > 1" class="remove-button mr-3" v-b-tooltip.hover.top="'Remove Form'">
