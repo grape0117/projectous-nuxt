@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="client-modal" class="modal fade" tabindex="-1" role="dialog" title="Add/Edit Client" @ok="saveClient">
+  <b-modal id="client-modal" class="modal fade" tabindex="-1" role="dialog" title="Add/Edit Client" @ok="saveClient" @hidden="hide">
     <div v-if="client.history !== 'null'">
       <div v-for="(event, eventIndex) in typeof client.history === 'string' ? JSON.parse(client.history) : client.history" :key="eventIndex">{{ event.message }} | {{ event.timestamp }}</div>
     </div>
@@ -234,13 +234,17 @@ export default {
         'sienna',
         'brown',
         'maroon'
-      ]
+      ],
+      client: {
+        id: this.$store.state.settings.current_edit_client.id,
+        status: 'new'
+      }
     }
   },
   computed: {
-    client: function() {
-      return this.$store.state.settings.current_edit_client
-    },
+    // current_edit_client: function() {
+    //   return this.$store.state.settings.current_edit_client.id
+    // },
     active_users: function() {
       return this.$store.getters['company_users/getActive']
     }
@@ -252,6 +256,12 @@ export default {
     })*/
   },
   methods: {
+    hide() {
+      this.client = {
+        id: this.$store.state.settings.current_edit_client.id,
+        status: 'new'
+      }
+    },
     updateClient(property) {
       this.updateHistory({ message: '' })
     },
@@ -272,10 +282,6 @@ export default {
     },
     saveClient: async function() {
       //TODO: change Save button to Saving...
-      if (!this.client.status) {
-        this.client.status = 'new'
-      }
-
       this.$store.dispatch('UPSERT', { module: 'clients', entity: this.client })
     }
   }
