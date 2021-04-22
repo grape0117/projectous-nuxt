@@ -1,6 +1,5 @@
 <template>
   <div class="header">
-    <!-- <div class="header-top" :style="`background-image: linear-gradient(to right, rgba(${headerBgColor},0.2), rgba(${headerBgColor},0.9), rgba(${headerBgColor},1));`"> -->
     <div class="header-nav">
       <div style="width: 30px;">
         <img @mouseenter="setReload(true)" v-if="!showReload" src="/apple-touch-icon.png" width="30" height="30" alt="logo" @click="goTo('project')" />
@@ -10,15 +9,6 @@
         </div>
       </div>
       <div class="nav-buttons">
-        <!-- <b-nav horizntal>
-          <b-navbar-brand to="/">Projectous</b-navbar-brand>
-          <b-nav-item to="/tasks">Tasks</b-nav-item>
-          <b-nav-item to="/projects">Projects</b-nav-item>
-          <b-nav-item to="/clients">Clients</b-nav-item>
-          <b-nav-item to="/users">Users</b-nav-item>
-          <b-nav-item to="/profile">Profile</b-nav-item>
-          <b-nav-item to="/logout">Log Out</b-nav-item>
-        </b-nav> -->
         <router-link class="nav-buttons__button" :to="button.path" v-for="(button, index) in navLinks" :style="{ 'text-decoration': $route.path === button.path ? 'underline' : '' }" :key="index">
           {{ button.name | toUpperCase }}
         </router-link>
@@ -26,7 +16,6 @@
     </div>
     <div class="header-bottom">
       <div class="nav-icons">
-        <!-- <i class="nav-icon icon-arrow_forward_ios nav-icons-active"></i> -->
         <div class="d-flex" :class="(has_route_query_showChatSection && icon.name === 'chat') || toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index">
           <div class="nav-icon" @click="toggle(icon.name)">
             <i class="nav-icon__icon" :class="icon.icon" />
@@ -43,7 +32,6 @@
             </div>
           </div>
           <div class="timers-right-icons" v-if="icon.name === 'timers' && (timerRunning || timerEmptyFields > 0)">
-            <!-- <i class="icon-play_arrow" style="font-size: 20px;" :style="{ color: timerRunning ? '#20d420' : 'rgba(0,0,0,0)' }" /> -->
             <i class="icon-play_arrow" style="font-size: 20px;" :style="{ color: timerRunning ? '#20d420' : '#20d420' }" />
             <div class="red-circle-icon" v-if="timerEmptyFields > 0">
               <span class="red-circle-icon-text">{{ timerEmptyFields }}</span>
@@ -68,7 +56,6 @@
             </div>
           </div>
         </div>
-        <!-- <i class="icon-cached header-icon-refresh" ></i> -->
       </div>
       <div class="header_menu-wrapper">
         <div class="profile-icon border" @click="showMenu = !showMenu"></div>
@@ -99,7 +86,7 @@ export default Vue.extend({
       // projectName: 'P',
       navLinks: [
         { name: 'Task Cloud', path: '/tasks' },
-        { name: 'Project', path: '/project' },
+        { name: 'Projects', path: '/projects' },
         { name: 'clients', path: '/clients' },
         { name: 'users', path: '/users' },
         { name: 'invoices', path: '/invoices' },
@@ -155,7 +142,6 @@ export default Vue.extend({
       return `${rgb[0]}, ${rgb[0]}, ${rgb[0]}`
     },
     showReload() {
-      // <!-- {{ !$store.state.totalActiveRequests ? !$store.state.totalActiveRequests : !isShowReload}} -->
       if (this.$store.state.totalActiveRequests > 0 || this.isShowReload) {
         return true
       }
