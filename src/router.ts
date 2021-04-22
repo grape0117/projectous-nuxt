@@ -9,7 +9,7 @@ Vue.use(Router)
 const router = new Router({
   mode: 'history',
   routes: [
-    { path: '/', name: 'home', redirect: '/project' },
+    { path: '/', name: 'home', redirect: '/projects' },
     {
       path: '/profit',
       name: 'Profit',
@@ -59,8 +59,8 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "Profile" */ '@/views/Profile.vue')
     },
     {
-      path: '/project',
-      name: 'Project',
+      path: '/projects',
+      name: 'Projects',
       component: () => import(/* webpackChunkName: "Project" */ '@/views/Kanban.vue')
     },
     {
