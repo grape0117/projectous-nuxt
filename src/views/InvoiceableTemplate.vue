@@ -504,7 +504,7 @@ export default {
       }
       //$('#client').val(this.chosen_clients)
 
-      let form = document.querySelector('#invoiceable-form')
+      let form = await document.querySelector('#invoiceable-form')
       let data = new FormData(form)
       //data.append('start', this.start)
       //data.append('end', this.end)
@@ -544,7 +544,7 @@ export default {
         }
       } else {
         const { timers } = await this.$http().post('payable-timers', data)
-        this.timers = response.timers
+        this.timers = timers
         this.total_time = 0
         this.total_earned = 0
         this.total_unpaid = 0
