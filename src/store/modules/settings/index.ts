@@ -26,7 +26,8 @@ export const settings = {
     last_poll_timestamp: null,
     last_seen_at: new Date().toISOString().replace(/([^T]+)T([^.]+).*/g, '$1 $2'),
     notes: '',
-    timer_watch: 1
+    timer_watch: 1,
+    logged_in: false
   },
   mutations,
   actions,

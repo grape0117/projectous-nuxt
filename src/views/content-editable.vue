@@ -1,11 +1,5 @@
 <template>
-  <div
-    v-if="task"
-    contenteditable=""
-    v-html="task.title + index"
-    @keydown.enter="createTaskFromEnter"
-    @blur="processTitle"
-  ></div>
+  <div v-if="task" contenteditable="" v-html="task.title + index" @keydown.enter="createTaskFromEnter" @blur="processTitle"></div>
 </template>
 <script>
 export default {
@@ -20,8 +14,9 @@ export default {
     processTitle: function(event) {
       alert('here')
       let new_title = event.target.innerHTML
-      const regex = /^[A-Z0-9]*:/g
+      const regex = /^\s*[A-Z0-9-]+:\s+/
       let matches = regex.exec(new_title)
+      alert('regex')
       if (matches) {
         console.log(matches)
         console.log(this.projects)
@@ -29,10 +24,7 @@ export default {
           console.log(proj)
           return proj.acronym + ':' === matches[0]
         })
-        new_title = new_title.replace(
-          regex,
-          '<span style="color: red;">$&</span>'
-        )
+        new_title = new_title.replace(regex, '<span style="color: red;">$&</span>')
         //this.task.title = new_title;
         //return;
         //console.log(new_title);

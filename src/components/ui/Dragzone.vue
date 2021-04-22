@@ -68,7 +68,8 @@
             </div> -->
             <div v-if="show_debug()" style="padding: 0 10px">
               <small>
-                <span style="color: red">{{ getTaskType(item.task_id || item.id) }}</span> list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}
+                <span style="color: red">{{ getTaskType(item.task_id || item.id) }}</span
+                >status: {{ item.status }} list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}
               </small>
             </div>
             <div class="dragzone__task-users">
@@ -370,28 +371,20 @@ export default class Dragzone extends Vue {
     let titleWithAcronym = event.target.innerHTML
 
     const id = item.task_id ? item.task_id : item.id
-    console.log('update title', item, id)
 
-    const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
+    const projectRegex = /^([A-Z-]+):\s*/
     const acronym_match = titleWithAcronym ? titleWithAcronym.match(projectRegex) : null
-
+    console.log(acronym_match)
     if (acronym_match && acronym_match[1]) {
       const projects_by_acronym = this.$store.state.projects.projects.filter((project: any) => project.acronym === acronym_match[1])
       if (projects_by_acronym.length === 1) {
         //TODO: update history
-        await this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
-        // console.log('match found: ', projects_by_acronym[0].name)
+        this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
+        const title = titleWithAcronym.replace(acronym_match[0], '')
+        this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'title', value: title }, { root: true })
+        event.target.innerHTML = title
       }
     }
-    // else {
-    //   await this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: '' }, { root: true })
-    // }
-
-    let title = titleWithAcronym.split(': ')[1] || titleWithAcronym
-
-    event.target.innerHTML = title
-
-    await this.$store.dispatch('tasks/UPDATE_TITLE', { id, title })
   }
 
   private async updateTask({ target: { innerHTML: name } }: any, item: any) {

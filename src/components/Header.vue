@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="header-nav">
-      <div style="width: 30px;">
+      <div style="width: 30px">
         <img @mouseenter="setReload(true)" v-if="!showReload" src="/apple-touch-icon.png" width="30" height="30" alt="logo" @click="goTo('project')" />
         <div v-else class="reload-icon" @mouseleave="setReload(false)">
           <i class="icon-cached" :class="$store.state.totalActiveRequests ? 'reload-rotate' : null" />
@@ -24,10 +24,10 @@
             </span>
           </div>
           <div class="chat-right-icons" v-if="icon.name === 'chat'">
-            <div class="chat-right-icon" style="background-color: green;">
+            <div class="chat-right-icon" style="background-color: green">
               <span class="chat-right-icon-text">0</span>
             </div>
-            <div class="chat-right-icon" style="background-color: red;">
+            <div class="chat-right-icon" style="background-color: red">
               <span class="chat-right-icon-text">0</span>
             </div>
           </div>
@@ -42,8 +42,8 @@
         <div class="header-paint" v-if="toggles.paint">
           <div class="mb-3" v-for="(style, styleIndex) in backgroundStyle" :key="styleIndex">
             <div class="d-flex justify-content-between">
-              <span style="font-weight: bold;">{{ style.name }}</span>
-              <i v-if="styleIndex === 0" class="icon-close" style="cursor: pointer;" @click="toggles.paint = false"></i>
+              <span style="font-weight: bold">{{ style.name }}</span>
+              <i v-if="styleIndex === 0" class="icon-close" style="cursor: pointer" @click="toggles.paint = false"></i>
             </div>
             <div>
               <div class="header-paint-style" v-if="style.name === 'Colors'">
@@ -134,6 +134,9 @@ export default Vue.extend({
     }
   },
   computed: {
+    is_loggedIn() {
+      return this.$store.state.settings.logged_in
+    },
     has_route_query_showChatSection() {
       return this.$route.query.showChatSection === 'true' ? true : false
     },
@@ -188,8 +191,11 @@ export default Vue.extend({
         await this.$router.replace({ query })
         return
       }
-      this.toggles[iconName] = !this.toggles[iconName]
-      EventBus.$emit(`toggle_${iconName}`)
+
+      if (this.is_loggedIn) {
+        this.toggles[iconName] = !this.toggles[iconName]
+        EventBus.$emit(`toggle_${iconName}`, this.toggles[iconName])
+      }
     }
     // async getAppDataFromApi() {
     //   try {
