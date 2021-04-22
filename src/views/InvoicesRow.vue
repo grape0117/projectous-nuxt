@@ -1,11 +1,11 @@
 <template>
   <div class="invoices-items">
     <div>
-      <b-button-group>
-        <b-button variant="primary" @click="updateInvoiceStatus(invoice.id, 'open')">Open</b-button>
-        <b-button variant="success" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</b-button>
-        <b-button variant="danger" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</b-button>
-      </b-button-group>
+      <div class="invoices-buttons">
+        <div class="invoices-button" :class="statusBackgroundStyle('open')" @click="updateInvoiceStatus(invoice.id, 'open')">Open</div>
+        <div class="invoices-button" :class="statusBackgroundStyle('paid')" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</div>
+        <div class="invoices-button" :class="statusBackgroundStyle('voided')" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</div>
+      </div>
     </div>
     <div>{{ invoice.date }}</div>
     <div>
@@ -19,15 +19,12 @@
     <div>{{ invoice.start_date }}</div>
     <div>{{ invoice.end_date }}</div>
     <div class="buttons">
-      <div class="options">
-        <a class="btn btn-xs btn-info" target="_blank" :href="'/invoice/' + invoice.invoice_id"> View </a>
-        <a class="btn btn-xs btn-primary" target="_blank" :href="'/export/csv/invoice/' + invoice.invoice_id"> CSV </a>
-        <!--<a class="btn btn-xs btn-default">Export</a>-->
-        <a class="btn btn-xs btn-danger" @click="deleteInvoice(invoice)">Delete</a>
-        <!--<div data-toggle="popover" :data-content="'select projects.name, round(invoice_duration/3600,2) as time, client_rate, report_at, notes from timelog left join projects on project_id = projects.id where invoice_id = '+invoice.invoice_id">Query</div>-->
+      <div class="invoices-buttons">
+        <div class="invoices-button" :class="backgroundStyle" @click="redirect('invoice')">View</div>
+        <div class="invoices-button" :class="backgroundStyle" @click="redirect('csv')">CSV</div>
+        <div class="invoices-button" :class="backgroundStyle" @click="deleteInvoice(invoice)">Delete</div>
       </div>
       <div class="payment">
-        <!--<span v-if="invoice.payments.length > 0">payment available</span>-->
         <button type="button" class="btn btn-primary" @click="applyPayment()" v-if="invoice.status === 'open'">Payment</button>
       </div>
     </div>
@@ -39,8 +36,16 @@ import { EventBus } from '@/components/event-bus'
 
 export default {
   name: 'invoices-row',
-  props: ['invoice'],
+  props: ['invoice', 'bgStyle'],
   methods: {
+    redirect(to) {
+      const path = 'http://release.projectous.com/'
+      const invoice = `invoice/${this.invoice.invoice_id}`
+      const csv = `export/csv/invoice/${this.invoice.invoice_id}`
+
+      if (to === 'invoice') return window.open(`${path}${invoice}`, '_blank')
+      if (to === 'csv') return window.open(`${path}${csv}`, '_blank')
+    },
     async updateInvoiceStatus(id, status) {
       const { invoice } = await this.$http().patch('/invoices/', id, { attribute: 'status', value: status })
       this.invoice = invoice
@@ -54,7 +59,63 @@ export default {
         const { invoice } = await this.$http().delete('/invoices', this.invoice.id)
         this.invoice = invoice
       }
+    },
+    statusBackgroundStyle(invoice_status) {
+      if (this.invoice.status !== invoice_status) return null
+
+      // if (!this.bgStyle) return 'paletteDefault'
+      return this.backgroundStyle
+    }
+  },
+  computed: {
+    backgroundStyle() {
+      return this.bgStyle ? this.bgStyle : 'paletteDefault'
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+// .background-opacity {
+//   background-color: rgba($color: #000000, $alpha: 0.5);
+// }
+.invoices-items {
+  .invoices-buttons {
+    height: 35px;
+    border-radius: 3px;
+    display: flex;
+    margin-right: 5px;
+    background-color: rgba($color: #000000, $alpha: 0.5);
+    // backdrop-filter: brightness(0.5);
+
+    .invoices-button {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+
+      &:first-child {
+        border-radius: 4px 0 0 4px;
+      }
+
+      &:last-child {
+        border-radius: 0 4px 4px 0;
+      }
+
+      &:hover {
+        box-shadow: 0 0 10px 2px rgba($color: #ffffff, $alpha: 0.5);
+      }
+
+      a {
+        color: white;
+        text-decoration: none;
+      }
+    }
+  }
+
+  .buttons .invoices-buttons {
+    width: 200px;
+  }
+}
+</style>
