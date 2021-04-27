@@ -8,8 +8,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     context.commit('settings/setCurrentEditClient', { id: uuid.v4() }, { root: true })
     context.dispatch('settings/openModal', 'client', { root: true })
   },
-  editClient(context, client_id) {
-    const client = context.getters['getById'](client_id)
+  async editClient(context, client_id) {
+    const client = await context.getters['getById'](client_id)
     console.log('client', client)
     context.rootState.settings.current_edit_client = client
     context.dispatch('settings/openModal', 'client', { root: true })

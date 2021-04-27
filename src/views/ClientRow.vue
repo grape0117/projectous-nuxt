@@ -9,8 +9,8 @@ export default {
   name: 'clients-row',
   props: ['client'],
   methods: {
-    editClient: function() {
-      this.$store.dispatch('clients/editClient', this.client.id)
+    async editClient() {
+      await this.$store.dispatch('clients/editClient', this.client.id)
     }
   }
 }
