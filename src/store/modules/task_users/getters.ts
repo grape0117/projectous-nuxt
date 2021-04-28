@@ -23,7 +23,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     return state.task_users
       .filter(({ company_user_id, task_id }) => {
         const task = allTasks[lookup[task_id]]
-        if (task && (task.status === 'closed' || task.status === 'completed..')) {
+        if (task && (task.status === 'closed' || task.status === 'completed')) {
           return false
         }
         return company_user_id === companyUserId

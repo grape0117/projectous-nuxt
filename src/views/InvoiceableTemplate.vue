@@ -135,6 +135,7 @@
                         <b-form-select-option value="adjust-user-rate">Adjust User Rate</b-form-select-option>
                         <b-form-select-option value="download-csv">Download CSV</b-form-select-option>
                         <b-form-select-option value="download-xls">Download XLS</b-form-select-option>
+                        <b-form-select-option value="create_invoice">Create Invoice</b-form-select-option>
                       </b-form-select>
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
                       <span id="actionLink"></span>
@@ -340,79 +341,79 @@ export default {
     hideAddInvoiceable() {
       this.isShowInvoiceableItems = false
     },
-    //   applyAction() {
-    //     let self = this
-    //     let action = document.getElementById('action').value
-    //
-    //     let timers = document.querySelector('.timer-action:checked').serialize() //TODO: remove jquery
-    //     //alert(timers)
-    //     let itemIds = document.querySelector('.item-action:checked').serialize() //TODO: remove jquery
-    //     if (action == 'create_invoice') {
-    //       //TODO: $invoice_id = Invoice::max('invoice_id') + 1
-    //       ajax('/get_invoice_id', {}, function(response) {
-    //         let invoice_id = prompt('What ID?', response.invoice_id)
-    //         if (document.querySelector('#client option:selected').length != 1) {
-    //           //alert('you must choose only one client'+ $('#client option:selected').length)
-    //           //return
-    //         }
-    //         if (!timers) {
-    //           alert('Please choose 1 or more timers.')
-    //           return
-    //         }
-    //         $.post('/invoice/create', timers + '&invoice_id=' + invoice_id + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value + '&client=' + document.getElementById('client').value + '&' + itemIds, function(r) {
-    //           document.getElementById('actionLink').innerHTML('<a style="background: red; color: white;" target="_blank" href="/invoice/' + invoice_id + '">View Invoice</a>')
-    //           console.log('Response', r)
-    //           self.$store.dispatch('invoices/clearInvoiceableItems', r[0])
-    //         })
-    //       })
-    //       return
-    //     } else if (action == 'adjust-invoice-rate') {
-    //       let new_client_rate = prompt('What rate?', '')
-    //       if (new_client_rate == '') {
-    //         alert('Try again.')
-    //         return
-    //       }
-    //       $.post('/timers/adjust-client-rate', timers + '&client_rate=' + new_client_rate, function() {
-    //         alert('Done, reload page.')
-    //       })
-    //       return
-    //     } else if (action == 'adjust-user-rate') {
-    //       let new_user_rate = prompt('What rate?', '')
-    //       if (new_user_rate == '') {
-    //         alert('Try again.')
-    //         return
-    //       }
-    //       $.post('/timers/adjust-user-rate', timers + '&user_rate=' + new_user_rate, function() {
-    //         alert('Done, reload page.')
-    //       })
-    //       return
-    //     } else if (action == 'assigntotask') {
-    //       let task_id = prompt('What task ID?', '')
-    //       if (task_id == '') {
-    //         alert('Try again.')
-    //         return
-    //       }
-    //       $.post('/timers/' + action, timers + '&task_id=' + task_id, function() {
-    //         alert('Done, reload page.')
-    //       })
-    //       return
-    //     } else if (action == 'download-csv') {
-    //       window.open('/timers/' + action + '?' + timers)
-    //       return
-    //     } else if (action == 'download-xls') {
-    //       window.open('/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
-    //       return
-    //     } else if (action == 'custom-xls') {
-    //       //$.get( "/test/set/modaldata/"+timers)
-    //       //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
-    //       return
-    //     }
-    //
-    //     $.post('/timers/' + action, timers, function() {
-    //       //TODO: update checked timers? reload page?
-    //       self.getData('applyaction')
-    //     })
-    //   },
+    applyAction() {
+      let self = this
+      let action = document.getElementById('action').value
+
+      let timers = document.querySelector('.timer-action:checked').serialize() //TODO: remove jquery
+      //alert(timers)
+      let itemIds = document.querySelector('.item-action:checked').serialize() //TODO: remove jquery
+      if (action == 'create_invoice') {
+        //TODO: $invoice_id = Invoice::max('invoice_id') + 1
+        this.$http().post('/get_invoice_id', {}, function(response) {
+          let invoice_id = prompt('What ID?', response.invoice_id)
+          if (document.querySelector('#client option:selected').length != 1) {
+            //alert('you must choose only one client'+ $('#client option:selected').length)
+            //return
+          }
+          if (!timers) {
+            alert('Please choose 1 or more timers.')
+            return
+          }
+          this.$http().post('/invoice/create', timers + '&invoice_id=' + invoice_id + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value + '&client=' + document.getElementById('client').value + '&' + itemIds, function(r) {
+            document.getElementById('actionLink').innerHTML('<a style="background: red; color: white;" target="_blank" href="/invoice/' + invoice_id + '">View Invoice</a>')
+            console.log('Response', r)
+            self.$store.dispatch('invoices/clearInvoiceableItems', r[0])
+          })
+        })
+        return
+      } else if (action == 'adjust-invoice-rate') {
+        let new_client_rate = prompt('What rate?', '')
+        if (new_client_rate == '') {
+          alert('Try again.')
+          return
+        }
+        this.$http().post('/timers/adjust-client-rate', timers + '&client_rate=' + new_client_rate, function() {
+          alert('Done, reload page.')
+        })
+        return
+      } else if (action == 'adjust-user-rate') {
+        let new_user_rate = prompt('What rate?', '')
+        if (new_user_rate == '') {
+          alert('Try again.')
+          return
+        }
+        this.$http().post('/timers/adjust-user-rate', timers + '&user_rate=' + new_user_rate, function() {
+          alert('Done, reload page.')
+        })
+        return
+      } else if (action == 'assigntotask') {
+        let task_id = prompt('What task ID?', '')
+        if (task_id == '') {
+          alert('Try again.')
+          return
+        }
+        this.$http().post('/timers/' + action, timers + '&task_id=' + task_id, function() {
+          alert('Done, reload page.')
+        })
+        return
+      } else if (action == 'download-csv') {
+        window.open('https://release.projectous.com/timers/' + action + '?' + timers)
+        return
+      } else if (action == 'download-xls') {
+        window.open('https://release.projectous.com/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
+        return
+      } else if (action == 'custom-xls') {
+        this.$http().get('/test/set/modaldata/' + timers)
+        //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
+        return
+      }
+
+      this.$http().post('/timers/' + action, timers, function() {
+        //TODO: update checked timers? reload page?
+        self.getData('applyaction')
+      })
+    },
 
     isTecharound: function() {
       return this.$store.getters['settings/isTecharound']
@@ -504,7 +505,7 @@ export default {
       }
       //$('#client').val(this.chosen_clients)
 
-      let form = document.querySelector('#invoiceable-form')
+      let form = await document.querySelector('#invoiceable-form')
       let data = new FormData(form)
       //data.append('start', this.start)
       //data.append('end', this.end)
@@ -544,7 +545,7 @@ export default {
         }
       } else {
         const { timers } = await this.$http().post('payable-timers', data)
-        this.timers = response.timers
+        this.timers = timers
         this.total_time = 0
         this.total_earned = 0
         this.total_unpaid = 0

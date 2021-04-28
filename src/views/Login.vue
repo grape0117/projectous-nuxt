@@ -46,6 +46,8 @@ export default class Login extends Vue {
       document.cookie = 'auth_token=' + auth_token
 
       if (user_id) {
+        this.$store.state.settings.logged_in = true
+
         document.cookie = 'user_id=' + user_id
         // @ts-ignore
         window.Echo.leave('addentryevent_channel_' + user_id)

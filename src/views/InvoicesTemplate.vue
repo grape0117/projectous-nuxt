@@ -1,5 +1,5 @@
-<template id="invoices-template">
-  <div class="container-fluid">
+<template>
+  <div id="invoices-template">
     <div class="row">
       <div class="col-sm-12 form-group form-inline"></div>
     </div>
@@ -27,12 +27,13 @@
           <span>Recipient</span>
           <span>Invoice ID</span>
           <span>Amount</span>
+          <span>Note</span>
           <span>Start Date</span>
           <span>End Date</span>
           <span>Options</span>
         </div>
         <div v-for="invoice in invoice_to_show" :key="invoice.id">
-          <invoices-row v-bind:invoice="invoice" />
+          <invoices-row v-bind:invoice="invoice" :bgStyle="bgStyle" />
         </div>
       </div>
       <!-- <div class="tab-pane invoices-table" role="tabpanel" id="closed">
@@ -59,8 +60,10 @@
 
 <script>
 import moment from 'moment'
+import { EventBus } from '@/components/event-bus'
 
 import InvoicesRow from './InvoicesRow.vue'
+import { getCookie } from '@/utils/util-functions'
 
 export default {
   name: 'invoices-template',
@@ -72,7 +75,13 @@ export default {
     return {
       invoices: [],
       selectedYear: moment(new Date()).format('YYYY'),
-      status: 'open'
+      status: 'open',
+      bgStyle: null
+    }
+  },
+  created() {
+    if (getCookie('bg-style')) {
+      this.bgStyle = getCookie('bg-style')
     }
   },
   computed: {
@@ -89,11 +98,11 @@ export default {
     }
   },
   mounted: function() {
-    //alert('mounting invoices')
-    //if (this.current_company.id) {
     this.getData()
-    //}
-    //initBindings()
+    EventBus.$on('changeBackground', ({ option, styleTheme }) => {
+      if (styleTheme !== 'Colors') return (this.bgStyle = null)
+      this.bgStyle = option
+    })
   },
   watch: {
     current_company() {
@@ -173,6 +182,14 @@ export default {
 </style>
 
 <style lang="scss">
+#invoices-template {
+  padding: 10px;
+  width: 100%;
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .invoices-table {
   .invoices-header {
     background-color: rgba($color: #000000, $alpha: 0.6);
@@ -199,7 +216,7 @@ export default {
     }
     span:nth-child(3) {
       width: 100%;
-      max-width: calc(100vw / 6);
+      max-width: calc(100vw / 10);
       min-width: 100px;
     }
     span:nth-child(4) {
@@ -212,9 +229,13 @@ export default {
     }
     span:nth-child(6) {
       width: 100%;
-      max-width: calc(100vw / 14);
+      max-width: calc(100vw / 10);
     }
     span:nth-child(7) {
+      width: 100%;
+      max-width: calc(100vw / 14);
+    }
+    span:nth-child(8) {
       width: 100%;
       max-width: calc(100vw / 14);
     }
@@ -240,7 +261,6 @@ export default {
       width: 100%;
       max-width: calc(100vw / 6);
       min-width: 200px;
-      // flex-grow: 10;
     }
     > div:nth-child(2) {
       width: 100%;
@@ -248,7 +268,7 @@ export default {
     }
     > div:nth-child(3) {
       width: 100%;
-      max-width: calc(100vw / 6);
+      max-width: calc(100vw / 10);
       min-width: 100px;
     }
     > div:nth-child(4) {
@@ -261,9 +281,13 @@ export default {
     }
     > div:nth-child(6) {
       width: 100%;
-      max-width: calc(100vw / 14);
+      max-width: calc(100vw / 10);
     }
     > div:nth-child(7) {
+      width: 100%;
+      max-width: calc(100vw / 14);
+    }
+    > div:nth-child(8) {
       width: 100%;
       max-width: calc(100vw / 14);
     }

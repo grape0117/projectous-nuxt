@@ -10,7 +10,6 @@
       </template>
 
       <div class="row-no-padding">
-        <!-- {{ route_query }} -->
         <Header v-on:reload="reload" />
         <div class="d-flex justify-content-between">
           <!-- <task-details v-if="show_task"></task-details> -->
@@ -21,7 +20,7 @@
           </div>
           <div class="d-flex">
             <task-tray v-show="showTaskSection" />
-            <task-side-bar v-show="has_route_query_showChatSection || showChatSection" />
+            <task-side-bar v-show="has_route_query_showChatSection || showChatSection" :show="has_route_query_showChatSection || showChatSection" />
             <timer-tab v-show="showTimerSection" />
           </div>
         </div>
@@ -242,20 +241,20 @@ export default {
       this.showTimerSection = false
     }
 
-    EventBus.$on('toggle_task', () => {
-      this.showTaskDetail = !this.showTaskDetail
+    EventBus.$on('toggle_task', value => {
+      this.showTaskDetail = value
       document.cookie = `task=${this.showTaskDetail}`
     })
-    EventBus.$on('toggle_tasks', () => {
-      this.showTaskSection = !this.showTaskSection
+    EventBus.$on('toggle_tasks', value => {
+      this.showTaskSection = value
       document.cookie = `tasks=${this.showTaskSection}`
     })
-    EventBus.$on('toggle_timers', () => {
-      this.showTimerSection = !this.showTimerSection
+    EventBus.$on('toggle_timers', value => {
+      this.showTimerSection = value
       document.cookie = `timers=${this.showTimerSection}`
     })
-    EventBus.$on('toggle_chat', () => {
-      this.showChatSection = !this.showChatSection
+    EventBus.$on('toggle_chat', value => {
+      this.showChatSection = value
       document.cookie = `chat=${this.showChatSection}`
     })
 
@@ -265,6 +264,7 @@ export default {
     if (getCookie('bg-theme')) {
       this.bgTheme = getCookie('bg-theme')
     }
+
     // background
     EventBus.$on('changeBackground', ({ option, styleTheme }) => {
       this.bgStyle = option
@@ -278,7 +278,8 @@ export default {
     let user_id = getCookie('user_id')
     let that = this
 
-    if (user_id)
+    if (user_id) {
+      this.$store.state.settings.logged_in = true
       window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', function(e) {
         console.log('-----Called getNewData!----' + e.data.data.item_type, e.data.data)
         let body = ''
@@ -322,6 +323,7 @@ export default {
           )
         that.$store.dispatch('GET_NEW_DATA')
       })
+    }
   },
   beforeDestroy() {
     // to avoid memory leak
@@ -377,12 +379,12 @@ export default {
         data = await this.storeDataInIndexedDb()
       }
       this.$store.dispatch('PROCESS_INCOMING_DATA', data)
-      //TODO
-      const userLists = createUserLists(data.lists)
-      this.$store.commit('lists/lists/CREATE_LISTS', {
-        listName: 'userLists',
-        lists: userLists
-      })
+      //TODO: user created lists are breaking since commit f7cd86c85cb00b58cf59ad1232595e3eaec8f115 for no apparent reason
+      // const userLists = createUserLists(data.lists)
+      // this.$store.commit('lists/lists/CREATE_LISTS', {
+      //   listName: 'userLists',
+      //   lists: userLists
+      // })
       this.dateInterval()
       setInterval(this.dateInterval, 1800000)
     },
