@@ -120,7 +120,7 @@
               </tr>
               <tr class="row-date">
                 <td style="width: 20px">
-                  <input class="uncheck" type="checkbox" onclick="toggleCheckboxes(this,'.timer-action');" />
+                  <input type="checkbox" v-model="checkbox_all_checked" />
                 </td>
                 <td colspan="100">
                   <div class="d-flex justify-content-between">
@@ -161,13 +161,13 @@
               </tr>
             </tbody>
             <tbody>
-              <tr :item="item" v-for="item in invoice_items" :key="item.id" is="invoiceable-item-row"></tr>
-              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" is="report-timer-row"></tr>
+              <tr :item="item" v-for="item in invoice_items" :key="item.id" :checkbox_all_checked="checkbox_all_checked" is="invoiceable-item-row"></tr>
+              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" is="report-timer-row"></tr>
             </tbody>
             <tbody>
               <tr>
                 <td>
-                  <input class="uncheck" type="checkbox" onclick="toggleCheckboxes(this,'.item-action');" />
+                  <input type="checkbox" v-model="checkbox_all_checked" />
                 </td>
                 <td colspan="100"></td>
               </tr>
@@ -195,6 +195,7 @@ export default {
   },
   data: function() {
     return {
+      checkbox_all_checked: false,
       isShowInvoiceableItems: false,
       total_time: 0,
       total_earned: 0,
