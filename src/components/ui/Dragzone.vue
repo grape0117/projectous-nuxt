@@ -373,18 +373,22 @@ export default class Dragzone extends Vue {
     const id = item.task_id ? item.task_id : item.id
 
     const projectRegex = /^([A-Z-]+):\s*/
+
     const acronym_match = titleWithAcronym ? titleWithAcronym.match(projectRegex) : null
-    console.log(acronym_match)
+
     if (acronym_match && acronym_match[1]) {
       const projects_by_acronym = this.$store.state.projects.projects.filter((project: any) => project.acronym === acronym_match[1])
+
       if (projects_by_acronym.length === 1) {
         //TODO: update history
         this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
         const title = titleWithAcronym.replace(acronym_match[0], '')
         this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'title', value: title }, { root: true })
         event.target.innerHTML = title
+        return
       }
     }
+    this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'title', value: titleWithAcronym }, { root: true })
   }
 
   private async updateTask({ target: { innerHTML: name } }: any, item: any) {
