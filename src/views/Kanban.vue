@@ -17,7 +17,7 @@
             <div class="client-name">
               <span class="mr-2">{{ client.name }}</span>
               <b-icon class="pointer mr-2" v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon>
-              <i class="icon-add add-client pointer" @click="addClient" />
+              <i class="icon-add add-client pointer" @click="addClient(client)" />
             </div>
             <div class="client-project-name" v-for="{ name, id, acronym } in openClientProjects(client)" :key="id" @click="setProjectId(id)">
               <div @click="setPinnedProject(id)" class="project-item-status">
@@ -296,7 +296,8 @@ export default class Custom extends Vue {
     this.$store.commit('settings/setCurrentEditProject', cloneDeep(project))
   }
 
-  private addClient() {
+  private async addClient(client: any) {
+    await this.$router.push({ query: { new_project_client_company_id: client.client_company_id } })
     this.$store.state.settings.current_edit_project = { id: uuid.v4() }
     this.$store.dispatch('settings/openModal', 'project')
   }

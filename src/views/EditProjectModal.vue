@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="project-modal" title="Edit Project" class="modal fade" role="dialog" @ok="saveProject">
+  <b-modal id="project-modal" :title="`${has_route_query_newProjectClientCompanyId ? 'Add' : 'Edit'} Project`" class="modal fade" role="dialog" @ok="saveProject" @hidden="closeModal">
     <form id="editProjectForm" class="form-horizontal">
       <input id="projectIDEdit" class="form-control" type="hidden" name="id" v-model="project.id" />
       <div class="form-group">
@@ -27,10 +27,10 @@
       <div class="form-group">
         <label class="control-label col-sm-4" for="companyClientSelect">Client: </label>
         <div class="col-sm-6">
-          <select class="form-control" id="client-modal-client-id" name="client_id" v-model="project.client_company_id" v-on:change="isCreateClient()">
+          <select class="form-control" id="client-modal-client-id" name="client_id" v-model="project.client_company_id">
             <option>***** Choose Client *****</option>
             <option value="create">Create New Client</option>
-            <option v-for="client in sorted_clients" v-bind:value="client.client_company_id" v-bind:client="client">
+            <option v-for="client in sorted_clients" :key="client.id" :value="client.client_company_id" :client="client">
               {{ client.name }}
             </option>
           </select>
@@ -79,7 +79,7 @@
       <div v-if="isAdmin()" class="form-group">
         <label class="control-label col-sm-4" for="projectEditDescription">Users: </label>
         <div class="col-sm-8">
-          <edit-project-modal-user v-for="user in users" :key="user.id" @toggle="toggleUser" v-bind:client_user="projectClientUser(user.id)" v-bind:project="project" v-bind:project_user="projectUser(project.id, user.id)" v-bind:user="user" />
+          <edit-project-modal-user v-for="user in users" :key="user.id" @toggle="toggleUser" :client_user="projectClientUser(user.id)" :project="project" :project_user="projectUser(project.id, user.id)" :user="user" />
         </div>
       </div>
     </form>
@@ -87,6 +87,8 @@
 </template>
 
 <script>
+import { EventBus } from '@/components/event-bus'
+
 import EditProjectModalUser from './EditProjectModalUser.vue'
 
 export default {
@@ -96,15 +98,28 @@ export default {
   },
   data: function() {
     return {
-      changed_project_users: []
+      changed_project_users: [],
+      project: {
+        id: this.project_id,
+        name: null,
+        acronym: null,
+        url: null,
+        monthly_target: null,
+        client_company_id: null,
+        estimate: null,
+        description: null
+      }
     }
   },
   computed: {
+    has_route_query_newProjectClientCompanyId() {
+      return this.$route.query.new_project_client_company_id ? true : false
+    },
     sorted_clients: function() {
       return this.$store.getters['clients/getActiveCompanyClients']
     },
-    project: function() {
-      return this.$store.state.settings.current_edit_project
+    project_id: function() {
+      return this.$store.state.settings.current_edit_project.id
     },
     clients: function() {
       return this.$store.state.clients.clients
@@ -129,6 +144,14 @@ export default {
     }
   },
   watch: {
+    '$route.query': {
+      immediate: true,
+      handler(query) {
+        if (query.new_project_client_company_id && Object.keys(query.new_project_client_company_id).length > 0) {
+          this.setClient(query.new_project_client_company_id)
+        }
+      }
+    },
     'project.client_id': function() {
       if (this.project.client_id === 'create') {
         this.$store.dispatch('settings/closeModal', {
@@ -142,6 +165,30 @@ export default {
     }
   },
   methods: {
+    reset_project() {
+      this.project = {
+        id: this.project_id,
+        name: null,
+        acronym: null,
+        url: null,
+        monthly_target: null,
+        client_company_id: null,
+        estimate: null,
+        description: null
+      }
+    },
+    setClient(client_company_id) {
+      this.project.client_company_id = client_company_id
+    },
+    async closeModal() {
+      this.reset_project()
+      if (this.has_route_query_newProjectClientCompanyId) {
+        let query = Object.assign({}, this.$route.query)
+        delete query.new_project_client_company_id
+        await this.$router.replace({ query })
+        return
+      }
+    },
     projectClientUser(company_user_id) {
       const client = this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
       return client ? this.$store.getters['client_users/getByClientIdAndCompanyUserId']({ client_id: client.id, company_user_id }) : null
@@ -198,8 +245,8 @@ export default {
     projectClient: function() {
       return this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
     },
-    saveProject: function(callback) {
-      this.$store.dispatch('UPSERT', { module: 'projects', entity: this.project })
+    async saveProject(callback) {
+      await this.$store.dispatch('UPSERT', { module: 'projects', entity: this.project })
       //this.$store.dispatch('projects/saveProject', { project: this.project, project_users: this.changed_project_users })
     }
   }
