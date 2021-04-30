@@ -243,10 +243,10 @@ export default {
     }
   },
   watch: {
-    '$store.state.settings.current_edit_client'() {
-      const { id, status, acronym, name, address1, address2, default_client_rate, city, state, zip, phone, color } = this.$store.getters['clients/getById'](this.$store.state.settings.current_edit_client.id)
+    '$store.state.settings.current_edit_client'(client) {
+      const { id, status, acronym, name, address1, address2, default_client_rate, city, state, zip, phone, color } = client
 
-      this.client = { id, name, acronym, status, default_client_rate, address1, address2, city, state, zip, phone, color }
+      this.client = { id, name, acronym, status: status ? status : 'new', default_client_rate, address1, address2, city, state, zip, phone, color }
     }
   },
   computed: {
@@ -263,9 +263,6 @@ export default {
   methods: {
     hide() {
       this.$store.state.settings.current_edit_client = { id: null }
-      this.client = {
-        status: 'new'
-      }
     },
     updateClient(property) {
       this.updateHistory({ message: '' })
