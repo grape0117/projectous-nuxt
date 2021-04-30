@@ -5,9 +5,9 @@
     </div>
     <div class="d-flex justify-content-between">
       <div class="year-buttons">
-        <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="year in invoices_years" :key="year" @click="selectYear(year)">
+        <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="{ year, total } in invoice_years_data" :key="year" @click="selectYear(year)">
           <span>{{ year }}</span>
-          <span class="total-open">{{ totalByStatus(year, status) }}</span>
+          <span class="total-open">{{ total }}</span>
         </div>
       </div>
       <div>
@@ -36,23 +36,6 @@
           <invoices-row v-bind:invoice="invoice" :bgStyle="bgStyle" />
         </div>
       </div>
-      <!-- <div class="tab-pane invoices-table" role="tabpanel" id="closed">
-        <div class="table-responsive">
-          <div class="invoices-header">
-            <span>Status</span>
-            <span>Date Created</span>
-            <span>Recipient</span>
-            <span>Invoice ID</span>
-            <span>Amount</span>
-            <span>Start Date</span>
-            <span>End Date</span>
-            <span>Options</span>
-          </div>
-          <div class="invoices-items" v-for="invoice in invoice_to_show" :key="invoice.id">
-            <invoices-row v-bind:invoice="invoice" />
-          </div>
-        </div>
-      </div> -->
     </div>
     <invoices-apply-payment />
   </div>
@@ -74,6 +57,8 @@ export default {
   data: function() {
     return {
       invoices: [],
+      invoice_years: [],
+      open_invoice_count: [],
       selectedYear: moment(new Date()).format('YYYY'),
       status: 'open',
       bgStyle: null
@@ -86,15 +71,23 @@ export default {
   },
   computed: {
     invoice_to_show() {
-      let invoices = this.invoicesByYear(this.selectedYear)
-      return this.getStatus(invoices, this.status)
+      return this.getStatus(this.invoices, this.status)
     },
     current_company: function() {
       return this.$store.state.settings.current_company_user_id
     },
-    invoices_years() {
-      // return [...new Set(this.invoices.map(invoice => invoice.date))]
-      return [...new Set(this.invoices.map(invoice => moment(invoice.date).format('YYYY')))]
+    invoice_years_data() {
+      let invoice = []
+
+      for (const { year } of this.invoice_years) {
+        for (const open_year of this.open_invoice_count) {
+          if (open_year.year === year) {
+            invoice.push({ year: year.toString(), total: open_year['count(id)'] })
+          }
+        }
+      }
+
+      return invoice
     }
   },
   mounted: function() {
@@ -117,21 +110,28 @@ export default {
     getStatus(invoices, status) {
       return invoices.filter(i => i.status === status)
     },
-    invoicesByYear(year) {
-      return this.invoices.filter(i => moment(i.date).format('YYYY') === year)
-    },
-    totalByStatus(year, status) {
-      let invoices = this.invoicesByYear(year)
-      return this.getStatus(invoices, status).length
-    },
-    selectYear(year) {
+    async selectYear(year) {
       if (this.selectedYear === year) return
 
       this.selectedYear = year
+
+      const { invoices, invoice_years, open_invoice_count } = await this.$http().get(`/invoices/${year}`)
+
+      this.invoices = invoices
+      this.invoice_years = invoice_years
+      this.open_invoice_count = open_invoice_count
+    },
+    async getInvoicesByYear(year) {
+      const { invoices, invoice_years, open_invoice_count } = await this.$http().get(`/invoices/${year}`)
+
+      return { invoices, invoice_years, open_invoice_count }
     },
     async getData() {
-      const { invoices } = await this.$http().get('/invoices')
+      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear(moment(new Date()).format('YYYY'))
+
       this.invoices = invoices
+      this.invoice_years = invoice_years
+      this.open_invoice_count = open_invoice_count
     }
   }
 }
