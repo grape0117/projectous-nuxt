@@ -287,8 +287,7 @@ export default {
     },
     saveClient: async function() {
       //TODO: change Save button to Saving...
-      console.log(this.client)
-      // this.$store.dispatch('UPSERT', { module: 'clients', entity: this.client })
+      this.$store.dispatch('UPSERT', { module: 'clients', entity: this.client })
     }
   }
 }
