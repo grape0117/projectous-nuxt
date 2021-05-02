@@ -7,7 +7,7 @@
       <div class="year-buttons">
         <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="year in invoices_years" :key="year" @click="selectYear(year)">
           <span>{{ year }}</span>
-          <span class="total-open">{{ totalByStatus(year, status) }}</span>
+          <span class="total-open" :style="{ 'background-color': is_theme_colors ? background_colors : toRGB(background_colors[0]) }">{{ totalByStatus(year, status) }}</span>
         </div>
       </div>
       <div>
@@ -33,7 +33,7 @@
           <span>Options</span>
         </div>
         <div v-for="invoice in invoice_to_show" :key="invoice.id">
-          <invoices-row v-bind:invoice="invoice" :bgStyle="bgStyle" />
+          <invoices-row v-bind:invoice="invoice" :bgStyle="background_colors" :bgTheme="bgTheme" />
         </div>
       </div>
       <!-- <div class="tab-pane invoices-table" role="tabpanel" id="closed">
@@ -76,15 +76,31 @@ export default {
       invoices: [],
       selectedYear: moment(new Date()).format('YYYY'),
       status: 'open',
-      bgStyle: null
+      bgStyle: null,
+      bgTheme: null
     }
   },
   created() {
     if (getCookie('bg-style')) {
-      this.bgStyle = getCookie('bg-style')
+      let bgStyle = getCookie('bg-style')
+      this.bgStyle = JSON.parse(bgStyle)
+    }
+    if (getCookie('bg-theme')) {
+      this.bgTheme = getCookie('bg-theme')
     }
   },
   computed: {
+    is_theme_colors() {
+      return this.bgTheme === 'Colors'
+    },
+    background_colors() {
+      // If theme is 'Colors'
+      if (this.bgTheme === 'Colors') {
+        return this.bgStyle
+      }
+      // If theme is 'Images'
+      return this.bgStyle.rgba_colors
+    },
     invoice_to_show() {
       let invoices = this.invoicesByYear(this.selectedYear)
       return this.getStatus(invoices, this.status)
@@ -99,9 +115,9 @@ export default {
   },
   mounted: function() {
     this.getData()
-    EventBus.$on('changeBackground', ({ option, styleTheme }) => {
-      if (styleTheme !== 'Colors') return (this.bgStyle = null)
+    EventBus.$on('changeBackground', ({ option, theme }) => {
       this.bgStyle = option
+      this.bgTheme = theme
     })
   },
   watch: {
@@ -111,6 +127,11 @@ export default {
     }
   },
   methods: {
+    toRGB(rgb) {
+      if (!rgb) return null
+      const { r, g, b } = rgb
+      if (r && g && b) return `rgb(${r}, ${g}, ${b})`
+    },
     setStatus(status) {
       this.status = status
     },
@@ -159,9 +180,6 @@ export default {
 
     .total-closed {
       background-color: red;
-    }
-    .total-open {
-      background-color: green;
     }
 
     .total-closed,
