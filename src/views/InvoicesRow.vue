@@ -48,8 +48,9 @@ export default {
       if (to === 'csv') return window.open(`${path}${csv}`, '_blank')
     },
     async updateInvoiceStatus(id, status) {
-      const { invoice } = await this.$http().patch('/invoices/', id, { attribute: 'status', value: status })
-      this.invoice = invoice
+      const { invoices } = await this.$http().patch('/invoices/', id, { attribute: 'status', value: status })
+
+      this.$emit('update-invoice-status', invoices)
     },
     applyPayment() {
       EventBus.$emit('apply-payment', this.invoice)

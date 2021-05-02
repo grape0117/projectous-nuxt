@@ -33,7 +33,7 @@
           <span>Options</span>
         </div>
         <div v-for="invoice in invoice_to_show" :key="invoice.id">
-          <invoices-row v-bind:invoice="invoice" :bgStyle="bgStyle" />
+          <invoices-row v-bind:invoice="invoice" :bgStyle="bgStyle" @update-invoice-status="updateInvoiceStatus" />
         </div>
       </div>
       <!-- <div class="tab-pane invoices-table" role="tabpanel" id="closed">
@@ -111,6 +111,14 @@ export default {
     }
   },
   methods: {
+    updateInvoiceStatus({ id, status }) {
+      const invoice = this.invoices.find(i => i.id === id)
+
+      const index = this.invoices.indexOf(invoice)
+
+      this.invoices[index].status = status
+    },
+    // filter status
     setStatus(status) {
       this.status = status
     },
