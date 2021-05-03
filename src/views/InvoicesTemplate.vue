@@ -33,7 +33,7 @@
           <span>Options</span>
         </div>
         <div v-for="invoice in invoice_to_show" :key="invoice.id">
-          <invoices-row v-bind:invoice="invoice" :bgStyle="background_colors" :bgTheme="bgTheme" />
+          <invoices-row v-bind:invoice="invoice" :bgStyle="background_colors" :bgTheme="bgTheme" @update-invoice-status="updateInvoiceStatus" />
         </div>
       </div>
     </div>
@@ -125,6 +125,14 @@ export default {
       const { r, g, b } = rgb
       if (r && g && b) return `rgb(${r}, ${g}, ${b})`
     },
+    updateInvoiceStatus({ id, status }) {
+      const invoice = this.invoices.find(i => i.id === id)
+
+      const index = this.invoices.indexOf(invoice)
+
+      this.invoices[index].status = status
+    },
+    // filter status
     setStatus(status) {
       this.status = status
     },
