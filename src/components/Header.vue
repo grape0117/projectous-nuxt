@@ -47,11 +47,11 @@
             </div>
             <div>
               <div class="header-paint-style" v-if="style.name === 'Colors'">
-                <span class="header-paint-color" :class="option" @click="setBackground(option, style.name)" v-for="(option, optionIndex) in style.options" :key="optionIndex"> </span>
+                <span class="header-paint-color" :style="{ 'background-color': option }" @click="setBackground(option, style.name)" v-for="(option, optionIndex) in style.options" :key="optionIndex"></span>
               </div>
 
               <div v-else class="header-paint-style">
-                <div class="header-paint-image" @click="setBackground(option, style.name)" v-for="(option, optionIndex) in style.options" :key="optionIndex" :style="{ background: `url(${option})` }"></div>
+                <div class="header-paint-image" @click="setBackground(option, style.name)" v-for="(option, optionIndex) in style.options" :key="optionIndex" :style="{ background: `url(${option.image})` }"></div>
               </div>
             </div>
           </div>
@@ -115,18 +115,89 @@ export default Vue.extend({
         // the 'name' inside these objects is connected in the App.vue's "changeBackground" EventBus. If wanted to rename, please rename it there also
         {
           name: 'Colors',
-          options: ['paletteRed', 'paletteGreen', 'paletteBlue', 'paletteOrange', 'palettePink', 'paletteViolet', 'paletteYellow']
+          options: [
+            'rgba(255, 0, 0, 0.6)', //paletteRed
+            'rgba(0, 128, 0, 0.6)', //paletteGreen
+            'rgba(0, 0, 255, 0.6)', //paletteBlue
+            'rgba(255, 165, 0, 0.6)', //paletteOrange
+            'rgba(255, 192, 203, 0.6)', //palettePink
+            'rgba(238, 130, 238, 0.6)', //paletteViolet
+            'rgba(255, 255, 0, 0.6)' //paletteYellow
+          ]
         },
         {
           name: 'Images',
           options: [
-            'https://images.pexels.com/photos/38537/woodland-road-falling-leaf-natural-38537.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260',
-            'https://images.pexels.com/photos/490466/pexels-photo-490466.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-            'https://images.pexels.com/photos/128234/pexels-photo-128234.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-            'https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-            'https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-            'https://images.pexels.com/photos/531321/pexels-photo-531321.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-            'https://images.pexels.com/photos/719609/pexels-photo-719609.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260'
+            {
+              image: 'https://images.pexels.com/photos/38537/woodland-road-falling-leaf-natural-38537.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260',
+              rgba_colors: [
+                { r: '167', g: '187', b: '120' }, // #A7BB78
+                { r: '67', g: '71', b: '22' }, // #434716
+                { r: '174', g: '167', b: '174' }, // #AEA7AE
+                { r: '157', g: '133', b: '108' }, // #9D856C
+                { r: '181', g: '102', b: '99' } // #B56663
+              ]
+            },
+            {
+              image: 'https://images.pexels.com/photos/490466/pexels-photo-490466.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+              rgba_colors: [
+                { r: '98', g: '189', b: '247' }, // #62bdf7
+                { r: '25', g: '159', b: '247' }, // #199ff7
+                { r: '221', g: '199', b: '154' }, // #ddc79a
+                { r: '243', g: '166', b: '54' }, // #F3A636
+                { r: '155', g: '146', b: '134' } // #9b9286
+              ]
+            },
+            {
+              image: 'https://images.pexels.com/photos/128234/pexels-photo-128234.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+              rgba_colors: [
+                { r: '189', g: '209', b: '63' }, // #bdd13f
+                { r: '161', g: '186', b: '105' }, // #a1ba69
+                { r: '109', g: '138', b: '62' }, // #6d8a3e
+                { r: '53', g: '69', b: '29' }, // #35451d
+                { r: '163', g: '163', b: '167' } // #a3a3a7
+              ]
+            },
+            {
+              image: 'https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+              rgba_colors: [
+                { r: '185', g: '72', b: '29' }, // #b9481d
+                { r: '119', g: '36', b: '14' }, // #77240e
+                { r: '246', g: '175', b: '60' }, // #f6af3c
+                { r: '230', g: '125', b: '60' }, // #e67d3c
+                { r: '140', g: '92', b: '42' } // #8c5c2a
+              ]
+            },
+            {
+              image: 'https://images.pexels.com/photos/1563356/pexels-photo-1563356.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+              rgba_colors: [
+                { r: '181', g: '72', b: '56' }, // #b54838
+                { r: '98', g: '53', b: '51' }, // #623533
+                { r: '199', g: '110', b: '70' }, // #c76e46
+                { r: '139', g: '87', b: '82' }, // #8b5752
+                { r: '37', g: '40', b: '45' } // #25282d
+              ]
+            },
+            {
+              image: 'https://images.pexels.com/photos/531321/pexels-photo-531321.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+              rgba_colors: [
+                { r: '148', g: '155', b: '63' }, // #949b3f
+                { r: '67', g: '84', b: '49' }, // #435431
+                { r: '130', g: '141', b: '105' }, // #828d69
+                { r: '52', g: '60', b: '53' }, // #343c35
+                { r: '101', g: '100', b: '90' } // #65645a
+              ]
+            },
+            {
+              image: 'https://images.pexels.com/photos/719609/pexels-photo-719609.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+              rgba_colors: [
+                { r: '185', g: '212', b: '223' }, // #b9d4df
+                { r: '101', g: '147', b: '151' }, // #659397
+                { r: '190', g: '182', b: '128' }, // #beb680
+                { r: '146', g: '132', b: '66' }, // #928442
+                { r: '31', g: '58', b: '40' } // #1f3a28
+              ]
+            }
           ]
         }
       ],
@@ -177,9 +248,8 @@ export default Vue.extend({
       document.cookie = 'auth_token=' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
       window.location.reload()
     },
-    setBackground(option, styleTheme) {
-      console.log(styleTheme)
-      EventBus.$emit('changeBackground', { option, styleTheme })
+    setBackground(option, theme) {
+      EventBus.$emit('changeBackground', { option, theme })
     },
     async toggle(iconName) {
       if (iconName === 'reload') {
@@ -244,6 +314,14 @@ export default Vue.extend({
       this.toggles.timers = true
     } else {
       this.toggles.timers = false
+    }
+
+    // Check if theme is available1
+    let theme = getCookie('bg-theme')
+    if (theme) {
+      this.bgTheme = theme
+    } else {
+      this.setBackground('rgba(255, 165, 0, 0.6)', 'Colors')
     }
   },
   filters: {
