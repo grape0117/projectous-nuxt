@@ -119,5 +119,8 @@ export default {
   .buttons .invoices-buttons {
     width: 200px;
   }
+  .payment {
+    min-width: 90px;
+  }
 }
 </style>
