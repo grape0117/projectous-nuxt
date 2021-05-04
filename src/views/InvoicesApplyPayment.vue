@@ -7,13 +7,13 @@
         <div class="d-flex flex-column justify-content-between">
           <h5>{{ active_tab_add_payments ? 'Apply Payment' : 'Payments' }}</h5>
 
-          <div class="d-flex flex-column" v-if="active_tab_add_payments">
+          <div class="d-flex flex-column">
             <span class="title">Invoice #: </span>
             <span class="text">{{ invoice.invoice_id }}</span>
           </div>
         </div>
 
-        <div v-if="active_tab_add_payments">
+        <div>
           <div class="text-right d-flex flex-column">
             <span class="title">Invoice date: </span>
             <span class="text">{{ invoice.date }}</span>
@@ -56,22 +56,16 @@
             <template #row-details="row">
               <b-card>
                 <div class="mt-2">
-                  <span class="label">Invoice #</span>
-                  <b-form-input :value="invoice ? invoice.invoice_id : null" disabled></b-form-input>
-                </div>
-                <div class="mt-2">
-                  <span class="label">Check #</span>
-                  <b-form-input v-model="row.item.check_no"></b-form-input>
-                  <span class="label error" v-if="edit_status === 'failed' && !row.item.check_no">* Check # must have value</span>
+                  <span class="label">Payment Details</span>
+                  <div class="textarea-grow-wrap">
+                    <textarea name="text" id="text" v-model="row.item.check_no" @input="updateText"></textarea>
+                  </div>
+                  <span class="label error" v-if="edit_status === 'failed' && !row.item.check_no">* Payment details must have value</span>
                 </div>
                 <div class="mt-2">
                   <span class="label">Amount</span>
                   <b-form-input type="number" v-model="row.item.amount"></b-form-input>
                   <span class="label error" v-if="edit_status === 'failed' && !row.item.amount">* Amount must have value</span>
-                </div>
-                <div class="mt-2">
-                  <span class="label">Client Name</span>
-                  <b-form-input :value="invoice ? invoice.client.name : null" disabled></b-form-input>
                 </div>
                 <div class="mt-2">
                   <span class="label">Image</span>
@@ -81,10 +75,6 @@
                   <span class="label">Date..</span>
                   <b-form-datepicker v-model="row.item.check_date"></b-form-datepicker>
                   <span class="label error" v-if="edit_status === 'failed' && !row.item.check_date">* Date must have value</span>
-                </div>
-                <div class="mt-2 mb-2">
-                  <span class="label">Invoice date</span>
-                  <b-form-datepicker :value="invoice ? invoice.date : null" disabled></b-form-datepicker>
                 </div>
 
                 <b-row class="my-2 px-4 d-flex justify-content-end">
@@ -97,9 +87,11 @@
         <b-tab title="Add Payment">
           <div class="form" v-for="(form, form_index) in apply_form" :key="form_index">
             <div>
-              <span class="label">Check #</span>
-              <b-form-input v-model="form.check_number"></b-form-input>
-              <span class="label error" v-if="saving_status === 'failed' && !form.check_number">* Check # must have value</span>
+              <span class="label">Payment Details</span>
+              <div class="textarea-grow-wrap">
+                <textarea name="text" id="text" v-model="form.check_number" @input="updateText"></textarea>
+              </div>
+              <span class="label error" v-if="saving_status === 'failed' && !form.check_number">* Payment details must have value</span>
             </div>
             <div class="mt-2">
               <span class="label">Amount</span>
@@ -139,9 +131,11 @@
     <!-- No Payments yet -->
     <div class="form" v-for="(form, form_index) in apply_form" :key="form_index" v-else>
       <div class="mt-2">
-        <span class="label">Check #</span>
-        <b-form-input v-model="form.check_number"></b-form-input>
-        <span class="label error" v-if="saving_status === 'failed' && !form.check_number">* Check # must have value</span>
+        <span class="label">Payment Details</span>
+        <div class="textarea-grow-wrap">
+          <textarea name="text" id="text" v-model="form.check_number" @input="updateText"></textarea>
+        </div>
+        <span class="label error" v-if="saving_status === 'failed' && !form.check_number">* Payment details must have value</span>
       </div>
       <div class="mt-2">
         <span class="label">Amount</span>
@@ -208,11 +202,11 @@ export default Vue.extend({
     active_tab_add_payments() {
       if ((this.invoice && !this.invoice.payments.length) || this.active_tab === 1) return true
     }
-    // currentDate() {
-    //   return moment(new Date()).format("YYYY-MM-DD")
-    // }
   },
   methods: {
+    updateText(e: any) {
+      return (e.target.parentNode.dataset.replicatedValue = e.target.value)
+    },
     async saveEdit(bvModalEvt: any, row_item: any) {
       bvModalEvt.preventDefault()
       this.edit_status = 'saving'
@@ -277,20 +271,29 @@ export default Vue.extend({
         }
       ]
     },
+    // set "toDelete" property
     toDeleteRow(row_item: any) {
       const index = this.invoice.payments.indexOf(row_item)
       Vue.set(this.invoice.payments[index], 'toDelete', true)
     },
+    // Deletetion trigger
     async deleteRow(row_item: any) {
       // @ts-ignore
       await this.$http().delete('/invoice_payments/', row_item.id, row_item)
 
-      this.removeToDelete(row_item)
-    },
-    removeToDelete(row_item: any) {
-      const index = this.invoice.payments.indexOf(row_item)
+      const index = this.paymentsIndex(row_item)
 
       Vue.delete(this.invoice.payments, index)
+    },
+    // remove "toDelete" property
+    removeToDelete(row_item: any) {
+      const index = this.paymentsIndex(row_item)
+
+      Vue.delete(this.invoice.payments[index], 'toDelete')
+    },
+    paymentsIndex(row_item: number) {
+      const index = this.invoice.payments.indexOf(row_item)
+      return index
     },
     fromIndex(form: any) {
       let apply_form = this.apply_form
@@ -343,6 +346,40 @@ export default Vue.extend({
   .text {
     font-size: 14px;
   }
+}
+
+// NOTE: for <textarea />
+.textarea-grow-wrap {
+  /* easy way to plop the elements on top of each other and have them both sized based on the tallest one's height */
+  display: grid;
+}
+.textarea-grow-wrap::after {
+  /* Note the weird space! Needed to preventy jumpy behavior */
+  content: attr(data-replicated-value) ' ';
+
+  /* This is how textarea text behaves */
+  white-space: pre-wrap;
+
+  /* Hidden from view, clicks, and screen readers */
+  visibility: hidden;
+}
+.textarea-grow-wrap > textarea {
+  /* You could leave this, but after a user resizes, then it ruins the auto sizing */
+  resize: none;
+
+  /* Firefox shows scrollbar on growth, you can hide like this. */
+  overflow: hidden;
+}
+.textarea-grow-wrap > textarea,
+.textarea-grow-wrap::after {
+  /* Identical styling required!! */
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  font: inherit;
+
+  /* Place on top of each other */
+  grid-area: 1 / 1 / 2 / 2;
 }
 
 .error {
