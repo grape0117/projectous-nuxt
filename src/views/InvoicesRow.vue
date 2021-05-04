@@ -2,9 +2,9 @@
   <div class="invoices-items">
     <div>
       <div class="invoices-buttons">
-        <div class="invoices-button" :class="statusBackgroundStyle('open')" @click="updateInvoiceStatus(invoice.id, 'open')">Open</div>
-        <div class="invoices-button" :class="statusBackgroundStyle('paid')" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</div>
-        <div class="invoices-button" :class="statusBackgroundStyle('voided')" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</div>
+        <div class="invoices-button" :style="{ background: backgroundColor('open') }" @click="updateInvoiceStatus(invoice.id, 'open')">Open</div>
+        <div class="invoices-button" :style="{ background: backgroundColor('paid') }" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</div>
+        <div class="invoices-button" :style="{ background: backgroundColor('voided') }" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</div>
       </div>
     </div>
     <div>{{ invoice.date }}</div>
@@ -21,9 +21,9 @@
     <div>{{ invoice.end_date }}</div>
     <div class="buttons">
       <div class="invoices-buttons">
-        <div class="invoices-button" :class="backgroundStyle" @click="redirect('invoice')">View</div>
-        <div class="invoices-button" :class="backgroundStyle" @click="redirect('csv')">CSV</div>
-        <div class="invoices-button" :class="backgroundStyle" @click="deleteInvoice(invoice)">Delete</div>
+        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('invoice')">View</div>
+        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('csv')">CSV</div>
+        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="deleteInvoice(invoice)">Delete</div>
       </div>
       <div class="payment">
         <button type="button" class="btn btn-primary" @click="applyPayment()" v-if="invoice.status === 'open'">Payment</button>
@@ -37,7 +37,12 @@ import { EventBus } from '@/components/event-bus'
 
 export default {
   name: 'invoices-row',
-  props: ['invoice', 'bgStyle'],
+  props: ['invoice', 'bgStyle', 'bgTheme'],
+  computed: {
+    is_theme_colors() {
+      return this.bgTheme === 'Colors'
+    }
+  },
   methods: {
     redirect(to) {
       const path = 'http://release.projectous.com/'
@@ -62,16 +67,18 @@ export default {
         this.invoice = invoice
       }
     },
-    statusBackgroundStyle(invoice_status) {
+    backgroundColor(status, color_index = 0) {
+      return this.is_theme_colors ? this.statusBgStyle(status) : this.toRGB(this.statusBgStyle(status) && this.statusBgStyle(status)[color_index])
+    },
+    toRGB(rgb) {
+      if (!rgb) return null
+      const { r, g, b } = rgb
+      if (r && g && b) return `rgb(${r}, ${g}, ${b})`
+    },
+    statusBgStyle(invoice_status) {
       if (this.invoice.status !== invoice_status) return null
 
-      // if (!this.bgStyle) return 'paletteDefault'
-      return this.backgroundStyle
-    }
-  },
-  computed: {
-    backgroundStyle() {
-      return this.bgStyle ? this.bgStyle : 'paletteDefault'
+      return this.bgStyle
     }
   }
 }
