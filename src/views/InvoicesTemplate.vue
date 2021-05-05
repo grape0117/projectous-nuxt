@@ -66,9 +66,23 @@ export default {
     }
   },
   created() {
-    if (getCookie('bg-style')) {
-      let bgStyle = getCookie('bg-style')
-      this.bgStyle = JSON.parse(bgStyle)
+    // if (getCookie('bg-style')) {
+    //   let bgStyle = getCookie('bg-style')
+    //   this.bgStyle = JSON.parse(bgStyle)
+    // }
+
+    // console.log('bgStyle')
+    // console.log(bgStyle)
+
+    let bgStyle = getCookie('bg-style')
+    if (bgStyle) {
+      // If bgStyle is an object
+      if (bgStyle && Object.keys(bgStyle).length > 0) {
+        this.bgStyle = JSON.parse(bgStyle)
+      } else {
+        // If bgStyle is a string
+        this.bgStyle = bgStyle
+      }
     }
     if (getCookie('bg-theme')) {
       this.bgTheme = getCookie('bg-theme')
