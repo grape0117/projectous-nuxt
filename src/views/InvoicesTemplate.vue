@@ -11,11 +11,11 @@
         </div>
       </div>
       <div>
-        <b-dropdown :text="status" dropleft variant="outline-primary">
+        <!-- <b-dropdown :text="status" dropleft variant="outline-primary">
           <b-dropdown-item @click="setStatus('open')">Open</b-dropdown-item>
           <b-dropdown-item @click="setStatus('closed')">Closed</b-dropdown-item>
           <b-dropdown-item @click="setStatus('voided')">Voided</b-dropdown-item>
-        </b-dropdown>
+        </b-dropdown> -->
       </div>
     </div>
 
@@ -32,7 +32,7 @@
           <span>End Date</span>
           <span>Options</span>
         </div>
-        <div v-for="invoice in invoice_to_show" :key="invoice.id">
+        <div v-for="invoice in invoices" :key="invoice.id">
           <invoices-row v-bind:invoice="invoice" :bgStyle="background_colors" :bgTheme="bgTheme" @update-invoice-status="updateInvoiceStatus" />
         </div>
       </div>
@@ -89,6 +89,9 @@ export default {
     }
   },
   computed: {
+    // invoice_to_show() {
+    //   return this.getStatus(this.invoices, this.status)
+    // },
     is_theme_colors() {
       return this.bgTheme === 'Colors'
     },
@@ -99,9 +102,6 @@ export default {
       }
       // If theme is 'Images'
       return this.bgStyle.rgba_colors
-    },
-    invoice_to_show() {
-      return this.getStatus(this.invoices, this.status)
     },
     current_company: function() {
       return this.$store.state.settings.current_company_user_id
@@ -150,9 +150,9 @@ export default {
     setStatus(status) {
       this.status = status
     },
-    getStatus(invoices, status) {
-      return invoices.filter(i => i.status === status)
-    },
+    // getStatus(invoices, status) {
+    //   return invoices.filter(i => i.status === status)
+    // },
     async selectYear(year) {
       if (this.selectedYear === year) return
 
