@@ -316,13 +316,13 @@ export default Vue.extend({
       this.toggles.timers = false
     }
 
-    // Check if theme is available1
-    let theme = getCookie('bg-theme')
-    if (theme) {
-      this.bgTheme = theme
-    } else {
-      this.setBackground('rgba(255, 165, 0, 0.6)', 'Colors')
-    }
+    // Check if theme is available
+    // let theme = getCookie('bg-theme')
+    // if (theme) {
+    //   this.bgTheme = theme
+    // } else {
+    //   this.setBackground('rgba(255, 165, 0, 0.6)', 'Colors')
+    // }
   },
   filters: {
     toUpperCase(val) {

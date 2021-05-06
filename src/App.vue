@@ -127,11 +127,10 @@ export default {
       return !!this.bgTheme && !!this.bgStyle
     },
     background_style() {
-      // If theme is "Colors"
-      if (this.bgTheme === 'Colors') return this.bgStyle
-
-      // If theme is "Images"
-      return `url(${this.bgStyle.image})`
+      if (typeof this.bgStyle === 'object') {
+        return `url(${this.bgStyle.image})`
+      }
+      return this.bgStyle
     },
     current_edit_task: function() {
       return this.$store.getters['settings/get_current_edit_task']
@@ -251,22 +250,29 @@ export default {
       document.cookie = `chat=${this.showChatSection}`
     })
 
-    // if (getCookie('bg-style')) {
-    //   let bgStyle = getCookie('bg-style')
-    //   this.bgStyle = JSON.parse(bgStyle)
-    // }
+    // STYLE
     let bgStyle = getCookie('bg-style')
     if (bgStyle) {
-      // If bgStyle is an object
-      if (bgStyle && Object.keys(bgStyle).length > 0) {
-        this.bgStyle = JSON.parse(bgStyle)
-      } else {
-        // If bgStyle is a string
+      try {
+        let style = JSON.parse(bgStyle)
+        this.bgStyle = style
+      } catch (error) {
         this.bgStyle = bgStyle
       }
+    } else {
+      const style_color = 'rgba(255, 165, 0, 0.6)'
+      this.bgStyle = style_color
+      this.setCookie('style', style_color)
     }
-    if (getCookie('bg-theme')) {
-      this.bgTheme = getCookie('bg-theme')
+
+    // THEMES
+    let style_theme = getCookie('bg-theme')
+    if (style_theme) {
+      this.bgTheme = style_theme
+    } else {
+      const theme_name = 'Colors'
+      this.bgTheme = theme_name
+      this.setCookie('theme', theme_name)
     }
 
     // background
@@ -274,14 +280,10 @@ export default {
       this.bgStyle = option
       this.bgTheme = theme
 
-      if (option && Object.keys(option).length > 0) {
-        document.cookie = `bg-style=${JSON.stringify(option)}`
-      } else {
-        document.cookie = `bg-style=${option}`
-      }
-
-      // document.cookie = `bg-style=${option}`
-      document.cookie = `bg-theme=${theme}`
+      this.setCookie('style', option)
+      this.setCookie('theme', theme)
+      // document.cookie = `bg-style=${JSON.stringify(option)}`
+      // document.cookie = `bg-theme=${theme}`
     })
 
     //listener
@@ -352,6 +354,9 @@ export default {
     //       this.$store.dispatch('PROCESS_INCOMING_DATA', response)
     //     })
     // },
+    setCookie(name, value) {
+      document.cookie = `bg-${name}=${JSON.stringify(value)}`
+    },
     async getAppDataFromApi() {
       try {
         return await this.$http().get('/test-tasks')
