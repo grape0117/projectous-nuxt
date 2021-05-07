@@ -14,12 +14,13 @@
         </div>
 
         <div class="d-flex justify-content-between align-items-center mt-2">
-          <div class="d-flex">
-            <span class="title">Invoice #: </span>
+          <div class="d-flex flex-column">
+            <span class="title">Invoice #:</span>
             <span class="text">{{ invoice.invoice_id }}</span>
           </div>
-          <div>
-            <span>{{ invoice.note }}</span>
+          <div class="d-flex flex-column">
+            <span class="title">Note:</span>
+            <span class="text">{{ invoice.note }}</span>
           </div>
           <div class="text-right d-flex flex-column" style="max-width: 250px;">
             <span class="title">Client name:</span>
