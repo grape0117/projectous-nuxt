@@ -4,21 +4,24 @@
     <!-- <template #modal-header="{ close }"> -->
     <template #modal-header>
       <div class="header">
-        <div class="d-flex flex-column justify-content-between">
+        <div class="d-flex justify-content-between">
           <h5>{{ active_tab_add_payments ? 'Apply Payment' : 'Payments' }}</h5>
 
-          <div class="d-flex flex-column">
-            <span class="title">Invoice #: </span>
-            <span class="text">{{ invoice.invoice_id }}</span>
-          </div>
-        </div>
-
-        <div>
           <div class="text-right d-flex flex-column">
             <span class="title">Invoice date: </span>
             <span class="text">{{ invoice.date }}</span>
           </div>
-          <div class="text-right d-flex flex-column mt-2">
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <div class="d-flex">
+            <span class="title">Invoice #: </span>
+            <span class="text">{{ invoice.invoice_id }}</span>
+          </div>
+          <div>
+            <span>{{ invoice.note }}</span>
+          </div>
+          <div class="text-right d-flex flex-column" style="max-width: 250px;">
             <span class="title">Client name:</span>
             <span class="text">{{ invoice.client.name }}</span>
           </div>
@@ -336,6 +339,7 @@ export default Vue.extend({
 .header {
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
 
   .title {
