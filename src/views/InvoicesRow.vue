@@ -16,7 +16,8 @@
     </div>
     <div>{{ invoice.invoice_id }}</div>
     <div>{{ invoice.total }}</div>
-    <div>{{ invoice.note ? invoice.note : 'No notes...' }}</div>
+    <!-- <div>{{ invoice.note ? invoice.note : 'No notes...' }}</div> -->
+    <div v-html="invoice.note ? invoice.note : 'No notes...'" contenteditable="true" @input="setNoteValue"></div>
     <div>{{ invoice.start_date }}</div>
     <div>{{ invoice.end_date }}</div>
     <div class="buttons">
@@ -34,16 +35,31 @@
 
 <script>
 import { EventBus } from '@/components/event-bus'
+import _ from 'lodash'
 
 export default {
   name: 'invoices-row',
   props: ['invoice', 'bgStyle', 'bgTheme'],
+  data() {
+    return {
+      note: null
+    }
+  },
   computed: {
     is_theme_colors() {
       return this.bgTheme === 'Colors'
     }
   },
   methods: {
+    setNoteValue: _.debounce(function(e) {
+      let note = e.target.innerText
+      this.saveNotes(note)
+    }, 500),
+    async saveNotes(note) {
+      const { id } = this.invoice
+
+      await this.$http().patch('/invoices/', id, { attribute: 'note', value: note })
+    },
     redirect(to) {
       const path = 'http://release.projectous.com/'
       const invoice = `invoice/${this.invoice.invoice_id}`
