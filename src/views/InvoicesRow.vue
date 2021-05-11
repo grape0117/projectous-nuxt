@@ -21,12 +21,18 @@
     <div>{{ invoice.end_date }}</div>
     <div class="buttons">
       <div class="invoices-buttons">
-        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('invoice')">View</div>
+        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('invoice')">
+          <i class="icon-open_in_new" />
+        </div>
         <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('csv')">CSV</div>
-        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="deleteInvoice(invoice)">Delete</div>
+        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="deleteInvoice(invoice)">
+          <!-- <i class="icon-delete_forever" />
+          <i class="icon-delete" /> -->
+          <i class="icon-delete_outline" />
+        </div>
       </div>
       <div class="payment">
-        <button type="button" class="btn btn-primary" @click="applyPayment()" v-if="invoice.status === 'open'">Payment</button>
+        <button type="button" class="btn btn-primary" @click="applyPayment()">{{ payments_count ? `Payments (${payments_count})` : 'Payments' }}</button>
       </div>
     </div>
   </div>
@@ -39,6 +45,9 @@ export default {
   name: 'invoices-row',
   props: ['invoice', 'bgStyle', 'bgTheme'],
   computed: {
+    payments_count() {
+      return this.invoice.payments.length > 0 ? this.invoice.payments.length : null
+    },
     is_theme_colors() {
       return this.bgTheme === 'Colors'
     }
@@ -130,7 +139,11 @@ export default {
     width: 200px;
   }
   .payment {
-    min-width: 90px;
+    min-width: 110px;
+
+    button {
+      width: 100%;
+    }
   }
 }
 </style>
