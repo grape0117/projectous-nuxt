@@ -88,6 +88,9 @@ export default {
 // .background-opacity {
 //   background-color: rgba($color: #000000, $alpha: 0.5);
 // }
+* {
+  font-size: 14px;
+}
 .invoices-items {
   .invoices-buttons {
     height: 35px;

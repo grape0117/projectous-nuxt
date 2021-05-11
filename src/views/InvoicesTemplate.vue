@@ -11,6 +11,10 @@
         </div>
       </div>
       <div>
+        <div class="invoices-total-paid">
+          <span>Total Paid:</span>
+          <span> {{ total_invoices_payment | numberWithCommas }}</span>
+        </div>
         <!-- <b-dropdown :text="status" dropleft variant="outline-primary">
           <b-dropdown-item @click="setStatus('open')">Open</b-dropdown-item>
           <b-dropdown-item @click="setStatus('closed')">Closed</b-dropdown-item>
@@ -92,6 +96,19 @@ export default {
     // invoice_to_show() {
     //   return this.getStatus(this.invoices, this.status)
     // },
+    total_invoices_payment() {
+      const invoices_payments = this.invoices.filter(invoice => {
+        return invoice.status === 'paid'
+      })
+
+      let total_payment = 0
+
+      for (const invoice of invoices_payments) {
+        total_payment += Number(invoice.total)
+      }
+
+      return Math.round(total_payment * 100) / 100
+    },
     is_theme_colors() {
       return this.bgTheme === 'Colors'
     },
@@ -126,6 +143,11 @@ export default {
       this.bgStyle = option
       this.bgTheme = theme
     })
+  },
+  filters: {
+    numberWithCommas(value) {
+      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    }
   },
   watch: {
     current_company() {
@@ -181,6 +203,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.invoices-total-paid {
+  background-color: rgba($color: #000000, $alpha: 0.4);
+  color: white;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 5px;
+
+  :first-child {
+    font-weight: 500;
+    margin-right: 10px;
+  }
+}
 .row-date {
   border: 10px solid red !important;
 }
