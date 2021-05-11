@@ -12,7 +12,7 @@
       </div>
       <div>
         <div class="invoices-total-paid">
-          <span>Total Paid:</span>
+          <span>Total Paid({{ selectedYear }}):</span>
           <span> {{ total_invoices_payment | numberWithCommas }}</span>
         </div>
         <!-- <b-dropdown :text="status" dropleft variant="outline-primary">
