@@ -3,7 +3,6 @@
     <div class="row">
       <div class="col-sm-12 form-group form-inline"></div>
     </div>
-    {{ sortBy ? sortBy : 'false' }}
     <div class="d-flex justify-content-between">
       <div class="year-buttons">
         <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="{ year, total } in invoice_years_data" :key="year" @click="selectYear(year)">
@@ -208,11 +207,11 @@ export default {
       return Math.round(total_payment * 100) / 100
     },
     is_theme_colors() {
-      return this.bgTheme === 'Colors'
+      return this.bgTheme === JSON.stringify('Colors')
     },
     background_colors() {
       // If theme is 'Colors'
-      if (this.bgTheme === 'Colors') {
+      if (this.is_theme_colors) {
         return this.bgStyle
       }
       // If theme is 'Images'
@@ -322,7 +321,9 @@ export default {
       return { invoices, invoice_years, open_invoice_count }
     },
     async getData() {
-      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear(moment(new Date()).format('YYYY'))
+      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear('2021')
+
+      console.log({ invoices })
 
       this.invoices = invoices
       this.invoice_years = invoice_years

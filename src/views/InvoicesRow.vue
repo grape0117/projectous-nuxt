@@ -49,7 +49,7 @@ export default {
       return this.invoice.payments.length > 0 ? this.invoice.payments.length : null
     },
     is_theme_colors() {
-      return this.bgTheme === 'Colors'
+      return this.bgTheme === JSON.stringify('Colors')
     }
   },
   methods: {
