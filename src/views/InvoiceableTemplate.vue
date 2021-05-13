@@ -572,8 +572,10 @@ export default {
 
 <style lang="scss">
 #invoiceable {
-  /* border: 100px solid red; */
   padding: 20px 50px 0 50px;
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
+  overflow-x: hidden;
 
   .top-selects {
     // border: 10px solid white;

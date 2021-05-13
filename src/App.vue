@@ -1,5 +1,7 @@
 <template>
-  <div id="app" style="position: relative" class="app-class" :class="bgStyle && bgTheme === 'Colors' ? bgStyle : 'paletteDefault'" :style="{ background: bgTheme === 'Images' ? `url(${this.bgStyle})` : '' }">
+  <!-- <div id="app" style="position: relative" class="app-class" :class="bgStyle && bgTheme === 'Colors' ? bgStyle : 'paletteDefault'" :style="{ background: bgTheme === 'Images' ? `url(${this.bgStyle})` : '' }"> -->
+  <!-- <div id="app" style="position: relative" class="app-class" :class="{ 'paletteDefault' : !has_background_theme}"  :style="{ 'background' : background_style }"> -->
+  <div id="app" style="position: relative" class="app-class" :style="{ background: background_style }">
     <b-overlay :show="$store.state.loading" rounded="sm" style="flex-grow: 1">
       <!-- Loading area -->
       <template #overlay>
@@ -12,9 +14,7 @@
       <div class="row-no-padding">
         <Header v-on:reload="reload" />
         <div class="d-flex justify-content-between">
-          <!-- <task-details v-if="show_task"></task-details> -->
           <div class="router-view-class">
-            <!-- {{ $route.query.task }} -->
             <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" />
             <router-view style="width: 100%; height: 100%" />
           </div>
@@ -91,6 +91,7 @@ export default {
       showTaskSection: false,
       showChatSection: false,
       showTimerSection: false,
+      bgDefault: 'rgba(255, 165, 0, 0.6)', // default style
       bgStyle: '',
       bgTheme: '',
       showTaskDetail: false
@@ -122,24 +123,15 @@ export default {
       const task = this.$store.state.tasks.tasks.find(t => t.id === this.route_query_taskId)
       return task
     },
-    // getChat() {
-    //   const { chat } = await this.$http().get(`/chat/${this.task_id}`)
-    //   console.log(chat)
-
-    //   console.log(this.task)
-    // },
-    // backgroundStyle() {
-    //   if(this.bgTheme === 'Images') {
-    //     return `
-    //       background: url(${this.bgStyle}),
-    //     `
-    //       // 'background-repeat': no-repeat,
-    //       // 'background-size': cover,
-    //     // background: url(https://images.pexels.com/photos/38537/woodland-road-falling-leaf-natural-38537.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260);
-    //     // background-repeat: no-repeat;
-    //     // background-size: cover;
-    //   }
-    // },
+    has_background_theme() {
+      return !!this.bgTheme && !!this.bgStyle
+    },
+    background_style() {
+      if (typeof this.bgStyle === 'object') {
+        return `url(${this.bgStyle.image})`
+      }
+      return this.bgStyle
+    },
     current_edit_task: function() {
       return this.$store.getters['settings/get_current_edit_task']
     },
@@ -258,20 +250,40 @@ export default {
       document.cookie = `chat=${this.showChatSection}`
     })
 
-    if (getCookie('bg-style')) {
-      this.bgStyle = getCookie('bg-style')
+    // STYLE
+    let bgStyle = getCookie('bg-style')
+    if (bgStyle) {
+      try {
+        let style = JSON.parse(bgStyle)
+        this.bgStyle = style
+      } catch (error) {
+        this.bgStyle = bgStyle
+      }
+    } else {
+      const style_color = 'rgba(255, 165, 0, 0.6)'
+      this.bgStyle = style_color
+      this.setCookie('style', style_color)
     }
-    if (getCookie('bg-theme')) {
-      this.bgTheme = getCookie('bg-theme')
+
+    // THEMES
+    let style_theme = getCookie('bg-theme')
+    if (style_theme) {
+      this.bgTheme = style_theme
+    } else {
+      const theme_name = 'Colors'
+      this.bgTheme = theme_name
+      this.setCookie('theme', theme_name)
     }
 
     // background
-    EventBus.$on('changeBackground', ({ option, styleTheme }) => {
+    EventBus.$on('changeBackground', ({ option, theme }) => {
       this.bgStyle = option
-      this.bgTheme = styleTheme
+      this.bgTheme = theme
 
-      document.cookie = `bg-style=${option}`
-      document.cookie = `bg-theme=${styleTheme}`
+      this.setCookie('style', option)
+      this.setCookie('theme', theme)
+      // document.cookie = `bg-style=${JSON.stringify(option)}`
+      // document.cookie = `bg-theme=${theme}`
     })
 
     //listener
@@ -342,6 +354,9 @@ export default {
     //       this.$store.dispatch('PROCESS_INCOMING_DATA', response)
     //     })
     // },
+    setCookie(name, value) {
+      document.cookie = `bg-${name}=${JSON.stringify(value)}`
+    },
     async getAppDataFromApi() {
       try {
         return await this.$http().get('/test-tasks')
@@ -446,6 +461,8 @@ export default {
 #app {
   display: flex;
   overflow-y: auto;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
   // background-color: rgba(0, 0, 0, 0.3);
   // background-color: rgba($color: orange, $alpha: 0.6);
 }
@@ -475,30 +492,28 @@ export default {
 }
 
 // background-color options
-.paletteDefault {
-  background: rgba($color: orange, $alpha: 0.6);
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
-}
-.paletteRed {
-  background: rgba($color: red, $alpha: 0.6);
-}
-.paletteGreen {
-  background: rgba($color: green, $alpha: 0.6);
-}
-.paletteBlue {
-  background: rgba($color: blue, $alpha: 0.6);
-}
-.paletteOrange {
-  background: rgba($color: orange, $alpha: 0.6);
-}
-.palettePink {
-  background: rgba($color: pink, $alpha: 0.6);
-}
-.paletteViolet {
-  background: rgba($color: violet, $alpha: 0.6);
-}
-.paletteYellow {
-  background: rgba($color: yellow, $alpha: 0.6);
-}
+// .paletteDefault {
+//   background: rgba($color: orange, $alpha: 0.6);
+// }
+// .paletteRed {
+//   background: rgba($color: red, $alpha: 0.6);
+// }
+// .paletteGreen {
+//   background: rgba($color: green, $alpha: 0.6);
+// }
+// .paletteBlue {
+//   background: rgba($color: blue, $alpha: 0.6);
+// }
+// .paletteOrange {
+//   background: rgba($color: orange, $alpha: 0.6);
+// }
+// .palettePink {
+//   background: rgba($color: pink, $alpha: 0.6);
+// }
+// .paletteViolet {
+//   background: rgba($color: violet, $alpha: 0.6);
+// }
+// .paletteYellow {
+//   background: rgba($color: yellow, $alpha: 0.6);
+// }
 </style>

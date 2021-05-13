@@ -5,17 +5,21 @@
     </div>
     <div class="d-flex justify-content-between">
       <div class="year-buttons">
-        <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="year in invoices_years" :key="year" @click="selectYear(year)">
+        <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="{ year, total } in invoice_years_data" :key="year" @click="selectYear(year)">
           <span>{{ year }}</span>
-          <span class="total-open">{{ totalByStatus(year, status) }}</span>
+          <span class="total-open" :style="{ 'background-color': is_theme_colors ? background_colors : toRGB(background_colors[0]) }">{{ total }}</span>
         </div>
       </div>
       <div>
-        <b-dropdown :text="status" dropleft variant="outline-primary">
+        <div class="invoices-total-paid">
+          <span>Total Paid({{ selectedYear }}):</span>
+          <span> {{ total_invoices_payment | numberWithCommas }}</span>
+        </div>
+        <!-- <b-dropdown :text="status" dropleft variant="outline-primary">
           <b-dropdown-item @click="setStatus('open')">Open</b-dropdown-item>
           <b-dropdown-item @click="setStatus('closed')">Closed</b-dropdown-item>
           <b-dropdown-item @click="setStatus('voided')">Voided</b-dropdown-item>
-        </b-dropdown>
+        </b-dropdown> -->
       </div>
     </div>
 
@@ -23,36 +27,35 @@
       <div class="invoices-table">
         <div class="invoices-header">
           <span class="status">Status</span>
-          <span>Date Created</span>
+          <span class="text-right pr-3" @click="setSortBy('date_created')">
+            <!-- <i class="icon-keyboard_arrow_down" /> -->
+            <i :class="sortClass('date_created')" />
+            Date Created
+          </span>
           <span>Recipient</span>
-          <span>Invoice ID</span>
-          <span>Amount</span>
+          <span class="text-right pr-3" @click="setSortBy('invoice_id')">
+            <i :class="sortClass('invoice_id')" />
+            Invoice ID
+          </span>
+          <span class="text-right pr-3" @click="setSortBy('amount')">
+            <i :class="sortClass('amount')" />
+            Amount
+          </span>
           <span>Note</span>
-          <span>Start Date</span>
-          <span>End Date</span>
+          <span class="text-right pr-3" @click="setSortBy('date_start')">
+            <i :class="sortClass('date_start')" />
+            Start Date
+          </span>
+          <span class="text-right pr-3" @click="setSortBy('date_end')">
+            <i :class="sortClass('date_end')" />
+            End Date
+          </span>
           <span>Options</span>
         </div>
-        <div v-for="invoice in invoice_to_show" :key="invoice.id">
-          <invoices-row v-bind:invoice="invoice" :bgStyle="bgStyle" />
+        <div v-for="invoice in invoiceSort" :key="invoice.id">
+          <invoices-row v-bind:invoice="invoice" :bgStyle="background_colors" :bgTheme="bgTheme" @update-invoice-status="updateInvoiceStatus" />
         </div>
       </div>
-      <!-- <div class="tab-pane invoices-table" role="tabpanel" id="closed">
-        <div class="table-responsive">
-          <div class="invoices-header">
-            <span>Status</span>
-            <span>Date Created</span>
-            <span>Recipient</span>
-            <span>Invoice ID</span>
-            <span>Amount</span>
-            <span>Start Date</span>
-            <span>End Date</span>
-            <span>Options</span>
-          </div>
-          <div class="invoices-items" v-for="invoice in invoice_to_show" :key="invoice.id">
-            <invoices-row v-bind:invoice="invoice" />
-          </div>
-        </div>
-      </div> -->
     </div>
     <invoices-apply-payment />
   </div>
@@ -74,35 +77,174 @@ export default {
   data: function() {
     return {
       invoices: [],
+      invoice_years: [],
+      open_invoice_count: [],
       selectedYear: moment(new Date()).format('YYYY'),
       status: 'open',
-      bgStyle: null
+      bgStyle: null,
+      bgTheme: null,
+      sortBy: {}
     }
   },
   created() {
-    if (getCookie('bg-style')) {
-      this.bgStyle = getCookie('bg-style')
+    // if (getCookie('bg-style')) {
+    //   let bgStyle = getCookie('bg-style')
+    //   this.bgStyle = JSON.parse(bgStyle)
+    // }
+
+    // console.log('bgStyle')
+    // console.log(bgStyle)
+
+    let bgStyle = getCookie('bg-style')
+    if (bgStyle) {
+      // If bgStyle is an object
+      if (bgStyle && Object.keys(bgStyle).length > 0) {
+        this.bgStyle = JSON.parse(bgStyle)
+      } else {
+        // If bgStyle is a string
+        this.bgStyle = bgStyle
+      }
+    }
+    if (getCookie('bg-theme')) {
+      this.bgTheme = getCookie('bg-theme')
     }
   },
   computed: {
-    invoice_to_show() {
-      let invoices = this.invoicesByYear(this.selectedYear)
-      return this.getStatus(invoices, this.status)
+    sortAsc() {
+      return this.sortBy && this.sortBy.type === 'asc'
+    },
+    sortDesc() {
+      return this.sortBy && this.sortBy.type === 'desc'
+    },
+    invoiceSort() {
+      let sortBy = this.sortBy
+      let ASC = sortBy.type === 'asc'
+
+      // default
+      if (sortBy && !Object.keys(sortBy).length)
+        return this.invoices.sort((a, b) => {
+          let date_1 = new Date(a.date)
+          let date_2 = new Date(b.date)
+
+          return date_1 > date_2 ? -1 : date_1 < date_2 ? 1 : 0
+        })
+
+      if (sortBy.col_name === 'date_created') {
+        return this.invoices.sort((a, b) => {
+          let date_1 = new Date(a.date)
+          let date_2 = new Date(b.date)
+
+          if (ASC) {
+            return date_1 > date_2 ? 1 : date_1 < date_2 ? -1 : 0
+          } else {
+            return date_1 > date_2 ? -1 : date_1 < date_2 ? 1 : 0
+          }
+        })
+      }
+      if (sortBy.col_name === 'invoice_id') {
+        return this.invoices.sort((a, b) => {
+          let id_ = Number(a.invoice_id)
+          let id_2 = Number(b.invoice_id)
+
+          if (ASC) {
+            return id_ > id_2 ? 1 : id_ < id_2 ? -1 : 0
+          } else {
+            return id_ > id_2 ? -1 : id_ < id_2 ? 1 : 0
+          }
+        })
+      }
+      if (sortBy.col_name === 'amount') {
+        return this.invoices.sort((a, b) => {
+          let amount_1 = Number(a.total)
+          let amount_2 = Number(b.total)
+
+          if (ASC) {
+            return amount_1 > amount_2 ? 1 : amount_1 < amount_2 ? -1 : 0
+          } else {
+            return amount_1 > amount_2 ? -1 : amount_1 < amount_2 ? 1 : 0
+          }
+        })
+      }
+      if (sortBy.col_name === 'date_start') {
+        return this.invoices.sort((a, b) => {
+          let date_1 = new Date(a.start_date)
+          let date_2 = new Date(b.start_date)
+
+          if (ASC) {
+            return date_1 > date_2 ? 1 : date_1 < date_2 ? -1 : 0
+          } else {
+            return date_1 > date_2 ? -1 : date_1 < date_2 ? 1 : 0
+          }
+        })
+      }
+      if (sortBy.col_name === 'date_end') {
+        return this.invoices.sort((a, b) => {
+          let date_1 = new Date(a.end_date)
+          let date_2 = new Date(b.end_date)
+
+          if (ASC) {
+            return date_1 > date_2 ? 1 : date_1 < date_2 ? -1 : 0
+          } else {
+            return date_1 > date_2 ? -1 : date_1 < date_2 ? 1 : 0
+          }
+        })
+      }
+    },
+    // invoice_to_show() {
+    //   return this.getStatus(this.invoices, this.status)
+    // },
+    total_invoices_payment() {
+      const invoices_payments = this.invoices.filter(invoice => {
+        return invoice.status === 'paid'
+      })
+
+      let total_payment = 0
+
+      for (const invoice of invoices_payments) {
+        total_payment += Number(invoice.total)
+      }
+
+      return Math.round(total_payment * 100) / 100
+    },
+    is_theme_colors() {
+      return this.bgTheme === JSON.stringify('Colors')
+    },
+    background_colors() {
+      // If theme is 'Colors'
+      if (this.is_theme_colors) {
+        return this.bgStyle
+      }
+      // If theme is 'Images'
+      return this.bgStyle.rgba_colors
     },
     current_company: function() {
       return this.$store.state.settings.current_company_user_id
     },
-    invoices_years() {
-      // return [...new Set(this.invoices.map(invoice => invoice.date))]
-      return [...new Set(this.invoices.map(invoice => moment(invoice.date).format('YYYY')))]
+    invoice_years_data() {
+      let invoice = []
+
+      for (const { year } of this.invoice_years) {
+        for (const open_year of this.open_invoice_count) {
+          if (open_year.year === year) {
+            invoice.push({ year: year.toString(), total: open_year['count(id)'] })
+          }
+        }
+      }
+
+      return invoice
     }
   },
   mounted: function() {
     this.getData()
-    EventBus.$on('changeBackground', ({ option, styleTheme }) => {
-      if (styleTheme !== 'Colors') return (this.bgStyle = null)
+    EventBus.$on('changeBackground', ({ option, theme }) => {
       this.bgStyle = option
+      this.bgTheme = theme
     })
+  },
+  filters: {
+    numberWithCommas(value) {
+      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    }
   },
   watch: {
     current_company() {
@@ -111,33 +253,102 @@ export default {
     }
   },
   methods: {
+    sortClass(sortBy_colName) {
+      const sortBy = this.sortBy
+
+      if (sortBy && sortBy_colName === 'date_created' && !Object.keys(sortBy).length) {
+        return 'icon-keyboard_arrow_down'
+      }
+
+      if (sortBy && sortBy.col_name === sortBy_colName) {
+        if (this.sortAsc) return 'icon-keyboard_arrow_up'
+        if (this.sortDesc) return 'icon-keyboard_arrow_down'
+      }
+
+      return null
+    },
+    setSortBy(option) {
+      let sortBy = this.sortBy
+      let sortBy_length = sortBy && Object.keys(sortBy).length
+
+      if (sortBy.col_name === 'date_created' && option === 'date_created') {
+        return (this.sortBy = {})
+      }
+
+      if (!sortBy_length || (sortBy_length > 0 && sortBy.col_name !== option)) {
+        return (this.sortBy = { col_name: option, type: 'asc' })
+      }
+
+      if (sortBy_length > 0 && sortBy.col_name === option) {
+        if (sortBy.type === 'desc') return (this.sortBy = {})
+
+        return (sortBy.type = 'desc')
+      }
+    },
+    toRGB(rgb) {
+      if (!rgb) return null
+      const { r, g, b } = rgb
+      if (r && g && b) return `rgb(${r}, ${g}, ${b})`
+    },
+    updateInvoiceStatus({ id, status }) {
+      const invoice = this.invoices.find(i => i.id === id)
+
+      const index = this.invoices.indexOf(invoice)
+
+      this.invoices[index].status = status
+    },
+    // filter status
     setStatus(status) {
       this.status = status
     },
-    getStatus(invoices, status) {
-      return invoices.filter(i => i.status === status)
-    },
-    invoicesByYear(year) {
-      return this.invoices.filter(i => moment(i.date).format('YYYY') === year)
-    },
-    totalByStatus(year, status) {
-      let invoices = this.invoicesByYear(year)
-      return this.getStatus(invoices, status).length
-    },
-    selectYear(year) {
+    // getStatus(invoices, status) {
+    //   return invoices.filter(i => i.status === status)
+    // },
+    async selectYear(year) {
       if (this.selectedYear === year) return
 
       this.selectedYear = year
+
+      const { invoices, invoice_years, open_invoice_count } = await this.$http().get(`/invoices/${year}`)
+
+      this.invoices = invoices
+      this.invoice_years = invoice_years
+      this.open_invoice_count = open_invoice_count
+    },
+    async getInvoicesByYear(year) {
+      const { invoices, invoice_years, open_invoice_count } = await this.$http().get(`/invoices/${year}`)
+
+      return { invoices, invoice_years, open_invoice_count }
     },
     async getData() {
-      const { invoices } = await this.$http().get('/invoices')
+      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear('2021')
+
+      console.log({ invoices })
+
       this.invoices = invoices
+      this.invoice_years = invoice_years
+      this.open_invoice_count = open_invoice_count
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.invoices-total-paid {
+  background-color: rgba($color: #000000, $alpha: 0.4);
+  color: white;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 5px;
+
+  :first-child {
+    font-weight: 500;
+    margin-right: 10px;
+  }
+}
 .row-date {
   border: 10px solid red !important;
 }
@@ -159,9 +370,6 @@ export default {
 
     .total-closed {
       background-color: red;
-    }
-    .total-open {
-      background-color: green;
     }
 
     .total-closed,
@@ -204,6 +412,15 @@ export default {
     justify-content: space-around;
     border-radius: 4px;
     box-shadow: 0px 0px 8px rgba($color: #fff, $alpha: 1);
+
+    span {
+      cursor: pointer;
+
+      i {
+        font-size: 16px;
+        margin-left: -20px;
+      }
+    }
 
     span:nth-child(1) {
       width: 100%;
