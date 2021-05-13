@@ -7,7 +7,7 @@
         <div class="invoices-button" :style="{ background: backgroundColor('voided') }" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</div>
       </div>
     </div>
-    <div>{{ invoice.date }}</div>
+    <div class="text-right pr-3">{{ invoice.date }}</div>
     <div>
       <b v-if="invoice && invoice.client">{{ invoice.client.name }}</b>
       <div v-for="(project, project_index) in invoice.projects" :key="project_index" v-bind:project="project" style="font-size: smaller">
@@ -16,18 +16,23 @@
     </div>
     <div>{{ invoice.invoice_id }}</div>
     <div>{{ invoice.total }}</div>
-    <!-- <div>{{ invoice.note ? invoice.note : 'No notes...' }}</div> -->
     <div v-html="invoice.note ? invoice.note : 'No notes...'" contenteditable="true" @input="setNoteValue"></div>
     <div>{{ invoice.start_date }}</div>
     <div>{{ invoice.end_date }}</div>
     <div class="buttons">
       <div class="invoices-buttons">
-        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('invoice')">View</div>
+        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('invoice')">
+          <i class="icon-open_in_new" />
+        </div>
         <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('csv')">CSV</div>
-        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="deleteInvoice(invoice)">Delete</div>
+        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="deleteInvoice(invoice)">
+          <!-- <i class="icon-delete_forever" />
+          <i class="icon-delete" /> -->
+          <i class="icon-delete_outline" />
+        </div>
       </div>
       <div class="payment">
-        <button type="button" class="btn btn-primary" @click="applyPayment()" v-if="invoice.status === 'open'">Payment</button>
+        <button type="button" class="btn btn-primary" @click="applyPayment()">{{ payments_count ? `Payments (${payments_count})` : 'Payments' }}</button>
       </div>
     </div>
   </div>
@@ -46,8 +51,11 @@ export default {
     }
   },
   computed: {
+    payments_count() {
+      return this.invoice.payments.length > 0 ? this.invoice.payments.length : null
+    },
     is_theme_colors() {
-      return this.bgTheme === 'Colors'
+      return this.bgTheme === JSON.stringify('Colors')
     }
   },
   methods: {
@@ -104,6 +112,9 @@ export default {
 // .background-opacity {
 //   background-color: rgba($color: #000000, $alpha: 0.5);
 // }
+* {
+  font-size: 14px;
+}
 .invoices-items {
   .invoices-buttons {
     height: 35px;
@@ -143,7 +154,11 @@ export default {
     width: 200px;
   }
   .payment {
-    min-width: 90px;
+    min-width: 110px;
+
+    button {
+      width: 100%;
+    }
   }
 }
 </style>

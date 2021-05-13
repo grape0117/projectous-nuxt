@@ -11,6 +11,10 @@
         </div>
       </div>
       <div>
+        <div class="invoices-total-paid">
+          <span>Total Paid({{ selectedYear }}):</span>
+          <span> {{ total_invoices_payment | numberWithCommas }}</span>
+        </div>
         <!-- <b-dropdown :text="status" dropleft variant="outline-primary">
           <b-dropdown-item @click="setStatus('open')">Open</b-dropdown-item>
           <b-dropdown-item @click="setStatus('closed')">Closed</b-dropdown-item>
@@ -23,16 +27,32 @@
       <div class="invoices-table">
         <div class="invoices-header">
           <span class="status">Status</span>
-          <span>Date Created</span>
+          <span class="text-right pr-3" @click="setSortBy('date_created')">
+            <!-- <i class="icon-keyboard_arrow_down" /> -->
+            <i :class="sortClass('date_created')" />
+            Date Created
+          </span>
           <span>Recipient</span>
-          <span>Invoice ID</span>
-          <span>Amount</span>
+          <span class="text-right pr-3" @click="setSortBy('invoice_id')">
+            <i :class="sortClass('invoice_id')" />
+            Invoice ID
+          </span>
+          <span class="text-right pr-3" @click="setSortBy('amount')">
+            <i :class="sortClass('amount')" />
+            Amount
+          </span>
           <span>Note</span>
-          <span>Start Date</span>
-          <span>End Date</span>
+          <span class="text-right pr-3" @click="setSortBy('date_start')">
+            <i :class="sortClass('date_start')" />
+            Start Date
+          </span>
+          <span class="text-right pr-3" @click="setSortBy('date_end')">
+            <i :class="sortClass('date_end')" />
+            End Date
+          </span>
           <span>Options</span>
         </div>
-        <div v-for="invoice in invoices" :key="invoice.id">
+        <div v-for="invoice in invoiceSort" :key="invoice.id">
           <invoices-row v-bind:invoice="invoice" :bgStyle="background_colors" :bgTheme="bgTheme" @update-invoice-status="updateInvoiceStatus" />
         </div>
       </div>
@@ -62,7 +82,8 @@ export default {
       selectedYear: moment(new Date()).format('YYYY'),
       status: 'open',
       bgStyle: null,
-      bgTheme: null
+      bgTheme: null,
+      sortBy: {}
     }
   },
   created() {
@@ -89,15 +110,108 @@ export default {
     }
   },
   computed: {
+    sortAsc() {
+      return this.sortBy && this.sortBy.type === 'asc'
+    },
+    sortDesc() {
+      return this.sortBy && this.sortBy.type === 'desc'
+    },
+    invoiceSort() {
+      let sortBy = this.sortBy
+      let ASC = sortBy.type === 'asc'
+
+      // default
+      if (sortBy && !Object.keys(sortBy).length)
+        return this.invoices.sort((a, b) => {
+          let date_1 = new Date(a.date)
+          let date_2 = new Date(b.date)
+
+          return date_1 > date_2 ? -1 : date_1 < date_2 ? 1 : 0
+        })
+
+      if (sortBy.col_name === 'date_created') {
+        return this.invoices.sort((a, b) => {
+          let date_1 = new Date(a.date)
+          let date_2 = new Date(b.date)
+
+          if (ASC) {
+            return date_1 > date_2 ? 1 : date_1 < date_2 ? -1 : 0
+          } else {
+            return date_1 > date_2 ? -1 : date_1 < date_2 ? 1 : 0
+          }
+        })
+      }
+      if (sortBy.col_name === 'invoice_id') {
+        return this.invoices.sort((a, b) => {
+          let id_ = Number(a.invoice_id)
+          let id_2 = Number(b.invoice_id)
+
+          if (ASC) {
+            return id_ > id_2 ? 1 : id_ < id_2 ? -1 : 0
+          } else {
+            return id_ > id_2 ? -1 : id_ < id_2 ? 1 : 0
+          }
+        })
+      }
+      if (sortBy.col_name === 'amount') {
+        return this.invoices.sort((a, b) => {
+          let amount_1 = Number(a.total)
+          let amount_2 = Number(b.total)
+
+          if (ASC) {
+            return amount_1 > amount_2 ? 1 : amount_1 < amount_2 ? -1 : 0
+          } else {
+            return amount_1 > amount_2 ? -1 : amount_1 < amount_2 ? 1 : 0
+          }
+        })
+      }
+      if (sortBy.col_name === 'date_start') {
+        return this.invoices.sort((a, b) => {
+          let date_1 = new Date(a.start_date)
+          let date_2 = new Date(b.start_date)
+
+          if (ASC) {
+            return date_1 > date_2 ? 1 : date_1 < date_2 ? -1 : 0
+          } else {
+            return date_1 > date_2 ? -1 : date_1 < date_2 ? 1 : 0
+          }
+        })
+      }
+      if (sortBy.col_name === 'date_end') {
+        return this.invoices.sort((a, b) => {
+          let date_1 = new Date(a.end_date)
+          let date_2 = new Date(b.end_date)
+
+          if (ASC) {
+            return date_1 > date_2 ? 1 : date_1 < date_2 ? -1 : 0
+          } else {
+            return date_1 > date_2 ? -1 : date_1 < date_2 ? 1 : 0
+          }
+        })
+      }
+    },
     // invoice_to_show() {
     //   return this.getStatus(this.invoices, this.status)
     // },
+    total_invoices_payment() {
+      const invoices_payments = this.invoices.filter(invoice => {
+        return invoice.status === 'paid'
+      })
+
+      let total_payment = 0
+
+      for (const invoice of invoices_payments) {
+        total_payment += Number(invoice.total)
+      }
+
+      return Math.round(total_payment * 100) / 100
+    },
     is_theme_colors() {
-      return this.bgTheme === 'Colors'
+      return this.bgTheme === JSON.stringify('Colors')
     },
     background_colors() {
       // If theme is 'Colors'
-      if (this.bgTheme === 'Colors') {
+      if (this.is_theme_colors) {
         return this.bgStyle
       }
       // If theme is 'Images'
@@ -127,6 +241,11 @@ export default {
       this.bgTheme = theme
     })
   },
+  filters: {
+    numberWithCommas(value) {
+      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    }
+  },
   watch: {
     current_company() {
       // alert('new company!')
@@ -134,6 +253,38 @@ export default {
     }
   },
   methods: {
+    sortClass(sortBy_colName) {
+      const sortBy = this.sortBy
+
+      if (sortBy && sortBy_colName === 'date_created' && !Object.keys(sortBy).length) {
+        return 'icon-keyboard_arrow_down'
+      }
+
+      if (sortBy && sortBy.col_name === sortBy_colName) {
+        if (this.sortAsc) return 'icon-keyboard_arrow_up'
+        if (this.sortDesc) return 'icon-keyboard_arrow_down'
+      }
+
+      return null
+    },
+    setSortBy(option) {
+      let sortBy = this.sortBy
+      let sortBy_length = sortBy && Object.keys(sortBy).length
+
+      if (sortBy.col_name === 'date_created' && option === 'date_created') {
+        return (this.sortBy = {})
+      }
+
+      if (!sortBy_length || (sortBy_length > 0 && sortBy.col_name !== option)) {
+        return (this.sortBy = { col_name: option, type: 'asc' })
+      }
+
+      if (sortBy_length > 0 && sortBy.col_name === option) {
+        if (sortBy.type === 'desc') return (this.sortBy = {})
+
+        return (sortBy.type = 'desc')
+      }
+    },
     toRGB(rgb) {
       if (!rgb) return null
       const { r, g, b } = rgb
@@ -170,7 +321,9 @@ export default {
       return { invoices, invoice_years, open_invoice_count }
     },
     async getData() {
-      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear(moment(new Date()).format('YYYY'))
+      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear('2021')
+
+      console.log({ invoices })
 
       this.invoices = invoices
       this.invoice_years = invoice_years
@@ -181,6 +334,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.invoices-total-paid {
+  background-color: rgba($color: #000000, $alpha: 0.4);
+  color: white;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 5px;
+
+  :first-child {
+    font-weight: 500;
+    margin-right: 10px;
+  }
+}
 .row-date {
   border: 10px solid red !important;
 }
@@ -244,6 +412,15 @@ export default {
     justify-content: space-around;
     border-radius: 4px;
     box-shadow: 0px 0px 8px rgba($color: #fff, $alpha: 1);
+
+    span {
+      cursor: pointer;
+
+      i {
+        font-size: 16px;
+        margin-left: -20px;
+      }
+    }
 
     span:nth-child(1) {
       width: 100%;
