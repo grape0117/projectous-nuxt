@@ -14,11 +14,11 @@
         <span v-if="project">{{ project.name }}</span>
       </div>
     </div>
-    <div class="text-right pr-3">{{ invoice.invoice_id }}</div>
-    <div class="text-right pr-3">{{ invoice.total }}</div>
-    <div>{{ invoice.note ? invoice.note : 'No notes...' }}</div>
-    <div class="text-right pr-3">{{ invoice.start_date }}</div>
-    <div class="text-right pr-3">{{ invoice.end_date }}</div>
+    <div>{{ invoice.invoice_id }}</div>
+    <div>{{ invoice.total }}</div>
+    <div v-html="invoice.note ? invoice.note : 'No notes...'" contenteditable="true" @input="setNoteValue"></div>
+    <div>{{ invoice.start_date }}</div>
+    <div>{{ invoice.end_date }}</div>
     <div class="buttons">
       <div class="invoices-buttons">
         <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('invoice')">
@@ -40,10 +40,16 @@
 
 <script>
 import { EventBus } from '@/components/event-bus'
+import _ from 'lodash'
 
 export default {
   name: 'invoices-row',
   props: ['invoice', 'bgStyle', 'bgTheme'],
+  data() {
+    return {
+      note: null
+    }
+  },
   computed: {
     payments_count() {
       return this.invoice.payments.length > 0 ? this.invoice.payments.length : null
@@ -53,6 +59,15 @@ export default {
     }
   },
   methods: {
+    setNoteValue: _.debounce(function(e) {
+      let note = e.target.innerText
+      this.saveNotes(note)
+    }, 500),
+    async saveNotes(note) {
+      const { id } = this.invoice
+
+      await this.$http().patch('/invoices/', id, { attribute: 'note', value: note })
+    },
     redirect(to) {
       const path = 'http://release.projectous.com/'
       const invoice = `invoice/${this.invoice.invoice_id}`
