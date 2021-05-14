@@ -1,9 +1,12 @@
 <template id="report-timer-row-template">
   <tr class="timer-form timer-stopped" :data-id="timer.id" :data-duration="timer.duration">
+    <!-- <pre>
+      {{ timer }}
+    </pre> -->
     <td v-if="isAdmin()">
       {{ timer.id }}
       <span v-if="isTecharound()" style="color: purple">{{ timer.default_user_rate }} / {{ timer.default_client_rate }}</span>
-      <input type="checkbox" value="1" class="uncheck timer-action" :name="'action[' + timer.id + ']'" />
+      <input type="checkbox" :value="checkbox_value" @input="toggleCheckbox" :checked="checkbox_all_checked" class="timer-action" :name="'action[' + timer.id + ']'" />
       <a v-if="timer.invoice_id" href="">{{ timer.invoice_id }}</a>
       <div v-if="timer.is_paid" style="color: green;">Paid</div>
       <div v-if="timer.exported_at" style="color:red;">Exported</div>
@@ -55,8 +58,25 @@ import { EventBus } from '@/components/event-bus'
 
 export default {
   name: 'report-timer-row',
-  props: ['timer'],
+  props: ['timer', 'checkbox_all_checked'],
+  data() {
+    return {
+      checkbox_toggled: false
+    }
+  },
+  watch: {
+    checkbox_all_checked() {
+      this.checkbox_toggled = false
+    }
+  },
   computed: {
+    checkbox_value() {
+      // if not toggled
+      if (!this.checkbox_toggled) return this.checkbox_all_checked
+
+      // if toggled toggled
+      return !this.checkbox_all_checked
+    },
     users() {
       return this.$store.state.company_users.company_users
     },
@@ -65,6 +85,9 @@ export default {
     }
   },
   methods: {
+    toggleCheckbox() {
+      this.checkbox_toggled = !this.checkbox_toggled
+    },
     applyPayment() {
       EventBus.$emit('apply-payment')
     },

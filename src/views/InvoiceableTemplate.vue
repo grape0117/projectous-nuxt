@@ -120,18 +120,19 @@
               </tr>
               <tr class="row-date">
                 <td style="width: 20px">
-                  <input class="uncheck" type="checkbox" onclick="toggleCheckboxes(this,'.timer-action');" />
+                  <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
                 </td>
                 <td colspan="100">
                   <div class="d-flex justify-content-between">
                     <!-- to add: the :value="null" must be replaced with v-model="" inside b-form-select -->
                     <div class="d-flex">
-                      <b-form-select id="action" :value="null" class="mr-3">
+                      <b-form-select id="action" v-model="invoice_action" class="mr-3">
+                        <b-form-select-option :value="null" disabled>Select Action</b-form-select-option>
                         <b-form-select-option value="markpaid">Mark Paid</b-form-select-option>
                         <b-form-select-option value="markunpaid">Mark Unpaid</b-form-select-option>
                         <b-form-select-option value="resavetimers">Resave Timers</b-form-select-option>
 
-                        <b-form-select-option :value="null">Adjust Invoice Rate</b-form-select-option>
+                        <b-form-select-option value="adjust-invoice-rate">Adjust Invoice Rate</b-form-select-option>
                         <b-form-select-option value="adjust-user-rate">Adjust User Rate</b-form-select-option>
                         <b-form-select-option value="download-csv">Download CSV</b-form-select-option>
                         <b-form-select-option value="download-xls">Download XLS</b-form-select-option>
@@ -162,13 +163,13 @@
               </tr>
             </tbody>
             <tbody>
-              <tr :item="item" v-for="item in invoice_items" :key="item.id" is="invoiceable-item-row"></tr>
-              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" is="report-timer-row"></tr>
+              <tr :item="item" v-for="item in invoice_items" :key="item.id" :checkbox_all_checked="checkbox_all_checked" is="invoiceable-item-row"></tr>
+              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" is="report-timer-row"></tr>
             </tbody>
             <tbody>
               <tr>
                 <td>
-                  <input class="uncheck" type="checkbox" onclick="toggleCheckboxes(this,'.item-action');" />
+                  <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
                 </td>
                 <td colspan="100"></td>
               </tr>
@@ -196,6 +197,8 @@ export default {
   },
   data: function() {
     return {
+      invoice_action: null,
+      checkbox_all_checked: false,
       isShowInvoiceableItems: false,
       total_time: 0,
       total_earned: 0,
@@ -343,13 +346,13 @@ export default {
     },
     applyAction() {
       let self = this
-      let action = document.getElementById('action').value
 
       let timers = document.querySelector('.timer-action:checked').serialize() //TODO: remove jquery
-      //alert(timers)
       let itemIds = document.querySelector('.item-action:checked').serialize() //TODO: remove jquery
-      if (action == 'create_invoice') {
+
+      if (this.invoice_action == 'create_invoice') {
         //TODO: $invoice_id = Invoice::max('invoice_id') + 1
+
         this.$http().post('/get_invoice_id', {}, function(response) {
           let invoice_id = prompt('What ID?', response.invoice_id)
           if (document.querySelector('#client option:selected').length != 1) {
@@ -367,7 +370,7 @@ export default {
           })
         })
         return
-      } else if (action == 'adjust-invoice-rate') {
+      } else if (this.invoice_action == 'adjust-invoice-rate') {
         let new_client_rate = prompt('What rate?', '')
         if (new_client_rate == '') {
           alert('Try again.')
@@ -377,7 +380,7 @@ export default {
           alert('Done, reload page.')
         })
         return
-      } else if (action == 'adjust-user-rate') {
+      } else if (this.invoice_action == 'adjust-user-rate') {
         let new_user_rate = prompt('What rate?', '')
         if (new_user_rate == '') {
           alert('Try again.')
@@ -387,7 +390,7 @@ export default {
           alert('Done, reload page.')
         })
         return
-      } else if (action == 'assigntotask') {
+      } else if (this.invoice_action == 'assigntotask') {
         let task_id = prompt('What task ID?', '')
         if (task_id == '') {
           alert('Try again.')
@@ -397,19 +400,19 @@ export default {
           alert('Done, reload page.')
         })
         return
-      } else if (action == 'download-csv') {
+      } else if (this.invoice_action == 'download-csv') {
         window.open('https://release.projectous.com/timers/' + action + '?' + timers)
         return
-      } else if (action == 'download-xls') {
+      } else if (invoice_action == 'download-xls') {
         window.open('https://release.projectous.com/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
         return
-      } else if (action == 'custom-xls') {
+      } else if (invoice_action == 'custom-xls') {
         this.$http().get('/test/set/modaldata/' + timers)
         //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
         return
       }
 
-      this.$http().post('/timers/' + action, timers, function() {
+      this.$http().post('/timers/' + invoice_action, timers, function() {
         //TODO: update checked timers? reload page?
         self.getData('applyaction')
       })
