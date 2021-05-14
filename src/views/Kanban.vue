@@ -36,14 +36,27 @@
         <b-col v-if="selectedProjectId" class="kanban-draggable custom-width">
           <div class="kanban_title-part">
             <h4 class="kanban-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
+            <div class="d-flex align-items-center pl-1">
+              <div v-for="(user, user_index) in project_users" :key="user.id">
+                <span v-if="user_index < 5" v-b-tooltip.hover :title="user.name" class="avatar mr-1 pointer" :style="{ 'background-color': user.color }">
+                  {{ abbrName(user.name) }}
+                </span>
+              </div>
+              <!-- <pre>
+                {{ project_users }}
+              </pre> -->
+              <span v-if="project_users.length > 5" class="avatar pointer" ref="user_avatar" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> +{{ project_users.length - 5 }} </span>
+            </div>
           </div>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
-        <!-- <div class="right-fixed">
-          <task-tray v-show="showTask" />
-          <task-side-bar v-show="showChat" />
-          <timer-tab v-show="showTimer" />
-        </div> -->
+        <b-tooltip :target="() => $refs['user_avatar']" placement="right">
+          <div class="d-flex flex-column align-items-start">
+            <span v-for="(user, user_index) in project_users" :key="user.id" v-show="user_index >= 5">
+              {{ user.name }}
+            </span>
+          </div>
+        </b-tooltip>
       </b-row>
     </b-container>
     <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
@@ -102,6 +115,39 @@ export default class Custom extends Vue {
   private showTimer: boolean = true
   private showChat: boolean = false
   private selectedClient: string = ''
+
+  get company_users() {
+    return this.$store.state.company_users.company_users
+  }
+
+  get project_users() {
+    let users = this.project_user_ids.reduce((acc: any, id: any) => {
+      let user = this.company_users.find((u: any) => u.id === id)
+
+      if (user) {
+        acc.push(user)
+      }
+
+      return acc
+    }, [])
+    return users
+  }
+
+  get project_user_ids() {
+    // return 'test'
+    let project_tasks = this.$store.state.tasks.tasks.filter((t: any) => t.project_id === this.selectedProjectId)
+
+    let users = project_tasks.reduce((acc: any, task: any) => {
+      for (const user of task.users) {
+        acc.push(user.company_user_id)
+        // acc.push(user)
+      }
+
+      return acc
+    }, [])
+
+    return [...new Set(users)]
+  }
 
   get filteredClient() {
     return this.activeClients.filter((client: any) => client.id === this.selectedClient)
@@ -196,6 +242,15 @@ export default class Custom extends Vue {
 
   public setPinnedProject(id: number) {
     this.pinProject({ id, userId: this.selectedCompanyUserId })
+  }
+
+  public abbrName(name: any) {
+    if (!name) return ''
+    let matches = name.match(/\b(\w)/g) // ['J','S','O','N']
+    if (matches) {
+      let acronym = matches.join('') // JSON
+      return acronym.toUpperCase()
+    }
   }
 
   public openClientProjects(client: any) {
@@ -335,7 +390,7 @@ export default class Custom extends Vue {
 }
 .kanban_title-part {
   display: flex;
-  justify-content: space-between;
+  // justify-content: space-between;
   /* border: 1px solid red;
   padding: 0 5px; */
 }

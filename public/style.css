@@ -13,6 +13,18 @@ body {
  * Global add-ons
  */
 
+ .avatar {
+    width: 25px;
+    height: 25px;
+    border-radius: 50px;
+    background-color: gray;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+ }
+
 .sub-header {
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
