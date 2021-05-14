@@ -4,9 +4,9 @@
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
     <!-- <pre style="color: white;">{{ tasks }}</pre> -->
+    <!-- <pre>{{ tasks }}</pre> -->
     <div class="dragzone__content" ref="dragzone_wrapper">
       <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
-        <!-- <pre>{{ item }}</pre> -->
         <div class="dragzone__item-block">
           <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
           <div class="dragzone__item-block-content">
