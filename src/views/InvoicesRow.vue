@@ -66,7 +66,9 @@ export default {
     async saveNotes(note) {
       const { id } = this.invoice
 
-      await this.$http().patch('/invoices/', id, { attribute: 'note', value: note })
+      const { invoices } = await this.$http().patch('/invoices/', id, { attribute: 'note', value: note })
+
+      this.invoice.note = invoices.note
     },
     redirect(to) {
       const path = 'http://release.projectous.com/'
