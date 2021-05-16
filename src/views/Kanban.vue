@@ -19,13 +19,31 @@
               <b-icon class="pointer mr-2" v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon>
               <i class="icon-add add-client pointer" @click="addClient(client)" />
             </div>
-            <div class="client-project-name" v-for="{ name, id, acronym } in openClientProjects(client)" :key="id" @click="setProjectId(id)">
+            <div>
+              <div class="d-flex align-items-center pl-1">
+                <div v-for="(user, user_index) in client.users" :key="user.id">
+                  <span v-if="user_index < 5" v-b-tooltip.hover :title="user.name" class="avatar mr-1 pointer" :style="{ 'background-color': user.color }">
+                    {{ abbrName(user.name) }}
+                  </span>
+                </div>
+                <span v-show="client.users.length > 5" class="avatar pointer" ref="client_user_names" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> +{{ client.users.length - 5 }} </span>
+              </div>
+
+              <b-tooltip :target="() => $refs['client_user_names']" placement="right">
+                <div class="d-flex flex-column align-items-start">
+                  <span v-for="(user, user_index) in client.users" :key="user.id" v-show="user_index >= 5">
+                    {{ user.name }}
+                  </span>
+                </div>
+              </b-tooltip>
+            </div>
+
+            <div class="client-project-name" v-for="{ name, id, acronym } in clientProjects(client)" :key="id" @click="setProjectId(id)">
               <div @click="setPinnedProject(id)" class="project-item-status">
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
                 <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
               </div>
               <p style="margin-bottom: 0 !important">
-                <!-- <pre>{{ client }}</pre> -->
                 <span class="client-section-acronym" :style="{ 'background-color': client.color }" v-if="acronym">{{ acronym }}</span>
                 <span class="client-project-name__name">{{ name }}</span>
               </p>
@@ -253,7 +271,7 @@ export default class Custom extends Vue {
     }
   }
 
-  public openClientProjects(client: any) {
+  public clientProjects(client: any) {
     return this.$store.state.projects.projects
       .filter((project: any) => {
         if (this.project_search && project.name.toLowerCase().indexOf(this.project_search.toLowerCase()) === -1 && client.name.toLowerCase().indexOf(this.project_search.toLowerCase()) === -1) {
@@ -273,6 +291,21 @@ export default class Custom extends Vue {
         return 0
       })
   }
+
+  // public clientProjectUsers(projects: any) {
+  //   const project_users = projects.reduce((acc:any, project:any) => {
+
+  //     for (const users of project) {
+  //       if(users.length) {
+  //         acc.push(users)
+  //       }
+  //     }
+
+  //     return acc
+  //   }, [])
+
+  //   return project_users
+  // }
 
   public clientName(client_id: any) {
     const client = this.$store.getters['clients/getById'](client_id)
