@@ -1,8 +1,5 @@
 <template>
   <div class="kanban-page">
-    <!-- Project Filter: <input v-model="project_search" /> <input type="checkbox" v-model="show_all_active_projects" /> Show all active projects
-    <hr /> -->
-    <!-- <pre>{{ $store.state.projects.projects }}</pre> -->
     <b-container fluid>
       <b-row class="kanban-page-innerwrapper">
         <b-col class="client-section scroll-col">
@@ -34,29 +31,48 @@
         </b-col>
 
         <b-col v-if="selectedProjectId" class="kanban-draggable custom-width">
-          <div class="kanban_title-part">
+          <div class="kanban_title-part mb-1">
             <h4 class="kanban-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
-            <div class="d-flex align-items-center pl-1">
-              <div v-for="(user, user_index) in project_users" :key="user.id">
-                <span v-if="user_index < 5" v-b-tooltip.hover :title="user.name" class="avatar mr-1 pointer" :style="{ 'background-color': user.color }">
-                  {{ abbrName(user.name) }}
-                </span>
+            <div class="d-flex flex-column ml-3" v-if="project_users && project_users.length">
+              <span class="avatar-titles ml-1">Project Users:</span>
+              <div class="d-flex align-items-center pl-1">
+                <div v-for="(user, user_index) in project_users" :key="user.id">
+                  <span v-if="user_index < 5" v-b-tooltip.hover :title="user.fullname || user.name" class="avatar mr-1 pointer" :style="{ 'background-color': user.color }">
+                    {{ abbrName(user.name) }}
+                  </span>
+                </div>
+                <span v-if="project_users.length > 5" class="avatar pointer" ref="project_users_avatar" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> +{{ project_users.length - 5 }} </span>
+                <b-tooltip :target="() => $refs['project_users_avatar']" placement="right">
+                  <div class="d-flex flex-column align-items-start">
+                    <span v-for="(user, user_index) in project_users" :key="user.id" v-show="user_index >= 5">
+                      {{ user.fullname || user.name }}
+                    </span>
+                  </div>
+                </b-tooltip>
               </div>
-              <!-- <pre>
-                {{ project_users }}
-              </pre> -->
-              <span v-if="project_users.length > 5" class="avatar pointer" ref="user_avatar" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> +{{ project_users.length - 5 }} </span>
             </div>
+            <div class="d-flex flex-column  ml-3" v-if="project_involved_users && project_involved_users.length">
+              <span class="avatar-titles ml-1">All Involved Users:</span>
+              <div class="d-flex align-items-center pl-1">
+                <div v-for="(user, user_index) in project_involved_users" :key="user.id">
+                  <span v-if="user_index < 5" v-b-tooltip.hover :title="user.fullname || user.name" class="avatar mr-1 pointer" :style="{ 'background-color': user.color }">
+                    {{ abbrName(user.name) }}
+                  </span>
+                </div>
+                <span v-if="project_involved_users.length > 5" class="avatar pointer" ref="involved_users_avatar" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> +{{ project_involved_users.length - 5 }} </span>
+                <b-tooltip :target="() => $refs['involved_users_avatar']" placement="right">
+                  <div class="d-flex flex-column align-items-start">
+                    <span v-for="(user, user_index) in project_involved_users" :key="user.id" v-show="user_index >= 5">
+                      {{ user.fullname || user.name }}
+                    </span>
+                  </div>
+                </b-tooltip>
+              </div>
+            </div>
+            <div></div>
           </div>
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
-        <b-tooltip :target="() => $refs['user_avatar']" placement="right">
-          <div class="d-flex flex-column align-items-start">
-            <span v-for="(user, user_index) in project_users" :key="user.id" v-show="user_index >= 5">
-              {{ user.name }}
-            </span>
-          </div>
-        </b-tooltip>
       </b-row>
     </b-container>
     <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
@@ -120,8 +136,8 @@ export default class Custom extends Vue {
     return this.$store.state.company_users.company_users
   }
 
-  get project_users() {
-    let users = this.project_user_ids.reduce((acc: any, id: any) => {
+  get project_involved_users() {
+    let users = this.project_involved_user_ids.reduce((acc: any, id: any) => {
       let user = this.company_users.find((u: any) => u.id === id)
 
       if (user) {
@@ -133,11 +149,9 @@ export default class Custom extends Vue {
     return users
   }
 
-  get project_user_ids() {
+  get project_involved_user_ids() {
     // return 'test'
-    let project_tasks = this.$store.state.tasks.tasks.filter((t: any) => t.project_id === this.selectedProjectId)
-
-    let users = project_tasks.reduce((acc: any, task: any) => {
+    let users = this.project_tasks.reduce((acc: any, task: any) => {
       for (const user of task.users) {
         acc.push(user.company_user_id)
         // acc.push(user)
@@ -147,6 +161,24 @@ export default class Custom extends Vue {
     }, [])
 
     return [...new Set(users)]
+  }
+
+  get project_tasks() {
+    return this.$store.state.tasks.tasks.filter((t: any) => t.project_id === this.selectedProjectId)
+  }
+
+  get project_users() {
+    if (!this.selectedProjectId) return []
+    let users = this.$store.state.projects.projects.find(({ id }: any) => id === this.selectedProjectId).users
+
+    const project_users = users.reduce((acc: any, user: any) => {
+      let company_user = this.$store.state.company_users.company_users.find(({ id }: any) => id === user.company_user_id)
+      if (company_user) {
+        acc.push(company_user)
+      }
+      return acc
+    }, [])
+    return project_users
   }
 
   get filteredClient() {
@@ -421,6 +453,10 @@ export default class Custom extends Vue {
 </style>
 
 <style scoped>
+.avatar-titles {
+  font-size: 10px;
+  font-weight: 600;
+}
 .pointer {
   cursor: pointer;
 }
