@@ -16,20 +16,20 @@
               <b-icon class="pointer mr-2" v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon>
               <i class="icon-add add-client pointer" @click="addClient(client)" />
             </div>
-            <div>
-              <div class="d-flex align-items-center pl-1">
-                <div v-for="(user, user_index) in client.users" :key="user.id">
-                  <span v-if="user_index < 5" v-b-tooltip.hover :title="user.name" class="avatar mr-1 pointer" :style="{ 'background-color': user.color }">
-                    {{ abbrName(user.name) }}
-                  </span>
-                </div>
-                <span v-show="client.users.length > 5" class="avatar pointer" ref="client_user_names" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> +{{ client.users.length - 5 }} </span>
+
+            <div class="d-flex align-items-center pl-1">
+              <div class="d-flex" v-for="(user, user_index) in client_users.filter(({ client_id }) => client_id === client.id)" :key="user.id">
+                <span v-if="user_index < 5" v-b-tooltip.hover :title="company_users.filter(c_user => c_user.id === user.company_user_id)[0].name" class="avatar mr-1 pointer" :style="{ 'background-color': company_users.filter(c_user => c_user.id === user.company_user_id)[0].color }">
+                  {{ abbrName(company_users.filter(c_user => c_user.id === user.company_user_id)[0].name) }}
+                </span>
+
+                <span v-if="client_users.filter(({ client_id }) => client_id === client.id).length > 5 && user_index - 1 === client_users.filter(({ client_id }) => client_id === client.id).length" class="avatar pointer" ref="client_user_names" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> + {{ client_users.filter(({ client_id }) => client_id === client.id) - 5 }} </span>
               </div>
 
-              <b-tooltip :target="() => $refs['client_user_names']" placement="right">
+              <b-tooltip :target="() => $refs['client_user_names']" placement="right" v-if="company_users && company_users.length">
                 <div class="d-flex flex-column align-items-start">
-                  <span v-for="(user, user_index) in client.users" :key="user.id" v-show="user_index >= 5">
-                    {{ user.name }}
+                  <span v-for="(user, user_index) in client_users.filter(({ client_id }) => client_id === client.id)" :key="user.id" v-show="user_index >= 5">
+                    {{ company_users.filter(c_user => c_user.id === user.company_user_id)[0].name }}
                   </span>
                 </div>
               </b-tooltip>
@@ -149,6 +149,26 @@ export default class Custom extends Vue {
   private showTimer: boolean = true
   private showChat: boolean = false
   private selectedClient: string = ''
+
+  get client_users() {
+    const clientReducer = (acc: any, client: any) => {
+      for (const user of this.active_users) {
+        if (this.clientUser(client.id, user.id)) {
+          acc.push(this.clientUser(client.id, user.id))
+        }
+      }
+
+      return acc
+    }
+
+    const client_users = this.selectedClient ? this.filteredClient.reduce(clientReducer, []) : this.activeClients.reduce(clientReducer, [])
+
+    return client_users
+  }
+
+  get active_users() {
+    return this.$store.getters['company_users/getActive']
+  }
 
   get company_users() {
     return this.$store.state.company_users.company_users
@@ -375,6 +395,10 @@ export default class Custom extends Vue {
 
   public deleteTask(task: any) {
     this.$store.dispatch('DELETE', { module: 'tasks', entity: task })
+  }
+
+  private clientUser(client_id: any, company_user_id: any) {
+    return this.$store.getters['client_users/getByClientIdAndCompanyUserId']({ client_id, company_user_id })
   }
 
   private clientVisible(client: any) {
