@@ -1,5 +1,6 @@
 <template>
   <b-modal id="project-modal" :title="`${has_route_query_newProjectClientCompanyId ? 'Add' : 'Edit'} Project`" class="modal fade" role="dialog" @ok="saveProject" @hidden="closeModal">
+    {{}}
     <form id="editProjectForm" class="form-horizontal">
       <input id="projectIDEdit" class="form-control" type="hidden" name="id" v-model="project.id" />
       <div class="form-group">
@@ -90,6 +91,7 @@
 import { EventBus } from '@/components/event-bus'
 
 import EditProjectModalUser from './EditProjectModalUser.vue'
+import { cloneDeep } from 'lodash'
 
 export default {
   name: 'project-modal',
@@ -99,16 +101,7 @@ export default {
   data: function() {
     return {
       changed_project_users: [],
-      project: {
-        id: this.project_id,
-        name: null,
-        acronym: null,
-        url: null,
-        monthly_target: null,
-        client_company_id: null,
-        estimate: null,
-        description: null
-      }
+      project: {}
     }
   },
   computed: {
@@ -117,6 +110,9 @@ export default {
     },
     sorted_clients: function() {
       return this.$store.getters['clients/getActiveCompanyClients']
+    },
+    edit_project() {
+      return this.$store.state.settings.current_edit_project
     },
     project_id: function() {
       return this.$store.state.settings.current_edit_project.id
@@ -144,6 +140,9 @@ export default {
     }
   },
   watch: {
+    edit_project(edit_project) {
+      this.project = cloneDeep(edit_project)
+    },
     '$route.query': {
       immediate: true,
       handler(query) {
@@ -166,16 +165,7 @@ export default {
   },
   methods: {
     reset_project() {
-      this.project = {
-        id: this.project_id,
-        name: null,
-        acronym: null,
-        url: null,
-        monthly_target: null,
-        client_company_id: null,
-        estimate: null,
-        description: null
-      }
+      this.project = {}
     },
     setClient(client_company_id) {
       this.project.client_company_id = client_company_id
