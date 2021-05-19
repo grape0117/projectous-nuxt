@@ -73,9 +73,12 @@
               </small>
             </div>
             <div class="dragzone__task-users">
-              <b-badge v-if="task_user.company_user_id !== selectedCompanyUserId || !verticalAlignment" class="dragzone_badge" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" v-bind:task_user="task_user">
-                {{ getCompanyUser(task_user.company_user_id).name | abbrName }}
-              </b-badge>
+              <!-- v-if="task_user.company_user_id !== selectedCompanyUserId || !verticalAlignment"  -->
+              <div v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id">
+                <b-badge v-if="(task_user.company_user_id !== selectedCompanyUserId || !verticalAlignment) && !Array.isArray(getCompanyUser(task_user.company_user_id))" v-b-tooltip.hover :title="getCompanyUser(task_user.company_user_id).fullname || getCompanyUser(task_user.company_user_id).name" class="dragzone_badge" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" :task_user="task_user">
+                  {{ getCompanyUser(task_user.company_user_id).name | abbrName }}
+                </b-badge>
+              </div>
             </div>
           </div>
           <div v-if="index == tasks.length - 1" class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
@@ -219,7 +222,15 @@ export default class Dragzone extends Vue {
   }
 
   private getTaskUsers(task_id: any) {
-    return this.$store.getters['task_users/getByTaskId'](task_id)
+    let task_users = this.$store.getters['task_users/getByTaskId'](task_id)
+
+    const users = task_users.reduce((acc: any, user: any) => {
+      if (!acc.find((u: any) => u.company_user_id === user.company_user_id)) {
+        acc.push(user)
+      }
+      return acc
+    }, [])
+    return users
   }
   private getCompanyUser(company_user_id: any) {
     let company_user = this.$store.getters['company_users/getById'](company_user_id)
