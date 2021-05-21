@@ -27,7 +27,8 @@ export const settings = {
     last_seen_at: new Date().toISOString().replace(/([^T]+)T([^.]+).*/g, '$1 $2'),
     notes: '',
     timer_watch: 1,
-    logged_in: false
+    logged_in: false,
+    invoices_status: 'open'
   },
   mutations,
   actions,
