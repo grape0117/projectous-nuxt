@@ -89,6 +89,7 @@
             </div>
             <div></div>
           </div>
+
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
       </b-row>
@@ -363,6 +364,10 @@ export default class Custom extends Vue {
     this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: item })
   }
 
+  public deleteTask(task: any) {
+    this.$store.dispatch('DELETE', { module: 'tasks', entity: task })
+  }
+
   //TODO: rename as move project task
   public updateTask(task: any) {
     console.log('************* Custom updateTask *************', task)
@@ -371,10 +376,6 @@ export default class Custom extends Vue {
     delete task.user_task_list_id
     if (this.currentListsBlockName !== this.listsBlockNames.PROJECTS) return
     this.$store.dispatch('UPDATE', { module: 'tasks', entity: task })
-  }
-
-  public deleteTask(task: any) {
-    this.$store.dispatch('DELETE', { module: 'tasks', entity: task })
   }
 
   private clientVisible(client: any) {
