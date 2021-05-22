@@ -417,8 +417,9 @@ export default class Custom extends Vue {
   }
 
   private editProject(project_id: any) {
-    console.log('edit project')
     let project = this.$store.getters['projects/getById'](project_id)
+    console.log(project)
+
     this.$store.commit('settings/setCurrentEditProject', cloneDeep(project))
   }
 
