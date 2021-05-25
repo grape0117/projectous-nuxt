@@ -35,6 +35,14 @@
     <td @click="editTimer(timer)">
       {{ timer.report_at }}
     </td>
+    <td>
+      <div class="report-timer-avatar" :style="{ 'background-color': timer.user.color || 'gray' }" v-b-tooltip.hover :title="timer.user.fullname || timer.user.name">
+        {{ abbrName(timer.user.fullname || timer.user.name) }}
+      </div>
+      <!-- <pre>
+        {{ timer.user }}
+      </pre> -->
+    </td>
     <td @click="editTimer(timer)">
       <span v-if="!timer.is_billable" style="color: red;">$</span>
     </td>
@@ -54,6 +62,7 @@
 </template>
 
 <script>
+import { abbrName } from '@/utils/util-functions'
 import { EventBus } from '@/components/event-bus'
 
 export default {
@@ -85,6 +94,7 @@ export default {
     }
   },
   methods: {
+    abbrName,
     toggleCheckbox() {
       this.checkbox_toggled = !this.checkbox_toggled
     },
@@ -128,3 +138,19 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.report-timer-avatar {
+  width: 25px;
+  height: 25px;
+  color: black;
+  box-shadow: rgb(255 255 255 / 50%) 0px 0px 5px;
+  margin-left: 0px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
