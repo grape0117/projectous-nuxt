@@ -1,8 +1,5 @@
 <template id="report-timer-row-template">
   <tr class="timer-form timer-stopped" :data-id="timer.id" :data-duration="timer.duration">
-    <!-- <pre>
-      {{ timer }}
-    </pre> -->
     <td v-if="isAdmin()">
       {{ timer.id }}
       <span v-if="isTecharound()" style="color: purple">{{ timer.default_user_rate }} / {{ timer.default_client_rate }}</span>

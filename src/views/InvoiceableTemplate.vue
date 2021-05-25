@@ -162,6 +162,7 @@
                 <td>Notes</td>
               </tr>
             </tbody>
+
             <tbody>
               <tr :item="item" v-for="item in invoice_items" :key="item.id" :checkbox_all_checked="checkbox_all_checked" is="invoiceable-item-row"></tr>
               <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" is="report-timer-row"></tr>
@@ -171,7 +172,12 @@
                 <td>
                   <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
                 </td>
-                <td colspan="100"></td>
+                <td colspan="100">
+                  <!-- <div class="reload-icon" v-if="loading_data"> -->
+                  <div class="reload-icon">
+                    <i class="icon-cached" :class="loading_data ? 'reload-rotate' : null" />
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -222,7 +228,8 @@ export default {
       invoice_id: null,
       timers: [],
       invoice_items: [],
-      settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false }
+      settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false },
+      loading_data: false
     }
   },
   computed: {
@@ -496,6 +503,7 @@ export default {
     async getData(where) {
       //TODO use: new URLSearchParams(new FormData(formElement)).toString()
       console.log(where)
+      this.loading_data = true
       //labeledConsole('where',where)
       let self = this
       //console.log(this.clients)
@@ -565,6 +573,7 @@ export default {
           }
         }
       }
+      this.loading_data = false
     }
   }
 }
@@ -665,9 +674,7 @@ export default {
 a.active {
   background: transparent;
 }
-</style>
 
-<style lang="scss">
 .b-table-sticky-header {
   max-height: 500px !important;
 }
@@ -721,5 +728,38 @@ a.active {
       margin-top: 10px;
     }
   }
+}
+</style>
+
+<style lang="scss" scoped>
+.reload-icon {
+  width: 100%;
+  height: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  cursor: pointer;
+
+  .icon-cached {
+    font-size: 24px;
+    display: flex;
+    width: 24px;
+    height: 24px;
+
+    &::before {
+      width: 100%;
+      height: 100%;
+      margin: 0 !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+.reload-rotate {
+  -webkit-animation: spin 1s linear infinite;
+  -moz-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
 }
 </style>
