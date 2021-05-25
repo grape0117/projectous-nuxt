@@ -25,7 +25,7 @@
                   {{ abbrName(company_users.filter(c_user => c_user.id === user.company_user_id)[0].name) }}
                 </span>
 
-                <span v-if="client_users.filter(({ client_id }) => client_id === client.id).length > 5 && user_index - 1 === client_users.filter(({ client_id }) => client_id === client.id).length" class="avatar pointer" ref="client_user_names" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> + {{ client_users.filter(({ client_id }) => client_id === client.id) - 5 }} </span>
+                <span v-if="client_users.filter(({ client_id }) => client_id === client.id) && client_users.filter(({ client_id }) => client_id === client.id).length > 5 && user_index - 1 === client_users.filter(({ client_id }) => client_id === client.id).length" class="avatar pointer" ref="client_user_names" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> + {{ client_users.filter(({ client_id }) => client_id === client.id) - 5 }} </span>
               </div>
 
               <b-tooltip :target="() => $refs['client_user_names']" placement="right" v-if="company_users && company_users.length">
