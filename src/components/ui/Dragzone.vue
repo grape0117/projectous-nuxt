@@ -4,7 +4,7 @@
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
     <div class="dragzone__content" ref="dragzone_wrapper">
-      <DragzoneTask class="dragzone__item" v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" :item="item" :index="index" :draggedItemId="draggedItemId" :timerId="timerId" :tasks="tasks" :selectedCompanyUserId="selectedCompanyUserId" :verticalAlignment="verticalAlignment" @dragstart="dragstart" @dragend="dragend" @drop="drop" @updateTaskTitle="updateTaskTitle" @onTaskTimerClicked="onTaskTimerClicked" @moveItem="moveItem"> </DragzoneTask>
+      <DragzoneTask class="dragzone__item" v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" :item="item" :index="index" :draggedItemId="draggedItemId" :timerId="timerId" :tasks="tasks" :selectedCompanyUserId="selectedCompanyUserId" :verticalAlignment="verticalAlignment" @dragstart="dragstart" @dragend="dragend" @drop="drop" @updateTaskTitle="updateTaskTitle" @onTaskTimerClicked="onTaskTimerClicked" @moveItem="moveItem" />
       <div v-if="tasks.length === 0" class="dragzone__add-task" @click="createTempItem(-1)">+</div>
     </div>
   </div>
