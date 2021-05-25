@@ -1,17 +1,21 @@
 <template>
-  <div class="form-group">
-    <b-input-group :prepend="user.name" class="mt-12" size="sm">
-      <b-input-group-prepend append="$">
+  <div class="form-group edit-task-modal-user">
+    <b-input-group class="mt-12" size="sm">
+      <div class="d-flex justify-content-between w-100">
+        <span @click="toggleShow" class="user-name pointer">{{ user.name }}</span>
+        <i class="icon-close pointer" v-if="show" @click="toggleShow" />
+      </div>
+      <b-input-group-prepend append="$" v-if="show">
         <b-button :variant="buttonVariant('visible')" @click="toggleRole('visible')">Visible</b-button>
         <b-button :variant="buttonVariant('assigned')" @click="toggleRole('assigned')">Assigned</b-button>
         <b-button :variant="buttonVariant('reviewer')" @click="toggleRole('reviewer')">Reviewer</b-button>
         <b-button :variant="buttonVariant('manager')" @click="toggleRole('manager')">Watcher</b-button>
       </b-input-group-prepend>
-      <b-input-group prepend="$" v-if="task_user && task_user.role">
+      <b-input-group prepend="$" v-if="show && task_user && task_user.role">
         <b-form-input type="number" :class="userRateClass()" :placeholder="userRatePlaceholder()" v-model="user_rate"></b-form-input>
       </b-input-group>
     </b-input-group>
-    <div class="form-group">
+    <div class="form-group" v-if="show">
       <label class="control-label col-sm-4" :for="'taskWorkDate' + user.id">Next Work Day: {{ next_work_day }} </label>
       <div class="col-sm-8">
         <input :id="'taskWorkDate' + user.id" class="form-control" type="date" name="next_work_day" placeholder="Next Work Day" v-model="next_work_day" />
@@ -34,7 +38,8 @@ export default {
       user_checked: !!this.task_user,
       user_rate: this.task_user ? this.task_user.user_rate : null,
       role: this.task_user ? this.task_user.role : '',
-      next_work_day: this.task_user ? this.task_user.next_work_day : null
+      next_work_day: this.task_user ? this.task_user.next_work_day : null,
+      show: false
     }
   },
   computed: {
@@ -91,6 +96,10 @@ export default {
     }
   },
   methods: {
+    toggleShow() {
+      // console.log(this.user.name)
+      this.show = !this.show
+    },
     userRatePlaceholder() {
       console.log('task_user.user_rate ' + this.task_user.user_rate)
       if (this.project_user) console.log('project_user.user_rate ' + this.project_user.default_user_rate, this.project_user)
@@ -150,3 +159,22 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.pointer {
+  cursor: pointer;
+}
+.edit-task-modal-user .input-group-text {
+  cursor: pointer;
+}
+.user-name {
+  color: #495057;
+  text-align: center;
+  white-space: nowrap;
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  font-weight: 400;
+  font-size: 14px;
+  padding: 4px 8px;
+}
+</style>

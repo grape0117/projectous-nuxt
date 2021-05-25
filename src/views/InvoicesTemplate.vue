@@ -7,7 +7,7 @@
       <div class="year-buttons">
         <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="{ year, total } in invoice_years_data" :key="year" @click="selectYear(year)">
           <span>{{ year }}</span>
-          <span class="total-open" :style="{ 'background-color': is_theme_colors ? background_colors : toRGB(background_colors[0]) }">{{ total }}</span>
+          <span class="total-open" :style="{ 'background-color': default_theme_color }">{{ total }}</span>
         </div>
       </div>
       <div>
@@ -53,7 +53,7 @@
           <span>Options</span>
         </div>
         <div v-for="invoice in invoiceSort" :key="invoice.id">
-          <invoices-row v-bind:invoice="invoice" :bgStyle="background_colors" :bgTheme="bgTheme" @update-invoice-status="updateInvoiceStatus" />
+          <invoices-row v-bind:invoice="invoice" @update-invoice-status="updateInvoiceStatus" />
         </div>
       </div>
     </div>
@@ -64,9 +64,10 @@
 <script>
 import moment from 'moment'
 import { EventBus } from '@/components/event-bus'
+import { colorThemes } from '@/mixins/colorThemes'
 
 import InvoicesRow from './InvoicesRow.vue'
-import { getCookie } from '@/utils/util-functions'
+// import { getCookie } from '@/utils/util-functions'
 
 export default {
   name: 'invoices-template',
@@ -74,6 +75,7 @@ export default {
     'invoices-row': InvoicesRow,
     'invoices-apply-payment': () => import('./InvoicesApplyPayment.vue')
   },
+  mixins: [colorThemes],
   data: function() {
     return {
       invoices: [],
@@ -81,8 +83,8 @@ export default {
       open_invoice_count: [],
       selectedYear: moment(new Date()).format('YYYY'),
       status: 'open',
-      bgStyle: null,
-      bgTheme: null,
+      // bgStyle: null,
+      // bgTheme: null,
       sortBy: {}
     }
   },
@@ -91,23 +93,21 @@ export default {
     //   let bgStyle = getCookie('bg-style')
     //   this.bgStyle = JSON.parse(bgStyle)
     // }
-
     // console.log('bgStyle')
     // console.log(bgStyle)
-
-    let bgStyle = getCookie('bg-style')
-    if (bgStyle) {
-      // If bgStyle is an object
-      if (bgStyle && Object.keys(bgStyle).length > 0) {
-        this.bgStyle = JSON.parse(bgStyle)
-      } else {
-        // If bgStyle is a string
-        this.bgStyle = bgStyle
-      }
-    }
-    if (getCookie('bg-theme')) {
-      this.bgTheme = getCookie('bg-theme')
-    }
+    // let bgStyle = getCookie('bg-style')
+    // if (bgStyle) {
+    //   // If bgStyle is an object
+    //   if (bgStyle && Object.keys(bgStyle).length > 0) {
+    //     this.bgStyle = JSON.parse(bgStyle)
+    //   } else {
+    //     // If bgStyle is a string
+    //     this.bgStyle = bgStyle
+    //   }
+    // }
+    // if (getCookie('bg-theme')) {
+    //   this.bgTheme = getCookie('bg-theme')
+    // }
   },
   computed: {
     sortAsc() {
@@ -206,17 +206,6 @@ export default {
 
       return Math.round(total_payment * 100) / 100
     },
-    is_theme_colors() {
-      return this.bgTheme === JSON.stringify('Colors')
-    },
-    background_colors() {
-      // If theme is 'Colors'
-      if (this.is_theme_colors) {
-        return this.bgStyle
-      }
-      // If theme is 'Images'
-      return this.bgStyle.rgba_colors
-    },
     current_company: function() {
       return this.$store.state.settings.current_company_user_id
     },
@@ -236,10 +225,14 @@ export default {
   },
   mounted: function() {
     this.getData()
-    EventBus.$on('changeBackground', ({ option, theme }) => {
-      this.bgStyle = option
-      this.bgTheme = theme
-    })
+    // EventBus.$on('changeBackground', ({ option, theme }) => {
+    //   if (theme === 'Colors') {
+    //     this.bgTheme = JSON.stringify(theme)
+    //   } else {
+    //     this.bgTheme = theme
+    //   }
+    //   this.bgStyle = option
+    // })
   },
   filters: {
     numberWithCommas(value) {
@@ -284,11 +277,6 @@ export default {
 
         return (sortBy.type = 'desc')
       }
-    },
-    toRGB(rgb) {
-      if (!rgb) return null
-      const { r, g, b } = rgb
-      if (r && g && b) return `rgb(${r}, ${g}, ${b})`
     },
     updateInvoiceStatus({ id, status }) {
       const invoice = this.invoices.find(i => i.id === id)
