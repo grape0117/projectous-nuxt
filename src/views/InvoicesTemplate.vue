@@ -15,21 +15,34 @@
           <span>Total Paid({{ selectedYear }}):</span>
           <span> {{ total_invoices_payment | numberWithCommas }}</span>
         </div>
-        <!-- <b-dropdown :text="status" dropleft variant="outline-primary">
-          <b-dropdown-item @click="setStatus('open')">Open</b-dropdown-item>
-          <b-dropdown-item @click="setStatus('closed')">Closed</b-dropdown-item>
-          <b-dropdown-item @click="setStatus('voided')">Voided</b-dropdown-item>
-        </b-dropdown> -->
       </div>
     </div>
-
     <div class="tab-content mt-2">
       <div class="invoices-table">
         <div class="invoices-header">
-          <span class="status">Status</span>
-          <span class="text-right pr-3" @click="setSortBy('date_created')">
+          <span class="status d-flex justify-content-between">
+            <div class="switch">
+              <div class="checkbox-switch" @click="toggleShowAllStatus" :style="{ 'background-color': show_all_status ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : null }">
+                <div :style="{ 'margin-left': show_all_status ? '10px' : null }"></div>
+              </div>
+              <span class="checkbox-switch-title" @click="toggleShowAllStatus">All</span>
+            </div>
+
+            <div class="status-buttons">
+              <span class="p-1" @click="setStatusFilter('open')" :style="{ 'background-color': status_filter === 'open' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : null }">
+                Open
+              </span>
+              <span class="p-1" @click="setStatusFilter('paid')" :style="{ 'background-color': status_filter === 'paid' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : null }">
+                Paid
+              </span>
+              <span class="p-1" @click="setStatusFilter('voided')" :style="{ 'background-color': status_filter === 'voided' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : null }">
+                Voided
+              </span>
+            </div>
+          </span>
+          <span style="min-width: 135px" class="text-right pr-3" @click="setSortBy('date_created')">
             <!-- <i class="icon-keyboard_arrow_down" /> -->
-            <i :class="sortClass('date_created')" />
+            <i :class="sortClass('date_created')" class="" />
             Date Created
           </span>
           <span>Recipient</span>
@@ -83,9 +96,11 @@ export default {
       open_invoice_count: [],
       selectedYear: moment(new Date()).format('YYYY'),
       status: 'open',
-      // bgStyle: null,
-      // bgTheme: null,
-      sortBy: {}
+      bgStyle: null,
+      bgTheme: null,
+      sortBy: {},
+      show_all_status: false
+      // status_filter: 'open'
     }
   },
   created() {
@@ -110,6 +125,19 @@ export default {
     // }
   },
   computed: {
+    invoice_filter() {
+      if (this.show_all_status) return this.invoiceSort
+
+      return this.invoiceSort.filter(invoice => invoice.status === this.status_filter)
+    },
+    status_filter: {
+      get() {
+        return this.$store.state.settings.invoices_status
+      },
+      set(status_value) {
+        this.$store.state.settings.invoices_status = status_value
+      }
+    },
     sortAsc() {
       return this.sortBy && this.sortBy.type === 'asc'
     },
@@ -241,11 +269,25 @@ export default {
   },
   watch: {
     current_company() {
-      // alert('new company!')
       this.getData()
     }
   },
   methods: {
+    toggleShowAllStatus() {
+      this.show_all_status = !this.show_all_status
+
+      if (this.show_all_status) {
+        this.status_filter = null
+        return
+      }
+      this.status_filter = 'open'
+    },
+    setStatusFilter(filter_value) {
+      if (this.show_all_status) {
+        this.show_all_status = false
+      }
+      this.status_filter = filter_value
+    },
     sortClass(sortBy_colName) {
       const sortBy = this.sortBy
 
@@ -322,6 +364,51 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.switch {
+  display: flex;
+  max-width: 60px;
+  align-items: center;
+
+  .checkbox-switch {
+    min-width: 28px;
+    width: 28px;
+    height: 16px;
+    border: 1px solid white;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    margin-right: 5px;
+
+    div {
+      width: 12px;
+      height: 12px;
+      background-color: white;
+      border-radius: 50px;
+      // margin-left: 10px;
+      transition: 0.2s;
+    }
+  }
+
+  .checkbox-switch-title {
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
+.status-buttons {
+  font-size: 14px;
+  font-weight: 400;
+  background-color: rgba($color: #000000, $alpha: 0.5);
+  overflow: hidden;
+  border-radius: 4px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 .invoices-total-paid {
   background-color: rgba($color: #000000, $alpha: 0.4);
   color: white;
@@ -418,6 +505,10 @@ export default {
     span:nth-child(2) {
       width: 100%;
       max-width: calc(100vw / 12);
+
+      i::before {
+        margin-right: -5px;
+      }
     }
     span:nth-child(3) {
       width: 100%;
@@ -427,10 +518,18 @@ export default {
     span:nth-child(4) {
       width: 100%;
       max-width: calc(100vw / 14);
+
+      i::before {
+        margin-right: -5px;
+      }
     }
     span:nth-child(5) {
       width: 100%;
       max-width: calc(100vw / 14);
+
+      i::before {
+        margin-right: -5px;
+      }
     }
     span:nth-child(6) {
       width: 100%;
@@ -439,10 +538,18 @@ export default {
     span:nth-child(7) {
       width: 100%;
       max-width: calc(100vw / 14);
+
+      i::before {
+        margin-right: -5px;
+      }
     }
     span:nth-child(8) {
       width: 100%;
       max-width: calc(100vw / 14);
+
+      i::before {
+        margin-right: -5px;
+      }
     }
     span:last-child {
       width: 100%;

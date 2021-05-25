@@ -1,24 +1,24 @@
 <template>
   <div class="invoices-items">
-    <div>
+    <div class="pr-3">
       <div class="invoices-buttons">
         <div class="invoices-button" :style="{ background: backgroundColor('open') }" @click="updateInvoiceStatus(invoice.id, 'open')">Open</div>
         <div class="invoices-button" :style="{ background: backgroundColor('paid') }" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</div>
         <div class="invoices-button" :style="{ background: backgroundColor('voided') }" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</div>
       </div>
     </div>
-    <div class="text-right pr-3">{{ invoice.date }}</div>
+    <div class="text-right pr-3" style="min-width: 135px">{{ invoice.date }}</div>
     <div>
       <b v-if="invoice && invoice.client">{{ invoice.client.name }}</b>
       <div v-for="(project, project_index) in invoice.projects" :key="project_index" v-bind:project="project" style="font-size: smaller">
         <span v-if="project">{{ project.name }}</span>
       </div>
     </div>
-    <div>{{ invoice.invoice_id }}</div>
-    <div>{{ invoice.total }}</div>
+    <div class="text-right pr-3">{{ invoice.invoice_id }}</div>
+    <div class="text-right pr-3">{{ invoice.total }}</div>
     <div v-html="invoice.note ? invoice.note : 'No notes...'" contenteditable="true" @input="setNoteValue"></div>
-    <div>{{ invoice.start_date }}</div>
-    <div>{{ invoice.end_date }}</div>
+    <div class="text-right pr-3">{{ invoice.start_date }}</div>
+    <div class="text-right pr-3">{{ invoice.end_date }}</div>
     <div class="buttons">
       <div class="invoices-buttons">
         <div class="invoices-button" :style="{ background: default_theme_color }" @click="redirect('invoice')">
