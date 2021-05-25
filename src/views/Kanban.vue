@@ -14,7 +14,9 @@
             <div class="client-name">
               <span class="mr-2">{{ client.name }}</span>
               <b-icon class="pointer mr-2" v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon>
-              <i class="icon-add add-client pointer" @click="addClient(client)" />
+              <div class="add-client">
+                <i class="icon-add pointer" :style="{ color: default_theme_color }" @click="addClient(client)" />
+              </div>
             </div>
             <div>
               <div class="d-flex align-items-center pl-1">
@@ -89,6 +91,7 @@
             </div>
             <div></div>
           </div>
+
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
       </b-row>
@@ -109,6 +112,8 @@ import TaskTray from './TaskTray.vue'
 import TimerTab from './TimerTab.vue'
 import TaskSideBar from './TaskSideBar.vue'
 import uuid from 'uuid'
+import { colorThemes } from '@/mixins/colorThemes'
+import { getCookie } from '@/utils/util-functions'
 import { EventBus } from '@/components/event-bus'
 
 const CompanyClients = namespace('clients')
@@ -131,6 +136,7 @@ enum listsBlockNames {
 }
 
 @Component({
+  mixins: [colorThemes],
   components: {
     NewListForm,
     TaskDetails,
@@ -363,6 +369,10 @@ export default class Custom extends Vue {
     this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: item })
   }
 
+  public deleteTask(task: any) {
+    this.$store.dispatch('DELETE', { module: 'tasks', entity: task })
+  }
+
   //TODO: rename as move project task
   public updateTask(task: any) {
     console.log('************* Custom updateTask *************', task)
@@ -371,10 +381,6 @@ export default class Custom extends Vue {
     delete task.user_task_list_id
     if (this.currentListsBlockName !== this.listsBlockNames.PROJECTS) return
     this.$store.dispatch('UPDATE', { module: 'tasks', entity: task })
-  }
-
-  public deleteTask(task: any) {
-    this.$store.dispatch('DELETE', { module: 'tasks', entity: task })
   }
 
   private clientVisible(client: any) {
@@ -411,8 +417,9 @@ export default class Custom extends Vue {
   }
 
   private editProject(project_id: any) {
-    console.log('edit project')
     let project = this.$store.getters['projects/getById'](project_id)
+    console.log(project)
+
     this.$store.commit('settings/setCurrentEditProject', cloneDeep(project))
   }
 
@@ -450,7 +457,13 @@ export default class Custom extends Vue {
 </script>
 <style lang="scss">
 .add-client {
-  color: lawngreen;
+  width: 20px;
+  height: 20px;
+  background-color: rgba($color: #000000, $alpha: 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
   font-size: 16px;
 }
 .kanban_title-part {
@@ -518,6 +531,7 @@ export default class Custom extends Vue {
   color: white;
 }
 .client-name {
+  display: flex;
   font-weight: bold;
   font-size: 15px;
   text-transform: uppercase;

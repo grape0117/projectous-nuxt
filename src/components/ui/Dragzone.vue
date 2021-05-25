@@ -3,115 +3,10 @@
     <div v-if="isListExpandable" @click="expandedList = !expandedList" class="dragzone__item-icon">
       {{ expandedList ? '&#9652;' : '&#9662;' }}
     </div>
-    <!-- <pre style="color: white;">{{ tasks }}</pre> -->
-    <!-- <pre>{{ tasks }}</pre> -->
     <div class="dragzone__content" ref="dragzone_wrapper">
-      <div v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" class="dragzone__item" :class="{ 'dragzone__item--dragged': item.id === draggedItemId }" :id="item.id" draggable="true" @dragstart="dragstart($event, item)" @dragend="dragend($event)" @drop="drop($event)">
-        <div class="dragzone__item-block">
-          <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
-          <div class="dragzone__item-block-content">
-            <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px">
-              <div class="burger-icon-wrapper" v-if="!item.project.acronym">
-                <div style="padding-left: 5px; padding-right: 5px; margin-top: 5px" class="burger-icon" @click="showTaskDetail(item)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-                <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
-              </div>
-
-              <div class="dragzone__item-info">
-                <!-- <p style="margin-bottom: 0 !important;">
-                  <span class="dragzone-project-acronym" v-if="item.project.acronym">{{ item.project.acronym }}</span>
-                  <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
-                  <span class="dragzone__item-text" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id">{{ item.title }}</span>
-                </p> -->
-                <div class="dragzone-project-acronym-wrapper" v-if="item.project.acronym">
-                  <div class="dragzone-project-acronym" :style="{ 'background-color': clientColor(item) }" @click="showTaskDetail(item)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
-                    {{ item.project.acronym }}
-                  </div>
-                  <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
-                </div>
-                <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
-                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
-              </div>
-              <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
-                <span v-if="timerId === item.id" class="icon-stop" style="font-size: 25px; color: red" />
-                <span v-else class="icon-play_arrow" style="font-size: 25px; color: green" />
-              </div>
-            </div>
-            <!-- <div class="dragzone__item-block-content-text">
-              <div class="dragzone__item-subtext mt-2">
-                <img v-if="project_url(item)" :src="project_url(item)" />
-                <div class="d-flex align-items-center">
-                  <span class="dragzone-project-acronym" v-if="item.project.acronym">
-                    {{ item.project.acronym }}
-                  </span>
-                  <span v-else>{{ projectName(item.project_id) }}</span>
-                  <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
-                    <span v-if="timerId === item.id" class="dragzone__item-tracker-icon-square" />
-                    <span v-else class="dragzone__item-tracker-icon-triangle" />
-                  </div>
-                </div>
-              </div>
-              <div class="dragzone__item-dragbox dragzone__item-dragbox--active" @click="editTask(item.task_id || item.id)">
-                <span />
-                <span />
-                <span />
-              </div>
-              <div class="dragzone__add-task dragzone__add-task--item" @click="createTempItem(index, item.id)">
-                +
-              </div>
-              <div class="">
-                <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
-              </div>
-            </div> -->
-            <div v-if="show_debug()" style="padding: 0 10px">
-              <small>
-                <span style="color: red">{{ getTaskType(item.task_id || item.id) }}</span
-                >status: {{ item.status }} list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}
-              </small>
-            </div>
-            <div class="dragzone__task-users">
-              <b-badge v-if="task_user.company_user_id !== selectedCompanyUserId || !verticalAlignment" class="dragzone_badge" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id" v-bind:task_user="task_user">
-                {{ getCompanyUser(task_user.company_user_id).name | abbrName }}
-              </b-badge>
-            </div>
-          </div>
-          <div v-if="index == tasks.length - 1" class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
-
-          <!-- <div
-            v-if="true || editedItemId === item.id"
-            class="dragzone__item-tracker"
-          >
-            <div
-              v-if="getTaskDueDate(item.task_id || item.id)"
-              class="dragzone__item-tracker-number"
-            >
-              08/01 {{ getTaskDueDate(item.task_id || item.id) }}
-            </div>
-            <div
-              class="dragzone__item-tracker-name"
-              :class="{
-                'dragzone__item-tracker-name--active': timerId === item.id
-              }"
-            />
-            <span
-              class="dragzone__item-tracker-circle"
-              :class="{
-                'dragzone__item-tracker-circle--active': timerId === item.id
-              }"
-            />
-            <div class="dragzone__item-tracker-time">00:00:00</div>
-          </div>-->
-        </div>
-      </div>
-
+      <DragzoneTask class="dragzone__item" v-for="(item, index) in expandedList ? tasks : tasks.slice(0, numberOfExpandedItems)" :key="item.uuid" :item="item" :index="index" :draggedItemId="draggedItemId" :timerId="timerId" :tasks="tasks" :selectedCompanyUserId="selectedCompanyUserId" :verticalAlignment="verticalAlignment" @dragstart="dragstart" @dragend="dragend" @drop="drop" @updateTaskTitle="updateTaskTitle" @onTaskTimerClicked="onTaskTimerClicked" @moveItem="moveItem"> </DragzoneTask>
       <div v-if="tasks.length === 0" class="dragzone__add-task" @click="createTempItem(-1)">+</div>
     </div>
-    <!--<div v-if="!expandedList && isListExpandable" class="pl-2">
-      ...
-    </div>-->
   </div>
 </template>
 <script lang="ts">
@@ -119,20 +14,15 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { cloneDeep } from 'lodash'
 import { namespace } from 'vuex-class'
 import { EventBus } from '@/components/event-bus'
+// @ts-ignore
+import DragzoneTask from './DragzoneTask'
 import uuid from 'uuid'
 
 const Tasks = namespace('tasks')
 
 @Component({
-  filters: {
-    abbrName(name: string) {
-      if (!name) return ''
-      let matches = name.match(/\b(\w)/g) // ['J','S','O','N']
-      if (matches) {
-        let acronym = matches.join('') // JSON
-        return acronym.toUpperCase()
-      }
-    }
+  components: {
+    DragzoneTask
   }
 })
 export default class Dragzone extends Vue {
@@ -159,6 +49,7 @@ export default class Dragzone extends Vue {
   private editedItemId: number | string | null = null
   private currentListsBlockName: string | null = null
   private showPlusIcon: object = { task_id: null, visible: false }
+  private show_task_option: boolean = false
 
   @Watch('tasks')
   public onTaskChanged(newTasks: any, oldTasks: any) {
@@ -180,27 +71,27 @@ export default class Dragzone extends Vue {
     }
   }
 
-  private async showTaskDetail(item: any) {
-    // editTask(item.task_id || item.id)
+  // private async showTaskDetail(item: any) {
+  //   // editTask(item.task_id || item.id)
 
-    let task = await this.$store.state.tasks.tasks.find((tsk: any) => {
-      if (item.task_id) {
-        return tsk.id === item.task_id
-      } else {
-        return tsk.id === item.id
-      }
-    })
+  //   let task = await this.$store.state.tasks.tasks.find((tsk: any) => {
+  //     if (item.task_id) {
+  //       return tsk.id === item.task_id
+  //     } else {
+  //       return tsk.id === item.id
+  //     }
+  //   })
 
-    await this.$router.push({ query: { task: task.id, showChatSection: 'true' } })
-  }
+  //   await this.$router.push({ query: { task: task.id, showChatSection: 'true' } })
+  // }
 
-  private clientColor(item: any) {
-    return this.$store.state.clients.clients.find((client: any) => client.client_company_id === item.project.client_company_id).color
-  }
+  // private clientColor(item: any) {
+  //   return this.$store.state.clients.clients.find((client: any) => client.client_company_id === item.project.client_company_id).color
+  // }
 
-  private show_plusIcon(task_id: any, visibility: boolean) {
-    this.showPlusIcon = { task_id: task_id, visible: visibility }
-  }
+  // private show_plusIcon(task_id: any, visibility: boolean) {
+  //   this.showPlusIcon = { task_id: task_id, visible: visibility }
+  // }
 
   private show_debug() {
     return process.env.VUE_APP_SHOW_DEBUG === 'on'
@@ -218,23 +109,23 @@ export default class Dragzone extends Vue {
     return project.project_url ? 'https://api.projectous.com/api/projects/' + project.id + '/favicon.png' : false
   }
 
-  private getTaskUsers(task_id: any) {
-    return this.$store.getters['task_users/getByTaskId'](task_id)
-  }
-  private getCompanyUser(company_user_id: any) {
-    let company_user = this.$store.getters['company_users/getById'](company_user_id)
-    //console.log(company_user)
-    return company_user ? company_user : []
-  }
+  // private getTaskUsers(task_id: any) {
+  //   return this.$store.getters['task_users/getByTaskId'](task_id)
+  // }
+  // private getCompanyUser(company_user_id: any) {
+  //   let company_user = this.$store.getters['company_users/getById'](company_user_id)
+  //   //console.log(company_user)
+  //   return company_user ? company_user : []
+  // }
   private getTaskDueDate(task_id: any) {
     let task = this.$store.getters['tasks/getById'](task_id)
     return task.due_date ? task.due_date : null
   }
 
-  private getTaskType(task_id: any) {
-    let task = this.$store.getters['tasks/getById'](task_id)
-    return task.settings ? task.settings.task_type : null
-  }
+  // private getTaskType(task_id: any) {
+  //   let task = this.$store.getters['tasks/getById'](task_id)
+  //   return task.settings ? task.settings.task_type : null
+  // }
 
   // private editTask(task_id: any) {
   //   let task = this.$store.getters['tasks/getById'](task_id)
@@ -242,10 +133,10 @@ export default class Dragzone extends Vue {
   //   this.$store.state.settings.current_edit_task = cloneDeep(task)
   //   this.$store.dispatch('settings/openModal', 'task')
   // }
-  private projectName(project_id: any) {
-    const project = this.$store.getters['projects/getById'](project_id)
-    return project ? project.name : project_id
-  }
+  // private projectName(project_id: any) {
+  //   const project = this.$store.getters['projects/getById'](project_id)
+  //   return project ? project.name : project_id
+  // }
   private dragstart(e: any, item: any) {
     e.dataTransfer.setData('application/node type', this)
     e.dataTransfer.setDragImage(e.target, 0, 0)

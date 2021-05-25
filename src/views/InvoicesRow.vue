@@ -21,13 +21,11 @@
     <div class="text-right pr-3">{{ invoice.end_date }}</div>
     <div class="buttons">
       <div class="invoices-buttons">
-        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('invoice')">
+        <div class="invoices-button" :style="{ background: default_theme_color }" @click="redirect('invoice')">
           <i class="icon-open_in_new" />
         </div>
-        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="redirect('csv')">CSV</div>
-        <div class="invoices-button" :style="{ background: is_theme_colors ? bgStyle : toRGB(bgStyle[0]) }" @click="deleteInvoice(invoice)">
-          <!-- <i class="icon-delete_forever" />
-          <i class="icon-delete" /> -->
+        <div class="invoices-button" :style="{ background: default_theme_color }" @click="redirect('csv')">CSV</div>
+        <div class="invoices-button" :style="{ background: default_theme_color }" @click="deleteInvoice(invoice)">
           <i class="icon-delete_outline" />
         </div>
       </div>
@@ -40,11 +38,13 @@
 
 <script>
 import { EventBus } from '@/components/event-bus'
+import { colorThemes } from '@/mixins/colorThemes'
 import _ from 'lodash'
 
 export default {
   name: 'invoices-row',
-  props: ['invoice', 'bgStyle', 'bgTheme'],
+  props: ['invoice'],
+  mixins: [colorThemes],
   data() {
     return {
       note: null
@@ -95,11 +95,6 @@ export default {
     },
     backgroundColor(status, color_index = 0) {
       return this.is_theme_colors ? this.statusBgStyle(status) : this.toRGB(this.statusBgStyle(status) && this.statusBgStyle(status)[color_index])
-    },
-    toRGB(rgb) {
-      if (!rgb) return null
-      const { r, g, b } = rgb
-      if (r && g && b) return `rgb(${r}, ${g}, ${b})`
     },
     statusBgStyle(invoice_status) {
       if (this.invoice.status !== invoice_status) return null
