@@ -35,9 +35,16 @@
             >status: {{ item.status }} list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}
           </small>
         </div>
-        <div class="dragzone__task-users">
+        <!-- <div class="dragzone__task-users">
           <div v-for="task_user in get_task_users" :key="task_user.id">
             <b-badge v-if="showBadge(task_user)" class="dragzone_badge" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" :task_user="task_user">
+              {{ getCompanyUser(task_user.company_user_id).name | abbrName }}
+            </b-badge>
+          </div>
+        </div> -->
+        <div class="dragzone__task-users">
+          <div v-for="task_user in getTaskUsers(item.task_id || item.id)" :key="task_user.id">
+            <b-badge v-if="(task_user.company_user_id !== selectedCompanyUserId || !verticalAlignment) && !Array.isArray(getCompanyUser(task_user.company_user_id))" v-b-tooltip.hover :title="getCompanyUser(task_user.company_user_id).fullname || getCompanyUser(task_user.company_user_id).name" class="dragzone_badge" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" :task_user="task_user">
               {{ getCompanyUser(task_user.company_user_id).name | abbrName }}
             </b-badge>
           </div>
@@ -142,6 +149,17 @@ export default Vue.extend({
     },
     showBadge(task_user: any) {
       return task_user.company_user_id !== this.selectedCompanyUserId || !this.verticalAlignment
+    },
+    getTaskUsers(task_id: any) {
+      let task_users = this.$store.getters['task_users/getByTaskId'](task_id)
+
+      const users = task_users.reduce((acc: any, user: any) => {
+        if (!acc.find((u: any) => u.company_user_id === user.company_user_id)) {
+          acc.push(user)
+        }
+        return acc
+      }, [])
+      return users
     }
   },
   computed: {
