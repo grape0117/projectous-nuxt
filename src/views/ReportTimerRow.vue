@@ -130,6 +130,7 @@ export default {
       }
     },
     editTimer() {
+      // console.log(this.timer)
       this.$store.dispatch('timers/editTimer', this.timer)
     }
   }

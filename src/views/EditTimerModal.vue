@@ -1,6 +1,16 @@
 <template>
   <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close">
-    <template v-slot:modal-header="{ ok, cancel }"> </template>
+    <!-- <template v-slot:modal-header="{ ok, cancel }"> </template> -->
+    <!-- <div class="col-sm-8">
+      <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer.company_user_id">
+        <option value="">***** Select User *****</option>
+        <option :selected="isTimerUser(user.user_id)" v-for="user in users.filter(u => u.user_type === 'user')" :key="user.id" v-bind:value="user.user_id">
+          {{ user.name }}
+          {{ isTimerUser(user.id) }}
+        </option>
+        <option>Selected or Current User if Editing Timer?</option>
+      </select>
+    </div> -->
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane active" id="timerEditTabShow">
         <form id="editTimerForm" class="form-horizontal">
@@ -75,7 +85,7 @@
             <div class="col-sm-8">
               <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer.company_user_id">
                 <option value="">***** Select User *****</option>
-                <option :selected="isTimerUser(user.user_id)" v-for="user in users.filter(u => u.user_type === 'user')" :key="user.id" v-bind:value="user.user_id">
+                <option :selected="isTimerUser(user.id)" v-for="user in users.filter(u => u.user_type === 'user')" :key="user.id" :value="user.id">
                   {{ user.name }}
                 </option>
                 <option>Selected or Current User if Editing Timer?</option>
@@ -406,8 +416,8 @@ export default {
     isTimerProjectTask: function(project_id) {
       return this.timer.project_id === project_id
     },
-    isTimerUser: function(user_id) {
-      return this.timer.user_id === user_id
+    isTimerUser: function(id) {
+      return this.timer.company_user_id === id
     },
     checkInputValue: function(input) {
       if (!input.length) {

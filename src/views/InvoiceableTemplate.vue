@@ -173,8 +173,7 @@
                   <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
                 </td>
                 <td colspan="100">
-                  <!-- <div class="reload-icon" v-if="loading_data"> -->
-                  <div class="reload-icon">
+                  <div class="reload-icon" v-if="loading_data">
                     <i class="icon-cached" :class="loading_data ? 'reload-rotate' : null" />
                   </div>
                 </td>
