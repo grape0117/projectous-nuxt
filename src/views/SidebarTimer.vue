@@ -1,5 +1,5 @@
 <template>
-  <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" :style="{ border: status_running ? `5px solid ${default_theme_color}` : null }" v-bind:data-restarted="timer.restart_at">
+  <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" :style="{ 'background-color': status_running ? default_theme_color : null }" v-bind:data-restarted="timer.restart_at">
     <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
