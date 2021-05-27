@@ -38,8 +38,7 @@
             </div>
           </div>
         </div>
-
-        <div class="header-paint" v-if="toggles.paint">
+        <div class="header-paint" v-if="this.toggles.paint" v-click-outside.prevent="closeModal">
           <div class="mb-3" v-for="(style, styleIndex) in backgroundStyle" :key="styleIndex">
             <div class="d-flex justify-content-between">
               <span style="font-weight: bold">{{ style.name }}</span>
@@ -234,6 +233,9 @@ export default Vue.extend({
     })
   },
   methods: {
+    closeModal() {
+      this.toggles.paint = false
+    },
     setReload(state) {
       console.log(state)
       this.isShowReload = state
