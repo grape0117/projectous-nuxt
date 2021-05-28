@@ -110,7 +110,10 @@ export default {
       return false
     },
     clientColor() {
-      return this.$store.state.clients.clients.find(client => client.client_company_id === this.project.client_company_id).color
+      const client = this.$store.state.clients.clients.find(client => client.client_company_id === this.project.client_company_id)
+      if (client) {
+        return client.color
+      }
     },
     current_user_id: function() {
       return this.$store.state.settings.current_user_id
