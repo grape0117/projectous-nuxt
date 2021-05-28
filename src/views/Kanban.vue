@@ -198,7 +198,6 @@ export default class Custom extends Vue {
     let users = this.project_tasks.reduce((acc: any, task: any) => {
       for (const user of task.users) {
         acc.push(user.company_user_id)
-        // acc.push(user)
       }
 
       return acc
@@ -215,14 +214,18 @@ export default class Custom extends Vue {
     if (!this.selectedProjectId) return []
     let users = this.$store.state.projects.projects.find(({ id }: any) => id === this.selectedProjectId).users
 
-    const project_users = users.reduce((acc: any, user: any) => {
-      let company_user = this.$store.state.company_users.company_users.find(({ id }: any) => id === user.company_user_id)
-      if (company_user) {
-        acc.push(company_user)
-      }
-      return acc
-    }, [])
-    return project_users
+    if (users) {
+      const project_users = users.reduce((acc: any, user: any) => {
+        let company_user = this.$store.state.company_users.company_users.find(({ id }: any) => id === user.company_user_id)
+        if (company_user) {
+          acc.push(company_user)
+        }
+        return acc
+      }, [])
+      return project_users
+    }
+
+    return []
   }
 
   get filteredClient() {

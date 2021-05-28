@@ -1,6 +1,6 @@
 <template>
   <b-modal id="project-modal" :title="`${has_route_query_newProjectClientCompanyId ? 'Add' : 'Edit'} Project`" class="modal fade" role="dialog" @ok="saveProject" @hidden="closeModal">
-    {{}}
+    <!-- {{ $route.query.new_project_client_company_id }} -->
     <form id="editProjectForm" class="form-horizontal">
       <input id="projectIDEdit" class="form-control" type="hidden" name="id" v-model="project.id" />
       <div class="form-group">
@@ -28,6 +28,7 @@
       <div class="form-group">
         <label class="control-label col-sm-4" for="companyClientSelect">Client: </label>
         <div class="col-sm-6">
+          <!--  -->
           <select class="form-control" id="client-modal-client-id" name="client_id" v-model="project.client_company_id">
             <option>***** Choose Client *****</option>
             <option value="create">Create New Client</option>
@@ -88,10 +89,8 @@
 </template>
 
 <script>
-import { EventBus } from '@/components/event-bus'
-
 import EditProjectModalUser from './EditProjectModalUser.vue'
-import { cloneDeep } from 'lodash'
+import Vue from 'vue'
 
 export default {
   name: 'project-modal',
@@ -141,7 +140,10 @@ export default {
   },
   watch: {
     edit_project(edit_project) {
-      this.project = cloneDeep(edit_project)
+      // this.project = cloneDeep(edit_project)
+      if (edit_project && Object.keys(edit_project).length > 0) {
+        Vue.set(this.project, 'id', this.project_id)
+      }
     },
     '$route.query': {
       immediate: true,
@@ -164,11 +166,14 @@ export default {
     }
   },
   methods: {
+    checkProject() {
+      console.log(this.project)
+    },
     reset_project() {
       this.project = {}
     },
     setClient(client_company_id) {
-      this.project.client_company_id = client_company_id
+      Vue.set(this.project, 'client_company_id', client_company_id)
     },
     async closeModal() {
       this.reset_project()
@@ -236,8 +241,8 @@ export default {
       return this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
     },
     async saveProject(callback) {
-      await this.$store.dispatch('UPSERT', { module: 'projects', entity: this.project })
-      //this.$store.dispatch('projects/saveProject', { project: this.project, project_users: this.changed_project_users })
+      const project = await this.$store.dispatch('UPSERT', { module: 'projects', entity: this.project })
+      this.$store.state.projects.projects.push(project)
     }
   }
 }
