@@ -73,6 +73,7 @@ export default {
   methods: {
     async getMonthStats() {
       const { profit } = await this.$http().get('/stats/month')
+      console.log(profit)
       this.month_stats = profit
     },
     trayClass: function() {
