@@ -17,12 +17,15 @@ export const actions: ActionTree<IRootState, IRootState> = {
     // @ts-ignore
     data[module] = entity
     // @ts-ignore
-    this._vm
+    let result = this._vm
       .$http()
       .post('/' + module, data)
       .then((response: any) => {
         dispatch('PROCESS_INCOMING_DATA', response)
+        return response
       })
+
+    return result
   },
   UPSERT({ dispatch, commit, state }, { module, entity }: any) {
     console.log('UPSERT ACTION', module, entity)
@@ -39,7 +42,7 @@ export const actions: ActionTree<IRootState, IRootState> = {
     if (state[module][module][key]) {
       dispatch('UPDATE', { module, entity })
     } else {
-      dispatch('ADD_ONE', { module, entity })
+      return dispatch('ADD_ONE', { module, entity }).then((result: any) => result)
     }
   },
   UPDATE({ commit, dispatch }, { module, entity }) {

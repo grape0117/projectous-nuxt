@@ -126,7 +126,7 @@ export default Vue.extend({
       this.$emit('createTempItem', index, after_id)
     },
     clientColor(item: any) {
-      const client = this.$store.state.clients.clients.find((client: any) => client.client_company_id === item.project.client_company_id)
+      const client = this.$store.state.clients.clients.find((c: any) => c.client_company_id === item.project.client_company_id)
       if (client) {
         return client.color
       }
