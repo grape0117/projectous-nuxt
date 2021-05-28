@@ -1,5 +1,5 @@
 <template>
-  <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" v-bind:data-restarted="timer.restart_at">
+  <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" :style="{ 'background-color': status_running ? default_theme_color : null }" v-bind:data-restarted="timer.restart_at">
     <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
@@ -17,12 +17,12 @@
       <!-- {{ Number(durationMinutes()) < 10 }}  -->
       <!-- <pre style="color: white;">{{ timer }}</pre> -->
       <div v-if="isCurrentUser()" class="status-icons">
-        <i class="icon-pause icon-class" v-if="timer.status === 'running'" v-on:click="pauseTimer"></i>
-        <i class="icon-stop icon-class" style="color: red" v-if="timer.status === 'running'" v-on:click="stopTimer"></i>
+        <i class="icon-pause icon-class" v-if="status_running" v-on:click="pauseTimer"></i>
+        <i class="icon-stop icon-class" style="color: red" v-if="status_running" v-on:click="stopTimer"></i>
         <i class="icon-play_arrow icon-class" v-else @click="restartTimer"></i>
       </div>
       <div class="sidebar-timer-timer">
-        <span :style="timer.status === 'running' ? 'font-weight: bold;' : ''">{{ durationDisplay }}</span>
+        <span :style="status_running ? 'font-weight: bold;' : ''">{{ durationDisplay }}</span>
       </div>
       <div class="bump-button" v-if="showBumpButton">
         <span @click="bumpItUp">Bump it up</span>
@@ -46,6 +46,7 @@
 import Vue from 'vue'
 import moment from 'moment'
 import { format_report_at, datetimeToJS } from '../utils/util-functions'
+import { colorThemes } from '@/mixins/colorThemes'
 
 import { EventBus } from '@/components/event-bus'
 import { IProject } from '../store/modules/projects/types'
@@ -54,6 +55,7 @@ import { cloneDeep } from 'lodash'
 export default {
   name: 'sidebar-timer',
   props: ['timer', 'projects', 'users', 'tasks', 'running_timers', 'index'],
+  mixins: [colorThemes],
   data: function() {
     return {
       totalDuration: 0,
@@ -72,6 +74,9 @@ export default {
     }
   },
   computed: {
+    status_running() {
+      return this.timer.status === 'running'
+    },
     durationDisplay: function() {
       const totalDuration = this.timer.duration
       if (totalDuration > this.totalDuration && this.timer.status == 'running') this.totalDuration = totalDuration
