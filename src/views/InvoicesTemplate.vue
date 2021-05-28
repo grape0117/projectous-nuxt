@@ -65,7 +65,7 @@
           </span>
           <span>Options</span>
         </div>
-        <div v-for="invoice in invoiceSort" :key="invoice.id">
+        <div v-for="invoice in invoice_filter" :key="invoice.id">
           <invoices-row v-bind:invoice="invoice" @update-invoice-status="updateInvoiceStatus" />
         </div>
       </div>
@@ -326,6 +326,9 @@ export default {
       const index = this.invoices.indexOf(invoice)
 
       this.invoices[index].status = status
+
+      console.log({ id })
+      console.log({ status })
     },
     // filter status
     setStatus(status) {
