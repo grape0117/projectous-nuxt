@@ -53,6 +53,10 @@ export const mutations: MutationTree<IModuleState> = {
       window.$_app.$bvModal.hide('project-modal')
     }
   },
+  setCurrentEditProjectStatus(state, status) {
+    console.log('open project modal')
+    state.current_edit_project_status = status
+  },
   setCurrentEditTask(state, task) {
     state.current_edit_task = JSON.parse(JSON.stringify(task))
     if (task.id) {

@@ -16,6 +16,7 @@ export const settings = {
     current_company: { name: '', modules: [] },
     current_module_settings: {},
     current_edit_project: {},
+    current_edit_project_status: null, // Add or Edit
     current_edit_company_user: {},
     current_edit_client: { id: null },
     current_edit_task: {},
