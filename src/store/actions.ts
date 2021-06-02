@@ -59,12 +59,14 @@ export const actions: ActionTree<IRootState, IRootState> = {
   UPDATE_ATTRIBUTE({ commit, dispatch }, { module, id, attribute, value }) {
     commit('UPDATE_ATTRIBUTE', { module: module, id: id, attribute: attribute, value: value })
     // @ts-ignore
-    this._vm
+    let result = this._vm
       .$http()
       .patch('/' + module + '/', id, { attribute, value })
       .then((response: any) => {
         dispatch('PROCESS_INCOMING_DATA', response)
+        return response
       })
+    return result
   },
 
   /**

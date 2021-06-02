@@ -33,7 +33,7 @@
             </div>
           </div>
           <div class="form-group">
-            <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard>
+            <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer" @update-duration="updateDuration" @update-invoice-duration="updateInvoiceDuration"></timer-modal-time-standard>
           </div>
           <div class="form-group">
             <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
@@ -76,7 +76,7 @@
             <div class="col-sm-8">
               <select name="task_id" id="timerTaskSelect" class="form-control" v-model="timer.task_id">
                 <option value="0">***** Select Task *****</option>
-                <option v-for="task in projecttasks(timer.project_id)" :value="task.id">{{ task.title }}</option>
+                <option v-for="task in projecttasks(timer.project_id)" :value="task.id" :key="task.id">{{ task.title }}</option>
               </select>
             </div>
           </div>
@@ -198,6 +198,8 @@
 <script>
 import TimerModalTimeStandard from './TimerModalTimeStandard.vue'
 import TimerFifteenTemplate from './TimerFifteenTemplate.vue'
+import Vue from 'vue'
+
 export default {
   name: 'timer-modal',
   components: {
@@ -284,6 +286,12 @@ export default {
     }
   },
   methods: {
+    updateDuration(duration) {
+      this.timer.duration = duration
+    },
+    updateInvoiceDuration(invoice_duration) {
+      this.timer.invoice_duration = invoice_duration
+    },
     close() {
       this.$store.commit('settings/setCurrentEditTimerStatus', null)
     },
@@ -468,7 +476,10 @@ export default {
         }
       }
 
-      this.$store.dispatch('timers/saveTimer', this.timer)
+      let result = this.$store.dispatch('timers/saveTimer', this.timer)
+      console.log('result')
+      console.log(result)
+
       if (this.editTimerStatus === 'add') {
         this.startTimer()
       }
