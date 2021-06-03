@@ -2,13 +2,13 @@
   <div id="invoiceable" class="container-fluid">
     <div class="row">
       <div class="col-sm-12">
-        <form method="get" id="invoiceable-form" action="/invoiceable">
+        <form method="get" id="invoiceable-form" class="invoiceable-form" action="/invoiceable">
           <div class="top-selects">
             <!-- here -->
             <div class="client-select">
               <div class="d-flex justify-content-between align-items-end mb-2">
                 <div class="">
-                  <b-form-checkbox v-model="not_clients" name="not_client" class="mr-2">
+                  <b-form-checkbox v-model="not_clients" name="not_client" class="mr-2 color-white">
                     Not
                   </b-form-checkbox>
                 </div>
@@ -31,7 +31,7 @@
             <!-- here -->
             <div class="project-select">
               <div class="mb-2 mt-1">
-                <b-form-checkbox v-model="not_projects" name="not_project" class="mr-2">
+                <b-form-checkbox v-model="not_projects" name="not_project" class="mr-2 color-white">
                   Not
                 </b-form-checkbox>
               </div>
@@ -45,7 +45,7 @@
             <!-- here -->
             <div v-if="isAdmin()" class="user-select">
               <div class="mb-2 mt-1">
-                <b-form-checkbox v-model="not_users" name="not_user" class="mr-2">
+                <b-form-checkbox v-model="not_users" name="not_user" class="mr-2 color-white">
                   Not
                 </b-form-checkbox>
               </div>
@@ -64,7 +64,7 @@
                   <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2 mr-2"></b-form-datepicker>
                   <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2 mr-2"></b-form-datepicker>
                 </div>
-                <div class="d-flex align-items-center flex-wrap">
+                <div class="d-flex align-items-center flex-wrap color-white">
                   <b-form-checkbox v-model="anytime" name="anytime" class="mr-2">
                     Anytime
                   </b-form-checkbox>
@@ -174,7 +174,7 @@
                 </td>
                 <td colspan="100">
                   <div class="reload-icon" v-if="loading_data">
-                    <i class="icon-cached" :class="loading_data ? 'reload-rotate' : null" />
+                    <i class="icon-cached color-white" :class="loading_data ? 'reload-rotate' : null" />
                   </div>
                 </td>
               </tr>
@@ -644,11 +644,12 @@ export default {
     }
   }
   .table-responsive {
-    box-shadow: 0 0px 10px rgba($color: #000000, $alpha: 0.2);
+    // box-shadow: 0 0px 10px 10px rgba($color: #FFFFFF, $alpha: 0.5);
+    box-shadow: 0px 0px 10px 2px rgba($color: #ffffff, $alpha: 0.5);
   }
 
   .bottom-selects {
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
 
     .form-inline {
       .inputs {
@@ -731,6 +732,16 @@ a.active {
 </style>
 
 <style lang="scss" scoped>
+.color-white {
+  color: white;
+}
+.invoiceable-form {
+  background-color: rgba($color: #000000, $alpha: 0.5);
+  box-shadow: 0px 0px 10px 2px rgba($color: #ffffff, $alpha: 0.5);
+  padding: 8px 8px 10px 8px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
 .reload-icon {
   width: 100%;
   height: 30px;

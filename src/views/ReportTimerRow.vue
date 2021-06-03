@@ -1,5 +1,5 @@
 <template id="report-timer-row-template">
-  <tr class="timer-form timer-stopped" :data-id="timer.id" :data-duration="timer.duration">
+  <tr class="report-timer-row timer-stopped" :data-id="timer.id" :data-duration="timer.duration">
     <td v-if="isAdmin()">
       {{ timer.id }}
       <span v-if="isTecharound()" style="color: purple">{{ timer.default_user_rate }} / {{ timer.default_client_rate }}</span>
@@ -150,5 +150,14 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.report-timer-row {
+  background-color: rgba($color: #000000, $alpha: 0.5);
+  cursor: pointer;
+  color: white;
+
+  &:hover {
+    background-color: rgba($color: #000000, $alpha: 0.6);
+  }
 }
 </style>
