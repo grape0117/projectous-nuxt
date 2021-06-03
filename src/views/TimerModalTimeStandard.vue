@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="timer-modal_duration col-sm-12">
-      <span class="timer-modal_button" @click="set_invoice_duration = true" v-if="(timer.status !== 'running' && isAdmin() && !set_invoice_duration) || timer.duration === timer.invoice_duration">Set Invoice Duration</span>
+      <span class="timer-modal_button" @click="setInvoiceDuration" v-if="(timer.status !== 'running' && isAdmin() && !is_set_invoice_duration) || timer.duration === timer.invoice_duration">Set Invoice Duration</span>
       <div class="form-group" v-else-if="timer.status !== 'running' && isAdmin()">
         <label class="control-label" for="timerUserNotes">Invoice Duration: </label>
         <div id="timerDuration" class="form-control-static">
@@ -32,7 +32,7 @@
               <button v-else class="btn btn-default" style="float: right;"><i class="glyphicon glyphicon-play"></i></button>
           </div>
     </div>-->
-    <!--<span class="timer-modal_button" @click="set_invoice_duration = true" v-if="(timer.status !== 'running' && isAdmin() && !set_invoice_duration) || timer.duration === timer.invoice_duration">Set Invoice Duration</span>-->
+    <!--<span class="timer-modal_button" @click="is_set_invoice_duration = true" v-if="(timer.status !== 'running' && isAdmin() && !is_set_invoice_duration) || timer.duration === timer.invoice_duration">Set Invoice Duration</span>-->
     <!--<div class="form-group" v-else-if="timer.status !== 'running' && isAdmin()">-->
     <!--<span class="timer-modal_label">Invoice Duration:</span>-->
 
@@ -53,16 +53,12 @@
 export default {
   name: 'timer-modal-time-standard',
   props: ['timer'],
-  /* data() {
-    return {
-      hours: '',
-      minutes: '',
-      seconds: ''
-    }
-  },*/
   data() {
     return {
-      set_invoice_duration: false
+      is_set_invoice_duration: false
+      // hours: Math.floor(this.timer.duration / 3600),
+      // minutes: ('00' + Math.floor((this.timer.duration % 3600) / 60)).slice(-2),
+      // seconds: ('00' + Math.floor(this.timer.duration % 60)).slice(-2)
     }
   },
   computed: {
@@ -119,6 +115,10 @@ export default {
     isAdmin() {
       return this.$store.getters['settings/isAdmin']
     },
+    async setInvoiceDuration() {
+      this.is_set_invoice_duration = true
+      this.updateDuration(this.hours, this.minutes, this.seconds)
+    },
     /* updateHours(hours) {
       console.log('hours', hours, this.hours)
       if (hours * 1 !== this.hours * 1) {
@@ -141,45 +141,49 @@ export default {
         this.$emit('input', duration)
       }
     },*/
-    updateDuration(hours, minutes, seconds) {
-      console.log('hms', hours, minutes, seconds, hours !== null ? hours : this.hours * 3600, minutes !== null ? minutes * 60 : this.minutes * 60, seconds !== null ? seconds * 1 : this.seconds * 1)
+    async updateDuration(hours, minutes, seconds) {
       let duration = hours !== null ? hours * 3600 : this.hours * 3600
-      console.log(duration)
-      duration += minutes !== null ? minutes * 60 : this.minutes * 60
-      console.log(duration)
-      duration += seconds !== null ? seconds * 1 : this.seconds * 1
-      console.log(duration)
 
-      console.log(duration, this.timer.duration)
+      duration += minutes !== null ? minutes * 60 : this.minutes * 60
+
+      duration += seconds !== null ? seconds * 1 : this.seconds * 1
+
       if (this.timer.duration !== duration) {
-        this.$store.dispatch('UPDATE_ATTRIBUTE', {
+        const { timers } = await this.$store.dispatch('UPDATE_ATTRIBUTE', {
           module: 'timers',
           id: this.timer.id,
           attribute: 'duration',
           value: duration
         })
+
+        this.$emit('update-duration', timers.duration)
       }
+
       if (this.timer.duration === this.timer.invoice_duration) {
-        this.$store.dispatch('UPDATE_ATTRIBUTE', {
+        const { timers } = await this.$store.dispatch('UPDATE_ATTRIBUTE', {
           module: 'timers',
           id: this.timer.id,
           attribute: 'invoice_duration',
           value: duration
         })
+
+        this.$emit('update-invoice-duration', timers.invoice_duration)
       }
     },
-    updateInvoiceDuration(hours, minutes, seconds) {
+    async updateInvoiceDuration(hours, minutes, seconds) {
       let duration = hours !== null ? hours * 3600 : this.hours * 3600
       duration += minutes !== null ? minutes * 60 : this.minutes * 60
       duration += seconds !== null ? seconds * 1 : this.seconds * 1
 
       if (this.timer.invoice_duration !== duration) {
-        this.$store.dispatch('UPDATE_ATTRIBUTE', {
+        let { timers } = await this.$store.dispatch('UPDATE_ATTRIBUTE', {
           module: 'timers',
           id: this.timer.id,
           attribute: 'invoice_duration',
           value: duration
         })
+
+        this.$emit('update-invoice-duration', timers.invoice_duration)
       }
     }
   }
