@@ -1,6 +1,5 @@
 <template>
   <b-modal id="project-modal" :title="`${has_route_query_newProjectClientCompanyId ? 'Add' : 'Edit'} Project`" class="modal fade" role="dialog" @ok="saveProject" @hidden="closeModal">
-    <!-- {{ $route.query.new_project_client_company_id }} -->
     <form id="editProjectForm" class="form-horizontal">
       <input id="projectIDEdit" class="form-control" type="hidden" name="id" v-model="project.id" />
       <div class="form-group">
@@ -113,6 +112,9 @@ export default {
     edit_project() {
       return this.$store.state.settings.current_edit_project
     },
+    current_edit_project_status() {
+      return this.$store.state.settings.current_edit_project_status
+    },
     project_id: function() {
       return this.$store.state.settings.current_edit_project.id
     },
@@ -141,9 +143,12 @@ export default {
   watch: {
     edit_project(edit_project) {
       // this.project = cloneDeep(edit_project)
-      if (edit_project && Object.keys(edit_project).length > 0) {
+      if (edit_project && Object.keys(edit_project).length === 1) {
         Vue.set(this.project, 'id', this.project_id)
+        return
       }
+      // this.project = _.cloneDeep(this.$store.state.settings.current_edit_project)
+      this.project = _.cloneDeep(edit_project)
     },
     '$route.query': {
       immediate: true,
@@ -242,7 +247,10 @@ export default {
     },
     async saveProject(callback) {
       const project = await this.$store.dispatch('UPSERT', { module: 'projects', entity: this.project })
-      this.$store.state.projects.projects.push(project)
+      if (this.current_edit_project_status === 'add') {
+        this.$store.state.projects.projects.push(project)
+        return
+      }
     }
   }
 }

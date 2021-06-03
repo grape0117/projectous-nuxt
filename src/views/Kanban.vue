@@ -15,7 +15,7 @@
               <span class="mr-2">{{ client.name }}</span>
               <b-icon class="pointer mr-2" v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon>
               <div class="add-client">
-                <i class="icon-add pointer" :style="{ color: default_theme_color }" @click="addClient(client)" />
+                <i class="icon-add pointer" :style="{ color: default_theme_color }" @click="addProject(client)" />
               </div>
             </div>
 
@@ -445,14 +445,14 @@ export default class Custom extends Vue {
 
   private editProject(project_id: any) {
     let project = this.$store.getters['projects/getById'](project_id)
-    console.log(project)
-
     this.$store.commit('settings/setCurrentEditProject', cloneDeep(project))
+    this.$store.commit('settings/setCurrentEditProjectStatus', 'edit')
   }
 
-  private async addClient(client: any) {
+  private async addProject(client: any) {
     await this.$router.push({ query: { new_project_client_company_id: client.client_company_id } })
     this.$store.state.settings.current_edit_project = { id: uuid.v4() }
+    this.$store.commit('settings/setCurrentEditProjectStatus', 'add')
     this.$store.dispatch('settings/openModal', 'project')
   }
 

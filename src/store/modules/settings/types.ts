@@ -18,6 +18,7 @@ export interface IModuleState {
   current_edit_project: IProject
   current_edit_company_user: ICompanyUser
   current_edit_client: { id: null }
+  current_edit_project_status: EditProjectStatus | null
   current_edit_task: ITask
   current_edit_timer: any // TODO
   current_edit_timer_status: EditTimerStatus | null
@@ -28,4 +29,5 @@ export interface IModuleState {
   timer_watch: number
 }
 
+type EditProjectStatus = 'add' | 'edit'
 type EditTimerStatus = 'add' | 'edit'
