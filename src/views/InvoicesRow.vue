@@ -94,7 +94,8 @@ export default {
       }
     },
     backgroundColor(status, color_index = 0) {
-      return this.is_theme_colors ? this.statusBgStyle(status) : this.toRGB(this.statusBgStyle(status) && this.statusBgStyle(status)[color_index])
+      //
+      return this.is_theme_colors ? this.statusBgStyle(status) : this.invoice.status === status ? this.default_theme_color : false
     },
     statusBgStyle(invoice_status) {
       if (this.invoice.status !== invoice_status) return null
