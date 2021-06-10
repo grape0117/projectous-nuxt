@@ -89,7 +89,6 @@
                 </b-tooltip>
               </div>
             </div>
-            <div></div>
           </div>
 
           <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
@@ -304,6 +303,7 @@ export default class Custom extends Vue {
   @TaskUsers.Action('updateSortOrders')
   private updateTaskUsersSortOrdersVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
+  @Tasks.Action('createProjectTask') private createProjectTaskVuex!: any
   @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('updateSortOrders') private updateTaskSortOrdersVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
@@ -386,10 +386,14 @@ export default class Custom extends Vue {
 
   public async createTask({ item, ids_of_items_to_shift_up }: any) {
     console.log('CREATE TASK CUSTOM')
-    item.project_id = this.selectedProjectId
 
-    console.log('createTask', item)
-    this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: item })
+    this.createProjectTaskVuex({
+      title: item.title,
+      project_id: this.selectedProjectId,
+      sort_order: item.sort_order,
+      status: item.status,
+      temp: false
+    })
   }
 
   public deleteTask(task: any) {

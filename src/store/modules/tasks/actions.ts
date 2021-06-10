@@ -82,13 +82,15 @@ export const actions: ActionTree<IModuleState, IRootState> = {
         id: generateUUID(),
         temp: true
       }
+      commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
     } else {
       //TODO: should we do this? task.id = uuid.v4();
       // @ts-ignore
       newTask = (await this._vm.$http().post('/tasks', { task })).task
-      commit('removeTempTasks')
+      commit('ADD_ONE', { module: 'tasks', entity: task }, { root: true })
+      // commit('removeTempTasks')
     }
-    commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
+
     return newTask
   },
   async createUserTask({ commit, getters }: any, { title, project_id, sort_order, status, temp }: any) {
