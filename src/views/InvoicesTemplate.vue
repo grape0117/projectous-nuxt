@@ -40,21 +40,22 @@
               </span>
             </div>
           </span>
-          <span style="min-width: 135px" class="text-right pr-3" @click="setSortBy('date_created')">
-            <!-- <i class="icon-keyboard_arrow_down" /> -->
-            <i :class="sortClass('date_created')" class="" />
-            Date Created
-          </span>
-          <span>Recipient</span>
           <span class="text-right pr-3" @click="setSortBy('invoice_id')">
             <i :class="sortClass('invoice_id')" />
             Invoice ID
           </span>
+          <span>Recipient</span>
           <span class="text-right pr-3" @click="setSortBy('amount')">
             <i :class="sortClass('amount')" />
             Amount
           </span>
           <span>Note</span>
+          <span class="text-right pr-3">Age</span>
+          <span class="text-right pr-3" @click="setSortBy('date_created')">
+            <!-- <i class="icon-keyboard_arrow_down" /> -->
+            <i :class="sortClass('date_created')" class="" />
+            Date Created
+          </span>
           <span class="text-right pr-3" @click="setSortBy('date_start')">
             <i :class="sortClass('date_start')" />
             Start Date
@@ -76,7 +77,6 @@
 
 <script>
 import moment from 'moment'
-import { EventBus } from '@/components/event-bus'
 import { colorThemes } from '@/mixins/colorThemes'
 
 import InvoicesRow from './InvoicesRow.vue'
@@ -487,7 +487,7 @@ export default {
     margin-bottom: 8px;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    // justify-content: space-around;
     border-radius: 4px;
     box-shadow: 0px 0px 8px rgba($color: #fff, $alpha: 1);
 
@@ -500,61 +500,72 @@ export default {
       }
     }
 
-    span:nth-child(1) {
+    > span:nth-child(1) {
       width: 100%;
       max-width: calc(100vw / 6);
       min-width: 200px;
     }
-    span:nth-child(2) {
+    > span:nth-child(2) {
       width: 100%;
       max-width: calc(100vw / 12);
+      min-width: 120px;
 
       i::before {
         margin-right: -5px;
       }
     }
-    span:nth-child(3) {
+    > span:nth-child(3) {
       width: 100%;
       max-width: calc(100vw / 10);
+      min-width: 120px;
+    }
+    > span:nth-child(4) {
+      width: 100%;
+      max-width: calc(100vw / 14);
       min-width: 100px;
-    }
-    span:nth-child(4) {
-      width: 100%;
-      max-width: calc(100vw / 14);
 
       i::before {
         margin-right: -5px;
       }
     }
-    span:nth-child(5) {
+    > span:nth-child(5) {
       width: 100%;
       max-width: calc(100vw / 14);
+      min-width: 100px;
 
       i::before {
         margin-right: -5px;
       }
     }
-    span:nth-child(6) {
+    > span:nth-child(6) {
+      width: 100%;
+      max-width: calc(100vw / 20);
+      min-width: 60px;
+    }
+    > span:nth-child(7) {
       width: 100%;
       max-width: calc(100vw / 10);
+      min-width: 135px;
     }
-    span:nth-child(7) {
+    > span:nth-child(8) {
       width: 100%;
       max-width: calc(100vw / 14);
+      min-width: 100px;
 
       i::before {
         margin-right: -5px;
       }
     }
-    span:nth-child(8) {
+    > span:nth-child(9) {
       width: 100%;
       max-width: calc(100vw / 14);
+      min-width: 100px;
 
       i::before {
         margin-right: -5px;
       }
     }
-    span:last-child {
+    > span:last-child {
       width: 100%;
       max-width: calc(100vw / 6);
       min-width: 320px;
@@ -562,7 +573,7 @@ export default {
   }
   .invoices-items {
     display: flex;
-    justify-content: space-around;
+    // justify-content: space-around;
     background-color: rgba($color: #000000, $alpha: 0.6);
     color: white;
     word-break: break-word;
@@ -580,31 +591,42 @@ export default {
     > div:nth-child(2) {
       width: 100%;
       max-width: calc(100vw / 12);
+      min-width: 120px;
     }
     > div:nth-child(3) {
       width: 100%;
       max-width: calc(100vw / 10);
-      min-width: 100px;
+      min-width: 120px;
     }
     > div:nth-child(4) {
       width: 100%;
       max-width: calc(100vw / 14);
+      min-width: 100px;
     }
     > div:nth-child(5) {
       width: 100%;
       max-width: calc(100vw / 14);
+      min-width: 100px;
     }
     > div:nth-child(6) {
       width: 100%;
-      max-width: calc(100vw / 10);
+      max-width: calc(100vw / 20);
+      min-width: 60px;
     }
     > div:nth-child(7) {
       width: 100%;
-      max-width: calc(100vw / 14);
+      max-width: calc(100vw / 10);
+      min-width: 135px;
     }
     > div:nth-child(8) {
       width: 100%;
       max-width: calc(100vw / 14);
+      min-width: 100px;
+    }
+    > div:nth-child(9) {
+      width: 100%;
+      max-width: calc(100vw / 14);
+      min-width: 100px;
     }
     > div:last-child {
       width: 100%;

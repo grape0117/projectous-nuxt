@@ -1,24 +1,27 @@
 <template>
   <div class="invoices-items">
-    <div class="pr-3">
+    <div>
       <div class="invoices-buttons">
         <div class="invoices-button" :style="{ background: backgroundColor('open') }" @click="updateInvoiceStatus(invoice.id, 'open')">Open</div>
         <div class="invoices-button" :style="{ background: backgroundColor('paid') }" @click="updateInvoiceStatus(invoice.id, 'paid')">Paid</div>
         <div class="invoices-button" :style="{ background: backgroundColor('voided') }" @click="updateInvoiceStatus(invoice.id, 'voided')">Voided</div>
       </div>
     </div>
-    <div class="text-right pr-3" style="min-width: 135px">{{ invoice.date }}</div>
+    <div class="text-right pr-3">{{ invoice.invoice_id }}</div>
     <div>
       <b v-if="invoice && invoice.client">{{ invoice.client.name }}</b>
       <div v-for="(project, project_index) in invoice.projects" :key="project_index" v-bind:project="project" style="font-size: smaller">
         <span v-if="project">{{ project.name }}</span>
       </div>
     </div>
-    <div class="text-right pr-3">{{ invoice.invoice_id }}</div>
-    <div class="text-right pr-3">{{ invoice.total }}</div>
+    <div class="text-right pr-3">{{ `$${invoice.total}` }}</div>
     <div v-html="invoice.note ? invoice.note : 'No notes...'" contenteditable="true" @input="setNoteValue"></div>
-    <div class="text-right pr-3">{{ invoice.start_date }}</div>
-    <div class="text-right pr-3">{{ invoice.end_date }}</div>
+    <div class="text-right pr-3">{{ invoice_age }}</div>
+    <!-- <div class="text-right pr-3" style="min-width: 135px">{{ invoice.created_at }}</div> -->
+    <div class="text-right pr-3">{{ invoice.created_at | moment('MMM DD') }}</div>
+    <div class="text-right pr-3">{{ invoice.start_date | moment('MMM DD') }}</div>
+    <!-- <div class="text-right pr-3">{{ invoice.end_date | moment('MMM do')}}</div> -->
+    <div class="text-right pr-3">{{ invoice.end_date | moment('MMM DD') }}</div>
     <div class="buttons">
       <div class="invoices-buttons">
         <div class="invoices-button" :style="{ background: default_theme_color }" @click="redirect('invoice')">
@@ -39,6 +42,7 @@
 <script>
 import { EventBus } from '@/components/event-bus'
 import { colorThemes } from '@/mixins/colorThemes'
+import moment from 'moment'
 import _ from 'lodash'
 
 export default {
@@ -56,6 +60,13 @@ export default {
     },
     is_theme_colors() {
       return this.bgTheme === JSON.stringify('Colors')
+    },
+    invoice_age() {
+      const invoice_date = moment(this.invoice.created_at, 'YYYY-MM-DD')
+      const today = moment().startOf('day')
+
+      //Difference in number of days
+      return moment.duration(today.diff(invoice_date)).asDays()
     }
   },
   methods: {
@@ -118,7 +129,7 @@ export default {
     height: 35px;
     border-radius: 3px;
     display: flex;
-    margin-right: 5px;
+    // margin-right: 5px;
     background-color: rgba($color: #000000, $alpha: 0.5);
     // backdrop-filter: brightness(0.5);
 
