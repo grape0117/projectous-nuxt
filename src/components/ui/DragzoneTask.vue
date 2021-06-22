@@ -25,7 +25,7 @@
             <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
           </div>
           <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
-            <span v-if="timerId === item.id" class="icon-stop" style="font-size: 25px; color: red" />
+            <span v-if="timerId === item.id || task_timer_running" class="icon-stop" style="font-size: 25px; color: red" />
             <span v-else class="icon-play_arrow" style="font-size: 25px; color: green" />
           </div>
         </div>
@@ -166,6 +166,19 @@ export default Vue.extend({
     }
   },
   computed: {
+    has_running_timer() {
+      const timer = this.$store.state.timers.timers.find((t: any) => t.status === 'running')
+
+      if (timer && Object.keys(timer)) {
+        return timer
+      }
+
+      return false
+    },
+    task_timer_running() {
+      // @ts-ignore
+      return this.has_running_timer ? this.has_running_timer.task_id === this.item.task_id : false
+    },
     show_debug() {
       return process.env.VUE_APP_SHOW_DEBUG === 'on'
     },

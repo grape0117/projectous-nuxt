@@ -12,10 +12,6 @@
     </div>
 
     <div class="status-icon-with-timer">
-      <!-- {{ typeof totalDuration }} -->
-      <!-- {{ Number(durationHours()) === 0 }} -->
-      <!-- {{ Number(durationMinutes()) < 10 }}  -->
-      <!-- <pre style="color: white;">{{ timer }}</pre> -->
       <div v-if="isCurrentUser()" class="status-icons">
         <i class="icon-pause icon-class" v-if="status_running" v-on:click="pauseTimer"></i>
         <i class="icon-stop icon-class" style="color: red" v-if="status_running" v-on:click="stopTimer"></i>

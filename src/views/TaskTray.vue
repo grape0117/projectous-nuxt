@@ -266,6 +266,13 @@ export default class Custom extends Vue {
       return
     }
 
+    const hasExistingTimer = this.$store.state.timers.timers.find((proj: any) => proj.task_id === taskId)
+
+    if (hasExistingTimer) {
+      this.$store.dispatch('timers/restartTimer', hasExistingTimer)
+      return
+    }
+
     this.$store.dispatch('timers/startTimer', timer)
     this.editedTaskId = taskId
     this.editedTaskTimerId = timerId
