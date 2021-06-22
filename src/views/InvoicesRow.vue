@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="payment">
-        <button type="button" class="btn btn-primary" @click="applyPayment()">{{ payments_count ? `Payments (${payments_count})` : 'Payments' }}</button>
+        <button type="button" class="payment-button" @click="applyPayment()">{{ payments_count ? `Payments (${payments_count})` : 'Payments' }}</button>
       </div>
     </div>
   </div>
@@ -126,7 +126,7 @@ export default {
 }
 .invoices-items {
   .invoices-buttons {
-    height: 35px;
+    height: 25px;
     border-radius: 3px;
     display: flex;
     // margin-right: 5px;
@@ -166,7 +166,17 @@ export default {
     min-width: 110px;
 
     button {
+      background-color: #007bff;
       width: 100%;
+      border: 0 !important;
+      color: white;
+      height: 25px;
+      border-radius: 4px;
+      font-size: 12px;
+
+      &:hover {
+        box-shadow: 0 0 10px 2px rgba($color: #ffffff, $alpha: 0.2);
+      }
     }
   }
 }

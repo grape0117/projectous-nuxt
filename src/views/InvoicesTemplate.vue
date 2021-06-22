@@ -12,8 +12,9 @@
       </div>
       <div>
         <div class="invoices-total-paid">
+          {{ status_filter }}
           <span>Total Paid({{ selectedYear }}):</span>
-          <span> {{ total_invoices_payment | numberWithCommas }}</span>
+          <span> ${{ total_invoices_payment | numberWithCommas }}</span>
         </div>
       </div>
     </div>
@@ -95,12 +96,10 @@ export default {
       invoice_years: [],
       open_invoice_count: [],
       selectedYear: moment(new Date()).format('YYYY'),
-      status: 'open',
       bgStyle: null,
       bgTheme: null,
       sortBy: {},
       show_all_status: false
-      // status_filter: 'open'
     }
   },
   created() {
@@ -222,13 +221,19 @@ export default {
     //   return this.getStatus(this.invoices, this.status)
     // },
     total_invoices_payment() {
-      const invoices_payments = this.invoices.filter(invoice => {
-        return invoice.status === 'paid'
-      })
+      const invoices_payments = () => {
+        if (this.status_filter) {
+          return this.invoices.filter(invoice => {
+            return invoice.status === this.status_filter
+          })
+        }
+
+        return this.invoices
+      }
 
       let total_payment = 0
 
-      for (const invoice of invoices_payments) {
+      for (const invoice of invoices_payments()) {
         total_payment += Number(invoice.total)
       }
 
@@ -329,10 +334,6 @@ export default {
 
       console.log({ id })
       console.log({ status })
-    },
-    // filter status
-    setStatus(status) {
-      this.status = status
     },
     // getStatus(invoices, status) {
     //   return invoices.filter(i => i.status === status)
@@ -577,7 +578,7 @@ export default {
     background-color: rgba($color: #000000, $alpha: 0.6);
     color: white;
     word-break: break-word;
-    padding: 10px 5px;
+    padding: 3px 5px;
 
     &:hover {
       background-color: rgba($color: #000000, $alpha: 0.7);
