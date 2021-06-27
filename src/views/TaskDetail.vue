@@ -12,10 +12,11 @@
       </div>
       <b-tabs content-class="mt-3" style="margin-top: 10px" v-model="showTab">
         <b-tab title="Details" style="color: black">
-          <b-form-group label="Task">
-            <b-form-textarea type="text" v-model="task.title" placeholder="Task Title" rows="2" max-rows="4"> </b-form-textarea>
+          <b-form-group style="margin-bottom: 0">
+            <span class="field-title">Task:</span>
+            <b-form-textarea class="task-textarea" type="text" v-model="task.title" placeholder="Task Title" rows="2" max-rows="4"> </b-form-textarea>
           </b-form-group>
-          <b-form-group label="Resources">
+          <!-- <b-form-group label="Resources">
             <div @click="onSelectResource(resource)" v-for="resource in getResources" :key="resource.id" :href="resource.href">
               <div class="resource-title">
                 <span>{{ resource.name }}</span>
@@ -35,9 +36,9 @@
                 </b-button>
               </b-input-group-append>
             </b-input-group>
-          </b-form-group>
+          </b-form-group> -->
           <div class="form-section">
-            Project:
+            <span class="field-title">Project:</span>
             <select id="timer-modal-project-id" class="form-control select2-select" name="project_id" v-model="task.project_id">
               {{
                 task.project_id
@@ -49,8 +50,23 @@
               </optgroup>
             </select>
           </div>
+          <!-- <pre>
+            {{ selectedFile }}
+          </pre>
+          
           <input type="file" @change="Images_onFileChanged" />
-          <button @click="Images_onUpload" v-if="selectedFile">Upload!</button>
+          <button @click="Images_onUpload" v-if="selectedFile">Upload!</button> -->
+          <span class="field-title">File:</span>
+          <div class="file-drag-n-drop" :style="{ 'background-color': selectedFile.length ? '#d8e9f2' : null }" @drop="drop">
+            <input v-show="false" type="file" multiple name="fields[assetsFieldHandle][]" id="assetsFieldHandle" @change="onChange" ref="file" accept=".pdf,.jpg,.jpeg,.png" />
+
+            <label for="assetsFieldHandle" class="block cursor-pointer">
+              <div class="drop-area">Drop or <span class="underline">click here</span> to upload files</div>
+            </label>
+            <ul class="mt-4" v-if="selectedFile.length" v-cloak>
+              <li class="text-sm p-1" v-for="(file, index) in selectedFile" :key="index">{{ file.name }}<button class="remove-file-button ml-2" type="button" @click="remove(selectedFile.indexOf(file))" title="Remove file">remove</button></li>
+            </ul>
+          </div>
 
           <!-- <div class="form-section" style="color: black;">
             Assigned to:
@@ -60,9 +76,9 @@
             </select>
           </div> -->
 
-          <div class="form-group">
-            <label class="control-label col-sm-4">Task Type: </label>
-            <div class="col-sm-8">
+          <div class="form-group mt-5">
+            <label class="field-title control-label col-sm-4">Task Type: </label>
+            <div class="col-sm-12">
               <select class="form-control select2-select" name="project_id" :value="task.settings && task.settings.task_type ? task.settings.task_type : ''" @input="e => (task['settings']['task_type'] = e.target.value)">
                 <option value="">***** Select Task Type *****</option>
                 <option>Habit</option>
@@ -74,22 +90,22 @@
           </div>
 
           <div class="form-group">
-            <label class="control-label col-sm-4" for="taskDueDate">Due Date: </label>
+            <label class="field-title control-label col-sm-4" for="taskDueDate">Due Date: </label>
             <div class="col-sm-8">
               <input id="taskDueDate" class="form-control" type="date" name="due_at" placeholder="Due Date" v-model="task.due_date" />
             </div>
           </div>
 
           <div class="form-group">
-            <label class="control-label col-sm-4" for="taskEditEstimate">Estimate: </label>
+            <label class="field-title control-label col-sm-4" for="taskEditEstimate">Estimate: </label>
             <div class="col-sm-8">
               <input id="taskEditEstimate" class="form-control" type="text" name="estimate" placeholder="Estimate" v-model="task.estimate" />
             </div>
           </div>
 
           <div class="form-group">
-            <label class="control-label col-sm-4" for="taskEditEstimate">Status: </label>
-            <div class="col-sm-8">
+            <label class="field-title control-label col-sm-4" for="taskEditEstimate">Status: </label>
+            <div class="col-sm-12">
               <select class="form-control" v-model="task.status">
                 <option value="open">Open</option>
                 <option value="turned-in">Turned-In</option>
@@ -100,10 +116,16 @@
             </div>
           </div>
 
-          <div class="row without-margin">
+          <div class="row without-margin d-flex justify-content-between">
             <p style="max-width: 100%; margin-bottom: 5px; font-weight: 700">Users:</p>
+
+            <b-form-checkbox v-model="user_filter">
+              Filter
+            </b-form-checkbox>
           </div>
-          <edit-task-modal-user v-for="user in active_users" :key="user.id" @toggle="toggleUser" v-bind:task_user="task_user(user)" v-bind:user="user" v-bind:task="task" />
+          <div v-for="user in active_users" :key="user.id">
+            <edit-task-modal-user :filter="user_filter" @toggle="toggleUser" :task_user="task_user(user)" :user="user" :task="task" />
+          </div>
         </b-tab>
         <b-tab title="Chat">
           <!-- <pre style="color: black;">
@@ -114,17 +136,42 @@
       </b-tabs>
     </div>
     <div class="center-section">
-      <draggable class="tab">
-        <button class="tablinks" :class="{ active: resource.name === selected_tab }" v-for="resource in getResources" :key="resource.id" @click="openTab(resource.name)">
-          {{ resource.name }}
-        </button>
-      </draggable>
-      <div v-for="resource in getResources" :key="resource.id" :id="resource.name">
+      <div>
+        <draggable class="tab d-flex" handle=".handle">
+          <button class="tablinks handle" :class="{ active: resource.name === selected_tab }" v-for="resource in getResources" :key="resource.id" @click="openTab(resource.name)">
+            {{ resource.name }}
+          </button>
+          <div class="tablinks d-flex align-items-end">
+            <button class="tablinks" @click="toggleNewResource">
+              {{ newResource ? 'x' : '+' }}
+            </button>
+
+            <!-- <b-button style="float: right" variant="primary" @click="onAddNewResource()">Add new</b-button> -->
+            <div v-if="newResource" class="d-flex align-items-end">
+              <b-input-group size="sm" class="mr-3">
+                <b-form-input placeholder="Label" type="text" id="add-resource-name"></b-form-input>
+                <b-form-input placeholder="https://" type="text" id="add-resource-href"></b-form-input>
+              </b-input-group>
+
+              <b-button class="task-detail__add-button" size="sm" style="min-width: 100px;" @click="addResource()">Add</b-button>
+            </div>
+          </div>
+        </draggable>
+      </div>
+      <div v-for="(resource, resource_index) in getResources" :key="resource.id" :id="resource.name">
         <div v-if="resource.name === selected_tab" class="d-flex justify-content-between align-items-center">
-          <label class="docs-path" style="white-space: nowrap; overflow: hidden">{{ resource.href }}</label>
+          <!-- <label class="docs-path" style="white-space: nowrap; overflow: hidden">{{ resource.href }}</label> -->
+          <div class="d-flex">
+            <input class="docs-path" style="white-space: nowrap; overflow: hidden" type="text" :value="resource.href" @dblclick="toggleIsEditUrl" @input="setResourceUrl($event, resource.href)" :style="isEditUrl ? null : 'border: 0 !important; cursor: pointer; color: transparent; text-shadow: 0 0 0 black;'" ref="resource-url" />
+            <i class="icon-check pointer" v-if="isEditUrl" @click="saveResourceUrl(resource_index)" />
+          </div>
           <div style="float: right; display: inline-block; margin-bottom: 8px; margin-top: 5px" v-if="resource.href != ''">
-            <b-button @click="copyURL(resource.href)" style="margin-right: 10px">Copy URL</b-button>
-            <b-button @click="openURL(resource.href)">Open in a new tab</b-button>
+            <i class="icon-delete pointer" @click="onDeleteResource(resource)" />
+            <i class="icon-copy pointer" @click="copyURL(resource.href)" />
+            <i class="icon-open_in_new pointer" @click="openURL(resource.href)" />
+
+            <!-- <b-button @click="copyURL(resource.href)" style="margin-right: 10px">Copy URL</b-button>
+            <b-button @click="openURL(resource.href)">Open in a new tab</b-button> -->
           </div>
         </div>
         <iframe v-if="resource.name === selected_tab" :src="resource.href" style="height: calc(100vh - 155px); width: 100%"></iframe>
@@ -141,6 +188,7 @@ import uuid from 'uuid'
 
 export default Vue.extend({
   name: 'task-detail',
+  delimiters: ['${', '}'], // Avoid Twig conflicts
   components: {
     'task-card': () => import('@/components/ui/TaskCard.vue'),
     'edit-task-modal-user': () => import('@/views/EditTaskModalUser.vue'),
@@ -156,12 +204,15 @@ export default Vue.extend({
   },
   data() {
     return {
+      isEditUrl: false,
       selected_resource: '',
       isEditResource: null,
-      selectedFile: null,
+      selectedFile: [],
       selected_tab: '',
       chat: {},
-      showTab: 0
+      showTab: 0,
+      newResource: false,
+      user_filter: false
     }
   },
   computed: {
@@ -202,6 +253,29 @@ export default Vue.extend({
     }
   },
   methods: {
+    saveResourceUrl(resource_index) {
+      const new_url = this.$refs['resource-url'][0].value
+      let resource_url = this.getResources[resource_index].href
+
+      if (new_url === resource_url) {
+        this.toggleIsEditUrl()
+        return
+      }
+
+      this.getResources[resource_index].href = new_url
+      this.toggleIsEditUrl()
+    },
+    setResourceUrl(e, url) {
+      if (!this.isEditUrl) {
+        e.target.value = url
+      }
+    },
+    toggleIsEditUrl() {
+      this.isEditUrl = !this.isEditUrl
+    },
+    toggleNewResource() {
+      this.newResource = !this.newResource
+    },
     async getChat(task_id) {
       if (!task_id) {
         this.chat = []
@@ -241,7 +315,9 @@ export default Vue.extend({
     },
     async saveTask(isRedirect = true) {
       // NOTE: uncommented temporarily since it fails to do the UPSERT with module tasks
-      // await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
+
+      this.task.files = this.selectedFile
+      await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
 
       // console.log(this.$route.query)
       if (isRedirect) {
@@ -405,6 +481,22 @@ export default Vue.extend({
       if (key === 'Escape' || key === 'Esc' || key === 27) {
         this.saveTask()
       }
+    },
+    onChange() {
+      this.selectedFile = [...this.$refs.file.files]
+    },
+    remove(i) {
+      this.selectedFile.splice(i, 1)
+    },
+    drop(event) {
+      event.preventDefault()
+      // console.log(event.dataTransfer.files)
+
+      this.$refs.file.files = event.dataTransfer.files
+      this.onChange() // Trigger the onChange event manually
+      // Clean up
+      event.currentTarget.classList.add('bg-gray-100')
+      event.currentTarget.classList.remove('bg-green-300')
     }
   },
   async created() {
@@ -426,6 +518,27 @@ export default Vue.extend({
   overflow-y: auto;
   background-color: white;
   display: flex;
+
+  .form-control {
+    border: transparent;
+    padding: 0 !important;
+
+    &:focus {
+      box-shadow: none !important;
+    }
+
+    &::placeholder {
+      color: rgba($color: #000000, $alpha: 0.4);
+    }
+  }
+
+  .field-title {
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .task-textarea {
+    overflow-y: auto !important;
+  }
 }
 .center-section {
   margin-top: 10px;
@@ -434,8 +547,6 @@ export default Vue.extend({
 .show-task {
   background-color: white;
   display: flex;
-  /* height: 100vh;
-  width: 100vw; */
 }
 
 .left-section {
@@ -464,5 +575,68 @@ export default Vue.extend({
 
 #task-detail .form-group label {
   white-space: nowrap;
+}
+
+.task-detail__add-button {
+  background-color: #2323ff !important;
+}
+</style>
+
+<style lang="scss" scoped>
+.pointer {
+  cursor: pointer;
+}
+
+.icon {
+  &-check {
+    font-size: 20px;
+    color: yellowgreen;
+  }
+
+  &-delete {
+    font-size: 20px;
+    color: red;
+  }
+
+  &-copy {
+    font-size: 20px;
+  }
+
+  &-open_in_new {
+    font-size: 20px;
+  }
+}
+
+.file-drag-n-drop {
+  // p-12 bg-gray-100 border border-gray-300
+  padding: 20px 12px;
+  background-color: #ececec;
+  border: 1px solid gray;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  label {
+    margin-bottom: 0 !important;
+  }
+
+  .drop-area {
+    cursor: pointer;
+    border: 1px dashed gray;
+    width: 100%;
+    padding: 5px;
+
+    .underline {
+      text-decoration: underline;
+    }
+  }
+
+  .remove-file-button {
+  }
+}
+
+[v-cloak] {
+  display: none;
 }
 </style>
