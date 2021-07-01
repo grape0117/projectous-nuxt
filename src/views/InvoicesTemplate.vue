@@ -12,7 +12,6 @@
       </div>
       <div>
         <div class="invoices-total-paid">
-          {{ status_filter }}
           <span>Total Paid({{ selectedYear }}):</span>
           <span> ${{ total_invoices_payment | numberWithCommas }}</span>
         </div>
