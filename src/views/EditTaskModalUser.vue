@@ -1,6 +1,6 @@
 <template>
   <div class="form-group edit-task-modal-user">
-    <b-input-group class="mt-12" size="sm">
+    <b-input-group class="mt-12" size="sm" v-if="filter || !!(task_user && Object.keys(task_user).length)">
       <div class="d-flex justify-content-between w-100">
         <span @click="toggleShow" class="user-name pointer">{{ user.name }}</span>
         <i class="icon-close pointer" v-if="show" @click="toggleShow" />
@@ -30,7 +30,7 @@
 import uuid from 'uuid'
 
 export default {
-  props: ['user', 'task', 'task_user'],
+  props: ['user', 'task', 'task_user', 'filter'],
   name: 'edit-task-modal-user',
   data: function() {
     return {
