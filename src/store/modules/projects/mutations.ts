@@ -18,6 +18,8 @@ export const mutations: MutationTree<IModuleState> = {
   },
   [SET_SELECTED_PROJECT](state: IModuleState, id: string | number | null) {
     state.selectedProjectId = id
+    // @ts-ignore
+    this.dispatch('projects/loadByProjectId', id)
   },
   [PIN_PROJECT](state: IModuleState, id: number) {
     if (!state.pinnedProjects.find(project => project === id)) {

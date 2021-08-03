@@ -5,6 +5,11 @@ import { IProject } from '@/store/modules/projects/types'
 import { generateUniqId } from '@/utils/util-functions'
 
 export const actions: ActionTree<IModuleState, IRootState> = {
+  loadByProjectId({}, id) {
+    // @ts-ignore
+    const tasks = this._vm.$http().get('/tasks?project_id=' + id)
+    this.commit('tasks/ADD_MANY', tasks)
+  },
   async pinProject({ commit, state }, { id, userId }) {
     const { projects, lookup } = state
     const { name } = projects[lookup[id]]

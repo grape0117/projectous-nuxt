@@ -37,10 +37,8 @@ export default class Dragzone extends Vue {
   @Prop({ required: true }) public verticalAlignment!: boolean
   @Prop({ required: false, default: false }) public initiallyExpanded!: boolean
   @Prop({ required: false, default: false })
-  @Tasks.Getter
-  public getById!: any
-
-  @Prop({ required: true }) private selectedCompanyUserId!: number
+  @Prop({ required: true })
+  private selectedCompanyUserId!: number
   private current_company_user_id: any = this.$store.state.settings.current_company_user_id
   private expandedList: boolean = this.initiallyExpanded
   private numberOfExpandedItems: number = 20
@@ -106,7 +104,7 @@ export default class Dragzone extends Vue {
       return false
     }
 
-    return project.project_url ? 'https://api.projectous.com/api/projects/' + project.id + '/favicon.png' : false
+    return project.project_url ? process.env.VUE_APP_API_URL + '/projects/' + project.id + '/favicon.png' : false
   }
 
   // private getTaskUsers(task_id: any) {

@@ -469,7 +469,7 @@ export default {
       if (this.timer.project_id) {
         let project = this.$store.getters['projects/getById'](this.timer.project_id)
         if (project) {
-          let client = this.$store.getters['clients/getByClientCompanyId']()
+          let client = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
           if (client) {
             this.timer.client_id = client.id
           }
@@ -481,7 +481,7 @@ export default {
       console.log(result)
 
       if (this.editTimerStatus === 'add') {
-        this.startTimer()
+        //this.startTimer()
       }
     },
     client_name: function(client_company_id) {

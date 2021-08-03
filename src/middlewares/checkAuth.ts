@@ -4,6 +4,9 @@ export default function(guarded: boolean, to: any, from: any, next: any, store: 
   let isAdmin = store.getters['settings/isAdmin']
 
   if (guarded && !getCookie('auth_token')) {
+    console.log(to, from, next, store)
+    sessionStorage.setItem('afterLoginRoute', to.fullPath)
+
     next({ name: 'Login' })
   } else if (!!store && !!store.state.initialDataLoaded && !isAdmin && to.meta.adminOnly === true) {
     alert('Only admin can access.')
