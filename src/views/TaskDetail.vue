@@ -46,7 +46,7 @@
               <option value="" selected>***** Select Project *****</option>
               <option value="create">Create New Project</option>
               <optgroup :label="client.name" v-bind:client="client" v-for="client in clients" :key="client.id">
-                <option v-for="project in openprojects(client)" :key="project.id" v-bind:client="client" :value="project.id">{{ client_name(project.client_company_id) }} - {{ project.name }}</option>
+                <option v-for="project in openprojects(client)" :key="project.id" v-bind:client="client" :value="project.id">{{ project.name }}</option>
               </optgroup>
             </select>
           </div>

@@ -5,7 +5,7 @@
         <!-- @click="goTo('project')" -->
         <img @mouseenter="setReload(true)" v-if="!showReload" src="/apple-touch-icon.png" width="30" height="30" alt="logo" />
         <div v-else class="reload-icon" @mouseleave="setReload(false)">
-          <i class="icon-cached" @click="storeDataInIndexedDb" :class="$store.state.totalActiveRequests ? 'reload-rotate' : null" />
+          <i class="icon-cached" @click="reload" :class="$store.state.totalActiveRequests ? 'reload-rotate' : null" />
           <span class="reload-text">RELOAD</span>
         </div>
       </div>
@@ -234,6 +234,11 @@ export default Vue.extend({
     })
   },
   methods: {
+    reload() {
+      alert('Non-functional')
+      return
+      this.$emit('reload')
+    },
     closeModal() {
       this.toggles.paint = false
     },
@@ -269,39 +274,6 @@ export default Vue.extend({
         this.toggles[iconName] = !this.toggles[iconName]
         EventBus.$emit(`toggle_${iconName}`, this.toggles[iconName])
       }
-    },
-    async getAppDataFromApi() {
-      try {
-        return await this.$http().get('/test-tasks')
-      } catch (e) {
-        console.log(e)
-      }
-    },
-    async storeDataInIndexedDb() {
-      if (this.$store.state.totalActiveRequests) return
-
-      const appData = await this.getAppDataFromApi()
-      console.log('appData', appData)
-      for (let key in appData) {
-        if (Array.isArray(appData[key])) {
-          appData[key].forEach(async entity => {
-            try {
-              if (key === 'lists') {
-                key = 'user_task_lists' //TODO: fix name
-              }
-              await idbKeyval.set(entity.id, entity, key)
-            } catch (e) {
-              console.error('---------------------')
-              console.error(e)
-              console.error(entity)
-              console.error('---------------------')
-            }
-          })
-        } else {
-          await idbKeyval.set(key, appData[key], 'properties')
-        }
-      }
-      return appData
     }
   },
   created() {

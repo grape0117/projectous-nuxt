@@ -70,6 +70,11 @@ import uuid from 'uuid'
 import AllTaskFilipTemplate from './views/AllTaskFilipTemplate'
 import { EventBus } from '@/components/event-bus'
 
+import vSelect from 'vue-select'
+import 'vue-select/dist/vue-select.css'
+
+Vue.component('v-select', vSelect)
+
 export default {
   components: {
     Header,
@@ -337,7 +342,7 @@ export default {
           that.$store.dispatch('GET_NEW_DATA')
         })
       } catch (e) {
-        alert('Websockets not running.')
+        console.error('Websockets not running?')
       }
     }
   },
@@ -361,9 +366,9 @@ export default {
     setCookie(name, value) {
       document.cookie = `bg-${name}=${JSON.stringify(value)}`
     },
-    async getAppDataFromApi() {
+    async getAppDataFromApi(updated_at) {
       try {
-        return await this.$http().get('/test-tasks')
+        return await this.$http().get('/test-tasks/' + updated_at)
       } catch (e) {
         console.log(e)
       }
@@ -381,7 +386,7 @@ export default {
       if (indexDBExists) dataValidation = await this.checkDataInIndexDB()
       let data = {}
       //TODO: find out why adding a table breaks
-      if (indexDBExists && dataValidation) {
+      if (false && indexDBExists && dataValidation) {
         console.log('----------------loading from IDB!------------------')
         for (let propertyName of modulesNamesList) {
           const allEntities = await idbGetAll(propertyName)
@@ -404,8 +409,17 @@ export default {
       //   listName: 'userLists',
       //   lists: userLists
       // })
+
+      setInterval(this.fetchData, 10000)
+
       this.dateInterval()
       setInterval(this.dateInterval, 1800000)
+    },
+    async fetchData() {
+      console.log(window.sessionStorage.last_poll_timestamp, 'poll')
+      if (!window.sessionStorage.last_poll_timestamp) return
+      const appData = await this.getAppDataFromApi(window.sessionStorage.last_poll_timestamp)
+      this.$store.dispatch('PROCESS_INCOMING_DATA', appData)
     },
     async checkDataInIndexDB() {
       let valid = true
@@ -444,12 +458,27 @@ export default {
       }
       return appData
     },
+    async clear_idb() {
+      let oRequest = indexedDB.open('projectous-data')
+      oRequest.onsuccess = function() {
+        console.log('clearing', modulesNamesList)
+        let db = oRequest.result
+        for (module of modulesNamesList) {
+          console.log(module)
+          let tx = db.transaction(module, 'readwrite')
+          let st = tx.objectStore(module)
+          st.clear(module)
+        }
+      }
+    },
     async reload() {
-      this.$store.state.loading = true
-      let data = {}
-      data = await this.storeDataInIndexedDb()
-      //this.$store.dispatch('PROCESS_INCOMING_DATA', data)
-      this.$store.state.loading = false
+      // console.log('reloading')
+      // this.$store.state.loading = true
+      // this.clear_idb()
+      // let data = {}
+      // data = await this.storeDataInIndexedDb()
+      // this.$store.dispatch('PROCESS_INCOMING_DATA', data)
+      // this.$store.state.loading = false
     },
     dateInterval() {
       this.$store.commit('lists/createListsByDays')

@@ -275,7 +275,7 @@ export default {
     restartedAt() {
       const timezone = moment.tz.guess()
       // Same timezone from database
-      const actual_date = moment.tz(this.timer.status_changed_at, 'America/Danmarkshavn')
+      const actual_date = moment.tz(this.timer.report_at, 'America/Danmarkshavn')
       // Date/Time conversion depending on current timezone
       const timezone_date = actual_date
         .clone()
@@ -288,11 +288,23 @@ export default {
         .format('YYYY-MM-DD')
 
       if (this.checkDay(timezone_date, TODAY)) {
-        return 'Today'
+        return actual_date
+          .clone()
+          .tz(timezone)
+          .format('h:mm a')
       } else if (this.checkDay(YESTERDAY, moment(TODAY).subtract(1, 'days'))) {
-        return 'Yesterday'
+        return (
+          'Yesterday' +
+          actual_date
+            .clone()
+            .tz(timezone)
+            .format('h:mm a')
+        )
       } else {
-        return 'Previous Days'
+        return actual_date
+          .clone()
+          .tz(timezone)
+          .format('ddd MMM Do h:mm a')
       }
     },
     reportAt: function() {

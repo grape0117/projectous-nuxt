@@ -39,7 +39,8 @@ if (typeof io !== 'undefined') {
     host: process.env.VUE_APP_WEB_SOCKET_SERVER_URL + ':' + process.env.VUE_APP_WEB_SOCKET_SERVER_PORT
   })
 } else {
-  alert('Socket.io not started')
+  // alert('Socket.io not started')
+  console.error('Socket.io not started?')
 }
 
 export let app = new Vue({

@@ -4,13 +4,10 @@
       <b-row class="kanban-page-innerwrapper">
         <b-col class="client-section scroll-col">
           <div class="d-flex justify-content-center mb-3">
-            <select v-model="selectedClient" style="width: 100px">
-              <option :value="null" selected>All Clients</option>
-              <option :value="id" v-for="{ id, name } in activeClients" :key="id">{{ name }}</option>
-            </select>
+            <v-select v-model="selectedClient" label="name" :options="activeClients" style="width: 100px"> </v-select>
           </div>
 
-          <div v-if="clientVisible(client)" v-for="(client, index) in selectedClient ? filteredClient : activeClients" :key="index">
+          <div v-if="clientVisible(client)" v-for="(client, index) in selectedClient.id ? filteredClient : activeClients" :key="index">
             <div class="client-name">
               <span class="mr-2">{{ client.name }}</span>
               <b-icon class="pointer mr-2" v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon>
@@ -153,7 +150,8 @@ export default class Custom extends Vue {
   private showTask: boolean = true
   private showTimer: boolean = true
   private showChat: boolean = false
-  private selectedClient: string = ''
+  private selectedClient: object = { id: null }
+  private clientNameFilter: string = ''
 
   get client_users() {
     const clientReducer = (acc: any, client: any) => {
@@ -228,7 +226,11 @@ export default class Custom extends Vue {
   }
 
   get filteredClient() {
-    return this.activeClients.filter((client: any) => client.id === this.selectedClient)
+    return this.activeClients.filter((client: any) => {
+      console.log(client.name.toLowerCase().indexOf(this.clientNameFilter.toLowerCase()))
+      /* @ts-ignore */
+      return client.id === this.selectedClient.id && client.name.toLowerCase().indexOf(this.clientNameFilter.toLowerCase()) !== -1
+    })
   }
 
   get listsBlockNames() {

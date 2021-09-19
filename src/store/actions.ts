@@ -63,7 +63,8 @@ export const actions: ActionTree<IRootState, IRootState> = {
       .$http()
       .patch('/' + module + '/', id, { attribute, value })
       .then((response: any) => {
-        dispatch('PROCESS_INCOMING_DATA', response)
+        //TODO: Not sure we need double commits. What happens if the value is updated on the backend?
+        commit('UPDATE_ATTRIBUTE', { module: module, id: id, attribute: attribute, value: response[module][attribute] })
         return response
       })
     return result

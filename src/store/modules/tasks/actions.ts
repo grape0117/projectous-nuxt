@@ -171,5 +171,22 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('updateTasksSortOrders', ids)
     // @ts-ignore
     this._vm.$http().post('/tasks/sort_order', { ids: ids })
+  },
+  updateTaskTitle({ rootState, commit, dispatch }: any, { task_id, title }: any) {
+    const projectRegex = /^([A-Z-]+):\s*/
+
+    const acronym_match = title ? title.match(projectRegex) : null
+
+    if (acronym_match && acronym_match[1]) {
+      const projects_by_acronym = rootState.projects.projects.filter((project: any) => project.acronym === acronym_match[1])
+
+      if (projects_by_acronym.length === 1) {
+        title = title.replace(acronym_match[0], '')
+        dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', task_id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
+        dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', task_id, attribute: 'title', value: title }, { root: true })
+      }
+    } else {
+      this.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', task_id, attribute: 'title', value: title }, { root: true })
+    }
   }
 }

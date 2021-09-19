@@ -152,7 +152,7 @@ export default class Custom extends Vue {
 
     const task_id = uuid.v4()
     const task_user_id = uuid.v4()
-    const task = { id: task_id, title: item.title } //TODO: sort_order? maybe put at the top of the list?
+    const task = { id: task_id, title: item.title, status: 'open' } //TODO: sort_order? maybe put at the top of the list?
     //const { id: task_id } = await this.createTask(task)
     const taskUser = {
       id: task_user_id,

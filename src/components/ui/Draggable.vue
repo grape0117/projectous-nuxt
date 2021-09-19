@@ -114,7 +114,7 @@ export default class Draggable extends Vue {
   private async dragzoneHeight() {
     let refs: any = await this.$refs
     if (Object.keys(refs).length > 0) {
-      let openHeight = refs.open[0].$refs.dragzone_wrapper.clientHeight
+      let openHeight = refs.open ? refs.open[0].$refs.dragzone_wrapper.clientHeight : 50
       let inProgressHeight = refs['in-progress'][0].$refs.dragzone_wrapper.clientHeight
       let turnedInHeight = refs['turned-in'][0].$refs.dragzone_wrapper.clientHeight
       let completedHeight = refs.completed[0].$refs.dragzone_wrapper.clientHeight

@@ -229,7 +229,7 @@ export default class Dragzone extends Vue {
       id,
       title: '',
       listId: this.id,
-      status: this.group.name,
+      status: this.group ? this.group.name : 'open',
       sort_order: index,
       temp: false
     }
