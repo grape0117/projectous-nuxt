@@ -16,7 +16,7 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   async ADD_MANY(state: IRootState, { module, entities }: any) {
-    console.log('ADD_MANY ' + module)
+    // console.log('ADD_MANY ' + module)
     if (!state[module]) {
       console.error('Module ' + module + ' does not exist.')
       return
@@ -28,11 +28,11 @@ export const mutations: MutationTree<IRootState> = {
         if (entity.deleted_at == null) {
           //@ts-ignore
           if (typeof state[module].lookup[entities[index].id] == 'undefined') {
-            console.log(entities[index], 'not found', state[module].lookup)
+            // console.log(entities[index], 'not found', state[module].lookup)
             //@ts-ignore
             state[module][module].push(entity)
           } else {
-            console.log('ADD_MANY entity found', state[module].lookup[entities[index].id], entity, state[module][module])
+            // console.log('ADD_MANY entity found', state[module].lookup[entities[index].id], entity, state[module][module])
             //@ts-ignore
             let key = state[module].lookup[entities[index].id]
             for (let property in entity) {
