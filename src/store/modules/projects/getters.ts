@@ -146,7 +146,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     if (!project) {
       return ''
     } else if (project.client_company_id) {
-      let client = rootGetters['clients/getById'](project.client_company_id)
+      let client = rootGetters['clients/getByClientCompanyId'](project.client_company_id)
       if (client) {
         return client.name
       }
