@@ -63,14 +63,14 @@ export default {
       this.checkbox_toggled = !this.checkbox_toggled
     },
     getClientNameFromProjectId: function(project_id) {
-      let project = this.$store.getters['projects/getProjectById'](project_id)
+      let project = this.$store.getters['projects/geById'](project_id)
       if (project) {
-        let client = this.$store.getters['clients/getCompanyClientByClientId'](project.client_company_id)
+        let client = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
       }
       return client ? client.name : ''
     },
     getProjectName: function(project_id) {
-      let project = this.$store.getters['projects/getProjectById'](project_id)
+      let project = this.$store.getters['projects/getById'](project_id)
       if (project) return project.name
     },
     isTecharound: function() {

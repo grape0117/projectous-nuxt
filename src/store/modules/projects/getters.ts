@@ -129,7 +129,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     // tslint:disable-next-line:no-shadowed-variable
     _getters: any
   ) => (project_id: string) => {
-    let project = _getters.getprojectById(project_id)
+    let project = _getters.getById(project_id)
     if (project) {
       return project.name
     }
@@ -142,11 +142,11 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     rootState: IRootState,
     rootGetters: any
   ) => (project_id: string) => {
-    let project = _getters.getprojectById(project_id)
+    let project = _getters.getById(project_id)
     if (!project) {
       return ''
     } else if (project.client_company_id) {
-      let client = rootGetters['clients/getClientById'](project.client_company_id)
+      let client = rootGetters['clients/getById'](project.client_company_id)
       if (client) {
         return client.name
       }

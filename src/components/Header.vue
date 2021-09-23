@@ -86,6 +86,7 @@ export default Vue.extend({
       // projectName: 'P',
       navLinks: [
         { name: 'Task Cloud', path: '/tasks' },
+        { name: 'User Tasks', path: '/user-tasks' },
         { name: 'Projects', path: '/projects' },
         { name: 'clients', path: '/clients' },
         { name: 'users', path: '/users' },

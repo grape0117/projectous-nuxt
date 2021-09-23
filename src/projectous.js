@@ -43,7 +43,7 @@ export default {
       (Vue.projectRelationSort = function(a, b) {
         //console.log(a.b)
         if (a.project_id && b.project_id) {
-          return Vue.projectSort(store.getters['projects/getProjectById'](a.project_id), store.getters['projects/getProjectById'](b.project_id))
+          return Vue.projectSort(store.getters['projects/getById'](a.project_id), store.getters['projects/getById'](b.project_id))
         }
       })
     Vue.projectSort = function(a, b) {

@@ -213,8 +213,8 @@ export default {
       this.$store.state.initialDataLoaded = true
 
       if (!this.$store.getters['settings/isAdmin'] && this.$route.meta.adminOnly) {
-        alert('Only admin can access.')
-        this.$router.push({ path: '/' })
+        // alert('Only admin can access.')
+        // this.$router.push({ path: '/' })
       }
 
       setInterval(this.getNewData, 3000)
@@ -435,7 +435,7 @@ export default {
       return valid
     },
     async storeDataInIndexedDb() {
-      const appData = await this.getAppDataFromApi()
+      const appData = await this.getAppDataFromApi(0)
       console.log('appData', appData)
       for (let key in appData) {
         if (Array.isArray(appData[key])) {

@@ -256,7 +256,7 @@ export default {
       return this.$store.getters['clients/getByClientCompanyId'](expenseProject.client_id)
     },
     expenseProject: function() {
-      return this.$store.getters['projects/getProjectById'](this.expense.project_id)
+      return this.$store.getters['projects/getById'](this.expense.project_id)
     },
     isExpenseProjectTask: function(project_id) {
       return this.expense.project_id == project_id
@@ -294,7 +294,7 @@ export default {
       }
       let formData = $('#editExpenseForm').serialize()
       console.log(formData)
-      let project = self.$store.getters['projects/getProjectById']($('#editExpenseForm select[name=project_id]').val())
+      let project = self.$store.getters['projects/getById']($('#editExpenseForm select[name=project_id]').val())
       if (project) {
         //TODO: checktypeof projectKey == 'number') {
         let client = self.$store.getters['clients/getByClientCompanyId'](project.client_id)

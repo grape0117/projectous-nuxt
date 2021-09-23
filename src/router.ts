@@ -41,6 +41,11 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "Tasks" */ '@/views/AllTaskFilipTemplate.vue')
     },
     {
+      path: '/user-tasks',
+      name: 'User Tasks',
+      component: () => import(/* webpackChunkName: "UserTasks" */ '@/views/UserTasksTemplate.vue')
+    },
+    {
       path: '/tasks/:task_id',
       name: 'Task_Detail',
       // props: true,
