@@ -16,6 +16,11 @@ export function createListsByDays(): IList[] {
   const lists: IList[] = []
   const today = setToMidnight(new Date())
   lists.push({
+    id: 'Unmarked',
+    title: 'Unmarked',
+    group: 'Past Tasks'
+  })
+  lists.push({
     id: 'Past',
     title: 'Older',
     group: 'Past Tasks'
@@ -34,11 +39,6 @@ export function createListsByDays(): IList[] {
       group: 'Current Tasks'
     })
   }
-  lists.push({
-    id: 'Unmarked',
-    title: 'Unmarked',
-    group: 'Unsorted'
-  })
   return lists
 }
 

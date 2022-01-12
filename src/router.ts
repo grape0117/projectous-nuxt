@@ -86,16 +86,32 @@ const router = new Router({
     //   component: () => import(/* webpackChunkName: "Custom" */ '@/views/UsersTemplate.vue')
     // },
     {
-      path: '/reports',
-      name: 'Reports',
+      path: '/invoiceable',
+      name: 'Invoiceable',
       meta: { adminOnly: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoiceableTemplate.vue')
+    },
+    {
+      path: '/payable',
+      name: 'Payable',
+      meta: { adminOnly: true },
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/PayableTemplate.vue')
     },
     {
       path: '/invoices',
       name: 'Invoices',
       meta: { adminOnly: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoicesTemplate.vue')
+    },
+    {
+      path: '/days',
+      name: 'Days',
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/DaysTemplate.vue')
+    },
+    {
+      path: '/reports',
+      name: 'Reports',
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/ReportsTemplate.vue')
     }
   ]
 })

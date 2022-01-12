@@ -15,7 +15,7 @@
       </div>
     </div>
     <div class="text-right pr-3">{{ `$${invoice.total}` }}</div>
-    <div v-html="invoice.note ? invoice.note : 'No notes...'" contenteditable="true" @input="setNoteValue"></div>
+    <div v-html="invoice.note ? invoice.note : ''" contenteditable="true" @input="setNoteValue"></div>
     <div class="text-right pr-3">{{ invoice_age }}</div>
     <!-- <div class="text-right pr-3" style="min-width: 135px">{{ invoice.created_at }}</div> -->
     <div class="text-right pr-3">{{ invoice.created_at | moment('MMM DD') }}</div>
@@ -62,11 +62,15 @@ export default {
       return this.bgTheme === JSON.stringify('Colors')
     },
     invoice_age() {
-      const invoice_date = moment(this.invoice.created_at, 'YYYY-MM-DD')
-      const today = moment().startOf('day')
+      if (this.invoice.status === 'open') {
+        const invoice_date = moment(this.invoice.created_at, 'YYYY-MM-DD')
+        const today = moment().startOf('day')
 
-      //Difference in number of days
-      return moment.duration(today.diff(invoice_date)).asDays()
+        //Difference in number of days
+        return moment.duration(today.diff(invoice_date)).asDays()
+      } else {
+        return null
+      }
     }
   },
   methods: {

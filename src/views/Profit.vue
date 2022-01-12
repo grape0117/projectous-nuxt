@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container-fluid">
     <h1>Techaround daily email</h1>
     <h3>Yesterday</h3>
     <div style="margin: 30px">

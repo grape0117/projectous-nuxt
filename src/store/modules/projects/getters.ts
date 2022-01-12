@@ -35,7 +35,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       // @ts-ignore
       let client_project_keys = state.lookup_by_client_company_id[client.client_company_id]
       if (!client_project_keys) {
-        console.log('project not found', client)
+        // console.log('project not found', client)
         return
       }
       // @ts-ignore
@@ -152,6 +152,44 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       }
     }
     return ''
+  },
+  projectName: (
+    state: IModuleState,
+    // tslint:disable-next-line:no-shadowed-variable
+    _getters: any,
+    rootState: IRootState,
+    rootGetters: any
+  ) => (project_id: string) => {
+    const project = _getters.getById(project_id)
+    if (!project) {
+      return ''
+    }
+
+    if (project.client_company_id) {
+      const client = rootGetters['clients/getByClientCompanyId'](project.client_company_id)
+      if (client) {
+        const prefix = '<span style="background-color: ' + client.color + ';">'
+        const suffix = '</span>'
+
+        let icon = ''
+        if (client.url && (client.url == project.project_url || !project.project_url)) {
+          icon = '<img src="' + process.env.VUE_APP_API_URL + '/clients/' + client.id + '/favicon.png" />'
+        } else if (project.project_url) {
+          icon = '<img src="' + process.env.VUE_APP_API_URL + '/projects/' + project.id + '/favicon.png" />'
+        }
+
+        let project_name = ''
+        if (client.url == project.project_url && project.project_url) {
+          return prefix + icon + suffix
+        } else if (project.acronym) {
+          return prefix + icon + project.acronym + suffix
+        } else {
+          return prefix + icon + project.name + suffix
+        }
+      }
+    }
+
+    return project.name
   },
   openprojects: (state, _getters, rootState, rootGetters) => (search: any, sort: any) => {
     let isAdmin = rootGetters['settings/isAdmin']

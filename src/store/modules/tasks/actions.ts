@@ -172,7 +172,31 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // @ts-ignore
     this._vm.$http().post('/tasks/sort_order', { ids: ids })
   },
-  updateTaskTitle({ rootState, commit, dispatch }: any, { task_id, title }: any) {
+  updateTaskTitle({ rootState, commit, dispatch, _getters }: any, { task_id, title }: any) {
+    const userRegex = /^@{1,3}[a-zA-Z]+\s|\s@{1,3}[a-zA-Z]+\s|\s@{1,3}[a-zA-Z]+$|^@{1,3}[a-zA-Z]+/gm
+
+    const titleMatch = title ? title.match(userRegex) : null
+    console.log(titleMatch)
+
+    if (titleMatch && titleMatch.length > 0) {
+      const task_users = _getters['task_users/getByTaskId'](task_id)
+
+      //get user by match
+      const matchedCompanyUsers = _getters['company_users/getByAlias'](titleMatch[0])
+      console.log('matched users', matchedCompanyUsers)
+      //assigned vs reviewer vs manager
+      const numAts = titleMatch[0].split('@').length - 1
+      const role = numAts == 1 ? 'assigned' : numAts == 2 ? 'reviewer' : numAts == 3 ? 'manager' : 'something is wrong'
+      //add task_user
+      if (!task_users.find((task_user: ITaskUser) => task_user == matchedCompanyUsers)) {
+        dispatch('ADD_ONE', {
+          module: 'task_uses',
+          entity: { role, id: uuid.v4(), task_id, company_user_id: matchedCompanyUsers }
+        })
+      }
+      //remove @match from title
+    }
+
     const projectRegex = /^([A-Z-]+):\s*/
 
     const acronym_match = title ? title.match(projectRegex) : null

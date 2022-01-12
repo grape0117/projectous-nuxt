@@ -22,6 +22,12 @@
         </div>
       </div>
       <div class="form-group">
+        <label class="col-sm-3 control-label" for="companyUrlInput">Url:</label>
+        <div class="col-sm-9">
+          <input id="companyUrlInput" class="form-control" type="text" size="5" name="acronym" v-model="client.url" />
+        </div>
+      </div>
+      <div class="form-group">
         <label class="control-label col-sm-3" for="companyClientSelect">Status: </label>
         <div class="col-sm-9">
           <select class="form-control" id="client-modal-client-id" name="status" v-model="client.status">
@@ -244,9 +250,9 @@ export default {
   },
   watch: {
     '$store.state.settings.current_edit_client'(client) {
-      const { id, status, acronym, name, address1, address2, default_client_rate, city, state, zip, phone, color } = client
+      const { id, status, url, acronym, name, address1, address2, default_client_rate, city, state, zip, phone, color } = client
 
-      this.client = { id, name, acronym, status: status ? status : 'new', default_client_rate, address1, address2, city, state, zip, phone, color }
+      this.client = { id, name, url, acronym, status: status ? status : 'new', default_client_rate, address1, address2, city, state, zip, phone, color }
     }
   },
   computed: {

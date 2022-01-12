@@ -488,6 +488,12 @@ export default {
 </script>
 
 <style lang="scss">
+:root {
+  --main-container-width: 65%;
+  /*The variable should be set with a calc and the calc uses a variable? */
+  /*document.documentElement.style.setProperty('--pagebackground', 'firebrick');*/
+}
+
 .modal-content {
   max-height: calc(100vh - 70px);
 }
@@ -499,6 +505,14 @@ export default {
   // background-color: rgba(0, 0, 0, 0.3);
   // background-color: rgba($color: orange, $alpha: 0.6);
 }
+
+.container-fluid {
+  padding: 20px 50px 0 50px;
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 #update-data-button {
   position: absolute;
   top: 30px;

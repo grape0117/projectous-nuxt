@@ -36,4 +36,5 @@ export interface IClient {
   accounting_email: string
   history: []
   color: string
+  url: string
 }

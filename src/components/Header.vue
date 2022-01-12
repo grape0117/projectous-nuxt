@@ -91,9 +91,7 @@ export default Vue.extend({
         { name: 'clients', path: '/clients' },
         { name: 'users', path: '/users' },
         { name: 'invoices', path: '/invoices' },
-        { name: 'reports', path: '/reports' },
-        { name: 'graph', path: '/graph' },
-        { name: 'profit', path: '/profit' }
+        { name: 'reports', path: '/reports' }
       ],
       colors: {
         backgroundColor: ['0', '0', '0'],

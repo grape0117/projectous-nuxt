@@ -38,5 +38,12 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     return state.company_users.find((user: ICompanyUser) => {
       return user.id == rootState.settings.current_company_user_id
     })
+  },
+  getByAlias: state => (alias: string) => {
+    //TODO: @me
+    return state.company_users.find((user: ICompanyUser) => {
+      console.log(user.aliases, '==', alias, user.aliases && user.aliases.trim() == alias.trim())
+      return user.aliases && user.aliases.trim() == alias.trim() //TODO: trim and split by comma?
+    })
   }
 }

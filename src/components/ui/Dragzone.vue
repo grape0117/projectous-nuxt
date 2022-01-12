@@ -261,6 +261,34 @@ export default class Dragzone extends Vue {
 
     const id = item.task_id ? item.task_id : item.id
 
+    const userRegex = /\W(@{1,3}[a-zA-Z]+)|^(@{1,3}[a-zA-Z]+)/gm
+
+    const titleMatch = titleWithAcronym ? titleWithAcronym.match(userRegex) : null
+    console.log(titleMatch)
+
+    if (titleMatch && titleMatch.length > 0) {
+      titleMatch.forEach((match: string) => {
+        titleWithAcronym = titleWithAcronym.replace(match, '')
+        console.log('titleWithAcronym', titleWithAcronym)
+
+        const task_users = this.$store.getters['task_users/getByTaskId'](id)
+
+        //get user by match
+        const matchedCompanyUser = this.$store.getters['company_users/getByAlias'](match.replaceAll('@', ''))
+        console.log('matched users', matchedCompanyUser, match.replaceAll('@', ''))
+        //assigned vs reviewer vs manager
+        const numAts = match.split('@').length - 1
+        const role = numAts == 1 ? 'assigned' : numAts == 2 ? 'reviewer' : numAts == 3 ? 'manager' : 'something is wrong'
+        //add task_user
+        if (!task_users.find((task_user: any) => task_user.company_user_id == matchedCompanyUser.id)) {
+          this.$store.dispatch('ADD_ONE', {
+            module: 'task_users',
+            entity: { role, id: uuid.v4(), task_id: id, company_user_id: matchedCompanyUser.id }
+          })
+        }
+      })
+    }
+
     const projectRegex = /^([A-Z-]+):\s*/
 
     const acronym_match = titleWithAcronym ? titleWithAcronym.match(projectRegex) : null
@@ -345,9 +373,11 @@ export default class Dragzone extends Vue {
 }
 .dragzone__item-info {
   width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+  text-indent: -30px;
+  position: relative;
+  /*display: flex;*/
+  /*justify-content: flex-start;*/
+  /*align-items: flex-start;*/
   word-break: break-word;
 }
 .burger-icon-wrapper {
@@ -462,7 +492,12 @@ export default class Dragzone extends Vue {
   background: lightgrey; /*#cef3f7;*/
 }
 .dragzone__item-text {
-  margin-left: 5px;
+  margin-left: 10px;
+  text-indent: 30px;
+  display: inline-block;
+  width: calc(100%);
+  border-bottom: blue;
+  min-height: 10px;
   flex-grow: 1;
   min-height: 1.459em;
   font-size: 0.9rem;
@@ -565,9 +600,9 @@ export default class Dragzone extends Vue {
   display: flex;
 }
 .dragzone-project-acronym-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  /*display: flex;*/
+  /*flex-direction: column;*/
+  /*align-items: center;*/
 }
 
 *:focus {

@@ -3,12 +3,11 @@
     <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
-    <div class="d-flex align-items-center">
-      <span class="sidebar-timer-acronym mr-2" @click="editTimer()" :style="{ 'background-color': `${clientColor}` }" v-if="project.acronym">{{ project.acronym }}</span>
-      <div class="project-details" @click="editTimer()">
-        <p v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</p>
-        <p v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</p>
-      </div>
+
+    <div @click="editTimer()">
+      <project-icon v-bind:project="project"></project-icon>
+      <span v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</span>
+      <span v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</span>
     </div>
 
     <div class="status-icon-with-timer">
@@ -47,9 +46,11 @@ import { colorThemes } from '@/mixins/colorThemes'
 import { EventBus } from '@/components/event-bus'
 import { IProject } from '../store/modules/projects/types'
 import { cloneDeep } from 'lodash'
+import ProjectIcon from '../components/ui/ProjectIcon'
 
 export default {
   name: 'sidebar-timer',
+  components: { ProjectIcon },
   props: ['timer', 'projects', 'users', 'tasks', 'running_timers', 'index'],
   mixins: [colorThemes],
   data: function() {

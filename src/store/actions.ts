@@ -69,6 +69,19 @@ export const actions: ActionTree<IRootState, IRootState> = {
       })
     return result
   },
+  UPDATE_SETTING({ commit, dispatch }, { module, id, setting, value }) {
+    commit('UPDATE_SETTING', { module: module, id: id, setting: setting, value: value })
+    // @ts-ignore
+    let result = this._vm
+      .$http()
+      .patch('/' + module + '/', id, { setting, value })
+      .then((response: any) => {
+        //TODO: Not sure we need double commits. What happens if the value is updated on the backend?
+        commit('UPDATE_SETTING', { module: module, id: id, setting: setting, value: response[module][setting] })
+        return response
+      })
+    return result
+  },
 
   /**
    * Dispatch cascade deletes, commit delete then send delete to backend

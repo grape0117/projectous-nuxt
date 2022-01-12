@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div class="row-no-padding">
+    <div class="row-no-padding" v-if="isAdmin">
       <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist">
           <!--<li @click="setTab('all_tasks')" :class="tabClass('all-tasks')" role="presentation"><a-->
@@ -124,6 +124,9 @@ export default {
       const me = this.$store.getters['company_users/getMe']
       console.log('me', me)
       return me
+    },
+    isAdmin() {
+      return this.$store.getters['settings/isAdmin']
     },
     filtered_tasks() {
       // alert('filtering tasks')

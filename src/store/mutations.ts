@@ -194,6 +194,30 @@ export const mutations: MutationTree<IRootState> = {
     // @ts-ignore
     this.commit('updateCreateIndexDBEntity', { module, entity: state[module][module][state[module].lookup[id]] })
   },
+  UPDATE_SETTING(state: IRootState, { module, id, setting }) {
+    if (!state[module]) return
+    console.log('lookup', id, state[module].lookup[id])
+
+    // @ts-ignore
+    state[module][module][state[module].lookup[id]][setting] = value
+
+    // @ts-ignore
+    this.commit('updateCreateIndexDBEntity', { module, entity: state[module][module][state[module].lookup[id]] })
+  },
+  // iterate(state: IRootState, { module, id, setting }) {
+  //   Object.keys(setting).forEach(key => {
+  //
+  //     console.log(`key: ${key}, value: ${setting[key]}`)
+  //
+  //     if (typeof setting[key] === 'object') {
+  //       if ( typeof state[module][module][state[module].lookup[id]][setting][key] == 'undefined') {
+  //         state[module][module][state[module].lookup[id]][setting][key] = setting[key]
+  //       } else {
+  //         this.commit('iterate', { module, id, setting: setting[key] })
+  //       }
+  //     }
+  //   })
+  // },
 
   /**
    * Deletes from all stores (Vuex, IDB) including related items.

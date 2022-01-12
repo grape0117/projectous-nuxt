@@ -4,45 +4,6 @@
       <div class="col-sm-12">
         <form method="get" id="invoiceable-form" class="invoiceable-form" action="/invoiceable">
           <div class="top-selects">
-            <!-- here -->
-            <div class="client-select">
-              <div class="d-flex justify-content-between align-items-end mb-2">
-                <div class="">
-                  <b-form-checkbox v-model="not_clients" name="not_client" class="mr-2 color-white">
-                    Not
-                  </b-form-checkbox>
-                </div>
-                <div>
-                  <ul class="nav nav-pills nav-pills-sm">
-                    <li class="nav-item">
-                      <a :class="!settings.show_all_clients ? 'nav-link active' : 'nav-link'" @click="settings.show_all_clients = false" href="javascript:void(0)">Active</a>
-                    </li>
-                    <li class="nav-item">
-                      <a :class="settings.show_all_clients ? 'nav-link active' : 'nav-link'" @click="settings.show_all_clients = true" href="javascript:void(0)">All</a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <select id="client" name="client[]" multiple="" v-model="chosen_clients">
-                <option value="0">All Clients</option>
-                <option v-for="(client, client_index) in clients" :client="client" :key="client_index" :value="client.id" @click="onOffSelect">{{ client.name }}</option>
-              </select>
-            </div>
-            <!-- here -->
-            <div class="project-select">
-              <div class="mb-2 mt-1">
-                <b-form-checkbox v-model="not_projects" name="not_project" class="mr-2 color-white">
-                  Not
-                </b-form-checkbox>
-              </div>
-              <select id="project" name="project[]" multiple="" v-model="chosen_projects">
-                <option value="0">All Projects</option>
-                <optgroup v-for="(client, client_index) in filteredclients(chosen_clients)" :key="client_index" :client="client" :label="client.name">
-                  <option v-for="(project, project_index) in client_projects(client)" :key="project_index" :project="project" :value="project.id">{{ project.name }}</option>
-                </optgroup>
-              </select>
-            </div>
-            <!-- here -->
             <div v-if="isAdmin()" class="user-select">
               <div class="mb-2 mt-1">
                 <b-form-checkbox v-model="not_users" name="not_user" class="mr-2 color-white">
@@ -71,10 +32,7 @@
                   <b-form-checkbox v-if="isAdmin()" v-model="show_paid" name="show_paid" class="mr-2">
                     Show paid
                   </b-form-checkbox>
-                  <b-form-checkbox v-if="isAdmin()" v-model="show_invoiced" name="show_invoiced">
-                    Show Invoiced
-                  </b-form-checkbox>
-                  <input v-else type="hidden" name="is_invoiced" value="1" />
+                  <input type="hidden" name="is_invoiced" value="1" />
                 </div>
 
                 <div class="d-flex flex-wrap">
@@ -82,40 +40,19 @@
                   <b-button variant="primary" @click="thisMonth()">This Month</b-button>
                 </div>
               </div>
-              <div class="inputs d-flex justify-content-start flex-wrap align-items-start w-100">
-                <b-form-input class="mt-3" placeholder="task ID"></b-form-input>
-                <!-- <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
-                <b-form-input class="mt-3" placeholder="Received Check #"></b-form-input>
-                <b-form-input class="mt-3" placeholder="Client Rate"></b-form-input>
-                <b-form-input class="mt-3" placeholder="User Rate"></b-form-input> -->
-                <b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>
-
-                <!-- <input placeholder="task ID" type="text" name="task_id" />
-                <input placeholder="Paid Check #" type="text" name="paid_check_number" />
-                <input placeholder="Received Check #" type="text" name="check_number" />
-                <input placeholder="Client Rate" type="text" name="client_rate" />
-                <input placeholder="User Rate" type="text" name="user_rate" />
-                <input placeholder="Invoice #" type="text" name="invoice_id" /> -->
-              </div>
             </div>
-            <!--<input type="checkbox" name="UTC"> UTC?<br>-->
-            <!--<a href="/invoiceable?start=2017-01-01&amp;end=2017-01-31">Last Month</a>--><!-- <a onclick="$('#start').val('')">Last Week</a><br><br>-->
-            <!--Sort By:<br>
-                        <input type="radio" name="sort" checked="" value="date"> Date <input type="radio" name="sort" value="projects"> Project<br>-->
-            <!--#<input type="text" style="width: 40px;">-->
           </div>
         </form>
         <div class="table-responsive">
           <table class="table timer-table">
-            <tbody v-if="isAdmin()" class="row-2017-2-18">
+            <tbody class="row-2017-2-18">
               <tr class="row-date">
                 <td colspan="100">
-                  <span style="color: darkblue"> Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} </span>&nbsp;
-                  <span style="color: orange;">Entries: {{ timers.length }}</span>
-                  <span style="color: olive;">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</span>
-                  <span v-if="total_unbillable" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightseagreen;">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</span>
+                  <b-badge>Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }}&nbsp;</b-badge>
+                  <b-badge variant="primary">Entries: {{ timers.length }}&nbsp;</b-badge>
+                  <span v-if="show_paid" style="color: olive;">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}&nbsp;</span>
+                  <span>Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}&nbsp;</span>
+                  <span>Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}&nbsp;</span>
                 </td>
               </tr>
               <tr class="row-date">
@@ -130,33 +67,22 @@
                         <b-form-select-option :value="null" disabled>Select Action</b-form-select-option>
                         <b-form-select-option value="markpaid">Mark Paid</b-form-select-option>
                         <b-form-select-option value="markunpaid">Mark Unpaid</b-form-select-option>
-                        <b-form-select-option value="resavetimers">Resave Timers</b-form-select-option>
-
-                        <b-form-select-option value="adjust-invoice-rate">Adjust Invoice Rate</b-form-select-option>
                         <b-form-select-option value="adjust-user-rate">Adjust User Rate</b-form-select-option>
                         <b-form-select-option value="download-csv">Download CSV</b-form-select-option>
                         <b-form-select-option value="download-xls">Download XLS</b-form-select-option>
-                        <b-form-select-option value="create_invoice">Create Invoice</b-form-select-option>
                       </b-form-select>
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
                       <span id="actionLink"></span>
                     </div>
-                    <button class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
                   </div>
                 </td>
               </tr>
-            </tbody>
-            <tbody v-else class="row-2017-2-18">
               <tr class="row-date">
-                <td colspan="100">
-                  <span style="color: darkblue">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }}</span
-                  >&nbsp; Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }} <span v-if="total_unbillable" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span> <span v-if="isTecharound()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span>
-                </td>
-              </tr>
-              <tr class="row-date">
+                <td></td>
                 <td>Earned</td>
                 <td>Project</td>
                 <td>Started</td>
+                <td>Who</td>
                 <td>$</td>
                 <td>Duration</td>
                 <td>Notes</td>
@@ -183,8 +109,6 @@
         </div>
       </div>
     </div>
-    <!-- Add Invoiceable Item Modal -->
-    <invoiceable-add-item :show="isShowInvoiceableItems" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
   </div>
 </template>
 
@@ -313,10 +237,8 @@ export default {
     }
   },
   beforeCreate: function() {
-    //labeledConsole('beforeCreate', $('#project').val())
-    if (sessionStorage.getItem('invoiceable')) {
-      console.log('invoiceable', new URLSearchParams(sessionStorage.getItem('invoiceable')).toString())
-      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() })
+    if (sessionStorage.getItem('payable')) {
+      this.$router.push({ path: '/payable?' + new URLSearchParams(sessionStorage.getItem('payable')).toString() })
     }
   },
   mounted() {
@@ -428,7 +350,6 @@ export default {
       return this.$store.getters['settings/isTecharound']
     },
     lastMonth: function() {
-      alert('lastMonth')
       let now = new Date()
       let lastday = new Date(now.getFullYear(), now.getMonth(), 0)
       let firstday = new Date(lastday.getFullYear(), lastday.getMonth(), 1)
@@ -438,8 +359,9 @@ export default {
     },
     thisMonth: function() {
       let now = new Date()
+      let firstday = new Date(now.getFullYear(), now.getMonth() + 1, 1)
       let lastday = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-      this.start = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate()
+      this.start = firstday.getFullYear() + '-' + firstday.getMonth() + '-' + firstday.getDate()
       this.end = lastday.getFullYear() + '-' + (lastday.getMonth() + 1) + '-' + lastday.getDate()
       this.getData('thismonth')
     },
@@ -456,8 +378,8 @@ export default {
     //   },
     filteredusers() {
       /*if(self.settings.show_inactive_users) {
-            return this.$store.getters['company_users/getCompanyUsers']
-        } else {*/
+              return this.$store.getters['company_users/getCompanyUsers']
+          } else {*/
       return this.$store.getters['company_users/getActive']
       //}
     },
@@ -507,51 +429,27 @@ export default {
         return
       }
       const queryString = new URLSearchParams(data).toString()
-      this.$router.push({ path: '/invoiceable?' + queryString })
-      sessionStorage.setItem('invoiceable', queryString)
+      this.$router.push({ path: '/payable?' + queryString })
+      sessionStorage.setItem('payable', queryString)
 
-      if (this.isAdmin()) {
-        const { invoice_items, timers } = await this.$http().post('/invoiceable-timers', data)
+      const { timers } = await this.$http().post('/payable-timers', data)
+      this.timers = timers
+      this.total_time = 0
+      this.total_earned = 0
+      this.total_unpaid = 0
+      this.total_unbillable = 0
 
-        this.invoice_items = invoice_items
-        this.timers = timers
-        this.total_time = 0
-        this.total_earned = 0
-        this.total_unpaid = 0
-        this.total_unbillable = 0
-        this.total_invoiceable = 0
-
-        for (const timer of this.timers) {
-          this.total_time += timer.duration
-          this.total_earned += (timer.duration / 3600) * timer.user_rate
-          if (!timer.is_paid) {
-            this.total_unpaid += (timer.duration / 3600) * timer.user_rate
-          }
-          if (!timer.is_billable) {
-            this.total_unbillable++
-          } else {
-            this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
-          }
+      for (const timer of timers) {
+        this.total_time += timer.duration
+        this.total_earned += (timer.duration / 3600) * timer.user_rate
+        if (!timer.is_paid) {
+          this.total_unpaid += (timer.duration / 3600) * timer.user_rate
         }
-      } else {
-        const { timers } = await this.$http().post('payable-timers', data)
-        this.timers = timers
-        this.total_time = 0
-        this.total_earned = 0
-        this.total_unpaid = 0
-        this.total_unbillable = 0
-
-        for (const timer of timers) {
-          this.total_time += timer.duration
-          this.total_earned += (timer.duration / 3600) * timer.user_rate
-          if (!timer.is_paid) {
-            this.total_unpaid += (timer.duration / 3600) * timer.user_rate
-          }
-          if (!timer.is_billable) {
-            this.total_unbillable++
-          }
+        if (!timer.is_billable) {
+          this.total_unbillable++
         }
       }
+
       this.loading_data = false
     }
   }
@@ -564,6 +462,10 @@ export default {
   max-height: calc(100vh - 50px);
   overflow-y: auto;
   overflow-x: hidden;
+
+  td {
+    color: white;
+  }
 
   .top-selects {
     // border: 10px solid white;

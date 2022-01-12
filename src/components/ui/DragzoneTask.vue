@@ -15,26 +15,23 @@
           </div>
 
           <div class="dragzone__item-info">
-            <div class="dragzone-project-acronym-wrapper" v-if="item.project.acronym">
-              <div class="dragzone-project-acronym" :style="{ 'background-color': clientColor(item) }" @click="showTaskDetail(item)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
-                {{ item.project.acronym }}
-              </div>
-              <span v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)"> + </span>
-            </div>
-            <span v-else class="dragzone-project-project-name">{{ projectName(item.project_id) }}</span>
-            <div class="dragzone__item-text d-flex align-items-center" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
+            <div class="add-task-plus" v-show="showPlusIcon.task_id === item.id && showPlusIcon.visible" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)" @click="createTempItem(index, item.id)">+</div>
+            <span class="dragzone-project-acronym-wrapper" v-if="item.project" @click="showTaskDetail(item)" @contextmenu.prevent="toggleTaskOptions($event)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
+              <project-icon v-bind:project="item.project"></project-icon>
+            </span>
+            <span class="dragzone__item-text" v-html="item.title" contenteditable="true" :data-id="item.id" @blur="updateTaskTitle($event, item)" @keydown.enter.prevent="createTempItem(index, item.id)" @click="editedItemId = item.id" />
           </div>
           <div v-if="item.project_id" class="dragzone__item-tracker-icon" @click="onTaskTimerClicked(item.task_id, item.id)">
             <span v-if="timerId === item.id || task_timer_running" class="icon-stop" style="font-size: 25px; color: red" />
             <span v-else class="icon-play_arrow" style="font-size: 25px; color: green" />
           </div>
         </div>
-        <div v-if="show_debug" style="padding: 0 10px">
-          <small>
-            <span style="color: red">{{ getTaskType(item.task_id || item.id) }}</span
-            >status: {{ item.status }} list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}
-          </small>
-        </div>
+        <!--<div v-if="show_debug" style="padding: 0 10px">-->
+        <!--<small>-->
+        <!--<span style="color: red">{{ getTaskType(item.task_id || item.id) }}</span-->
+        <!--&gt;status: {{ item.status }} list: {{ item.user_task_list_id }} work: {{ item.next_work_day }} sort: {{ item.sort_order }} index: {{ index }} <small v-if="item.task_id">TaskUser</small><small v-else>Task.id</small>: {{ item.id }}-->
+        <!--</small>-->
+        <!--</div>-->
         <!-- <div class="dragzone__task-users">
           <div v-for="task_user in get_task_users" :key="task_user.id">
             <b-badge v-if="showBadge(task_user)" class="dragzone_badge" :style="{ backgroundColor: getCompanyUser(task_user.company_user_id).color }" :task_user="task_user">
@@ -66,19 +63,25 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue'
+import { IProject } from '../../store/modules/projects/types'
+import ProjectIcon from './ProjectIcon.vue'
 
 export default Vue.extend({
   props: ['item', 'index', 'draggedItemId', 'tasks', 'timerId', 'selectedCompanyUserId', 'verticalAlignment'],
+
   data() {
     return {
       showPlusIcon: { task_id: null, visible: false },
       show_task_option: false
     }
   },
+  components: {
+    'project-icon': ProjectIcon
+  },
   filters: {
-    abbrName(name: string) {
+    abbrName(name) {
       if (!name) return ''
       let matches = name.match(/\b(\w)/g) // ['J','S','O','N']
       if (matches) {
@@ -88,28 +91,28 @@ export default Vue.extend({
     }
   },
   methods: {
-    async updateStatus(status: any) {
+    toggleTaskOptions() {
+      this.show_task_option = !this.show_task_option
+    },
+    async updateStatus(status) {
       this.toggleTaskOptions()
       const { id } = this.item
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'status', value: status }, { root: true })
     },
-    toggleTaskOptions() {
-      this.show_task_option = !this.show_task_option
-    },
-    dragstart(e: any, item: any) {
+    dragstart(e, item) {
       this.$emit('dragstart', e, item)
     },
-    dragend(e: any) {
+    dragend(e) {
       this.$emit('dragend', e)
     },
-    drop(e: any) {
+    drop(e) {
       this.$emit('drop', e)
     },
-    moveItem(index: number, id: string) {
+    moveItem(index, id) {
       this.$emit('moveItem', index, id)
     },
-    async showTaskDetail(item: any) {
-      let task = await this.$store.state.tasks.tasks.find((tsk: any) => {
+    async showTaskDetail(item) {
+      let task = await this.$store.state.tasks.tasks.find(tsk => {
         if (item.task_id) {
           return tsk.id === item.task_id
         } else {
@@ -119,45 +122,44 @@ export default Vue.extend({
 
       await this.$router.push({ query: { task: task.id, showChatSection: 'true' } })
     },
-    show_plusIcon(task_id: any, visibility: boolean) {
+    show_plusIcon(task_id, visibility) {
       this.showPlusIcon = { task_id: task_id, visible: visibility }
     },
-    createTempItem(index: number, after_id: number) {
+    createTempItem(index, after_id) {
       this.$emit('createTempItem', index, after_id)
     },
-    clientColor(item: any) {
-      const client = this.$store.state.clients.clients.find((c: any) => c.client_company_id === item.project.client_company_id)
+    clientColor(item) {
+      const client = this.$store.state.clients.clients.find(c => c.client_company_id === item.project.client_company_id)
       if (client) {
         return client.color
       }
     },
-    projectName(project_id: any) {
-      const project = this.$store.getters['projects/getById'](project_id)
-      return project ? project.name : project_id
+    projectName(project_id) {
+      return this.$store.getters['projects/projectName'](project_id)
     },
-    updateTaskTitle(event: any, item: any) {
+    updateTaskTitle(event, item) {
       this.$emit('updateTaskTitle', event, item)
     },
-    onTaskTimerClicked(taskId: number | string, itemId: number | string) {
+    onTaskTimerClicked(taskId, itemId) {
       this.$emit('onTaskTimerClicked', taskId, itemId)
     },
-    getTaskType(task_id: any) {
+    getTaskType(task_id) {
       let task = this.$store.getters['tasks/getById'](task_id)
       return task.settings ? task.settings.task_type : null
     },
-    getCompanyUser(company_user_id: any) {
+    getCompanyUser(company_user_id) {
       let company_user = this.$store.getters['company_users/getById'](company_user_id)
       //console.log(company_user)
       return company_user ? company_user : []
     },
-    showBadge(task_user: any) {
+    showBadge(task_user) {
       return task_user.company_user_id !== this.selectedCompanyUserId || !this.verticalAlignment
     },
-    getTaskUsers(task_id: any) {
+    getTaskUsers(task_id) {
       let task_users = this.$store.getters['task_users/getByTaskId'](task_id)
 
-      const users = task_users.reduce((acc: any, user: any) => {
-        if (!acc.find((u: any) => u.company_user_id === user.company_user_id)) {
+      const users = task_users.reduce((acc, user) => {
+        if (!acc.find(u => u.company_user_id === user.company_user_id)) {
           acc.push(user)
         }
         return acc
@@ -167,7 +169,7 @@ export default Vue.extend({
   },
   computed: {
     has_running_timer() {
-      const timer = this.$store.state.timers.timers.find((t: any) => t.status === 'running')
+      const timer = this.$store.state.timers.timers.find(t => t.status === 'running')
 
       if (timer && Object.keys(timer)) {
         return timer
@@ -223,6 +225,12 @@ export default Vue.extend({
         color: rgba($color: #2983e2, $alpha: 1);
       }
     }
+  }
+
+  .add-task-plus {
+    position: absolute;
+    left: 15px;
+    top: 5px;
   }
 }
 </style>

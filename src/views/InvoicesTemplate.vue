@@ -12,8 +12,12 @@
       </div>
       <div>
         <div class="invoices-total-paid">
-          <span>Total Paid({{ selectedYear }}):</span>
-          <span> ${{ total_invoices_payment | numberWithCommas }}</span>
+          <span>Paid:</span>
+          <span> ${{ total_invoices_payment('paid') | numberWithCommas }}</span>
+        </div>
+        <div class="invoices-total-paid">
+          <span>Unpaid:</span>
+          <span> ${{ total_invoices_payment('open') | numberWithCommas }}</span>
         </div>
       </div>
     </div>
@@ -44,13 +48,19 @@
             <i :class="sortClass('invoice_id')" />
             Invoice ID
           </span>
-          <span>Recipient</span>
+          <span class="text-right pr-3" @click="setSortBy('client')">
+            <i :class="sortClass('client')" />
+            Recipient</span
+          >
           <span class="text-right pr-3" @click="setSortBy('amount')">
             <i :class="sortClass('amount')" />
             Amount
           </span>
           <span>Note</span>
-          <span class="text-right pr-3">Age</span>
+          <span class="text-right pr-3" @click="setSortBy('age')">
+            <i :class="sortClass('age')" class="" />
+            Age</span
+          >
           <span class="text-right pr-3" @click="setSortBy('date_created')">
             <!-- <i class="icon-keyboard_arrow_down" /> -->
             <i :class="sortClass('date_created')" class="" />
@@ -155,7 +165,7 @@ export default {
           return date_1 > date_2 ? -1 : date_1 < date_2 ? 1 : 0
         })
 
-      if (sortBy.col_name === 'date_created') {
+      if (sortBy.col_name === 'date_created' || sortBy.col_name === 'age') {
         return this.invoices.sort((a, b) => {
           let date_1 = new Date(a.date)
           let date_2 = new Date(b.date)
@@ -215,29 +225,23 @@ export default {
           }
         })
       }
+      if (sortBy.col_name === 'client') {
+        return this.invoices.sort((a, b) => {
+          let client_1 = a.client.name
+          let client_2 = b.client.name
+
+          if (ASC) {
+            return client_1 > client_2 ? 1 : client_1 < client_2 ? -1 : 0
+          } else {
+            return client_1 > client_2 ? -1 : client_1 < client_2 ? 1 : 0
+          }
+        })
+      }
     },
     // invoice_to_show() {
     //   return this.getStatus(this.invoices, this.status)
     // },
-    total_invoices_payment() {
-      const invoices_payments = () => {
-        if (this.status_filter) {
-          return this.invoices.filter(invoice => {
-            return invoice.status === this.status_filter
-          })
-        }
 
-        return this.invoices
-      }
-
-      let total_payment = 0
-
-      for (const invoice of invoices_payments()) {
-        total_payment += Number(invoice.total)
-      }
-
-      return Math.round(total_payment * 100) / 100
-    },
     current_company: function() {
       return this.$store.state.settings.current_company_user_id
     },
@@ -277,6 +281,25 @@ export default {
     }
   },
   methods: {
+    total_invoices_payment(filter) {
+      const invoices_payments = () => {
+        if (this.status_filter) {
+          return this.invoices.filter(invoice => {
+            return invoice.status === filter
+          })
+        }
+
+        return this.invoices
+      }
+
+      let total_payment = 0
+
+      for (const invoice of invoices_payments()) {
+        total_payment += Number(invoice.total)
+      }
+
+      return Math.round(total_payment * 100) / 100
+    },
     toggleShowAllStatus() {
       this.show_all_status = !this.show_all_status
 
@@ -416,7 +439,7 @@ export default {
   background-color: rgba($color: #000000, $alpha: 0.4);
   color: white;
   height: 100%;
-  display: flex;
+  display: inline-block;
   justify-content: center;
   align-items: center;
   padding: 2px 10px;
@@ -453,7 +476,7 @@ export default {
     .total-closed,
     .total-open {
       margin: 5px 5px;
-      width: 10px 10px;
+      width: 10px;
       font-size: 12px;
       border-radius: 4px;
       padding: 0 5px;
@@ -489,7 +512,7 @@ export default {
     align-items: center;
     // justify-content: space-around;
     border-radius: 4px;
-    box-shadow: 0px 0px 8px rgba($color: #fff, $alpha: 1);
+    box-shadow: 0 0 8px rgba($color: #fff, $alpha: 1);
 
     span {
       cursor: pointer;

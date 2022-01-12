@@ -120,16 +120,8 @@ export default {
       }
     },
     task_users() {
-      let project = this.$store.getters['projects/getById'](this.task.project_id)
       let task_users = []
-      if (project) {
-        project.users.forEach(user => {
-          if (user.role !== '') {
-            user.from_project = true
-            task_users.push(user)
-          }
-        })
-      }
+
       this.task.users.forEach(user => {
         task_users.push(user)
       })

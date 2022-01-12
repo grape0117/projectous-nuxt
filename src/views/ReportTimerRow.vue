@@ -48,9 +48,9 @@
       <div v-if="isAdmin() && timer.duration !== timer.invoice_duration" style="color:red;">{{ Math.trunc(timer.invoice_duration / 3600) }}:{{ ('00' + Math.trunc((timer.invoice_duration % 3600) / 60)).slice(-2) }}</div>
     </td>
     <td @click="editTimer(timer)">
-      <div v-if="isAdmin() && timer.invoice_notes" v-html="timer.invoice_notes"></div>
+      <div v-if="isAdmin() && timer.invoice_notes && timer.invoice_notes !== 'undefined' && timer.invoice_notes.trim() !== ''" v-html="timer.invoice_notes"></div>
       <div v-else v-html="timer.notes"></div>
-      <div v-html="timer.admin_notes"></div>
+      <div v-if="timer.admin_notes && timer.admin_notes !== 'undefined' && timer.admin_notes.trim() !== ''" v-html="timer.admin_notes"></div>
     </td>
     <!-- <td>
       <button class="btn btn-primary" v-if="isAdmin()" @click="applyPayment">Payment</button>
