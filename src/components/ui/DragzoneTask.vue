@@ -4,7 +4,7 @@
       <div class="dragzone_dragover" @dragover="moveItem(index, item.id)"></div>
       <div class="dragzone__item-block-content">
         <div class="dragzone__item-wrapper" style="padding-left: 5px; padding-right: 5px">
-          <div class="burger-icon-wrapper" v-if="!item.project.acronym">
+          <div class="burger-icon-wrapper" v-if="item.project && !item.project.acronym">
             <div style="padding-left: 5px; padding-right: 5px; margin-top: 5px" class="burger-icon" @click="showTaskDetail(item)" @contextmenu.prevent="toggleTaskOptions($event)" @mouseenter="show_plusIcon(item.id, true)" @mouseleave="show_plusIcon(null, false)">
               <span></span>
               <span></span>
@@ -129,7 +129,7 @@ export default Vue.extend({
       this.$emit('createTempItem', index, after_id)
     },
     clientColor(item) {
-      const client = this.$store.state.clients.clients.find(c => c.client_company_id === item.project.client_company_id)
+      const client = this.$store.state.clients.clients.find(c => item.project && c.client_company_id === item.project.client_company_id)
       if (client) {
         return client.color
       }

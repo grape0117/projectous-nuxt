@@ -7,6 +7,7 @@ import { generateUUID } from '@/utils/util-functions'
 import uuid from 'uuid'
 import { IProject } from '@/store/modules/projects/types'
 import { ITaskUser } from '@/store/modules/task_users/types'
+import { idbKeyval, idbGetAll } from '@/plugins/idb.ts'
 
 function createDefaultTask(): ITask {
   return {
@@ -43,6 +44,11 @@ function createDefaultTask(): ITask {
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
+  async getBoardTasksFromIDB({ state }, project_id) {
+    let tasks = await idbGetAll('tasks')
+
+    state.tasks_by_project = tasks.filter((task: ITask) => (task.project_id = project_id))
+  },
   async createTask({ commit, getters }: any, { title, project_id, sort_order, status, temp }: any) {
     const task = {
       ...createDefaultTask(),

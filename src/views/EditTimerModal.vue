@@ -11,8 +11,8 @@
         <option>Selected or Current User if Editing Timer?</option>
       </select>
     </div> -->
-    <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" id="timerEditTabShow">
+    <div class="b-tabs">
+      <div role="tabpanel" class="b-tab active" title="Details" id="timerEditTabShow">
         <form id="editTimerForm" class="form-horizontal">
           <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
           <div class="form-group">
@@ -179,16 +179,21 @@
           </div>-->
         </form>
       </div>
-      <div role="tabpanel" class="tab-pane" id="timerTableTab">
+      <div role="tabpanel" class="b-tab" id="timerTableTab">
         <table class="table timer-table">
           <tbody>
             <tr class="row-date">
               <td>Notes</td>
-              <td>RestartedAt</td>
               <td>Status</td>
-              <td>UpdatedAt</td>
+              <td>Duration</td>
+              <td>Updated</td>
             </tr>
-            <tr v-bind:history="history" v-for="history in timer.histories" :key="history" is="timelog-history-row"></tr>
+            <tr v-for="h in history" :key="h.id">
+              <td>{{ h.notes }}</td>
+              <td>{{ h.status }}</td>
+              <td>{{ durationHours(h.duration) }}:{{ durationMinutes(h.duration) }}</td>
+              <td>{{ h.updated_at }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -214,6 +219,7 @@ export default {
   },
   data: function() {
     return {
+      history: [],
       startSeconds: '',
       endSeconds: '',
       showInvoiceNotes: false,
@@ -279,6 +285,11 @@ export default {
     // })
   },
   watch: {
+    'timer.id': async function() {
+      const resp = await this.$http().get('/timer/' + this.timer.id + '/history')
+      console.log(resp.history)
+      this.history = resp.history
+    },
     'timer.project_id': function() {
       if (this.timer.project_id === 'create') {
         this.$store.dispatch('settings/closeModal', {
@@ -383,13 +394,19 @@ export default {
       await this.$store.dispatch('DELETE', { module: 'timers', entity: this.timer })
       await this.$store.commit('settings/setCurrentEditTimer', {})
     },
-    durationHours: function() {
+    durationHours(duration) {
+      if (typeof duration === 'number') {
+        return Math.floor(duration / 3600)
+      }
       if (typeof this.timer.duration != 'number') {
         return ''
       }
       return Math.floor(this.timer.duration / 3600)
     },
-    durationMinutes: function() {
+    durationMinutes(duration) {
+      if (typeof duration === 'number') {
+        return ('00' + Math.floor((duration % 3600) / 60)).slice(-2)
+      }
       if (typeof this.timer.duration != 'number') {
         return ''
       }

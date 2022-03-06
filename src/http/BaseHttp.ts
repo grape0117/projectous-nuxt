@@ -6,7 +6,8 @@ export class BaseHttp implements IHttp {
   protected baseUrl: any = process.env.VUE_APP_API_URL
   protected headers: any = {
     InstanceID: store.state.settings.instance_id,
-    Authorization: 'Bearer ' + getCookie('auth_token')
+    Authorization: 'Bearer ' + getCookie('auth_token'),
+    'Referrer-Policy': 'strict-origin-when-cross-origin'
   }
   protected offlineMode: boolean = false
   protected offlineNotifyUserMessage: string = 'You are offline, try later'

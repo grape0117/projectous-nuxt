@@ -354,13 +354,14 @@ export default {
           this.timer.project_id = projects_by_acronym[0].id
           // notes = notes.replace(acronym_match[0], '')
           console.log('acronym', acronym_match[0], notesWithAcronym.replace(acronym_match[0], ''))
+
+          let notes = notesWithAcronym.split(': ')[1] || notesWithAcronym
+
+          this.timer.notes = notes
+          event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
         }
       }
 
-      let notes = notesWithAcronym.split(': ')[1] || notesWithAcronym
-
-      this.timer.notes = notes
-      event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
       // await this.$store.dispatch('timers/saveTimer', this.timer)
       await this.saveTimer()
     }

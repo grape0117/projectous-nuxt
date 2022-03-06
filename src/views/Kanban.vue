@@ -204,7 +204,12 @@ export default class Custom extends Vue {
   }
 
   get project_tasks() {
-    return this.$store.state.tasks.tasks.filter((t: any) => t.project_id === this.selectedProjectId)
+    if (!this.selectedProjectId) return []
+
+    this.$store.dispatch('tasks/getBoardTasksFromIDB', this.selectedProjectId)
+    const tasks = this.$store.state.tasks.tasks_by_project
+    // console.log({tasks})
+    return tasks
   }
 
   get project_users() {
@@ -297,6 +302,8 @@ export default class Custom extends Vue {
       initiallyExpanded: true
     }))
   }
+
+  mounted() {}
 
   @TaskUsers.Getter('getById') private getTaskUserById!: any
   @TaskUsers.Getter private sortedByDays!: any

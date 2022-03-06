@@ -1,7 +1,7 @@
 <template>
   <span class="project-icon" :style="{ 'background-color': client.color }">
     <span v-html="icon"></span>
-    <span class="dragzone-project-acronym"> {{ project.acronym }}.. </span>
+    <span v-if="project" class="dragzone-project-acronym"> {{ project.acronym }} </span>
   </span>
 </template>
 

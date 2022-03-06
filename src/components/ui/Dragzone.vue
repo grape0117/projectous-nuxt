@@ -298,6 +298,7 @@ export default class Dragzone extends Vue {
 
       if (projects_by_acronym.length === 1) {
         //TODO: update history
+        console.log({ acronym_match })
         this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'project_id', value: projects_by_acronym[0].id }, { root: true })
         const title = titleWithAcronym.replace(acronym_match[0], '')
         this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'title', value: title }, { root: true })
@@ -373,11 +374,9 @@ export default class Dragzone extends Vue {
 }
 .dragzone__item-info {
   width: 100%;
-  text-indent: -30px;
-  position: relative;
-  /*display: flex;*/
-  /*justify-content: flex-start;*/
-  /*align-items: flex-start;*/
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
   word-break: break-word;
 }
 .burger-icon-wrapper {
@@ -492,12 +491,7 @@ export default class Dragzone extends Vue {
   background: lightgrey; /*#cef3f7;*/
 }
 .dragzone__item-text {
-  margin-left: 10px;
-  text-indent: 30px;
-  display: inline-block;
-  width: calc(100%);
-  border-bottom: blue;
-  min-height: 10px;
+  margin-left: 5px;
   flex-grow: 1;
   min-height: 1.459em;
   font-size: 0.9rem;
@@ -600,9 +594,9 @@ export default class Dragzone extends Vue {
   display: flex;
 }
 .dragzone-project-acronym-wrapper {
-  /*display: flex;*/
-  /*flex-direction: column;*/
-  /*align-items: center;*/
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 *:focus {

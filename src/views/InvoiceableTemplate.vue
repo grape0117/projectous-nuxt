@@ -68,9 +68,9 @@
                   <b-form-checkbox v-model="anytime" name="anytime" class="mr-2">
                     Anytime
                   </b-form-checkbox>
-                  <b-form-checkbox v-if="isAdmin()" v-model="show_paid" name="show_paid" class="mr-2">
-                    Show paid
-                  </b-form-checkbox>
+                  <!--<b-form-checkbox v-if="isAdmin()" v-model="show_paid" name="show_paid" class="mr-2">-->
+                  <!--Show paid-->
+                  <!--</b-form-checkbox>-->
                   <b-form-checkbox v-if="isAdmin()" v-model="show_invoiced" name="show_invoiced">
                     Show Invoiced
                   </b-form-checkbox>
@@ -223,7 +223,7 @@ export default {
       not_projects: this.$route.query.not_project == 1,
       utc: this.$route.query.utc == 1,
       sort: 'date', //TODO
-      show_invoiced: this.$route.query.is_invoiced == 1,
+      show_invoiced: this.$route.query.is_invoiced == 1 ? 1 : 0,
       invoice_id: null,
       timers: [],
       invoice_items: [],
@@ -317,6 +317,7 @@ export default {
     if (sessionStorage.getItem('invoiceable')) {
       console.log('invoiceable', new URLSearchParams(sessionStorage.getItem('invoiceable')).toString())
       this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() })
+      console.log(this.$route)
     }
   },
   mounted() {
@@ -428,7 +429,7 @@ export default {
       return this.$store.getters['settings/isTecharound']
     },
     lastMonth: function() {
-      alert('lastMonth')
+      // alert('lastMonth')
       let now = new Date()
       let lastday = new Date(now.getFullYear(), now.getMonth(), 0)
       let firstday = new Date(lastday.getFullYear(), lastday.getMonth(), 1)
@@ -439,7 +440,7 @@ export default {
     thisMonth: function() {
       let now = new Date()
       let lastday = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-      this.start = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate()
+      this.start = now.getFullYear() + '-' + (now.getMonth() + 1) + '-01'
       this.end = lastday.getFullYear() + '-' + (lastday.getMonth() + 1) + '-' + lastday.getDate()
       this.getData('thismonth')
     },
@@ -469,7 +470,7 @@ export default {
     },
     filteredclients(chosen_clients) {
       let self = this
-      return this.clients //TODO: make this work:
+      // return this.clients //TODO: make this work:
       return self.clients.filter(function(client) {
         if (chosen_clients.indexOf('0') === -1) {
           if (typeof chosen_clients[0] !== 'number') {
