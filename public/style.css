@@ -881,3 +881,29 @@ div:hover > .hover-action {
     cursor: col-resize;
     z-index: 999
 }
+
+.transparent-button > button {
+    color: white; 
+    background-color: transparent; 
+    border-color: transparent; 
+    text-transform: uppercase; 
+    font-weight: bold;
+}
+
+.transparent-button > .btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active, .show > .btn-secondary.dropdown-toggle {
+    color: #fff;
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.transparent-button > .show .btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active, .show > .btn-secondary.dropdown-toggle {
+    color: #fff !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
+
+.transparent-button > .btn-secondary:focus, .btn-secondary.focus {
+    color: #fff !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
