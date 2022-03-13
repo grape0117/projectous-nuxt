@@ -9,10 +9,18 @@
           <span class="reload-text">RELOAD</span>
         </div>
       </div>
-      <div class="nav-buttons">
+      <div class="nav-buttons" style="align-items: center;">
         <router-link class="nav-buttons__button" :to="button.path" v-for="(button, index) in navLinks" :style="{ 'text-decoration': $route.path === button.path ? 'underline' : '' }" :key="index">
           {{ button.name | toUpperCase }}
         </router-link>
+        <div>
+          <b-dropdown id="dropdown-divider" class="transparent-button" text="Reports">
+            <b-dropdown-item-button><router-link to="/days">Days</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/invoiceable">Invoiceable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/payable">Payable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/profit">Profit</router-link></b-dropdown-item-button>
+          </b-dropdown>
+        </div>
       </div>
     </div>
     <div class="header-bottom">
@@ -90,8 +98,7 @@ export default Vue.extend({
         { name: 'Projects', path: '/projects' },
         { name: 'clients', path: '/clients' },
         { name: 'users', path: '/users' },
-        { name: 'invoices', path: '/invoices' },
-        { name: 'reports', path: '/reports' }
+        { name: 'invoices', path: '/invoices' }
       ],
       colors: {
         backgroundColor: ['0', '0', '0'],
