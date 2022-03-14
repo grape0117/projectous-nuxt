@@ -13,135 +13,169 @@
     </div> -->
     <div class="b-tabs">
       <div role="tabpanel" class="b-tab active" title="Details" id="timerEditTabShow">
-        <form id="editTimerForm" class="form-horizontal">
-          <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
-          <div class="form-group">
-            <label class="control-label col-sm-4" for="timer-modal-project-id">Project: </label>
-            <div class="col-sm-12">
-              <select id="timer-modal-project-id" class="form-control" name="project_id" v-model="timer.project_id">
-                <option :value="null">***** Select Project *****</option>
-                <option value="create">Create New Project</option>
-                <option v-for="(project, projectIndex) in openprojects()" :key="projectIndex" v-bind:project="project" :value="project.id">
-                  {{ client_name(project.client_company_id) }} -
-                  {{ project.name }}
-                </option>
-              </select>
-            </div>
-            <div class="col-sm-2 edit-ClientProject">
-              <a v-on:click="editClient()" class="edit-ClientProject-a-tag">Edit Client</a>
-              <a v-on:click="editProject()" class="edit-ClientProject-a-tag">Edit Project</a>
-            </div>
-          </div>
-          <div class="form-group">
-            <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer" @update-duration="updateDuration" @update-invoice-duration="updateInvoiceDuration"></timer-modal-time-standard>
-          </div>
+        <!--START OF TAB IMPLEMENTATION-->
+        <div class="row">
+          <div class="col-sm-12">
+            <div>
+              <b-tabs content-class="mt-3">
+                <b-tab title="Details" active>
+                  <form id="editTimerForm" class="form-horizontal">
+                    <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
+                    <div class="form-group">
+                      <label class="control-label col-sm-4" for="timer-modal-project-id">Project: </label>
+                      <div class="col-sm-12">
+                        <select id="timer-modal-project-id" class="form-control" name="project_id" v-model="timer.project_id">
+                          <option :value="null">***** Select Project *****</option>
+                          <option value="create">Create New Project</option>
+                          <option v-for="(project, projectIndex) in openprojects()" :key="projectIndex" v-bind:project="project" :value="project.id">
+                            {{ client_name(project.client_company_id) }} -
+                            {{ project.name }}
+                          </option>
+                        </select>
+                      </div>
+                      <div class="col-sm-2 edit-ClientProject">
+                        <a v-on:click="editClient()" class="edit-ClientProject-a-tag">Edit Client</a>
+                        <a v-on:click="editProject()" class="edit-ClientProject-a-tag">Edit Project</a>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer" @update-duration="updateDuration" @update-invoice-duration="updateInvoiceDuration"></timer-modal-time-standard>
+                    </div>
 
-          <div class="form-group">
-            <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
-            <div class="timer-modal_notes" style="padding-left: 14px">
-              <div contenteditable="true" id="timerUserNotes" class="form-control" style="min-height: 60px; height: auto;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
-            </div>
-          </div>
+                    <div class="form-group">
+                      <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
+                      <div class="timer-modal_notes" style="padding-left: 14px">
+                        <div contenteditable="true" id="timerUserNotes" class="form-control" style="min-height: 60px; height: auto;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
+                      </div>
+                    </div>
 
-          <div v-if="isAdmin" class="form-group">
-            <label class="control-label col-sm-4" for="timerInvoiceId">Invoice Number:</label>
-            <input name="invoice_id" id="timerInvoiceId" v-model="timer.invoice_id" />
-          </div>
+                    <div v-if="isAdmin" class="form-group">
+                      <label class="control-label col-sm-4" for="timerInvoiceId">Invoice Number:</label>
+                      <input name="invoice_id" id="timerInvoiceId" v-model="timer.invoice_id" />
+                    </div>
 
-          <div class="form-group">
-            <span class="set-button" :style="{ 'background-color': !showInvoiceNotes ? '#6c8eff' : '#231F20' }" @click="clearInvoiceNotes()">
-              Set Invoice Notes
-            </span>
-            <span class="set-button" :style="{ 'background-color': !showAdminNotes ? '#6c8eff' : '#231F20' }" @click="clearAdminNotes()">
-              Set Admin Notes
-            </span>
-          </div>
-          <!-- [ Set Invoice Notes ] [ Set Admin Notes (internal company notes, not visible to client) ] -->
-          <div v-if="isAdmin" class="form-group">
-            <label v-if="showInvoiceNotes" class="control-label col-sm-4" for="timerInvoiceNotes">Invoice Notes: </label>
-            <div v-if="showInvoiceNotes" class="col-sm-12 invoice-notes" style="padding-right: 0;">
-              <div contenteditable="true" id="timerInvoiceNotes" class="form-control" style="min-height: 60px; max-height: 90px; overflow-y: auto;" v-html="getInvoiceNotes" @blur="setInvoiceNotes"></div>
-              <div class="clear-set-input">
-                <a href="javascript:void(0)" @click="clearInvoiceNotes">Clear and hide</a>
-              </div>
-            </div>
-          </div>
+                    <div class="form-group">
+                      <span class="set-button" :style="{ 'background-color': !showInvoiceNotes ? '#6c8eff' : '#231F20' }" @click="clearInvoiceNotes()">
+                        Set Invoice Notes
+                      </span>
+                      <span class="set-button" :style="{ 'background-color': !showAdminNotes ? '#6c8eff' : '#231F20' }" @click="clearAdminNotes()">
+                        Set Admin Notes
+                      </span>
+                    </div>
+                    <!-- [ Set Invoice Notes ] [ Set Admin Notes (internal company notes, not visible to client) ] -->
+                    <div v-if="isAdmin" class="form-group">
+                      <label v-if="showInvoiceNotes" class="control-label col-sm-4" for="timerInvoiceNotes">Invoice Notes: </label>
+                      <div v-if="showInvoiceNotes" class="col-sm-12 invoice-notes" style="padding-right: 0;">
+                        <div contenteditable="true" id="timerInvoiceNotes" class="form-control" style="min-height: 60px; max-height: 90px; overflow-y: auto;" v-html="getInvoiceNotes" @blur="setInvoiceNotes"></div>
+                        <div class="clear-set-input">
+                          <a href="javascript:void(0)" @click="clearInvoiceNotes">Clear and hide</a>
+                        </div>
+                      </div>
+                    </div>
 
-          <!-- Admin Notes: (visible to users, not clients) -->
-          <div v-if="isAdmin" class="form-group">
-            <label v-if="showAdminNotes" class="control-label col-sm-4" for="timerInvoiceNotes">Admin Notes:</label>
-            <div v-if="showAdminNotes" class="col-sm-12" style="padding-right: 0;">
-              <div contenteditable="true" id="timerAdminNotes" class="form-control" style="min-height: 60px; max-height: 90px; overflow-y: auto" v-html="getAdminNotes" @blur="setAdminNotes"></div>
-              <div class="clear-set-input">
-                <a href="javascript:void(0)" @click="clearAdminNotes">Clear and hide</a>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-sm-4" for="timerTaskSelect">Task: </label>
-            <div class="col-sm-8">
-              <select name="task_id" id="timerTaskSelect" class="form-control" v-model="timer.task_id">
-                <option value="0">***** Select Task *****</option>
-                <option v-for="task in projecttasks(timer.project_id)" :value="task.id" :key="task.id">{{ task.title }}</option>
-              </select>
-            </div>
-          </div>
-          <div v-if="isAdmin" class="form-group">
-            <label class="control-label col-sm-4" for="timerUserSelect">User: </label>
-            <div class="col-sm-8">
-              <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer.company_user_id">
-                <option value="">***** Select User *****</option>
-                <option :selected="isTimerUser(user.id)" v-for="user in users.filter(u => u.user_type === 'user')" :key="user.id" :value="user.id">
-                  {{ user.name }}
-                </option>
-                <option>Selected or Current User if Editing Timer?</option>
-              </select>
-            </div>
-          </div>
-          <div v-if="isAdmin" class="form-group">
-            <label class="control-label col-sm-4" for="timerUserTime">Is billable? </label>
-            <div class="col-sm-8">
-              <div class="checkbox">
-                <label>
-                  <input name="is_billable" type="checkbox" id="blankCheckbox" value="1" v-model="timer.is_billable" aria-label="..." />
-                </label>
-              </div>
-            </div>
-          </div>
-          <div v-if="isAdmin" class="form-group">
-            <label class="control-label col-sm-4" for="report_at">User Rate: </label>
-            <div class="col-sm-8">
-              <input name="user_rate" type="datetime" id="user_rate" :placeholder="user_rate_placeholder()" class="form-control" :value="user_rate_value()" />
-            </div>
-          </div>
-          <div v-if="isAdmin" class="form-group">
-            <label class="control-label col-sm-4" for="client_rate">Client Rate: </label>
-            <div class="col-sm-8">
-              <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value()" />
-            </div>
-          </div>
-          <!-- <div class="form-group">
-            <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
-            <div class="col-sm-8">
-              <div contenteditable="true" id="timerUserNotes" class="form-control" style="height: auto; min-height: 35px;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
-            </div>
-          </div> -->
+                    <!-- Admin Notes: (visible to users, not clients) -->
+                    <div v-if="isAdmin" class="form-group">
+                      <label v-if="showAdminNotes" class="control-label col-sm-4" for="timerInvoiceNotes">Admin Notes:</label>
+                      <div v-if="showAdminNotes" class="col-sm-12" style="padding-right: 0;">
+                        <div contenteditable="true" id="timerAdminNotes" class="form-control" style="min-height: 60px; max-height: 90px; overflow-y: auto" v-html="getAdminNotes" @blur="setAdminNotes"></div>
+                        <div class="clear-set-input">
+                          <a href="javascript:void(0)" @click="clearAdminNotes">Clear and hide</a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-sm-4" for="timerTaskSelect">Task: </label>
+                      <div class="col-sm-8">
+                        <select name="task_id" id="timerTaskSelect" class="form-control" v-model="timer.task_id">
+                          <option value="0">***** Select Task *****</option>
+                          <option v-for="task in projecttasks(timer.project_id)" :value="task.id" :key="task.id">{{ task.title }}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div v-if="isAdmin" class="form-group">
+                      <label class="control-label col-sm-4" for="timerUserSelect">User: </label>
+                      <div class="col-sm-8">
+                        <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer.company_user_id">
+                          <option value="">***** Select User *****</option>
+                          <option :selected="isTimerUser(user.id)" v-for="user in users.filter(u => u.user_type === 'user')" :key="user.id" :value="user.id">
+                            {{ user.name }}
+                          </option>
+                          <option>Selected or Current User if Editing Timer?</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div v-if="isAdmin" class="form-group">
+                      <label class="control-label col-sm-4" for="timerUserTime">Is billable? </label>
+                      <div class="col-sm-8">
+                        <div class="checkbox">
+                          <label>
+                            <input name="is_billable" type="checkbox" id="blankCheckbox" value="1" v-model="timer.is_billable" aria-label="..." />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-if="isAdmin" class="form-group">
+                      <label class="control-label col-sm-4" for="report_at">User Rate: </label>
+                      <div class="col-sm-8">
+                        <input name="user_rate" type="datetime" id="user_rate" :placeholder="user_rate_placeholder()" class="form-control" :value="user_rate_value()" />
+                      </div>
+                    </div>
+                    <div v-if="isAdmin" class="form-group">
+                      <label class="control-label col-sm-4" for="client_rate">Client Rate: </label>
+                      <div class="col-sm-8">
+                        <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value()" />
+                      </div>
+                    </div>
+                    <!-- <div class="form-group">
+                        <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
+                        <div class="col-sm-8">
+                          <div contenteditable="true" id="timerUserNotes" class="form-control" style="height: auto; min-height: 35px;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
+                        </div>
+                      </div> -->
 
-          <div class="form-group">
-            <label class="control-label col-sm-4" for="report_at">Started at: </label>
-            <div class="col-sm-8">
-              <input name="report_at" type="datetime" id="report_at" class="form-control" v-model="timer.report_at" />
+                    <div class="form-group">
+                      <label class="control-label col-sm-4" for="report_at">Started at: </label>
+                      <div class="col-sm-8">
+                        <input name="report_at" type="datetime" id="report_at" class="form-control" v-model="timer.report_at" />
+                      </div>
+                    </div>
+                  </form>
+                </b-tab>
+                <b-tab title="History">
+                  <div role="tabpanel" class="b-tab" id="timerTableTab">
+                    <table class="table timer-table">
+                      <tbody>
+                        <tr class="row-date">
+                          <td>Notes</td>
+                          <td>Status</td>
+                          <td>Duration</td>
+                          <td>Updated</td>
+                        </tr>
+                        <tr v-for="h in history" :key="h.id">
+                          <td>{{ h.notes }}</td>
+                          <td>{{ h.status }}</td>
+                          <td>{{ durationHours(h.duration) }}:{{ durationMinutes(h.duration) }}</td>
+                          <td>{{ h.updated_at }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </b-tab>
+              </b-tabs>
             </div>
           </div>
-          <!--          <div v-if="isIHI()" class="form-group">
+        </div>
+        <!--END OF TAB IMPLEMENTATION-->
+
+        <!--          <div v-if="isIHI()" class="form-group">
             <label class="control-label col-sm-4" for="timerUserTime">Date: </label>
             <div class="col-sm-8">
               <input type="date" id="timerUserDate" class="form-control" :value="timerDate()" />
             </div>
           </div>-->
-          <!-- <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard> -->
+        <!-- <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer"></timer-modal-time-standard> -->
 
-          <!--<div v-if="isIHI()" class="form-group row">
+        <!--<div v-if="isIHI()" class="form-group row">
             <label for="projectName" class="control-label labelLeft col-sm-4" style="line-height:46px;">Start: </label>
             <div class="col-sm-8 fieldRight">
               <div id="timesSliderStart" class="carousel timesSlider slide" data-ride="carousel" data-interval="false">
@@ -177,25 +211,6 @@
               </div>
             </div>
           </div>-->
-        </form>
-      </div>
-      <div role="tabpanel" class="b-tab" id="timerTableTab">
-        <table class="table timer-table">
-          <tbody>
-            <tr class="row-date">
-              <td>Notes</td>
-              <td>Status</td>
-              <td>Duration</td>
-              <td>Updated</td>
-            </tr>
-            <tr v-for="h in history" :key="h.id">
-              <td>{{ h.notes }}</td>
-              <td>{{ h.status }}</td>
-              <td>{{ durationHours(h.duration) }}:{{ durationMinutes(h.duration) }}</td>
-              <td>{{ h.updated_at }}</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
     <template v-slot:modal-footer="{ ok, cancel }">
@@ -288,6 +303,9 @@ export default {
     'timer.id': async function() {
       const resp = await this.$http().get('/timer/' + this.timer.id + '/history')
       console.log(resp.history)
+      resp.history.sort(function(a, b) {
+        return b.id - a.id
+      })
       this.history = resp.history
     },
     'timer.project_id': function() {
