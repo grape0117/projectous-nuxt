@@ -110,12 +110,18 @@
             <tbody v-if="isAdmin()" class="row-2017-2-18">
               <tr class="row-date">
                 <td colspan="100">
-                  <span style="color: darkblue"> Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} </span>&nbsp;
+                  <b-badge variant="dark" style="opacity:50%">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} ({{ this.timeToDecimal(Math.trunc(total_time / 3600), Math.trunc((total_time % 3600) / 60)) }})</b-badge>&nbsp; <b-badge variant="dark" style="opacity:50%">Entries: {{ timers.length }}</b-badge
+                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</b-badge
+                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Unbilled: ${{ Math.trunc(total_unbillable * 100) / 100 }}</b-badge
+                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</b-badge
+                  >&nbsp;
+                  <b-badge variant="dark" style="opacity:50%">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</b-badge>
+                  <!--<span style="color: darkblue"> Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} </span>&nbsp;
                   <span style="color: orange;">Entries: {{ timers.length }}</span>
                   <span style="color: olive;">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</span>
                   <span v-if="total_unbillable" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span>
                   <span v-if="isAdmin()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightseagreen;">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</span>
+                  <span v-if="isAdmin()" style="color: lightseagreen;">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</span>>-->
                 </td>
               </tr>
               <tr class="row-date">
@@ -331,7 +337,7 @@ export default {
     },
     initEndDate() {
       const current_date = new Date()
-      return this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 2) + '-00'
+      return this.$route.query.end ? decodeURI(this.$route.query.end) : current_date.getFullYear() + '-' + (current_date.getMonth() + 2) + '-00'
     },
     setStart(start) {
       this.start = start
@@ -490,6 +496,11 @@ export default {
         //this.chosen_clients.push(e.target.value*1)
       }
       //console.log(this.chosen_clients)
+    },
+    timeToDecimal(hour, min) {
+      const dec = parseInt((min / 6) * 10, 10)
+
+      return parseFloat(parseInt(hour, 10) + '.' + (dec < 10 ? '0' : '') + dec)
     },
     async getData(where) {
       this.loading_data = true
