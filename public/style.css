@@ -907,3 +907,9 @@ div:hover > .hover-action {
     background-color: transparent !important;
     border-color: transparent !important;
 }
+
+.transparent-button > .btn-secondary:hover {
+    color: #fff;
+    background-color: transparent !important;
+    /* border-color: transparent !important; */
+}
