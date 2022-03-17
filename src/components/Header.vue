@@ -247,9 +247,8 @@ export default Vue.extend({
     })
 
     const report_menu = document.querySelector('.dropdown-menu')
-    console.log(report_menu)
+    console.log(report_menu, this.bgStyle)
     if (report_menu) {
-      console.log(report_menu, this.bgStyle)
       report_menu.style.backgroundColor = this.bgStyle
     }
   },
@@ -317,9 +316,9 @@ export default Vue.extend({
     if (bgStyle) {
       try {
         let style = JSON.parse(bgStyle)
-        this.bgStyle = style
+        this.bgStyle = style.replace(', 0.6', '')
       } catch (error) {
-        this.bgStyle = bgStyle
+        this.bgStyle = bgStyle.replace(', 0.6', '')
       }
     } else {
       const style_color = 'rgba(255, 165, 0, 0.6)'
