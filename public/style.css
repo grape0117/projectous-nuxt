@@ -913,3 +913,11 @@ div:hover > .hover-action {
     background-color: transparent !important;
     /* border-color: transparent !important; */
 }
+
+.white-text {
+    color: white !important;
+}
+
+.white-text:hover {
+    color: black !important;
+}

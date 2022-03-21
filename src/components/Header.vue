@@ -15,10 +15,10 @@
         </router-link>
         <div>
           <b-dropdown id="dropdown-divider" class="transparent-button" text="Reports">
-            <b-dropdown-item-button><router-link to="/days">Days</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link to="/invoiceable">Invoiceable</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link to="/payable">Payable</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link to="/profit">Profit</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/days" class="white-text">Days</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/invoiceable" class="white-text">Invoiceable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/payable" class="white-text">Payable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/profit" class="white-text">Profit</router-link></b-dropdown-item-button>
           </b-dropdown>
         </div>
       </div>
@@ -246,11 +246,7 @@ export default Vue.extend({
       this.timerRunning = false
     })
 
-    const report_menu = document.querySelector('.dropdown-menu')
-    console.log(report_menu, this.bgStyle)
-    if (report_menu) {
-      report_menu.style.backgroundColor = this.bgStyle
-    }
+    this.updateBackground()
   },
   methods: {
     reload() {
@@ -275,8 +271,17 @@ export default Vue.extend({
       document.cookie = 'auth_token=' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
       window.location.reload()
     },
+    updateBackground(option = null) {
+      const report_menu = document.querySelector('.dropdown-menu')
+      console.log(report_menu, this.bgStyle)
+      if (report_menu) {
+        report_menu.style.backgroundColor = option ? option.replace(', 0.6', '') : this.bgStyle
+      }
+    },
     setBackground(option, theme) {
       EventBus.$emit('changeBackground', { option, theme })
+      this.updateBackground(option)
+      console.log('HERE 2')
     },
     async toggle(iconName) {
       if (iconName === 'reload') {

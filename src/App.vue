@@ -135,6 +135,7 @@ export default {
       if (typeof this.bgStyle === 'object') {
         return `url(${this.bgStyle.image})`
       }
+      console.log('HERE')
       return this.bgStyle
     },
     current_edit_task: function() {
