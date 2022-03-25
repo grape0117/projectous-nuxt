@@ -346,7 +346,7 @@ export default {
       // Check for ABC: //TODO: move somewhere else to common area?
       const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
       const acronym_match = notesWithAcronym ? notesWithAcronym.match(projectRegex) : null
-      console.log('saveNotes', acronym_match)
+      // console.log('saveNotes', acronym_match)
       // We have an acronym. Look for a matching project
       let notes
       if (acronym_match && acronym_match[1]) {
