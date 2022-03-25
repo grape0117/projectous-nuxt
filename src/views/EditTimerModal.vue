@@ -22,6 +22,14 @@
                   <form id="editTimerForm" class="form-horizontal">
                     <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
                     <div class="form-group">
+                      <div class="col-sm-12">
+                        <b-input-group class="mt-3 mb-3">
+                          <b-form-input v-on:focus="$event.target.select()" ref="timerLink" readonly v-model="timer_link"></b-form-input>
+                          <b-input-group-append>
+                            <b-button variant="info" @click="copyTimerLink()"><b-icon icon="clipboard" aria-hidden="true"></b-icon></b-button>
+                          </b-input-group-append>
+                        </b-input-group>
+                      </div>
                       <label class="control-label col-sm-4" for="timer-modal-project-id">Project: </label>
                       <div class="col-sm-12">
                         <select id="timer-modal-project-id" class="form-control" name="project_id" v-model="timer.project_id">
@@ -238,7 +246,8 @@ export default {
       startSeconds: '',
       endSeconds: '',
       showInvoiceNotes: false,
-      showAdminNotes: false
+      showAdminNotes: false,
+      timer_link: null
     }
   },
   computed: {
@@ -301,6 +310,8 @@ export default {
   },
   watch: {
     'timer.id': async function() {
+      const timer_url = `${window.location.origin}?timer_id=${this.timer.id}`
+      this.timer_link = timer_url
       const resp = await this.$http().get('/timer/' + this.timer.id + '/history')
       console.log(resp.history)
       resp.history.sort(function(a, b) {
@@ -321,6 +332,17 @@ export default {
     }
   },
   methods: {
+    copyTimerLink() {
+      this.$refs.timerLink.focus()
+      document.execCommand('copy')
+
+      this.$bvToast.toast('Timer link copied to clipboard!', {
+        title: `Copy link`,
+        variant: 'info',
+        autoHideDelay: 2000,
+        solid: true
+      })
+    },
     updateDuration(duration) {
       this.timer.duration = duration
     },
@@ -516,7 +538,6 @@ export default {
           }
         }
       }
-
       let result = this.$store.dispatch('timers/saveTimer', this.timer)
       console.log('result')
       console.log(result)
