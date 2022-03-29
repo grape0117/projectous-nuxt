@@ -769,7 +769,7 @@ tr.sub-head {
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    user-select: none;
+    user-select: auto;
 }
 
 .hover-action {

@@ -109,17 +109,6 @@
           <table class="table timer-table">
             <tbody v-if="isAdmin()" class="row-2017-2-18">
               <tr class="row-date">
-                <td colspan="100">
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">Total Time: {{ this.convertToTwoDecimalPlace('time') }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="font-size: 13px; background:none;">Entries: {{ timers.length }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="font-size: 13px; background:none;">Total Earned: {{ this.convertToTwoDecimalPlace('earned') }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="font-size: 13px; background:none;">Total Unbilled: {{ this.convertToTwoDecimalPlace('unbilled') }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="font-size: 13px; background:none;">Total Unpaid: {{ this.convertToTwoDecimalPlace('unpaid') }}</b-badge
-                  >&nbsp;
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">Total: {{ this.convertToTwoDecimalPlace('total') }}</b-badge>
-                </td>
-              </tr>
-              <tr class="row-date">
                 <td style="width: 20px">
                   <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
                 </td>
@@ -151,7 +140,11 @@
                   <b-badge variant="dark" style="font-size: 13px; background:none;">{{ timers.length }} {{ timers.length > 1 ? 'Entries' : 'Entry' }}</b-badge>
                 </td>
                 <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">{{ this.convertToTwoDecimalPlace('earned') }}<br />{{ this.convertToTwoDecimalPlace('unbilled') !== '$0.00' ? this.convertToTwoDecimalPlace('unbilled') : '' }}</b-badge>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">
+                    Earned: {{ this.convertToTwoDecimalPlace('earned') }}<br />
+                    Unpaid: {{ this.convertToTwoDecimalPlace('unpaid') }}<br />
+                    Total: {{ this.convertToTwoDecimalPlace('total') }}
+                  </b-badge>
                 </td>
                 <td>
                   <b-badge variant="dark" style="font-size: 13px; background:none;">Project</b-badge>
@@ -162,9 +155,11 @@
                 <td>
                   <b-badge variant="dark" style="font-size: 13px; background:none;">User</b-badge>
                 </td>
-                <td></td>
                 <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">{{ this.convertToTwoDecimalPlace('time') }}</b-badge>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Unbilled ({{ this.total_unbillable }})</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Time</b-badge>
                 </td>
                 <td>
                   <b-badge variant="dark" style="font-size: 13px; background:none;">Notes</b-badge>
@@ -217,6 +212,7 @@
 import Vue from 'vue'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
+import moment from 'moment'
 
 export default {
   name: 'invoiceable-template',
@@ -280,6 +276,9 @@ export default {
     timer_watch() {
       return this.$store.state.settings.timer_watch
     }
+  },
+  created() {
+    this.$root.$refs.Invoiceable = this
   },
   watch: {
     timer_watch: function() {
@@ -522,14 +521,21 @@ export default {
 
       return parseFloat(parseInt(hour, 10) + '.' + (dec < 10 ? '0' : '') + dec)
     },
-    convertToTwoDecimalPlace(type) {
+    convertToTwoDecimalPlace(type, time = null) {
       let updated_value
       if (type === 'time') {
-        updated_value = `${Math.trunc(this.total_time / 3600)}:${Math.trunc((this.total_time % 3600) / 60)} (${this.timeToDecimal(Math.trunc(this.total_time / 3600), Math.trunc((this.total_time % 3600) / 60))})`
+        let time_reference = this.total_time
+        console.log(time_reference)
+        if (time) {
+          time_reference = time
+        }
+
+        updated_value = `${Math.trunc(time_reference / 3600)}:${Math.trunc((time_reference % 3600) / 60)} (${this.timeToDecimal(Math.trunc(time_reference / 3600), Math.trunc((time_reference % 3600) / 60))})`
       } else if (type === 'earned') {
         updated_value = Math.trunc(this.total_earned * 100) / 100
       } else if (type === 'unbilled') {
         updated_value = Math.trunc(this.total_unbillable * 100) / 100
+        return updated_value
       } else if (type === 'unpaid') {
         updated_value = Math.trunc(this.total_unpaid * 100) / 100
       } else if (type === 'total') {
@@ -562,6 +568,7 @@ export default {
 
         this.invoice_items = invoice_items
         this.timers = timers
+        console.log('TIMERS', timers)
         this.total_time = 0
         this.total_earned = 0
         this.total_unpaid = 0
@@ -580,6 +587,9 @@ export default {
             this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
           }
         }
+
+        console.log('3TIMERS', timers.length)
+        console.log('UNBILLABLE', this.total_unbillable)
       } else {
         // const { timers } = await this.$http().post('payable-timers', data)
         // this.timers = timers
