@@ -159,11 +159,9 @@
                   <b-badge variant="dark" style="font-size: 13px; background:none;">Unbilled ({{ this.total_unbillable }})</b-badge>
                 </td>
                 <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">Time</b-badge>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Time: {{ this.convertToTwoDecimalPlace('time') }}</b-badge>
                 </td>
-                <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">Notes</b-badge>
-                </td>
+                <td></td>
               </tr>
             </tbody>
             <tbody v-else class="row-2017-2-18">
