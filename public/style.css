@@ -887,7 +887,7 @@ div:hover > .hover-action {
     background-color: transparent; 
     border-color: transparent; 
     text-transform: uppercase; 
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .transparent-button > .btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active, .show > .btn-secondary.dropdown-toggle {
@@ -911,13 +911,13 @@ div:hover > .hover-action {
 .transparent-button > .btn-secondary:hover {
     color: #fff;
     background-color: transparent !important;
-    /* border-color: transparent !important; */
+    border-color: none !important;
 }
 
 .white-text {
     color: white !important;
 }
 
-.white-text:hover {
-    color: black !important;
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: #ffffff47 !important;
 }
