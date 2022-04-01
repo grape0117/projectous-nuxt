@@ -2,7 +2,7 @@
   <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close">
     <template #modal-title>
       {{ title }}&nbsp;&nbsp;
-      <b-button v-b-tooltip.hover title="Copy timer link" size="sm" variant="info" @click="copyTimerLink()">
+      <b-button v-b-tooltip.hover title="Copy timer link" size="sm" variant="info" @click="copyTimerLink()" :style="buttonStyle">
         <b-icon icon="clipboard" aria-hidden="true"></b-icon>
       </b-button>
     </template>
@@ -226,6 +226,7 @@
 import TimerModalTimeStandard from './TimerModalTimeStandard.vue'
 import TimerFifteenTemplate from './TimerFifteenTemplate.vue'
 import Vue from 'vue'
+import { getCookie } from '@/utils/util-functions'
 
 export default {
   name: 'timer-modal',
@@ -242,7 +243,24 @@ export default {
       showAdminNotes: false,
       timer_link: null,
       dismissSecs: 3,
-      dismissCountDown: 0
+      dismissCountDown: 0,
+      buttonStyle: ''
+    }
+  },
+  created() {
+    console.log('HERE')
+    let bgStyle = getCookie('bg-style')
+    if (bgStyle) {
+      try {
+        let style = JSON.parse(bgStyle)
+        this.buttonStyle = `background-color:${style}`
+      } catch (error) {
+        this.buttonStyle = `background-color:${buttonStyle}`
+      }
+    } else {
+      const style_color = 'rgba(255, 165, 0, 0.6)'
+      this.buttonStyle = `background-color:${style_color}`
+      console.log('HERE')
     }
   },
   computed: {
