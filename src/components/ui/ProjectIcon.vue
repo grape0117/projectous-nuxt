@@ -1,5 +1,5 @@
 <template>
-  <span class="project-icon" :style="{ 'background-color': client.color }">
+  <span v-if="project.acronym" class="project-icon" :style="{ 'background-color': client ? client.color : '' }">
     <span v-html="icon"></span>
     <span v-if="project" class="dragzone-project-acronym"> {{ project.acronym }} </span>
   </span>
@@ -24,7 +24,7 @@ export default {
     icon() {
       if (this.client && this.client.url && (this.client.url === this.project.project_url || !this.project.project_url)) {
         return '<img class="project-favicon" src="' + process.env.VUE_APP_API_URL + '/clients/' + this.client.id + '/favicon.png" />'
-      } else if (project.project_url) {
+      } else if (this.project.project_url) {
         return '<img class="project-favicon" src="' + process.env.VUE_APP_API_URL + '/projects/' + this.project.id + '/favicon.png" />'
       } else {
         return ''

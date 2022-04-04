@@ -1,16 +1,10 @@
 <template>
   <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close">
     <template #modal-title>
-      {{ title }}&nbsp;&nbsp;
-      <b-button v-b-tooltip.hover title="Copy timer link" size="sm" variant="info" @click="copyTimerLink()" :style="buttonStyle">
-        <b-icon icon="clipboard" aria-hidden="true"></b-icon>
-      </b-button>
+      <copy-link-template :link="timer_link" :title="title"></copy-link-template>
     </template>
     <div class="b-tabs">
       <div>
-        <b-input-group>
-          <b-form-input style="height:1px; width:1px; opacity:0;" v-on:focus="$event.target.select()" ref="timerLink" readonly v-model="timer_link"></b-form-input>
-        </b-input-group>
         <b-alert :show="dismissCountDown" dismissible variant="success" @dismissed="dismissCountDown = 0" @dismiss-count-down="countDownChanged"><b-icon icon="check-circle-fill" variant="success"></b-icon>&nbsp;Timer link copied to clipboard!</b-alert>
       </div>
       <div role="tabpanel" class="b-tab active" title="Details" id="timerEditTabShow">
@@ -225,6 +219,7 @@
 <script>
 import TimerModalTimeStandard from './TimerModalTimeStandard.vue'
 import TimerFifteenTemplate from './TimerFifteenTemplate.vue'
+import CopyUrl from './CopyUrl.vue'
 import Vue from 'vue'
 import { getCookie } from '@/utils/util-functions'
 
@@ -232,7 +227,8 @@ export default {
   name: 'timer-modal',
   components: {
     'timer-modal-time-standard': TimerModalTimeStandard,
-    'timer-fifteen-template': TimerFifteenTemplate
+    'timer-fifteen-template': TimerFifteenTemplate,
+    'copy-link-template': CopyUrl
   },
   data: function() {
     return {
@@ -248,7 +244,6 @@ export default {
     }
   },
   created() {
-    console.log('HERE')
     let bgStyle = getCookie('bg-style')
     if (bgStyle) {
       try {
@@ -260,7 +255,6 @@ export default {
     } else {
       const style_color = 'rgba(255, 165, 0, 0.6)'
       this.buttonStyle = `background-color:${style_color}`
-      console.log('HERE')
     }
   },
   computed: {
@@ -345,11 +339,6 @@ export default {
     }
   },
   methods: {
-    copyTimerLink() {
-      this.$refs.timerLink.focus()
-      document.execCommand('copy')
-      this.showCopySuccess()
-    },
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown
     },
