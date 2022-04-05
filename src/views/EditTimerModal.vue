@@ -1,17 +1,12 @@
 <template>
   <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close">
-    <!-- <template v-slot:modal-header="{ ok, cancel }"> </template> -->
-    <!-- <div class="col-sm-8">
-      <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer.company_user_id">
-        <option value="">***** Select User *****</option>
-        <option :selected="isTimerUser(user.user_id)" v-for="user in users.filter(u => u.user_type === 'user')" :key="user.id" v-bind:value="user.user_id">
-          {{ user.name }}
-          {{ isTimerUser(user.id) }}
-        </option>
-        <option>Selected or Current User if Editing Timer?</option>
-      </select>
-    </div> -->
+    <template #modal-title>
+      <copy-link-template :link="timer_link" :title="title"></copy-link-template>
+    </template>
     <div class="b-tabs">
+      <div>
+        <b-alert :show="dismissCountDown" dismissible variant="success" @dismissed="dismissCountDown = 0" @dismiss-count-down="countDownChanged"><b-icon icon="check-circle-fill" variant="success"></b-icon>&nbsp;Timer link copied to clipboard!</b-alert>
+      </div>
       <div role="tabpanel" class="b-tab active" title="Details" id="timerEditTabShow">
         <!--START OF TAB IMPLEMENTATION-->
         <div class="row">
@@ -22,14 +17,6 @@
                   <form id="editTimerForm" class="form-horizontal">
                     <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
                     <div class="form-group">
-                      <div class="col-sm-12">
-                        <b-input-group class="mt-3 mb-3">
-                          <b-form-input v-on:focus="$event.target.select()" ref="timerLink" readonly v-model="timer_link"></b-form-input>
-                          <b-input-group-append>
-                            <b-button variant="info" @click="copyTimerLink()"><b-icon icon="clipboard" aria-hidden="true"></b-icon></b-button>
-                          </b-input-group-append>
-                        </b-input-group>
-                      </div>
                       <label class="control-label col-sm-4" for="timer-modal-project-id">Project: </label>
                       <div class="col-sm-12">
                         <select id="timer-modal-project-id" class="form-control" name="project_id" v-model="timer.project_id">
@@ -232,13 +219,16 @@
 <script>
 import TimerModalTimeStandard from './TimerModalTimeStandard.vue'
 import TimerFifteenTemplate from './TimerFifteenTemplate.vue'
+import CopyUrl from './CopyUrl.vue'
 import Vue from 'vue'
+import { getCookie } from '@/utils/util-functions'
 
 export default {
   name: 'timer-modal',
   components: {
     'timer-modal-time-standard': TimerModalTimeStandard,
-    'timer-fifteen-template': TimerFifteenTemplate
+    'timer-fifteen-template': TimerFifteenTemplate,
+    'copy-link-template': CopyUrl
   },
   data: function() {
     return {
@@ -247,7 +237,24 @@ export default {
       endSeconds: '',
       showInvoiceNotes: false,
       showAdminNotes: false,
-      timer_link: null
+      timer_link: null,
+      dismissSecs: 3,
+      dismissCountDown: 0,
+      buttonStyle: ''
+    }
+  },
+  created() {
+    let bgStyle = getCookie('bg-style')
+    if (bgStyle) {
+      try {
+        let style = JSON.parse(bgStyle)
+        this.buttonStyle = `background-color:${style}`
+      } catch (error) {
+        this.buttonStyle = `background-color:${buttonStyle}`
+      }
+    } else {
+      const style_color = 'rgba(255, 165, 0, 0.6)'
+      this.buttonStyle = `background-color:${style_color}`
     }
   },
   computed: {
@@ -332,16 +339,11 @@ export default {
     }
   },
   methods: {
-    copyTimerLink() {
-      this.$refs.timerLink.focus()
-      document.execCommand('copy')
-
-      this.$bvToast.toast('Timer link copied to clipboard!', {
-        title: `Copy link`,
-        variant: 'info',
-        autoHideDelay: 2000,
-        solid: true
-      })
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown
+    },
+    showCopySuccess() {
+      this.dismissCountDown = this.dismissSecs
     },
     updateDuration(duration) {
       this.timer.duration = duration
