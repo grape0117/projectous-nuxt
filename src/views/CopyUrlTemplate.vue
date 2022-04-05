@@ -7,6 +7,7 @@
     <b-input-group>
       <b-form-input style="height:0px; width:0px; opacity:0;" v-on:focus="$event.target.select()" ref="timerLink" readonly v-model="link"></b-form-input>
     </b-input-group>
+    <b-alert :show="dismissCountDown" variant="success" @dismissed="dismissCountDown = 0" @dismiss-count-down="countDownChanged" style="font-size:13px;"><b-icon icon="check-circle-fill" variant="success"></b-icon>&nbsp;Timer link copied to clipboard!</b-alert>
   </div>
 </template>
 
@@ -14,11 +15,13 @@
 import { getCookie } from '@/utils/util-functions'
 export default {
   name: 'copy-link-button',
-  props: ['link', 'title', 'showCopySuccessFunction'],
+  props: ['link', 'title'],
   data() {
     return {
       test: false,
-      buttonStyle: ''
+      buttonStyle: '',
+      dismissSecs: 3,
+      dismissCountDown: 0
     }
   },
   mounted: function() {
@@ -28,9 +31,13 @@ export default {
     copyTimerLink() {
       this.$refs.timerLink.focus()
       document.execCommand('copy')
-      if (this.showCopySuccessFunction) {
-        this.showCopySuccessFunction()
-      }
+      this.showCopySuccess()
+    },
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown
+    },
+    showCopySuccess() {
+      this.dismissCountDown = this.dismissSecs
     },
     applyTheme() {
       let bgStyle = getCookie('bg-style')

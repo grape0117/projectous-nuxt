@@ -1,12 +1,9 @@
 <template>
   <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close">
     <template #modal-title>
-      <copy-link-template :link="timer_link" :title="title"></copy-link-template>
+      <copy-url-template :link="timer_link" :title="title"></copy-url-template>
     </template>
     <div class="b-tabs">
-      <div>
-        <b-alert :show="dismissCountDown" dismissible variant="success" @dismissed="dismissCountDown = 0" @dismiss-count-down="countDownChanged"><b-icon icon="check-circle-fill" variant="success"></b-icon>&nbsp;Timer link copied to clipboard!</b-alert>
-      </div>
       <div role="tabpanel" class="b-tab active" title="Details" id="timerEditTabShow">
         <!--START OF TAB IMPLEMENTATION-->
         <div class="row">
@@ -219,7 +216,7 @@
 <script>
 import TimerModalTimeStandard from './TimerModalTimeStandard.vue'
 import TimerFifteenTemplate from './TimerFifteenTemplate.vue'
-import CopyUrl from './CopyUrl.vue'
+import CopyUrlTemplate from './CopyUrlTemplate.vue'
 import Vue from 'vue'
 import { getCookie } from '@/utils/util-functions'
 
@@ -228,7 +225,7 @@ export default {
   components: {
     'timer-modal-time-standard': TimerModalTimeStandard,
     'timer-fifteen-template': TimerFifteenTemplate,
-    'copy-link-template': CopyUrl
+    'copy-url-template': CopyUrlTemplate
   },
   data: function() {
     return {
@@ -238,8 +235,6 @@ export default {
       showInvoiceNotes: false,
       showAdminNotes: false,
       timer_link: null,
-      dismissSecs: 3,
-      dismissCountDown: 0,
       buttonStyle: ''
     }
   },
@@ -339,12 +334,6 @@ export default {
     }
   },
   methods: {
-    countDownChanged(dismissCountDown) {
-      this.dismissCountDown = dismissCountDown
-    },
-    showCopySuccess() {
-      this.dismissCountDown = this.dismissSecs
-    },
     updateDuration(duration) {
       this.timer.duration = duration
     },
