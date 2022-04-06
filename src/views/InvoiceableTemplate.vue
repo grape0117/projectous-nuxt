@@ -360,9 +360,9 @@ export default {
     applyAction() {
       let self = this
 
-      let timers = document.querySelector('.timer-action:checked').serialize() //TODO: remove jquery
-      let itemIds = document.querySelector('.item-action:checked').serialize() //TODO: remove jquery
-
+      let timers = document.querySelectorAll('.timer-action:checked') //TODO: remove jquery
+      let itemIds = document.querySelector('.item-action:checked') //TODO: remove jquery
+      console.log(timers)
       if (this.invoice_action == 'create_invoice') {
         //TODO: $invoice_id = Invoice::max('invoice_id') + 1
 
@@ -416,16 +416,23 @@ export default {
       } else if (this.invoice_action == 'download-csv') {
         window.open('https://release.projectous.com/timers/' + action + '?' + timers)
         return
-      } else if (invoice_action == 'download-xls') {
+      } else if (this.invoice_action == 'download-xls') {
         window.open('https://release.projectous.com/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
         return
-      } else if (invoice_action == 'custom-xls') {
+      } else if (this.invoice_action == 'custom-xls') {
         this.$http().get('/test/set/modaldata/' + timers)
         //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
         return
       }
-
-      this.$http().post('/timers/' + invoice_action, timers, function() {
+      let timer_ids = []
+      for (const timer of timers) {
+        const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
+        timer_ids.push(timer_id)
+      }
+      timers = {
+        timers: timer_ids
+      }
+      this.$http().post('/timers/' + this.invoice_action, timers, function() {
         //TODO: update checked timers? reload page?
         self.getData('applyaction')
       })
