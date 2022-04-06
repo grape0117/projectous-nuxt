@@ -428,9 +428,11 @@ export default {
       for (const timer of timers) {
         const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
         timer_ids.push(timer_id)
-        // console.log()
       }
-      this.$http().post('/timers/' + this.invoice_action, timer_ids, function() {
+      timers = {
+        timers: timer_ids
+      }
+      this.$http().post('/timers/' + this.invoice_action, timers, function() {
         //TODO: update checked timers? reload page?
         self.getData('applyaction')
       })
