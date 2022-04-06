@@ -281,7 +281,6 @@ export default Vue.extend({
     setBackground(option, theme) {
       EventBus.$emit('changeBackground', { option, theme })
       this.updateBackground(option)
-      console.log('HERE 2')
     },
     async toggle(iconName) {
       if (iconName === 'reload') {

@@ -109,9 +109,7 @@
           <table class="table timer-table">
             <tbody v-if="isAdmin()" class="row-2017-2-18">
               <tr class="row-date">
-                <td style="width: 20px">
-                  <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
-                </td>
+                <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />1</td>
                 <td colspan="100">
                   <div class="d-flex justify-content-between">
                     <!-- to add: the :value="null" must be replaced with v-model="" inside b-form-select -->
@@ -141,9 +139,9 @@
                 </td>
                 <td>
                   <b-badge variant="dark" style="font-size: 13px; background:none;">
-                    Earned: {{ this.convertToTwoDecimalPlace('earned') }}<br />
-                    Unpaid: {{ this.convertToTwoDecimalPlace('unpaid') }}<br />
-                    Total: {{ this.convertToTwoDecimalPlace('total') }}
+                    Earned: {{ totalToDecimal('earned', this.total_earned) }}<br />
+                    Unpaid: {{ totalToDecimal('unpaid', this.total_unpaid) }}<br />
+                    Total: {{ totalToDecimal('total', this.total_invoiceable) }}
                   </b-badge>
                 </td>
                 <td>
@@ -159,7 +157,7 @@
                   <b-badge variant="dark" style="font-size: 13px; background:none;">Unbilled ({{ this.total_unbillable }})</b-badge>
                 </td>
                 <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">Time: {{ this.convertToTwoDecimalPlace('time') }}</b-badge>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Time: {{ totalToDecimal('time', this.total_time) }}</b-badge>
                 </td>
                 <td></td>
               </tr>
@@ -211,6 +209,7 @@ import Vue from 'vue'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
 import moment from 'moment'
+import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
 
 export default {
   name: 'invoiceable-template',
@@ -347,6 +346,7 @@ export default {
     this.getData()
   },
   methods: {
+    totalToDecimal,
     initStartDate() {
       const current_date = new Date()
       return this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
@@ -375,11 +375,8 @@ export default {
     },
     applyAction() {
       let self = this
-      console.log('HERE', self, this.invoice_action, self.invoice_action)
-      let timers = document.querySelector('.timer-action:checked') //TODO: remove jquery
-      console.log(timers)
-      let itemIds = document.querySelector('.item-action:checked') //TODO: remove jquery
-
+      let timers = document.querySelector('.timer-action:checked').serialize() //TODO: remove jquery
+      let itemIds = document.querySelector('.item-action:checked').serialize() //TODO: remove jquery
       if (this.invoice_action == 'create_invoice') {
         //TODO: $invoice_id = Invoice::max('invoice_id') + 1
 
@@ -441,7 +438,7 @@ export default {
         //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
         return
       }
-
+      console.log('HERE')
       this.$http().put('/timers/' + this.invoice_action, timers, function() {
         //TODO: update checked timers? reload page?
         self.getData('applyaction')
@@ -514,33 +511,6 @@ export default {
       }
       //console.log(this.chosen_clients)
     },
-    timeToDecimal(hour, min) {
-      const dec = parseInt((min / 6) * 10, 10)
-
-      return parseFloat(parseInt(hour, 10) + '.' + (dec < 10 ? '0' : '') + dec)
-    },
-    convertToTwoDecimalPlace(type, time = null) {
-      let updated_value
-      if (type === 'time') {
-        let time_reference = this.total_time
-        console.log(time_reference)
-        if (time) {
-          time_reference = time
-        }
-
-        updated_value = `${Math.trunc(time_reference / 3600)}:${Math.trunc((time_reference % 3600) / 60)} (${this.timeToDecimal(Math.trunc(time_reference / 3600), Math.trunc((time_reference % 3600) / 60))})`
-      } else if (type === 'earned') {
-        updated_value = Math.trunc(this.total_earned * 100) / 100
-      } else if (type === 'unbilled') {
-        updated_value = Math.trunc(this.total_unbillable * 100) / 100
-        return updated_value
-      } else if (type === 'unpaid') {
-        updated_value = Math.trunc(this.total_unpaid * 100) / 100
-      } else if (type === 'total') {
-        updated_value = Math.trunc(this.total_invoiceable * 100) / 100
-      }
-      return updated_value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
-    },
     async getData(where) {
       this.loading_data = true
       let self = this
@@ -558,7 +528,7 @@ export default {
         return
       }
       const queryString = new URLSearchParams(data).toString()
-      this.$router.push({ path: '/invoiceable?' + queryString })
+      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {})
       sessionStorage.setItem('invoiceable', queryString)
 
       if (this.isAdmin()) {
@@ -566,7 +536,6 @@ export default {
 
         this.invoice_items = invoice_items
         this.timers = timers
-        console.log('TIMERS', timers)
         this.total_time = 0
         this.total_earned = 0
         this.total_unpaid = 0
@@ -585,9 +554,6 @@ export default {
             this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
           }
         }
-
-        console.log('3TIMERS', timers.length)
-        console.log('UNBILLABLE', this.total_unbillable)
       } else {
         // const { timers } = await this.$http().post('payable-timers', data)
         // this.timers = timers

@@ -107,3 +107,31 @@ export function abbrName(name: string) {
     return acronym.toUpperCase()
   }
 }
+
+export function timeToDecimal(hour: any, min: any) {
+  const dec = (min / 6) * 10
+
+  return parseFloat(parseInt(hour, 10) + '.' + (dec < 10 ? '0' : '') + dec)
+}
+
+export function totalToDecimal(type: string, data: any) {
+  let updated_value: any
+  if (type === 'time') {
+    let time_reference = data
+    if (data) {
+      time_reference = data
+    }
+
+    updated_value = `${Math.trunc(data / 3600)}:${Math.trunc((data % 3600) / 60)} (${timeToDecimal(Math.trunc(time_reference / 3600), Math.trunc((time_reference % 3600) / 60))})`
+  } else if (type === 'earned') {
+    updated_value = Math.trunc(data * 100) / 100
+  } else if (type === 'unbilled') {
+    updated_value = Math.trunc(data * 100) / 100
+    return updated_value
+  } else if (type === 'unpaid') {
+    updated_value = Math.trunc(data * 100) / 100
+  } else if (type === 'total') {
+    updated_value = Math.trunc(data * 100) / 100
+  }
+  return updated_value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+}

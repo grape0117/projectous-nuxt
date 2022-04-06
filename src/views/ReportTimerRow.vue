@@ -41,7 +41,7 @@
       <span v-if="!timer.is_billable" style="color: red;">$</span>
     </td>
     <td @click="editTimer(timer)" style="white-space: nowrap;">
-      {{ this.timeToDecimal(timer.duration) }}
+      {{ this.formatTime(timer.duration) }}
       <div v-if="isAdmin() && timer.duration !== timer.invoice_duration" style="color:red;">{{ Math.trunc(timer.invoice_duration / 3600) }}:{{ ('00' + Math.trunc((timer.invoice_duration % 3600) / 60)).slice(-2) }}</div>
     </td>
     <td @click="editTimer(timer)">
@@ -55,12 +55,12 @@
 <script>
 import { abbrName } from '@/utils/util-functions'
 import { EventBus } from '@/components/event-bus'
+import { timeToDecimal } from '@/utils/util-functions'
 
 export default {
   name: 'report-timer-row',
   props: ['timer', 'checkbox_all_checked'],
   data() {
-    console.log('2TIMER', this.timer)
     return {
       checkbox_toggled: false
     }
@@ -87,6 +87,7 @@ export default {
   },
   methods: {
     abbrName,
+    timeToDecimal,
     toggleCheckbox() {
       this.checkbox_toggled = !this.checkbox_toggled
     },
@@ -128,13 +129,13 @@ export default {
       // console.log(this.timer)
       this.$store.dispatch('timers/editTimer', this.timer)
     },
-    timeToDecimal(duration) {
+    formatTime(duration) {
       let temp_hours = Math.trunc(duration / 3600)
       if (temp_hours < 10) {
         temp_hours = `0${temp_hours}`
       }
       let hours = `${temp_hours}:${('00' + Math.trunc((duration % 3600) / 60)).slice(-2)}`
-      let decimal = this.$root.$refs.Invoiceable.timeToDecimal(Math.trunc(duration / 3600), Math.trunc((duration % 3600) / 60))
+      let decimal = this.timeToDecimal(Math.trunc(duration / 3600), Math.trunc((duration % 3600) / 60))
       return `${hours} (${decimal})`
     }
   }
