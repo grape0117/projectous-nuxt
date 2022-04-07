@@ -375,8 +375,10 @@ export default {
     },
     applyAction() {
       let self = this
-      let timers = document.querySelector('.timer-action:checked').serialize() //TODO: remove jquery
-      let itemIds = document.querySelector('.item-action:checked').serialize() //TODO: remove jquery
+
+      let timers = document.querySelectorAll('.timer-action:checked') //TODO: remove jquery
+      let itemIds = document.querySelector('.item-action:checked') //TODO: remove jquery
+      console.log(timers)
       if (this.invoice_action == 'create_invoice') {
         //TODO: $invoice_id = Invoice::max('invoice_id') + 1
 
@@ -438,13 +440,21 @@ export default {
         //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
         return
       }
-      console.log('HERE')
-      this.$http().put('/timers/' + this.invoice_action, timers, function() {
-        //TODO: update checked timers? reload page?
-        self.getData('applyaction')
-      })
+      let timer_ids = []
+      for (const timer of timers) {
+        const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
+        timer_ids.push(timer_id)
+      }
+      timers = {
+        timers: timer_ids
+      }
+      this.$http()
+        .post('/timers/' + this.invoice_action, timers)
+        .then(function() {
+          // Do something with the response
+          self.getData()
+        })
     },
-
     isTecharound: function() {
       return this.$store.getters['settings/isTecharound']
     },
@@ -554,6 +564,7 @@ export default {
             this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
           }
         }
+        console.log(this.total_time)
       } else {
         // const { timers } = await this.$http().post('payable-timers', data)
         // this.timers = timers

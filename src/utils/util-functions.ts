@@ -117,12 +117,7 @@ export function timeToDecimal(hour: any, min: any) {
 export function totalToDecimal(type: string, data: any) {
   let updated_value: any
   if (type === 'time') {
-    let time_reference = data
-    if (data) {
-      time_reference = data
-    }
-
-    updated_value = `${Math.trunc(data / 3600)}:${Math.trunc((data % 3600) / 60)} (${timeToDecimal(Math.trunc(time_reference / 3600), Math.trunc((time_reference % 3600) / 60))})`
+    updated_value = formatTime(data)
   } else if (type === 'earned') {
     updated_value = Math.trunc(data * 100) / 100
   } else if (type === 'unbilled') {
@@ -134,4 +129,14 @@ export function totalToDecimal(type: string, data: any) {
     updated_value = Math.trunc(data * 100) / 100
   }
   return updated_value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+}
+
+export function formatTime(duration: any) {
+  let temp_hours: any = Math.trunc(duration / 3600)
+  if (temp_hours < 10) {
+    temp_hours = `0${temp_hours}`
+  }
+  let hours = `${temp_hours}:${('00' + Math.trunc((duration % 3600) / 60)).slice(-2)}`
+  let decimal = timeToDecimal(Math.trunc(duration / 3600), Math.trunc((duration % 3600) / 60))
+  return `${hours} (${decimal})`
 }

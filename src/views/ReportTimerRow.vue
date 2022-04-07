@@ -55,7 +55,7 @@
 <script>
 import { abbrName } from '@/utils/util-functions'
 import { EventBus } from '@/components/event-bus'
-import { timeToDecimal } from '@/utils/util-functions'
+import { formatTime } from '@/utils/util-functions'
 
 export default {
   name: 'report-timer-row',
@@ -87,7 +87,7 @@ export default {
   },
   methods: {
     abbrName,
-    timeToDecimal,
+    formatTime,
     toggleCheckbox() {
       this.checkbox_toggled = !this.checkbox_toggled
     },
@@ -128,15 +128,6 @@ export default {
     editTimer() {
       // console.log(this.timer)
       this.$store.dispatch('timers/editTimer', this.timer)
-    },
-    formatTime(duration) {
-      let temp_hours = Math.trunc(duration / 3600)
-      if (temp_hours < 10) {
-        temp_hours = `0${temp_hours}`
-      }
-      let hours = `${temp_hours}:${('00' + Math.trunc((duration % 3600) / 60)).slice(-2)}`
-      let decimal = this.timeToDecimal(Math.trunc(duration / 3600), Math.trunc((duration % 3600) / 60))
-      return `${hours} (${decimal})`
     }
   }
 }
