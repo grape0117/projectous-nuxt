@@ -196,6 +196,7 @@
 
 <script>
 import Vue from 'vue'
+import moment from 'moment'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
 
@@ -333,11 +334,17 @@ export default {
   methods: {
     initStartDate() {
       const current_date = new Date()
-      return this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
+      const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
+      // this.start = start_date
+
+      return start_date
     },
     initEndDate() {
       const current_date = new Date()
-      return this.$route.query.end ? decodeURI(this.$route.query.end) : current_date.getFullYear() + '-' + (current_date.getMonth() + 2) + '-00'
+      const end_date = this.$route.query.end ? decodeURI(this.$route.query.end) : current_date.getFullYear() + '-' + (current_date.getMonth() + 2) + '-00'
+      // this.end = end_date
+
+      return end_date
     },
     setStart(start) {
       this.start = start
@@ -357,32 +364,59 @@ export default {
     hideAddInvoiceable() {
       this.isShowInvoiceableItems = false
     },
+    createInvoice(timers) {
+      this.$http()
+        .post('/invoice/create', timers)
+        .then(function(response) {})
+    },
     applyAction() {
       let self = this
 
       let timers = document.querySelectorAll('.timer-action:checked') //TODO: remove jquery
-      let itemIds = document.querySelector('.item-action:checked') //TODO: remove jquery
-      console.log(timers)
+      let itemIds = document.querySelectorAll('.item-action:checked') //TODO: remove jquery
+      let timer_ids = []
+      for (const timer of timers) {
+        const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
+        timer_ids.push(timer_id)
+      }
+      timers = {
+        timers: timer_ids
+      }
       if (this.invoice_action == 'create_invoice') {
         //TODO: $invoice_id = Invoice::max('invoice_id') + 1
-
-        this.$http().post('/get_invoice_id', {}, function(response) {
-          let invoice_id = prompt('What ID?', response.invoice_id)
-          if (document.querySelector('#client option:selected').length != 1) {
-            //alert('you must choose only one client'+ $('#client option:selected').length)
-            //return
-          }
-          if (!timers) {
-            alert('Please choose 1 or more timers.')
-            return
-          }
-          this.$http().post('/invoice/create', timers + '&invoice_id=' + invoice_id + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value + '&client=' + document.getElementById('client').value + '&' + itemIds, function(r) {
-            document.getElementById('actionLink').innerHTML('<a style="background: red; color: white;" target="_blank" href="/invoice/' + invoice_id + '">View Invoice</a>')
-            console.log('Response', r)
-            self.$store.dispatch('invoices/clearInvoiceableItems', r[0])
+        this.$http()
+          .post('/get_invoice_id', {})
+          .then(function(response) {
+            if (self.chosen_clients.length > 1) {
+              alert('you must choose only one client')
+              return
+            }
+            if (timer_ids.length === 0) {
+              alert('Please choose 1 or more timers.')
+              return
+            }
+            let invoice_id = prompt('What ID?', response.invoice_id)
+            // console.log(document.querySelector('#client:selected'))
+            self.createInvoice(timers)
           })
-        })
+
         return
+        // this.$http().post('/get_invoice_id', {}, function(response) {
+        //   let invoice_id = prompt('What ID?', response.invoice_id)
+        //   if (document.querySelector('#client option:selected').length != 1) {
+        //     //alert('you must choose only one client'+ $('#client option:selected').length)
+        //     //return
+        //   }
+        //   if (!timers) {
+        //     alert('Please choose 1 or more timers.')
+        //     return
+        //   }
+        //   this.$http().post('/invoice/create', timers + '&invoice_id=' + invoice_id + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value + '&client=' + document.getElementById('client').value + '&' + itemIds, function(r) {
+        //     document.getElementById('actionLink').innerHTML('<a style="background: red; color: white;" target="_blank" href="/invoice/' + invoice_id + '">View Invoice</a>')
+        //     console.log('Response', r)
+        //     self.$store.dispatch('invoices/clearInvoiceableItems', r[0])
+        //   })
+        // })
       } else if (this.invoice_action == 'adjust-invoice-rate') {
         let new_client_rate = prompt('What rate?', '')
         if (new_client_rate == '') {
@@ -423,14 +457,6 @@ export default {
         this.$http().get('/test/set/modaldata/' + timers)
         //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
         return
-      }
-      let timer_ids = []
-      for (const timer of timers) {
-        const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
-        timer_ids.push(timer_id)
-      }
-      timers = {
-        timers: timer_ids
       }
       this.$http().post('/timers/' + this.invoice_action, timers, function() {
         //TODO: update checked timers? reload page?
