@@ -129,7 +129,7 @@
                   <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
                 </td>
                 <td colspan="100">
-                  <div class="d-flex justify-content-between">
+                  <div class="d-flex">
                     <!-- to add: the :value="null" must be replaced with v-model="" inside b-form-select -->
                     <div class="d-flex">
                       <b-form-select id="action" v-model="invoice_action" class="mr-3">
@@ -145,9 +145,11 @@
                         <b-form-select-option value="create_invoice">Create Invoice</b-form-select-option>
                       </b-form-select>
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
-                      <span id="actionLink"></span>
                     </div>
-                    <button class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
+                    <div style="width: 100%" class="ml-3">
+                      <span id="actionLink"> </span>
+                      <button style="float:right" class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -364,14 +366,36 @@ export default {
     hideAddInvoiceable() {
       this.isShowInvoiceableItems = false
     },
-    createInvoice(timers) {
-      this.$http()
-        .post('/invoice/create', timers)
-        .then(function(response) {})
+    generateInvoiceButton(timers, invoice_id) {
+      const view_invoice_container = document.getElementById('actionLink')
+      view_invoice_container.innerHTML = ''
+      view_invoice_container.innerHTML += '<a id="createInvoiceButton" target="_blank" href="/invoice/' + invoice_id + '">View Invoice</a>'
+      const create_invoice_button = document.getElementById('createInvoiceButton')
+      create_invoice_button.classList.add('btn')
+      create_invoice_button.classList.add('btn-primary')
+
+      // Do we still need this? You said that if i refetch it doesn't matter
+      // this.$http()
+      //   .post('/invoice/create', timers)
+      //   .then(function(response) {
+      //     const view_invoice_container = document.getElementById('actionLink')
+      //     view_invoice_container.innerHTML = ""
+      //     view_invoice_container.innerHTML += '<a id="createInvoiceButton" target="_blank" href="/invoice/'+invoice_id+'">View Invoice</a>';
+      //     const create_invoice_button = document.getElementById('createInvoiceButton')
+      //     create_invoice_button.classList.add('btn')
+      //     create_invoice_button.classList.add('btn-primary')
+      //   })
+    },
+    makeToast(variant = null, title, content) {
+      this.$bvToast.toast(content, {
+        title: title,
+        variant: variant
+      })
     },
     applyAction() {
       let self = this
-
+      const view_invoice_container = document.getElementById('actionLink')
+      view_invoice_container.innerHTML = ''
       let timers = document.querySelectorAll('.timer-action:checked') //TODO: remove jquery
       let itemIds = document.querySelectorAll('.item-action:checked') //TODO: remove jquery
       let timer_ids = []
@@ -388,35 +412,19 @@ export default {
           .post('/get_invoice_id', {})
           .then(function(response) {
             if (self.chosen_clients.length > 1) {
-              alert('you must choose only one client')
+              self.makeToast(null, 'Choose one client', 'You must choose one client only.')
               return
             }
             if (timer_ids.length === 0) {
-              alert('Please choose 1 or more timers.')
+              self.makeToast(null, 'Choose one timer', 'Please select one or more timers.')
               return
             }
             let invoice_id = prompt('What ID?', response.invoice_id)
-            // console.log(document.querySelector('#client:selected'))
-            self.createInvoice(timers)
+            self.getData()
+            self.generateInvoiceButton(timers, response.invoice_id)
           })
 
         return
-        // this.$http().post('/get_invoice_id', {}, function(response) {
-        //   let invoice_id = prompt('What ID?', response.invoice_id)
-        //   if (document.querySelector('#client option:selected').length != 1) {
-        //     //alert('you must choose only one client'+ $('#client option:selected').length)
-        //     //return
-        //   }
-        //   if (!timers) {
-        //     alert('Please choose 1 or more timers.')
-        //     return
-        //   }
-        //   this.$http().post('/invoice/create', timers + '&invoice_id=' + invoice_id + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value + '&client=' + document.getElementById('client').value + '&' + itemIds, function(r) {
-        //     document.getElementById('actionLink').innerHTML('<a style="background: red; color: white;" target="_blank" href="/invoice/' + invoice_id + '">View Invoice</a>')
-        //     console.log('Response', r)
-        //     self.$store.dispatch('invoices/clearInvoiceableItems', r[0])
-        //   })
-        // })
       } else if (this.invoice_action == 'adjust-invoice-rate') {
         let new_client_rate = prompt('What rate?', '')
         if (new_client_rate == '') {
@@ -458,10 +466,12 @@ export default {
         //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
         return
       }
-      this.$http().post('/timers/' + this.invoice_action, timers, function() {
-        //TODO: update checked timers? reload page?
-        self.getData('applyaction')
-      })
+      this.$http()
+        .post('/timers/' + this.invoice_action, timers)
+        .then(function() {
+          // Do something with the response
+          self.getData()
+        })
     },
 
     isTecharound: function() {
