@@ -19,6 +19,7 @@
             <b-dropdown-item-button><router-link to="/invoiceable">Invoiceable</router-link></b-dropdown-item-button>
             <b-dropdown-item-button><router-link to="/payable">Payable</router-link></b-dropdown-item-button>
             <b-dropdown-item-button><router-link to="/profit">Profit</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/user_report">My Report</router-link></b-dropdown-item-button>
           </b-dropdown>
         </div>
       </div>
