@@ -322,7 +322,6 @@ export default {
   mounted() {
     console.log('reports mounted', this.$route.query, this.$route, this.chosen_clients, this.total_time, 'test')
     this.getData()
-    console.log('KLAYENT', this.clients)
   },
   methods: {
     initStartDate() {
