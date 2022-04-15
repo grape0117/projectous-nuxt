@@ -367,9 +367,15 @@ export default {
     generateInvoiceButton(timers, invoice_id) {
       console.log(this.$store)
       const client = document.getElementById('client').value
-      const parameters = `timers=${timers}&invoice_id=${invoice_id}&start=${this.start}&end=${this.end}&client=${client}`
+      const params = {
+        timers,
+        invoice_id,
+        start: this.start,
+        end: this.end,
+        client: client
+      }
       this.$http()
-        .post('/invoice/create', parameters)
+        .post('/invoice/create', params)
         .then(function(response) {
           const view_invoice_container = document.getElementById('actionLink')
           view_invoice_container.innerHTML = ''
