@@ -125,7 +125,7 @@
                 </td>
               </tr>
               <tr class="row-date">
-                <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />1111</td>
+                <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" /></td>
                 <td colspan="100">
                   <div class="d-flex">
                     <!-- to add: the :value="null" must be replaced with v-model="" inside b-form-select -->
