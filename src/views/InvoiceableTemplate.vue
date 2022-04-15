@@ -125,9 +125,7 @@
                 </td>
               </tr>
               <tr class="row-date">
-                <td style="width: 20px">
-                  <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
-                </td>
+                <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />1111</td>
                 <td colspan="100">
                   <div class="d-flex">
                     <!-- to add: the :value="null" must be replaced with v-model="" inside b-form-select -->
@@ -367,8 +365,11 @@ export default {
       this.isShowInvoiceableItems = false
     },
     generateInvoiceButton(timers, invoice_id) {
+      console.log(this.$store)
+      const client = document.getElementById('client').value
+      const parameters = `timers=${timers}&invoice_id=${invoice_id}&start=${this.start}&end=${this.end}&client=${client}`
       this.$http()
-        .post('/invoice/create', timers)
+        .post('/invoice/create', parameters)
         .then(function(response) {
           const view_invoice_container = document.getElementById('actionLink')
           view_invoice_container.innerHTML = ''
@@ -376,6 +377,8 @@ export default {
           const create_invoice_button = document.getElementById('createInvoiceButton')
           create_invoice_button.classList.add('btn')
           create_invoice_button.classList.add('btn-primary')
+          console.log('Response', response)
+          // this.$store.dispatch('invoices/clearInvoiceableItems', response[0])
         })
     },
     makeToast(variant = null, title, content) {
@@ -390,6 +393,7 @@ export default {
       view_invoice_container.innerHTML = ''
       let timers = document.querySelectorAll('.timer-action:checked') //TODO: remove jquery
       let itemIds = document.querySelectorAll('.item-action:checked') //TODO: remove jquery
+      console.log(itemIds, timers)
       let timer_ids = []
       for (const timer of timers) {
         const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
@@ -413,7 +417,7 @@ export default {
             }
             let invoice_id = prompt('What ID?', response.invoice_id)
             self.getData()
-            self.generateInvoiceButton(timers, response.invoice_id)
+            self.generateInvoiceButton(timers.timers, response.invoice_id)
           })
 
         return
