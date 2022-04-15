@@ -56,13 +56,9 @@
                   <b-form-checkbox v-model="anytime" name="anytime" class="mr-2">
                     Anytime
                   </b-form-checkbox>
-                  <!--<b-form-checkbox v-if="isAdmin()" v-model="show_paid" name="show_paid" class="mr-2">-->
-                  <!--Show paid-->
-                  <!--</b-form-checkbox>-->
-                  <b-form-checkbox v-if="isAdmin()" v-model="show_invoiced" name="show_invoiced">
-                    Show Invoiced
+                  <b-form-checkbox v-model="show_paid" name="show_paid" class="mr-2">
+                    Show paid
                   </b-form-checkbox>
-                  <input v-else type="hidden" name="is_invoiced" value="1" />
                 </div>
 
                 <div class="d-flex flex-wrap">
@@ -551,8 +547,9 @@ export default {
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
       }
+
       const queryString = new URLSearchParams(data).toString()
-      //   const updated_path = `user=${self.company_user_id}?${queryString}`
+      console.log('queryString', queryString)
       this.$router.push({ path: `/user_report?${queryString}` })
       sessionStorage.setItem('user_report', queryString)
 
