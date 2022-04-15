@@ -67,12 +67,12 @@
                 </div>
               </div>
               <div class="inputs d-flex justify-content-start flex-wrap align-items-start w-100">
-                <b-form-input class="mt-3" placeholder="task ID"></b-form-input>
-                <!-- <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
+                <!--<b-form-input class="mt-3" placeholder="task ID"></b-form-input>
+                 <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
                 <b-form-input class="mt-3" placeholder="Received Check #"></b-form-input>
                 <b-form-input class="mt-3" placeholder="Client Rate"></b-form-input>
-                <b-form-input class="mt-3" placeholder="User Rate"></b-form-input> -->
-                <b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>
+                <b-form-input class="mt-3" placeholder="User Rate"></b-form-input> 
+                <b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>-->
 
                 <!-- <input placeholder="task ID" type="text" name="task_id" />
                 <input placeholder="Paid Check #" type="text" name="paid_check_number" />
@@ -118,7 +118,7 @@
                     <div class="d-flex">
                       <b-form-select id="action" v-model="invoice_action" class="mr-3">
                         <b-form-select-option :value="null" disabled>Select Action</b-form-select-option>
-                        <b-form-select-option value="markpaid">Mark Paid</b-form-select-option>
+                        <!--<b-form-select-option value="markpaid">Mark Paid</b-form-select-option>
                         <b-form-select-option value="markunpaid">Mark Unpaid</b-form-select-option>
                         <b-form-select-option value="resavetimers">Resave Timers</b-form-select-option>
 
@@ -126,7 +126,7 @@
                         <b-form-select-option value="adjust-user-rate">Adjust User Rate</b-form-select-option>
                         <b-form-select-option value="download-csv">Download CSV</b-form-select-option>
                         <b-form-select-option value="download-xls">Download XLS</b-form-select-option>
-                        <b-form-select-option value="create_invoice">Create Invoice</b-form-select-option>
+                        <b-form-select-option value="create_invoice">Create Invoice</b-form-select-option>-->
                       </b-form-select>
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
                     </div>
