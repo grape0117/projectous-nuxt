@@ -438,6 +438,9 @@ export default {
     async storeDataInIndexedDb() {
       const appData = await this.getAppDataFromApi(0)
       console.log('appData', appData)
+      if (appData) {
+        document.cookie = `company_user_id=${appData.current_company_user_id}`
+      }
       for (let key in appData) {
         if (Array.isArray(appData[key])) {
           appData[key].forEach(async entity => {

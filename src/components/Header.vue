@@ -15,10 +15,11 @@
         </router-link>
         <div>
           <b-dropdown id="dropdown-divider" class="transparent-button" text="Reports">
-            <b-dropdown-item-button><router-link to="/days" class="white-text">Days</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link to="/invoiceable" class="white-text">Invoiceable</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link to="/payable" class="white-text">Payable</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link to="/profit" class="white-text">Profit</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/days">Days</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/invoiceable">Invoiceable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/payable">Payable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/profit">Profit</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link to="/user_report">My Report</router-link></b-dropdown-item-button>
           </b-dropdown>
         </div>
       </div>

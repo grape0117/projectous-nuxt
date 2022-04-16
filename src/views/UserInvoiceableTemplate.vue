@@ -3,6 +3,7 @@
     <div class="row">
       <div class="col-sm-12">
         <form method="get" id="invoiceable-form" class="invoiceable-form" action="/invoiceable">
+          <input type="hidden" name="user[]" :value="company_user_id" />
           <div class="top-selects">
             <!-- here -->
             <div class="client-select">
@@ -25,7 +26,7 @@
               </div>
               <select id="client" name="client[]" multiple="" v-model="chosen_clients">
                 <option value="0">All Clients</option>
-                <option v-for="(client, client_index) in clients" :client="client" :key="client_index" :value="client.id" @click="onOffSelect">{{ client.name }}</option>
+                <option v-for="(client, client_index) in clients" :client="client" :key="client_index" :value="client.id">{{ client.name }}</option>
               </select>
             </div>
             <!-- here -->
@@ -40,19 +41,6 @@
                 <optgroup v-for="(client, client_index) in filteredclients(chosen_clients)" :key="client_index" :client="client" :label="client.name">
                   <option v-for="(project, project_index) in client_projects(client)" :key="project_index" :project="project" :value="project.id">{{ project.name }}</option>
                 </optgroup>
-              </select>
-            </div>
-            <!-- here -->
-            <div v-if="isAdmin()" class="user-select">
-              <div class="mb-2 mt-1">
-                <b-form-checkbox v-model="not_users" name="not_user" class="mr-2 color-white">
-                  Not
-                </b-form-checkbox>
-              </div>
-              <!--<input type="checkbox" id="show-inactive-users" value="1" @click="toggleUsers"> Show Inactive-->
-              <select name="user[]" multiple="" v-model="chosen_users">
-                <option value="0">All Users</option>
-                <option v-for="(user, user_index) in users" :key="user_index" :user="user" :value="user.id">{{ user.name }}</option>
               </select>
             </div>
           </div>
@@ -109,9 +97,6 @@
           <table class="table timer-table">
             <tbody v-if="isAdmin()" class="row-2017-2-18">
               <tr class="row-date">
-                <<<<<<< HEAD
-                <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />1</td>
-                =======
                 <td colspan="100">
                   <b-badge variant="dark" style="opacity:50%">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} ({{ this.timeToDecimal(Math.trunc(total_time / 3600), Math.trunc((total_time % 3600) / 60)) }})</b-badge>&nbsp; <b-badge variant="dark" style="opacity:50%">Entries: {{ timers.length }}</b-badge
                   >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</b-badge
@@ -128,8 +113,9 @@
                 </td>
               </tr>
               <tr class="row-date">
-                <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" /></td>
-                >>>>>>> master
+                <td style="width: 20px">
+                  <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
+                </td>
                 <td colspan="100">
                   <div class="d-flex">
                     <!-- to add: the :value="null" must be replaced with v-model="" inside b-form-select -->
@@ -154,34 +140,6 @@
                     </div>
                   </div>
                 </td>
-              </tr>
-              <tr class="row-date">
-                <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">{{ timers.length }} {{ timers.length > 1 ? 'Entries' : 'Entry' }}</b-badge>
-                </td>
-                <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">
-                    Earned: {{ totalToDecimal('earned', this.total_earned) }}<br />
-                    Unpaid: {{ totalToDecimal('unpaid', this.total_unpaid) }}<br />
-                    Total: {{ totalToDecimal('total', this.total_invoiceable) }}
-                  </b-badge>
-                </td>
-                <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">Project</b-badge>
-                </td>
-                <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">Date & Time</b-badge>
-                </td>
-                <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">User</b-badge>
-                </td>
-                <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">Unbilled ({{ this.total_unbillable }})</b-badge>
-                </td>
-                <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;">Time: {{ totalToDecimal('time', this.total_time) }}</b-badge>
-                </td>
-                <td></td>
               </tr>
             </tbody>
             <tbody v-else class="row-2017-2-18">
@@ -231,8 +189,7 @@ import Vue from 'vue'
 import moment from 'moment'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
-import moment from 'moment'
-import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
+import { getCookie } from '@/utils/util-functions'
 
 export default {
   name: 'invoiceable-template',
@@ -269,7 +226,8 @@ export default {
       timers: [],
       invoice_items: [],
       settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false },
-      loading_data: false
+      loading_data: false,
+      company_user_id: getCookie('company_user_id')
     }
   },
   computed: {
@@ -296,9 +254,6 @@ export default {
     timer_watch() {
       return this.$store.state.settings.timer_watch
     }
-  },
-  created() {
-    this.$root.$refs.Invoiceable = this
   },
   watch: {
     timer_watch: function() {
@@ -358,9 +313,9 @@ export default {
   },
   beforeCreate: function() {
     //labeledConsole('beforeCreate', $('#project').val())
-    if (sessionStorage.getItem('invoiceable')) {
-      console.log('invoiceable', new URLSearchParams(sessionStorage.getItem('invoiceable')).toString())
-      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() })
+    if (sessionStorage.getItem('user_report')) {
+      console.log('user_report', new URLSearchParams(sessionStorage.getItem('user_report')).toString())
+      this.$router.push({ path: '/user_report?' + new URLSearchParams(sessionStorage.getItem('user_report')).toString() })
       console.log(this.$route)
     }
   },
@@ -369,7 +324,6 @@ export default {
     this.getData()
   },
   methods: {
-    totalToDecimal,
     initStartDate() {
       const current_date = new Date()
       const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
@@ -403,27 +357,24 @@ export default {
       this.isShowInvoiceableItems = false
     },
     generateInvoiceButton(timers, invoice_id) {
-      console.log(this.$store)
-      const client = document.getElementById('client').value
-      const params = {
-        timers,
-        invoice_id,
-        start: this.start,
-        end: this.end,
-        client: client
-      }
-      this.$http()
-        .post('/invoice/create', params)
-        .then(function(response) {
-          const view_invoice_container = document.getElementById('actionLink')
-          view_invoice_container.innerHTML = ''
-          view_invoice_container.innerHTML += '<a id="createInvoiceButton" target="_blank" href="https://release.projectous.com/invoice/' + invoice_id + '">View Invoice</a>'
-          const create_invoice_button = document.getElementById('createInvoiceButton')
-          create_invoice_button.classList.add('btn')
-          create_invoice_button.classList.add('btn-primary')
-          console.log('Response', response)
-          // this.$store.dispatch('invoices/clearInvoiceableItems', response[0])
-        })
+      const view_invoice_container = document.getElementById('actionLink')
+      view_invoice_container.innerHTML = ''
+      view_invoice_container.innerHTML += '<a id="createInvoiceButton" target="_blank" href="https://release.projectous.com/invoice/' + invoice_id + '">View Invoice</a>'
+      const create_invoice_button = document.getElementById('createInvoiceButton')
+      create_invoice_button.classList.add('btn')
+      create_invoice_button.classList.add('btn-primary')
+
+      // Do we still need this? You said that if i refetch it doesn't matter
+      // this.$http()
+      //   .post('/invoice/create', timers)
+      //   .then(function(response) {
+      //     const view_invoice_container = document.getElementById('actionLink')
+      //     view_invoice_container.innerHTML = ""
+      //     view_invoice_container.innerHTML += '<a id="createInvoiceButton" target="_blank" href="/invoice/'+invoice_id+'">View Invoice</a>';
+      //     const create_invoice_button = document.getElementById('createInvoiceButton')
+      //     create_invoice_button.classList.add('btn')
+      //     create_invoice_button.classList.add('btn-primary')
+      //   })
     },
     makeToast(variant = null, title, content) {
       this.$bvToast.toast(content, {
@@ -437,7 +388,6 @@ export default {
       view_invoice_container.innerHTML = ''
       let timers = document.querySelectorAll('.timer-action:checked') //TODO: remove jquery
       let itemIds = document.querySelectorAll('.item-action:checked') //TODO: remove jquery
-      console.log(itemIds, timers)
       let timer_ids = []
       for (const timer of timers) {
         const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
@@ -461,7 +411,7 @@ export default {
             }
             let invoice_id = prompt('What ID?', response.invoice_id)
             self.getData()
-            self.generateInvoiceButton(timers.timers, response.invoice_id)
+            self.generateInvoiceButton(timers, response.invoice_id)
           })
 
         return
@@ -506,7 +456,6 @@ export default {
         //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
         return
       }
-
       this.$http()
         .post('/timers/' + this.invoice_action, timers)
         .then(function() {
@@ -514,6 +463,7 @@ export default {
           self.getData()
         })
     },
+
     isTecharound: function() {
       return this.$store.getters['settings/isTecharound']
     },
@@ -580,6 +530,11 @@ export default {
       }
       //console.log(this.chosen_clients)
     },
+    timeToDecimal(hour, min) {
+      const dec = parseInt((min / 6) * 10, 10)
+
+      return parseFloat(parseInt(hour, 10) + '.' + (dec < 10 ? '0' : '') + dec)
+    },
     async getData(where) {
       this.loading_data = true
       let self = this
@@ -597,8 +552,9 @@ export default {
         return
       }
       const queryString = new URLSearchParams(data).toString()
-      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {})
-      sessionStorage.setItem('invoiceable', queryString)
+      //   const updated_path = `user=${self.company_user_id}?${queryString}`
+      this.$router.push({ path: `/user_report?${queryString}` })
+      sessionStorage.setItem('user_report', queryString)
 
       if (this.isAdmin()) {
         const { invoice_items, timers } = await this.$http().post('/invoiceable-timers', data)
@@ -623,7 +579,6 @@ export default {
             this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
           }
         }
-        console.log(this.total_time)
       } else {
         // const { timers } = await this.$http().post('payable-timers', data)
         // this.timers = timers
