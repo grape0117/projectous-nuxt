@@ -227,7 +227,6 @@ import Vue from 'vue'
 import moment from 'moment'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
-import moment from 'moment'
 import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
 
 export default {
