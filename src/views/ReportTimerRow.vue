@@ -33,18 +33,15 @@
       {{ timer.report_at }}
     </td>
     <td>
-      <div class="report-timer-avatar" :style="{ 'background-color': timer.user.color || 'gray' }" v-b-tooltip.hover :title="timer.user.fullname || timer.user.name">
-        {{ abbrName(timer.user.fullname || timer.user.name) }}
+      <div class="report-timer-avatar" :style="{ 'background-color': timer.user ? timer.user.color : 'gray' }" v-b-tooltip.hover :title="timer.user ? timer.user.name : ''">
+        {{ abbrName(timer.user ? timer.user.name : 'U') }}
       </div>
-      <!-- <pre>
-        {{ timer.user }}
-      </pre> -->
     </td>
     <td @click="editTimer(timer)">
       <span v-if="!timer.is_billable" style="color: red;">$</span>
     </td>
     <td @click="editTimer(timer)" style="white-space: nowrap;">
-      {{ Math.trunc(timer.duration / 3600) }}:{{ ('00' + Math.trunc((timer.duration % 3600) / 60)).slice(-2) }}
+      {{ this.formatTime(timer.duration) }}
       <div v-if="isAdmin() && timer.duration !== timer.invoice_duration" style="color:red;">{{ Math.trunc(timer.invoice_duration / 3600) }}:{{ ('00' + Math.trunc((timer.invoice_duration % 3600) / 60)).slice(-2) }}</div>
     </td>
     <td @click="editTimer(timer)">
@@ -52,15 +49,13 @@
       <div v-else v-html="timer.notes"></div>
       <div v-if="timer.admin_notes && timer.admin_notes !== 'undefined' && timer.admin_notes.trim() !== ''" v-html="timer.admin_notes"></div>
     </td>
-    <!-- <td>
-      <button class="btn btn-primary" v-if="isAdmin()" @click="applyPayment">Payment</button>
-    </td> -->
   </tr>
 </template>
 
 <script>
 import { abbrName } from '@/utils/util-functions'
 import { EventBus } from '@/components/event-bus'
+import { formatTime } from '@/utils/util-functions'
 
 export default {
   name: 'report-timer-row',
@@ -92,6 +87,7 @@ export default {
   },
   methods: {
     abbrName,
+    formatTime,
     toggleCheckbox() {
       this.checkbox_toggled = !this.checkbox_toggled
     },

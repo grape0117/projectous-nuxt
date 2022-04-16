@@ -151,6 +151,34 @@
                   </div>
                 </td>
               </tr>
+              <tr class="row-date">
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">{{ timers.length }} {{ timers.length > 1 ? 'Entries' : 'Entry' }}</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">
+                    Earned: {{ totalToDecimal('earned', this.total_earned) }}<br />
+                    Unpaid: {{ totalToDecimal('unpaid', this.total_unpaid) }}<br />
+                    Total: {{ totalToDecimal('total', this.total_invoiceable) }}
+                  </b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Project</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Date & Time</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">User</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Unbilled ({{ this.total_unbillable }})</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Time: {{ totalToDecimal('time', this.total_time) }}</b-badge>
+                </td>
+                <td></td>
+              </tr>
             </tbody>
             <tbody v-else class="row-2017-2-18">
               <tr class="row-date">
@@ -199,6 +227,8 @@ import Vue from 'vue'
 import moment from 'moment'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
+import moment from 'moment'
+import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
 
 export default {
   name: 'invoiceable-template',
@@ -262,6 +292,9 @@ export default {
     timer_watch() {
       return this.$store.state.settings.timer_watch
     }
+  },
+  created() {
+    this.$root.$refs.Invoiceable = this
   },
   watch: {
     timer_watch: function() {
@@ -332,6 +365,7 @@ export default {
     this.getData()
   },
   methods: {
+    totalToDecimal,
     initStartDate() {
       const current_date = new Date()
       const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
@@ -468,6 +502,7 @@ export default {
         //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
         return
       }
+
       this.$http()
         .post('/timers/' + this.invoice_action, timers)
         .then(function() {
@@ -475,7 +510,6 @@ export default {
           self.getData()
         })
     },
-
     isTecharound: function() {
       return this.$store.getters['settings/isTecharound']
     },
@@ -542,11 +576,6 @@ export default {
       }
       //console.log(this.chosen_clients)
     },
-    timeToDecimal(hour, min) {
-      const dec = parseInt((min / 6) * 10, 10)
-
-      return parseFloat(parseInt(hour, 10) + '.' + (dec < 10 ? '0' : '') + dec)
-    },
     async getData(where) {
       this.loading_data = true
       let self = this
@@ -564,7 +593,7 @@ export default {
         return
       }
       const queryString = new URLSearchParams(data).toString()
-      this.$router.push({ path: '/invoiceable?' + queryString })
+      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {})
       sessionStorage.setItem('invoiceable', queryString)
 
       if (this.isAdmin()) {
@@ -590,6 +619,7 @@ export default {
             this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
           }
         }
+        console.log(this.total_time)
       } else {
         // const { timers } = await this.$http().post('payable-timers', data)
         // this.timers = timers
