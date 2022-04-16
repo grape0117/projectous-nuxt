@@ -109,9 +109,6 @@
           <table class="table timer-table">
             <tbody v-if="isAdmin()" class="row-2017-2-18">
               <tr class="row-date">
-                <<<<<<< HEAD
-                <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />1</td>
-                =======
                 <td colspan="100">
                   <b-badge variant="dark" style="opacity:50%">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} ({{ this.timeToDecimal(Math.trunc(total_time / 3600), Math.trunc((total_time % 3600) / 60)) }})</b-badge>&nbsp; <b-badge variant="dark" style="opacity:50%">Entries: {{ timers.length }}</b-badge
                   >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</b-badge
@@ -129,7 +126,6 @@
               </tr>
               <tr class="row-date">
                 <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" /></td>
-                >>>>>>> master
                 <td colspan="100">
                   <div class="d-flex">
                     <!-- to add: the :value="null" must be replaced with v-model="" inside b-form-select -->
