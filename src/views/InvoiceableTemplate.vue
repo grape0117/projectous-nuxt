@@ -199,7 +199,7 @@
 
             <tbody>
               <tr :item="item" v-for="item in invoice_items" :key="item.id" :checkbox_all_checked="checkbox_all_checked" is="invoiceable-item-row"></tr>
-              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" is="report-timer-row"></tr>
+              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" :is_user_report="is_user_report" is="report-timer-row"></tr>
             </tbody>
             <tbody>
               <tr>
@@ -227,7 +227,6 @@ import Vue from 'vue'
 import moment from 'moment'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
-import moment from 'moment'
 import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
 
 export default {
@@ -265,7 +264,8 @@ export default {
       timers: [],
       invoice_items: [],
       settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false },
-      loading_data: false
+      loading_data: false,
+      is_user_report: false
     }
   },
   computed: {
@@ -366,6 +366,7 @@ export default {
   },
   methods: {
     totalToDecimal,
+    timeToDecimal,
     initStartDate() {
       const current_date = new Date()
       const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'

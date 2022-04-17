@@ -10,7 +10,7 @@
     </td>
     <td v-if="isAdmin()" @click="editTimer(timer)">
       <div v-if="timer.client_rate > 0">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
-      <div v-else style="color: red;">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
+      <div v-else-if="is_user_report === false" style="color: red;">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
       <!--<div v-if="isTecharound()">${{ Math.trunc((timer.client_rate * timer.invoice_duration / 3600 - timer.user_rate * timer.duration / 3600) * 100) / 100 }} (${{ timer.client_rate - timer.user_rate }})</div>-->
       <div v-if="isAdmin()">
         <span v-if="timer.user_rate > 0">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span><span v-else style="color: red;">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span>
@@ -59,7 +59,7 @@ import { formatTime } from '@/utils/util-functions'
 
 export default {
   name: 'report-timer-row',
-  props: ['timer', 'checkbox_all_checked'],
+  props: ['timer', 'checkbox_all_checked', 'is_user_report'],
   data() {
     return {
       checkbox_toggled: false
@@ -84,6 +84,9 @@ export default {
     current_company() {
       return this.$store.state.settings.current_company
     }
+  },
+  created: function() {
+    console.log(this.is_user_report)
   },
   methods: {
     abbrName,
