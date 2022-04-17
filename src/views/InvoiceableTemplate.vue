@@ -109,22 +109,6 @@
           <table class="table timer-table">
             <tbody v-if="isAdmin()" class="row-2017-2-18">
               <tr class="row-date">
-                <td colspan="100">
-                  <b-badge variant="dark" style="opacity:50%">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} ({{ this.timeToDecimal(Math.trunc(total_time / 3600), Math.trunc((total_time % 3600) / 60)) }})</b-badge>&nbsp; <b-badge variant="dark" style="opacity:50%">Entries: {{ timers.length }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Unbilled: ${{ Math.trunc(total_unbillable * 100) / 100 }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</b-badge
-                  >&nbsp;
-                  <b-badge variant="dark" style="opacity:50%">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</b-badge>
-                  <!--<span style="color: darkblue"> Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} </span>&nbsp;
-                  <span style="color: orange;">Entries: {{ timers.length }}</span>
-                  <span style="color: olive;">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</span>
-                  <span v-if="total_unbillable" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightseagreen;">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</span>>-->
-                </td>
-              </tr>
-              <tr class="row-date">
                 <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" /></td>
                 <td colspan="100">
                   <div class="d-flex">
