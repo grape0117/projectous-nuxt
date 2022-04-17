@@ -125,11 +125,9 @@
                 </td>
               </tr>
               <tr class="row-date">
-                <td style="width: 20px">
-                  <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
-                </td>
+                <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" /></td>
                 <td colspan="100">
-                  <div class="d-flex justify-content-between">
+                  <div class="d-flex">
                     <!-- to add: the :value="null" must be replaced with v-model="" inside b-form-select -->
                     <div class="d-flex">
                       <b-form-select id="action" v-model="invoice_action" class="mr-3">
@@ -145,11 +143,41 @@
                         <b-form-select-option value="create_invoice">Create Invoice</b-form-select-option>
                       </b-form-select>
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
-                      <span id="actionLink"></span>
                     </div>
-                    <button class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
+                    <div style="width: 100%" class="ml-3">
+                      <span id="actionLink"> </span>
+                      <button style="float:right" class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
+                    </div>
                   </div>
                 </td>
+              </tr>
+              <tr class="row-date">
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">{{ timers.length }} {{ timers.length > 1 ? 'Entries' : 'Entry' }}</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">
+                    Earned: {{ totalToDecimal('earned', this.total_earned) }}<br />
+                    Unpaid: {{ totalToDecimal('unpaid', this.total_unpaid) }}<br />
+                    Total: {{ totalToDecimal('total', this.total_invoiceable) }}
+                  </b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Project</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Date & Time</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">User</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Unbilled ({{ this.total_unbillable }})</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Time: {{ totalToDecimal('time', this.total_time) }}</b-badge>
+                </td>
+                <td></td>
               </tr>
             </tbody>
             <tbody v-else class="row-2017-2-18">
@@ -196,8 +224,11 @@
 
 <script>
 import Vue from 'vue'
+import moment from 'moment'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
+import moment from 'moment'
+import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
 
 export default {
   name: 'invoiceable-template',
@@ -261,6 +292,9 @@ export default {
     timer_watch() {
       return this.$store.state.settings.timer_watch
     }
+  },
+  created() {
+    this.$root.$refs.Invoiceable = this
   },
   watch: {
     timer_watch: function() {
@@ -331,13 +365,20 @@ export default {
     this.getData()
   },
   methods: {
+    totalToDecimal,
     initStartDate() {
       const current_date = new Date()
-      return this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
+      const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
+      // this.start = start_date
+
+      return start_date
     },
     initEndDate() {
       const current_date = new Date()
-      return this.$route.query.end ? decodeURI(this.$route.query.end) : current_date.getFullYear() + '-' + (current_date.getMonth() + 2) + '-00'
+      const end_date = this.$route.query.end ? decodeURI(this.$route.query.end) : current_date.getFullYear() + '-' + (current_date.getMonth() + 2) + '-00'
+      // this.end = end_date
+
+      return end_date
     },
     setStart(start) {
       this.start = start
@@ -357,31 +398,68 @@ export default {
     hideAddInvoiceable() {
       this.isShowInvoiceableItems = false
     },
+    generateInvoiceButton(timers, invoice_id) {
+      console.log(this.$store)
+      const client = document.getElementById('client').value
+      const params = {
+        timers,
+        invoice_id,
+        start: this.start,
+        end: this.end,
+        client: client
+      }
+      this.$http()
+        .post('/invoice/create', params)
+        .then(function(response) {
+          const view_invoice_container = document.getElementById('actionLink')
+          view_invoice_container.innerHTML = ''
+          view_invoice_container.innerHTML += '<a id="createInvoiceButton" target="_blank" href="https://release.projectous.com/invoice/' + invoice_id + '">View Invoice</a>'
+          const create_invoice_button = document.getElementById('createInvoiceButton')
+          create_invoice_button.classList.add('btn')
+          create_invoice_button.classList.add('btn-primary')
+          console.log('Response', response)
+          // this.$store.dispatch('invoices/clearInvoiceableItems', response[0])
+        })
+    },
+    makeToast(variant = null, title, content) {
+      this.$bvToast.toast(content, {
+        title: title,
+        variant: variant
+      })
+    },
     applyAction() {
       let self = this
-
+      const view_invoice_container = document.getElementById('actionLink')
+      view_invoice_container.innerHTML = ''
       let timers = document.querySelectorAll('.timer-action:checked') //TODO: remove jquery
-      let itemIds = document.querySelector('.item-action:checked') //TODO: remove jquery
-      console.log(timers)
+      let itemIds = document.querySelectorAll('.item-action:checked') //TODO: remove jquery
+      console.log(itemIds, timers)
+      let timer_ids = []
+      for (const timer of timers) {
+        const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
+        timer_ids.push(timer_id)
+      }
+      timers = {
+        timers: timer_ids
+      }
       if (this.invoice_action == 'create_invoice') {
         //TODO: $invoice_id = Invoice::max('invoice_id') + 1
-
-        this.$http().post('/get_invoice_id', {}, function(response) {
-          let invoice_id = prompt('What ID?', response.invoice_id)
-          if (document.querySelector('#client option:selected').length != 1) {
-            //alert('you must choose only one client'+ $('#client option:selected').length)
-            //return
-          }
-          if (!timers) {
-            alert('Please choose 1 or more timers.')
-            return
-          }
-          this.$http().post('/invoice/create', timers + '&invoice_id=' + invoice_id + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value + '&client=' + document.getElementById('client').value + '&' + itemIds, function(r) {
-            document.getElementById('actionLink').innerHTML('<a style="background: red; color: white;" target="_blank" href="/invoice/' + invoice_id + '">View Invoice</a>')
-            console.log('Response', r)
-            self.$store.dispatch('invoices/clearInvoiceableItems', r[0])
+        this.$http()
+          .post('/get_invoice_id', {})
+          .then(function(response) {
+            if (self.chosen_clients.length > 1) {
+              self.makeToast(null, 'Choose one client', 'You must choose one client only.')
+              return
+            }
+            if (timer_ids.length === 0) {
+              self.makeToast(null, 'Choose one timer', 'Please select one or more timers.')
+              return
+            }
+            let invoice_id = prompt('What ID?', response.invoice_id)
+            self.getData()
+            self.generateInvoiceButton(timers.timers, response.invoice_id)
           })
-        })
+
         return
       } else if (this.invoice_action == 'adjust-invoice-rate') {
         let new_client_rate = prompt('What rate?', '')
@@ -424,20 +502,14 @@ export default {
         //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
         return
       }
-      let timer_ids = []
-      for (const timer of timers) {
-        const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
-        timer_ids.push(timer_id)
-      }
-      timers = {
-        timers: timer_ids
-      }
-      this.$http().post('/timers/' + this.invoice_action, timers, function() {
-        //TODO: update checked timers? reload page?
-        self.getData('applyaction')
-      })
-    },
 
+      this.$http()
+        .post('/timers/' + this.invoice_action, timers)
+        .then(function() {
+          // Do something with the response
+          self.getData()
+        })
+    },
     isTecharound: function() {
       return this.$store.getters['settings/isTecharound']
     },
@@ -504,11 +576,6 @@ export default {
       }
       //console.log(this.chosen_clients)
     },
-    timeToDecimal(hour, min) {
-      const dec = parseInt((min / 6) * 10, 10)
-
-      return parseFloat(parseInt(hour, 10) + '.' + (dec < 10 ? '0' : '') + dec)
-    },
     async getData(where) {
       this.loading_data = true
       let self = this
@@ -526,7 +593,7 @@ export default {
         return
       }
       const queryString = new URLSearchParams(data).toString()
-      this.$router.push({ path: '/invoiceable?' + queryString })
+      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {})
       sessionStorage.setItem('invoiceable', queryString)
 
       if (this.isAdmin()) {
@@ -552,6 +619,7 @@ export default {
             this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
           }
         }
+        console.log(this.total_time)
       } else {
         // const { timers } = await this.$http().post('payable-timers', data)
         // this.timers = timers

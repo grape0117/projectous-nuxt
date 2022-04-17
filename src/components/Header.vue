@@ -208,7 +208,8 @@ export default Vue.extend({
           ]
         }
       ],
-      isShowReload: false
+      isShowReload: false,
+      bgStyle: ''
     }
   },
   computed: {
@@ -227,6 +228,12 @@ export default Vue.extend({
         return true
       }
       return false
+    },
+    background_style() {
+      if (typeof this.bgStyle === 'object') {
+        return `url(${this.bgStyle.image})`
+      }
+      return this.bgStyle
     }
   },
   mounted() {
@@ -239,6 +246,8 @@ export default Vue.extend({
       }
       this.timerRunning = false
     })
+
+    this.updateBackground()
   },
   methods: {
     reload() {
@@ -263,8 +272,16 @@ export default Vue.extend({
       document.cookie = 'auth_token=' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
       window.location.reload()
     },
+    updateBackground(option = null) {
+      const report_menu = document.querySelector('.dropdown-menu')
+      console.log(report_menu, this.bgStyle)
+      if (report_menu) {
+        report_menu.style.backgroundColor = option ? option : this.bgStyle
+      }
+    },
     setBackground(option, theme) {
       EventBus.$emit('changeBackground', { option, theme })
+      this.updateBackground(option)
     },
     async toggle(iconName) {
       if (iconName === 'reload') {
@@ -298,6 +315,20 @@ export default Vue.extend({
       this.toggles.timers = true
     } else {
       this.toggles.timers = false
+    }
+
+    let bgStyle = getCookie('bg-style')
+    if (bgStyle) {
+      try {
+        let style = JSON.parse(bgStyle)
+        this.bgStyle = style
+      } catch (error) {
+        this.bgStyle = bgStyle
+      }
+    } else {
+      const style_color = 'rgba(255, 165, 0, 0.6)'
+      this.bgStyle = style_color
+      this.setCookie('style', style_color)
     }
 
     // Check if theme is available
