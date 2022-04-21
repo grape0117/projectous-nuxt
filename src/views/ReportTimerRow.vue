@@ -8,6 +8,7 @@
       <div v-if="timer.is_paid" style="color: green;">Paid</div>
       <div v-if="timer.exported_at" style="color:red;">Exported</div>
     </td>
+    <td v-else></td>
     <td v-if="isAdmin()" @click="editTimer(timer)">
       <div v-if="timer.client_rate > 0">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
       <div v-else style="color: red;">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>

@@ -107,7 +107,7 @@
         </form>
         <div class="table-responsive">
           <table class="table timer-table">
-            <tbody v-if="isAdmin()" class="row-2017-2-18">
+            <tbody v-if="timers" class="row-2017-2-18">
               <tr class="row-date">
                 <td colspan="100">
                   <b-badge variant="dark" style="opacity:50%">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} ({{ this.timeToDecimal(Math.trunc(total_time / 3600), Math.trunc((total_time % 3600) / 60)) }})</b-badge>&nbsp; <b-badge variant="dark" style="opacity:50%">Entries: {{ timers.length }}</b-badge
@@ -227,7 +227,6 @@ import Vue from 'vue'
 import moment from 'moment'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
-import moment from 'moment'
 import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
 
 export default {
@@ -355,9 +354,7 @@ export default {
   beforeCreate: function() {
     //labeledConsole('beforeCreate', $('#project').val())
     if (sessionStorage.getItem('invoiceable')) {
-      console.log('invoiceable', new URLSearchParams(sessionStorage.getItem('invoiceable')).toString())
-      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() })
-      console.log(this.$route)
+      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() }).catch(() => {})
     }
   },
   mounted() {
@@ -365,6 +362,7 @@ export default {
     this.getData()
   },
   methods: {
+    timeToDecimal,
     totalToDecimal,
     initStartDate() {
       const current_date = new Date()
@@ -589,55 +587,41 @@ export default {
       let data = new FormData(form)
 
       if (!data) {
+        console.log('!!!!!!!!!!!!!!!!')
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
       }
       const queryString = new URLSearchParams(data).toString()
-      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {})
+      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {
+        console.log('getData')
+      })
       sessionStorage.setItem('invoiceable', queryString)
 
-      if (this.isAdmin()) {
-        const { invoice_items, timers } = await this.$http().post('/invoiceable-timers', data)
+      // if (this.isAdmin()) {
+      const { invoice_items, timers } = await this.$http().post('/invoiceable-timers', data)
 
-        this.invoice_items = invoice_items
-        this.timers = timers
-        this.total_time = 0
-        this.total_earned = 0
-        this.total_unpaid = 0
-        this.total_unbillable = 0
-        this.total_invoiceable = 0
+      this.invoice_items = invoice_items
+      this.timers = timers
+      this.total_time = 0
+      this.total_earned = 0
+      this.total_unpaid = 0
+      this.total_unbillable = 0
+      this.total_invoiceable = 0
 
-        for (const timer of this.timers) {
-          this.total_time += timer.duration
-          this.total_earned += (timer.duration / 3600) * timer.user_rate
-          if (!timer.is_paid) {
-            this.total_unpaid += (timer.duration / 3600) * timer.user_rate
-          }
-          if (!timer.is_billable) {
-            this.total_unbillable++
-          } else {
-            this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
-          }
+      for (const timer of this.timers) {
+        this.total_time += timer.duration
+        this.total_earned += (timer.duration / 3600) * timer.user_rate
+        if (!timer.is_paid) {
+          this.total_unpaid += (timer.duration / 3600) * timer.user_rate
         }
-        console.log(this.total_time)
-      } else {
-        // const { timers } = await this.$http().post('payable-timers', data)
-        // this.timers = timers
-        // this.total_time = 0
-        // this.total_earned = 0
-        // this.total_unpaid = 0
-        // this.total_unbillable = 0
-        // for (const timer of timers) {
-        //   this.total_time += timer.duration
-        //   this.total_earned += (timer.duration / 3600) * timer.user_rate
-        //   if (!timer.is_paid) {
-        //     this.total_unpaid += (timer.duration / 3600) * timer.user_rate
-        //   }
-        //   if (!timer.is_billable) {
-        //     this.total_unbillable++
-        //   }
-        // }
+        if (!timer.is_billable) {
+          this.total_unbillable++
+        } else {
+          this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
+        }
       }
+      console.log(this.total_time)
+      // }
       this.loading_data = false
     }
   }
