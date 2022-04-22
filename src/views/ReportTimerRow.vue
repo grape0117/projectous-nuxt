@@ -32,12 +32,12 @@
     <td @click="editTimer(timer)">
       {{ timer.report_at }}
     </td>
-    <td>
+    <td v-if="!is_user_report">
       <div class="report-timer-avatar" :style="{ 'background-color': timer.user ? timer.user.color : 'gray' }" v-b-tooltip.hover :title="timer.user ? timer.user.name : ''">
         {{ abbrName(timer.user ? timer.user.name : 'U') }}
       </div>
     </td>
-    <td @click="editTimer(timer)">
+    <td v-if="!is_user_report" @click="editTimer(timer)">
       <span v-if="!timer.is_billable" style="color: red;">$</span>
     </td>
     <td @click="editTimer(timer)" style="white-space: nowrap;">

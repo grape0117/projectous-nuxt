@@ -131,10 +131,10 @@
                 <td>
                   <b-badge variant="dark" style="font-size: 13px; background:none;">Date & Time</b-badge>
                 </td>
-                <td>
+                <td v-if="!is_user_report">
                   <b-badge variant="dark" style="font-size: 13px; background:none;">User</b-badge>
                 </td>
-                <td>
+                <td v-if="!is_user_report">
                   <b-badge variant="dark" style="font-size: 13px; background:none;">Unbilled ({{ this.total_unbillable }})</b-badge>
                 </td>
                 <td>
@@ -596,7 +596,7 @@ export default {
         //     this.total_unbillable++
         //   }
         // }
-      }
+      // }
       this.loading_data = false
     }
   }
