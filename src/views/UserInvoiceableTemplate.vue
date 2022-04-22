@@ -596,7 +596,7 @@ export default {
         //     this.total_unbillable++
         //   }
         // }
-      // }
+      }
       this.loading_data = false
     }
   }
