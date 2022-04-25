@@ -264,7 +264,8 @@ export default {
       timers: [],
       invoice_items: [],
       settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false },
-      loading_data: false
+      loading_data: false,
+      is_admin: null
     }
   },
   computed: {
@@ -291,9 +292,6 @@ export default {
     timer_watch() {
       return this.$store.state.settings.timer_watch
     }
-  },
-  created() {
-    this.$root.$refs.Invoiceable = this
   },
   watch: {
     timer_watch: function() {
@@ -349,6 +347,12 @@ export default {
     },
     received_check_id: function() {
       this.getData('received_check_id')
+    },
+    is_admin: function() {
+      if (this.is_admin == true) {
+        this.getData()
+        return
+      }
     }
   },
   beforeCreate: function() {
@@ -364,6 +368,7 @@ export default {
     this.getData()
   },
   methods: {
+    timeToDecimal,
     totalToDecimal,
     initStartDate() {
       const current_date = new Date()
@@ -529,7 +534,9 @@ export default {
       this.getData('thismonth')
     },
     isAdmin: function() {
-      return this.$store.getters['settings/isAdmin']
+      const temp_is_admin = this.$store.getters['settings/isAdmin']
+      this.is_admin = temp_is_admin
+      return temp_is_admin
     },
     //   searchMe(nt) {
     //     let force = this.search
@@ -618,7 +625,6 @@ export default {
             this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
           }
         }
-        console.log(this.total_time)
       } else {
         // const { timers } = await this.$http().post('payable-timers', data)
         // this.timers = timers
