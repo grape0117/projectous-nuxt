@@ -56,13 +56,9 @@
                   <b-form-checkbox v-model="anytime" name="anytime" class="mr-2">
                     Anytime
                   </b-form-checkbox>
-                  <!--<b-form-checkbox v-if="isAdmin()" v-model="show_paid" name="show_paid" class="mr-2">-->
-                  <!--Show paid-->
-                  <!--</b-form-checkbox>-->
-                  <b-form-checkbox v-if="isAdmin()" v-model="show_invoiced" name="show_invoiced">
-                    Show Invoiced
+                  <b-form-checkbox v-model="show_paid" name="show_paid" class="mr-2">
+                    Show paid
                   </b-form-checkbox>
-                  <input v-else type="hidden" name="is_invoiced" value="1" />
                 </div>
 
                 <div class="d-flex flex-wrap">
@@ -71,12 +67,12 @@
                 </div>
               </div>
               <div class="inputs d-flex justify-content-start flex-wrap align-items-start w-100">
-                <b-form-input class="mt-3" placeholder="task ID"></b-form-input>
-                <!-- <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
+                <!--<b-form-input class="mt-3" placeholder="task ID"></b-form-input>
+                 <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
                 <b-form-input class="mt-3" placeholder="Received Check #"></b-form-input>
                 <b-form-input class="mt-3" placeholder="Client Rate"></b-form-input>
-                <b-form-input class="mt-3" placeholder="User Rate"></b-form-input> -->
-                <b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>
+                <b-form-input class="mt-3" placeholder="User Rate"></b-form-input> 
+                <b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>-->
 
                 <!-- <input placeholder="task ID" type="text" name="task_id" />
                 <input placeholder="Paid Check #" type="text" name="paid_check_number" />
@@ -97,22 +93,6 @@
           <table class="table timer-table">
             <tbody v-if="isAdmin()" class="row-2017-2-18">
               <tr class="row-date">
-                <td colspan="100">
-                  <b-badge variant="dark" style="opacity:50%">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} ({{ this.timeToDecimal(Math.trunc(total_time / 3600), Math.trunc((total_time % 3600) / 60)) }})</b-badge>&nbsp; <b-badge variant="dark" style="opacity:50%">Entries: {{ timers.length }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Unbilled: ${{ Math.trunc(total_unbillable * 100) / 100 }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</b-badge
-                  >&nbsp;
-                  <b-badge variant="dark" style="opacity:50%">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</b-badge>
-                  <!--<span style="color: darkblue"> Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} </span>&nbsp;
-                  <span style="color: orange;">Entries: {{ timers.length }}</span>
-                  <span style="color: olive;">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</span>
-                  <span v-if="total_unbillable" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightseagreen;">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</span>>-->
-                </td>
-              </tr>
-              <tr class="row-date">
                 <td style="width: 20px">
                   <input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" />
                 </td>
@@ -122,7 +102,7 @@
                     <div class="d-flex">
                       <b-form-select id="action" v-model="invoice_action" class="mr-3">
                         <b-form-select-option :value="null" disabled>Select Action</b-form-select-option>
-                        <b-form-select-option value="markpaid">Mark Paid</b-form-select-option>
+                        <!--<b-form-select-option value="markpaid">Mark Paid</b-form-select-option>
                         <b-form-select-option value="markunpaid">Mark Unpaid</b-form-select-option>
                         <b-form-select-option value="resavetimers">Resave Timers</b-form-select-option>
 
@@ -130,16 +110,37 @@
                         <b-form-select-option value="adjust-user-rate">Adjust User Rate</b-form-select-option>
                         <b-form-select-option value="download-csv">Download CSV</b-form-select-option>
                         <b-form-select-option value="download-xls">Download XLS</b-form-select-option>
-                        <b-form-select-option value="create_invoice">Create Invoice</b-form-select-option>
+                        <b-form-select-option value="create_invoice">Create Invoice</b-form-select-option>-->
                       </b-form-select>
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
                     </div>
-                    <div style="width: 100%" class="ml-3">
-                      <span id="actionLink"> </span>
-                      <button style="float:right" class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
-                    </div>
+                    <div style="width: 100%" class="ml-3"></div>
                   </div>
                 </td>
+              </tr>
+              <tr class="row-date">
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">{{ timers.length }} {{ timers.length > 1 ? 'Entries' : 'Entry' }}</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;"> Earned: {{ totalToDecimal('earned', this.total_earned) }} </b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Project</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Date & Time</b-badge>
+                </td>
+                <td v-if="!is_user_report">
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">User</b-badge>
+                </td>
+                <td v-if="!is_user_report">
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Unbilled ({{ this.total_unbillable }})</b-badge>
+                </td>
+                <td>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;">Time: {{ totalToDecimal('time', this.total_time) }}</b-badge>
+                </td>
+                <td></td>
               </tr>
             </tbody>
             <tbody v-else class="row-2017-2-18">
@@ -161,7 +162,7 @@
 
             <tbody>
               <tr :item="item" v-for="item in invoice_items" :key="item.id" :checkbox_all_checked="checkbox_all_checked" is="invoiceable-item-row"></tr>
-              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" is="report-timer-row"></tr>
+              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" :is_user_report="is_user_report" is="report-timer-row"></tr>
             </tbody>
             <tbody>
               <tr>
@@ -189,7 +190,7 @@ import Vue from 'vue'
 import moment from 'moment'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
-import { getCookie } from '@/utils/util-functions'
+import { getCookie, timeToDecimal, totalToDecimal } from '@/utils/util-functions'
 
 export default {
   name: 'invoiceable-template',
@@ -227,7 +228,8 @@ export default {
       invoice_items: [],
       settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false },
       loading_data: false,
-      company_user_id: getCookie('company_user_id')
+      company_user_id: getCookie('company_user_id'),
+      is_user_report: true
     }
   },
   computed: {
@@ -321,6 +323,8 @@ export default {
     this.getData()
   },
   methods: {
+    timeToDecimal,
+    totalToDecimal,
     initStartDate() {
       const current_date = new Date()
       const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
@@ -527,11 +531,6 @@ export default {
       }
       //console.log(this.chosen_clients)
     },
-    timeToDecimal(hour, min) {
-      const dec = parseInt((min / 6) * 10, 10)
-
-      return parseFloat(parseInt(hour, 10) + '.' + (dec < 10 ? '0' : '') + dec)
-    },
     async getData(where) {
       this.loading_data = true
       let self = this
@@ -548,8 +547,9 @@ export default {
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
       }
+
       const queryString = new URLSearchParams(data).toString()
-      //   const updated_path = `user=${self.company_user_id}?${queryString}`
+      console.log('queryString', queryString)
       this.$router.push({ path: `/user_report?${queryString}` })
       sessionStorage.setItem('user_report', queryString)
 

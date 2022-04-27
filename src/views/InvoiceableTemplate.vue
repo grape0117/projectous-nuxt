@@ -109,22 +109,6 @@
           <table class="table timer-table">
             <tbody v-if="timers" class="row-2017-2-18">
               <tr class="row-date">
-                <td colspan="100">
-                  <b-badge variant="dark" style="opacity:50%">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} ({{ this.timeToDecimal(Math.trunc(total_time / 3600), Math.trunc((total_time % 3600) / 60)) }})</b-badge>&nbsp; <b-badge variant="dark" style="opacity:50%">Entries: {{ timers.length }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Unbilled: ${{ Math.trunc(total_unbillable * 100) / 100 }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</b-badge
-                  >&nbsp;
-                  <b-badge variant="dark" style="opacity:50%">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</b-badge>
-                  <!--<span style="color: darkblue"> Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} </span>&nbsp;
-                  <span style="color: orange;">Entries: {{ timers.length }}</span>
-                  <span style="color: olive;">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</span>
-                  <span v-if="total_unbillable" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightseagreen;">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</span>>-->
-                </td>
-              </tr>
-              <tr class="row-date">
                 <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" /></td>
                 <td colspan="100">
                   <div class="d-flex">
@@ -199,7 +183,7 @@
 
             <tbody>
               <tr :item="item" v-for="item in invoice_items" :key="item.id" :checkbox_all_checked="checkbox_all_checked" is="invoiceable-item-row"></tr>
-              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" is="report-timer-row"></tr>
+              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" :is_user_report="is_user_report" is="report-timer-row"></tr>
             </tbody>
             <tbody>
               <tr>
@@ -264,7 +248,8 @@ export default {
       timers: [],
       invoice_items: [],
       settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false },
-      loading_data: false
+      loading_data: false,
+      is_user_report: false
     }
   },
   computed: {
@@ -364,6 +349,7 @@ export default {
   methods: {
     timeToDecimal,
     totalToDecimal,
+    timeToDecimal,
     initStartDate() {
       const current_date = new Date()
       const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
