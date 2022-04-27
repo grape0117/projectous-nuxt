@@ -364,6 +364,7 @@ export default {
     this.getData()
   },
   methods: {
+    timeToDecimal,
     totalToDecimal,
     initStartDate() {
       const current_date = new Date()
@@ -586,7 +587,7 @@ export default {
 
       let form = await document.querySelector('#invoiceable-form')
       let data = new FormData(form)
-
+      console.log(data)
       if (!data) {
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
@@ -597,7 +598,7 @@ export default {
 
       if (this.isAdmin()) {
         const { invoice_items, timers } = await this.$http().post('/invoiceable-timers', data)
-
+        console.log('timers', timers)
         this.invoice_items = invoice_items
         this.timers = timers
         this.total_time = 0

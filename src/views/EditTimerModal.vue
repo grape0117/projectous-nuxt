@@ -529,9 +529,10 @@ export default {
           }
         }
       }
+      console.log('PROJ ID', this.timer.project_id)
+      console.log(sessionStorage.getItem('invoiceable'))
+      const selected_data = sessionStorage.getItem('invoiceable')
       let result = this.$store.dispatch('timers/saveTimer', this.timer)
-      console.log('result')
-      console.log(result)
 
       if (this.editTimerStatus === 'add') {
         //this.startTimer()
