@@ -312,11 +312,8 @@ export default {
     }
   },
   beforeCreate: function() {
-    //labeledConsole('beforeCreate', $('#project').val())
     if (sessionStorage.getItem('user_report')) {
-      console.log('user_report', new URLSearchParams(sessionStorage.getItem('user_report')).toString())
-      this.$router.push({ path: '/user_report?' + new URLSearchParams(sessionStorage.getItem('user_report')).toString() })
-      console.log(this.$route)
+      this.$router.push({ path: '/user_report?' + new URLSearchParams(sessionStorage.getItem('user_report')).toString() }).catch(() => {})
     }
   },
   mounted() {
@@ -579,23 +576,6 @@ export default {
             this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
           }
         }
-      } else {
-        // const { timers } = await this.$http().post('payable-timers', data)
-        // this.timers = timers
-        // this.total_time = 0
-        // this.total_earned = 0
-        // this.total_unpaid = 0
-        // this.total_unbillable = 0
-        // for (const timer of timers) {
-        //   this.total_time += timer.duration
-        //   this.total_earned += (timer.duration / 3600) * timer.user_rate
-        //   if (!timer.is_paid) {
-        //     this.total_unpaid += (timer.duration / 3600) * timer.user_rate
-        //   }
-        //   if (!timer.is_billable) {
-        //     this.total_unbillable++
-        //   }
-        // }
       }
       this.loading_data = false
     }
