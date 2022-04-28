@@ -576,7 +576,7 @@ export default {
 
       let form = await document.querySelector('#invoiceable-form')
       let data = new FormData(form)
-
+      console.log(data)
       if (!data) {
         console.log('!!!!!!!!!!!!!!!!')
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh

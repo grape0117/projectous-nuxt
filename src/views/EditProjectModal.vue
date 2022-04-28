@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="project-modal" :title="`${has_route_query_newProjectClientCompanyId ? 'Add' : 'Edit'} Project`" class="modal fade" role="dialog" @ok="saveProject" @hidden="closeModal">
+  <b-modal ref="project-modal" id="project-modal" :title="`${has_route_query_newProjectClientCompanyId ? 'Add' : 'Edit'} Project`" class="modal fade" role="dialog" @ok="saveProject" @hidden="closeModal">
     <form id="editProjectForm" class="form-horizontal">
       <input id="projectIDEdit" class="form-control" type="hidden" name="id" v-model="project.id" />
       <div class="form-group">
@@ -234,13 +234,16 @@ export default {
       return '' //dateTimeToInput(this.project.due_at)
     },
     editClient: function() {
-      this.$store.dispatch('settings/closeModal', {
-        modal: 'project',
-        object: this.project,
-        pop: false,
-        push: true
-      })
-      this.$store.dispatch('clients/editClient', this.projectClient())
+      alert()
+      // this.$store.dispatch('settings/closeModal', {
+      //   modal: 'project',
+      //   object: this.project,
+      //   pop: false,
+      //   push: true
+      // })
+      this.$refs['project-modal'].hide()
+      const project_client = this.projectClient()
+      this.$store.dispatch('clients/editClient', project_client.id)
     },
     projectClient: function() {
       return this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
