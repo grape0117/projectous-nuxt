@@ -8,9 +8,10 @@
       <div v-if="timer.is_paid" style="color: green;">Paid</div>
       <div v-if="timer.exported_at" style="color:red;">Exported</div>
     </td>
+    <td v-else></td>
     <td v-if="isAdmin()" @click="editTimer(timer)">
       <div v-if="timer.client_rate > 0">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
-      <div v-else style="color: red;">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
+      <div v-else-if="is_user_report === false" style="color: red;">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
       <!--<div v-if="isTecharound()">${{ Math.trunc((timer.client_rate * timer.invoice_duration / 3600 - timer.user_rate * timer.duration / 3600) * 100) / 100 }} (${{ timer.client_rate - timer.user_rate }})</div>-->
       <div v-if="isAdmin()">
         <span v-if="timer.user_rate > 0">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span><span v-else style="color: red;">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span>
@@ -32,12 +33,12 @@
     <td @click="editTimer(timer)">
       {{ timer.report_at }}
     </td>
-    <td>
+    <td v-if="!is_user_report">
       <div class="report-timer-avatar" :style="{ 'background-color': timer.user ? timer.user.color : 'gray' }" v-b-tooltip.hover :title="timer.user ? timer.user.name : ''">
         {{ abbrName(timer.user ? timer.user.name : 'U') }}
       </div>
     </td>
-    <td @click="editTimer(timer)">
+    <td v-if="!is_user_report" @click="editTimer(timer)">
       <span v-if="!timer.is_billable" style="color: red;">$</span>
     </td>
     <td @click="editTimer(timer)" style="white-space: nowrap;">
@@ -59,7 +60,7 @@ import { formatTime } from '@/utils/util-functions'
 
 export default {
   name: 'report-timer-row',
-  props: ['timer', 'checkbox_all_checked'],
+  props: ['timer', 'checkbox_all_checked', 'is_user_report'],
   data() {
     return {
       checkbox_toggled: false
@@ -84,6 +85,9 @@ export default {
     current_company() {
       return this.$store.state.settings.current_company
     }
+  },
+  created: function() {
+    console.log(this.is_user_report)
   },
   methods: {
     abbrName,

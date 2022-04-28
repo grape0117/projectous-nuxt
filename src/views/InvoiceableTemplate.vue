@@ -107,23 +107,7 @@
         </form>
         <div class="table-responsive">
           <table class="table timer-table">
-            <tbody v-if="isAdmin()" class="row-2017-2-18">
-              <tr class="row-date">
-                <td colspan="100">
-                  <b-badge variant="dark" style="opacity:50%">Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} ({{ this.timeToDecimal(Math.trunc(total_time / 3600), Math.trunc((total_time % 3600) / 60)) }})</b-badge>&nbsp; <b-badge variant="dark" style="opacity:50%">Entries: {{ timers.length }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Unbilled: ${{ Math.trunc(total_unbillable * 100) / 100 }}</b-badge
-                  >&nbsp; <b-badge variant="dark" style="opacity:50%">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</b-badge
-                  >&nbsp;
-                  <b-badge variant="dark" style="opacity:50%">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</b-badge>
-                  <!--<span style="color: darkblue"> Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }} </span>&nbsp;
-                  <span style="color: orange;">Entries: {{ timers.length }}</span>
-                  <span style="color: olive;">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}</span>
-                  <span v-if="total_unbillable" style="color: pink">Total Unbilled: {{ Math.trunc(total_unbillable * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightgreen">Total Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}</span>
-                  <span v-if="isAdmin()" style="color: lightseagreen;">Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}</span>>-->
-                </td>
-              </tr>
+            <tbody v-if="timers" class="row-2017-2-18">
               <tr class="row-date">
                 <td style="width: 20px"><input type="checkbox" v-model="checkbox_all_checked" :class="checkbox_all_checked ? '.item-action' : null" /></td>
                 <td colspan="100">
@@ -199,7 +183,7 @@
 
             <tbody>
               <tr :item="item" v-for="item in invoice_items" :key="item.id" :checkbox_all_checked="checkbox_all_checked" is="invoiceable-item-row"></tr>
-              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" is="report-timer-row"></tr>
+              <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" :is_user_report="is_user_report" is="report-timer-row"></tr>
             </tbody>
             <tbody>
               <tr>
@@ -264,7 +248,8 @@ export default {
       timers: [],
       invoice_items: [],
       settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false },
-      loading_data: false
+      loading_data: false,
+      is_user_report: false
     }
   },
   computed: {
@@ -354,9 +339,7 @@ export default {
   beforeCreate: function() {
     //labeledConsole('beforeCreate', $('#project').val())
     if (sessionStorage.getItem('invoiceable')) {
-      console.log('invoiceable', new URLSearchParams(sessionStorage.getItem('invoiceable')).toString())
-      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() })
-      console.log(this.$route)
+      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() }).catch(() => {})
     }
   },
   mounted() {
@@ -366,6 +349,7 @@ export default {
   methods: {
     timeToDecimal,
     totalToDecimal,
+    timeToDecimal,
     initStartDate() {
       const current_date = new Date()
       const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
@@ -589,55 +573,41 @@ export default {
       let data = new FormData(form)
       console.log(data)
       if (!data) {
+        console.log('!!!!!!!!!!!!!!!!')
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
       }
       const queryString = new URLSearchParams(data).toString()
-      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {})
+      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {
+        console.log('getData')
+      })
       sessionStorage.setItem('invoiceable', queryString)
 
-      if (this.isAdmin()) {
-        const { invoice_items, timers } = await this.$http().post('/invoiceable-timers', data)
-        console.log('timers', timers)
-        this.invoice_items = invoice_items
-        this.timers = timers
-        this.total_time = 0
-        this.total_earned = 0
-        this.total_unpaid = 0
-        this.total_unbillable = 0
-        this.total_invoiceable = 0
+      // if (this.isAdmin()) {
+      const { invoice_items, timers } = await this.$http().post('/invoiceable-timers', data)
 
-        for (const timer of this.timers) {
-          this.total_time += timer.duration
-          this.total_earned += (timer.duration / 3600) * timer.user_rate
-          if (!timer.is_paid) {
-            this.total_unpaid += (timer.duration / 3600) * timer.user_rate
-          }
-          if (!timer.is_billable) {
-            this.total_unbillable++
-          } else {
-            this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
-          }
+      this.invoice_items = invoice_items
+      this.timers = timers
+      this.total_time = 0
+      this.total_earned = 0
+      this.total_unpaid = 0
+      this.total_unbillable = 0
+      this.total_invoiceable = 0
+
+      for (const timer of this.timers) {
+        this.total_time += timer.duration
+        this.total_earned += (timer.duration / 3600) * timer.user_rate
+        if (!timer.is_paid) {
+          this.total_unpaid += (timer.duration / 3600) * timer.user_rate
         }
-        console.log(this.total_time)
-      } else {
-        // const { timers } = await this.$http().post('payable-timers', data)
-        // this.timers = timers
-        // this.total_time = 0
-        // this.total_earned = 0
-        // this.total_unpaid = 0
-        // this.total_unbillable = 0
-        // for (const timer of timers) {
-        //   this.total_time += timer.duration
-        //   this.total_earned += (timer.duration / 3600) * timer.user_rate
-        //   if (!timer.is_paid) {
-        //     this.total_unpaid += (timer.duration / 3600) * timer.user_rate
-        //   }
-        //   if (!timer.is_billable) {
-        //     this.total_unbillable++
-        //   }
-        // }
+        if (!timer.is_billable) {
+          this.total_unbillable++
+        } else {
+          this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
+        }
       }
+      console.log(this.total_time)
+      // }
       this.loading_data = false
     }
   }

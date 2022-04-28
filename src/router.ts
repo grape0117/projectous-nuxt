@@ -116,7 +116,6 @@ const router = new Router({
     {
       path: '/user_report',
       name: 'My Report',
-      meta: { adminOnly: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/UserInvoiceableTemplate.vue')
     }
   ]
