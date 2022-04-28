@@ -235,7 +235,9 @@ export default {
       showInvoiceNotes: false,
       showAdminNotes: false,
       timer_link: null,
-      buttonStyle: ''
+      buttonStyle: '',
+      user_rate: '',
+      client_rate: ''
     }
   },
   created() {
@@ -529,9 +531,10 @@ export default {
           }
         }
       }
-      console.log('PROJ ID', this.timer.project_id)
-      console.log(sessionStorage.getItem('invoiceable'))
-      const selected_data = sessionStorage.getItem('invoiceable')
+
+      this.timer.user_rate = this.user_rate
+      this.timer.client_rate = this.client_rate
+
       let result = this.$store.dispatch('timers/saveTimer', this.timer)
 
       if (this.editTimerStatus === 'add') {
