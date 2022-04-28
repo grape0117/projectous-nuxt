@@ -235,7 +235,9 @@ export default {
       showInvoiceNotes: false,
       showAdminNotes: false,
       timer_link: null,
-      buttonStyle: ''
+      buttonStyle: '',
+      user_rate: '',
+      client_rate: ''
     }
   },
   created() {
@@ -529,6 +531,8 @@ export default {
           }
         }
       }
+      this.timer.user_rate = this.user_rate
+      this.timer.client_rate = this.client_rate
       let result = this.$store.dispatch('timers/saveTimer', this.timer)
       console.log('result')
       console.log(result)
