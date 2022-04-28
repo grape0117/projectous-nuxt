@@ -277,9 +277,6 @@ export default {
       return this.$store.state.settings.timer_watch
     }
   },
-  created() {
-    this.$root.$refs.Invoiceable = this
-  },
   watch: {
     timer_watch: function() {
       this.getData('timer_watch')
@@ -334,6 +331,12 @@ export default {
     },
     received_check_id: function() {
       this.getData('received_check_id')
+    },
+    is_admin: function() {
+      if (this.is_admin == true) {
+        this.getData()
+        return
+      }
     }
   },
   beforeCreate: function() {
@@ -514,7 +517,9 @@ export default {
       this.getData('thismonth')
     },
     isAdmin: function() {
-      return this.$store.getters['settings/isAdmin']
+      const temp_is_admin = this.$store.getters['settings/isAdmin']
+      this.is_admin = temp_is_admin
+      return temp_is_admin
     },
     //   searchMe(nt) {
     //     let force = this.search
@@ -605,6 +610,26 @@ export default {
         } else {
           this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
         }
+<<<<<<< HEAD
+      } else {
+        // const { timers } = await this.$http().post('payable-timers', data)
+        // this.timers = timers
+        // this.total_time = 0
+        // this.total_earned = 0
+        // this.total_unpaid = 0
+        // this.total_unbillable = 0
+        // for (const timer of timers) {
+        //   this.total_time += timer.duration
+        //   this.total_earned += (timer.duration / 3600) * timer.user_rate
+        //   if (!timer.is_paid) {
+        //     this.total_unpaid += (timer.duration / 3600) * timer.user_rate
+        //   }
+        //   if (!timer.is_billable) {
+        //     this.total_unbillable++
+        //   }
+        // }
+=======
+>>>>>>> master
       }
       console.log(this.total_time)
       // }
