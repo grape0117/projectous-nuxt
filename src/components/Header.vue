@@ -274,7 +274,6 @@ export default Vue.extend({
     },
     updateBackground(option = null) {
       const report_menu = document.querySelector('.dropdown-menu')
-      console.log(report_menu, this.bgStyle)
       if (report_menu) {
         report_menu.style.backgroundColor = option ? option : this.bgStyle
       }
