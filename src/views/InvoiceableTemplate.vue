@@ -610,26 +610,6 @@ export default {
         } else {
           this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
         }
-<<<<<<< HEAD
-      } else {
-        // const { timers } = await this.$http().post('payable-timers', data)
-        // this.timers = timers
-        // this.total_time = 0
-        // this.total_earned = 0
-        // this.total_unpaid = 0
-        // this.total_unbillable = 0
-        // for (const timer of timers) {
-        //   this.total_time += timer.duration
-        //   this.total_earned += (timer.duration / 3600) * timer.user_rate
-        //   if (!timer.is_paid) {
-        //     this.total_unpaid += (timer.duration / 3600) * timer.user_rate
-        //   }
-        //   if (!timer.is_billable) {
-        //     this.total_unbillable++
-        //   }
-        // }
-=======
->>>>>>> master
       }
       console.log(this.total_time)
       // }
