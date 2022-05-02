@@ -219,6 +219,7 @@ import TimerFifteenTemplate from './TimerFifteenTemplate.vue'
 import CopyUrlTemplate from './CopyUrlTemplate.vue'
 import Vue from 'vue'
 import { getCookie } from '@/utils/util-functions'
+import { cloneDeep, groupBy } from 'lodash'
 
 export default {
   name: 'timer-modal',
@@ -452,27 +453,32 @@ export default {
       return ('00' + Math.floor(this.timer.duration % 60)).slice(-2)
     },
     editProject: function() {
-      this.$store.dispatch('settings/closeModal', {
-        modal: 'timer',
-        object: this.timer,
-        pop: false,
-        push: true
-      })
-      this.$store.dispatch('settings/editProject', this.timerProject())
+      // this.$store.dispatch('settings/closeModal', {
+      //   modal: 'timer',
+      //   object: this.timer,
+      //   pop: false,
+      //   push: true
+      // })
+      // console.log(timer_project.id)
+      const timer_project = this.timerProject()
+      this.$store.commit('settings/setCurrentEditProject', cloneDeep(timer_project))
+      this.$store.commit('settings/setCurrentEditProjectStatus', 'edit')
     },
     editClient: function() {
-      this.$store.dispatch('settings/closeModal', {
-        modal: 'timer',
-        object: this.timer,
-        pop: false,
-        push: true
-      })
-      this.$store.dispatch('clients/editClient', this.timerClient())
+      // this.$store.dispatch('settings/closeModal', {
+      //   modal: 'timer',
+      //   object: this.timer,
+      //   pop: false,
+      //   push: true
+      // })
+      const timer_client = this.timerClient()
+      console.log(timer_client)
+      this.$store.dispatch('clients/editClient', timer_client.id)
       this.$store.commit('settings/setCheckModalStack', true)
     },
     timerClient: function() {
       let timerProject = this.timerProject()
-      return this.$store.getters['clients/getByClientCompanyId'](timerProject.client_id)
+      return this.$store.getters['clients/getByClientCompanyId'](timerProject.client_company_id)
     },
     timerProject: function() {
       return this.$store.getters['projects/getById'](this.timer.project_id)
