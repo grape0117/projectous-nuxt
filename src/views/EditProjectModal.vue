@@ -36,8 +36,8 @@
             </option>
           </select>
         </div>
-        <div class="col-sm-2">
-          <a v-on:click="editClient()">Edit Client</a>
+        <div class="col-sm-12 edit-ClientProject">
+          <a class="edit-ClientProject-a-tag" style="cursor:pointer;" v-on:click="editClient()">Edit Client</a>
         </div>
       </div>
       <div class="form-group">
@@ -234,14 +234,14 @@ export default {
       return '' //dateTimeToInput(this.project.due_at)
     },
     editClient: function() {
-      alert()
+      // alert()
       // this.$store.dispatch('settings/closeModal', {
       //   modal: 'project',
       //   object: this.project,
       //   pop: false,
       //   push: true
       // })
-      this.$refs['project-modal'].hide()
+
       const project_client = this.projectClient()
       this.$store.dispatch('clients/editClient', project_client.id)
     },

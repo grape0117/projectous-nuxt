@@ -141,7 +141,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   editProject(context, project) {
     // @ts-ignore
-    this.bvModal.show('project-modal')
+    // this.bvModal.show('project-modal')
+    window.$_app.$bvModal.show('project-modal')
   },
   loadCurrentCompanyUser(context, { user_id, company_id }) {
     let company_user = context.rootState.company_users.company_users.find(({ company_id: companyId, user_id: userId }: ICompanyUser) => companyId == company_id && userId == user_id)
