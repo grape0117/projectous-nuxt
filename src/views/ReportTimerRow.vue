@@ -10,7 +10,7 @@
     </td>
     <td v-else></td>
     <td v-if="isAdmin()" @click="editTimer(timer)">
-      <div v-if="timer.client_rate > 0">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
+      <div v-if="timer.client_rate > 0">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} {{ is_user_report ? '' : `$(${timer.client_rate})` }}</div>
       <div v-else-if="is_user_report === false" style="color: red;">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
       <!--<div v-if="isTecharound()">${{ Math.trunc((timer.client_rate * timer.invoice_duration / 3600 - timer.user_rate * timer.duration / 3600) * 100) / 100 }} (${{ timer.client_rate - timer.user_rate }})</div>-->
       <div v-if="isAdmin()">
@@ -74,10 +74,11 @@ export default {
   computed: {
     checkbox_value() {
       // if not toggled
-      if (!this.checkbox_toggled) return this.checkbox_all_checked
+      if (!this.checkbox_toggled) return this.checkbox_all_checked === true ? 1 : 0
 
       // if toggled toggled
-      return !this.checkbox_all_checked
+      console.log(!this.checkbox_all_checked)
+      return !this.checkbox_all_checked === true ? 1 : 0
     },
     users() {
       return this.$store.state.company_users.company_users
