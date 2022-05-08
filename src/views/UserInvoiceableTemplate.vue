@@ -111,6 +111,9 @@
                         <b-form-select-option value="download-csv">Download CSV</b-form-select-option>
                         <b-form-select-option value="download-xls">Download XLS</b-form-select-option>
                         <b-form-select-option value="create_invoice">Create Invoice</b-form-select-option>-->
+
+                        <b-form-select-option value="download-csv">Download CSV</b-form-select-option>
+                        <b-form-select-option value="download-xls">Download XLS</b-form-select-option>
                       </b-form-select>
                       <b-button variant="primary" @click="applyAction()">Go</b-button>
                     </div>
@@ -385,8 +388,6 @@ export default {
     },
     applyAction() {
       let self = this
-      const view_invoice_container = document.getElementById('actionLink')
-      view_invoice_container.innerHTML = ''
       let timers = document.querySelectorAll('.timer-action:checked') //TODO: remove jquery
       let itemIds = document.querySelectorAll('.item-action:checked') //TODO: remove jquery
       let timer_ids = []
@@ -447,10 +448,12 @@ export default {
         })
         return
       } else if (this.invoice_action == 'download-csv') {
-        window.open('https://release.projectous.com/timers/' + action + '?' + timers)
+        // window.open('https://release.projectous.com/timers/' + action + '?' + timers)
+        alert('Download CSV is comming soon')
         return
       } else if (this.invoice_action == 'download-xls') {
-        window.open('https://release.projectous.com/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
+        alert('Download XLS is comming soon')
+        // window.open('https://release.projectous.com/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
         return
       } else if (this.invoice_action == 'custom-xls') {
         this.$http().get('/test/set/modaldata/' + timers)
