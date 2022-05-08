@@ -237,8 +237,9 @@ export default {
     }
   },
   beforeCreate: function() {
+    console.log(sessionStorage.getItem('payable'))
     if (sessionStorage.getItem('payable')) {
-      this.$router.push({ path: '/payable?' + new URLSearchParams(sessionStorage.getItem('payable')).toString() })
+      this.$router.push({ path: '/payable?' + new URLSearchParams(sessionStorage.getItem('payable')).toString() }).catch(() => {})
     }
   },
   mounted() {
@@ -248,11 +249,17 @@ export default {
   methods: {
     initStartDate() {
       const current_date = new Date()
-      return this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
+      const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
+      // this.start = start_date
+
+      return start_date
     },
     initEndDate() {
       const current_date = new Date()
-      return this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 2) + '-00'
+      const end_date = this.$route.query.end ? decodeURI(this.$route.query.end) : current_date.getFullYear() + '-' + (current_date.getMonth() + 2) + '-00'
+      // this.end = end_date
+
+      return end_date
     },
     setStart(start) {
       this.start = start
@@ -275,9 +282,16 @@ export default {
     applyAction() {
       let self = this
 
-      let timers = document.querySelector('.timer-action:checked').serialize() //TODO: remove jquery
-      let itemIds = document.querySelector('.item-action:checked').serialize() //TODO: remove jquery
-
+      let timers = document.querySelectorAll('.timer-action:checked') //TODO: remove jquery
+      let itemIds = document.querySelectorAll('.item-action:checked') //TODO: remove jquery
+      let timer_ids = []
+      for (const timer of timers) {
+        const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
+        timer_ids.push(timer_id)
+      }
+      timers = {
+        timers: timer_ids
+      }
       if (this.invoice_action == 'create_invoice') {
         //TODO: $invoice_id = Invoice::max('invoice_id') + 1
 
@@ -331,19 +345,21 @@ export default {
       } else if (this.invoice_action == 'download-csv') {
         window.open('https://release.projectous.com/timers/' + action + '?' + timers)
         return
-      } else if (invoice_action == 'download-xls') {
+      } else if (this.invoice_action == 'download-xls') {
         window.open('https://release.projectous.com/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
         return
-      } else if (invoice_action == 'custom-xls') {
+      } else if (this.invoice_action == 'custom-xls') {
         this.$http().get('/test/set/modaldata/' + timers)
         //TODO: what is this and remove jquery $('.projectous_modal').trigger('click')
         return
       }
 
-      this.$http().post('/timers/' + invoice_action, timers, function() {
-        //TODO: update checked timers? reload page?
-        self.getData('applyaction')
-      })
+      this.$http()
+        .post('/timers/' + this.invoice_action, timers)
+        .then(function() {
+          // Do something with the response
+          self.getData()
+        })
     },
 
     isTecharound: function() {
@@ -422,14 +438,23 @@ export default {
       //$('#client').val(this.chosen_clients)
 
       let form = await document.querySelector('#invoiceable-form')
+      console.log(form, self.chosen_users, self.chosen_users.length)
       let data = new FormData(form)
 
       if (!data) {
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
       }
+      let chosen_filter = ''
+      if (where !== 'chosen_users' && self.chosen_users.length > 0) {
+        for (const user of self.chosen_users) {
+          chosen_filter += `user[]=${user}&`
+        }
+      }
+      console.log(chosen_filter)
       const queryString = new URLSearchParams(data).toString()
-      this.$router.push({ path: '/payable?' + queryString })
+      this.$router.push({ path: '/payable?' + chosen_filter + queryString }).catch(() => {})
+      console.log('queryString', queryString)
       sessionStorage.setItem('payable', queryString)
 
       const { timers } = await this.$http().post('/payable-timers', data)
