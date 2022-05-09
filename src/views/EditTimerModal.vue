@@ -16,14 +16,22 @@
                     <div class="form-group">
                       <label class="control-label col-sm-4" for="timer-modal-project-id">Project: </label>
                       <div class="col-sm-12">
-                        <select id="timer-modal-project-id" class="form-control" name="project_id" v-model="timer.project_id">
+                        <!-- <select id="timer-modal-project-id" class="form-control" name="project_id" v-model="timer.project_id">
                           <option :value="null">***** Select Project *****</option>
                           <option value="create">Create New Project</option>
                           <option v-for="(project, projectIndex) in openprojects()" :key="projectIndex" v-bind:project="project" :value="project.id">
                             {{ client_name(project.client_company_id) }} -
                             {{ project.name }}
-                          </option>
-                        </select>
+                          </option> 
+                        </select> -->
+                        <v-select :options="openprojects()" :reduce="project => project.id" label="name" v-model="timer.project_id" placeholder="Select a project">
+                          <template slot="selected-option" slot-scope="option">
+                            <div class="flex">
+                              <div class="col">{{ client_name(option.client_company_id) }} - {{ option.name }}</div>
+                            </div>
+                          </template>
+                          <template slot="option" slot-scope="option"> {{ client_name(option.client_company_id) }} - {{ option.name }} </template>
+                        </v-select>
                       </div>
                       <div class="col-sm-2 edit-ClientProject">
                         <a v-on:click="editClient()" class="edit-ClientProject-a-tag">Edit Client</a>
