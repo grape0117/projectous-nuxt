@@ -126,7 +126,7 @@
                   <b-badge variant="dark" style="font-size: 13px; background:none;">{{ timers.length }} {{ timers.length > 1 ? 'Entries' : 'Entry' }}</b-badge>
                 </td>
                 <td>
-                  <b-badge variant="dark" style="font-size: 13px; background:none;"> Earned: {{ totalToDecimal('earned', this.total_earned) }} </b-badge>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;"> Earned </b-badge>
                 </td>
                 <td>
                   <b-badge variant="dark" style="font-size: 13px; background:none;">Project</b-badge>
@@ -550,10 +550,14 @@ export default {
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
       }
+      if (where == 'show_paid' && this.show_paid == true) {
+        console.log('here')
+        data.set('show_paid', 1)
+      }
 
       const queryString = new URLSearchParams(data).toString()
       console.log('queryString', queryString)
-      this.$router.push({ path: `/user_report?${queryString}` })
+      this.$router.push({ path: `/user_report?${queryString.replace('show_paid=true', 'show_paid=1')}` })
       sessionStorage.setItem('user_report', queryString)
 
       if (this.isAdmin()) {
