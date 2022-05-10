@@ -24,7 +24,7 @@
                             {{ project.name }}
                           </option> 
                         </select> -->
-                        <v-select :options="openprojects()" :reduce="project => project.id" label="name" v-model="timer.project_id" placeholder="Select a project">
+                        <v-select :options="openprojects()" :reduce="project => project.id" label="name" :filter-by="searchProject" v-model="timer.project_id" placeholder="Select a project">
                           <template slot="selected-option" slot-scope="option">
                             <div class="flex">
                               <div class="col">{{ client_name(option.client_company_id) }} - {{ option.name }}</div>
@@ -554,6 +554,15 @@ export default {
     client_name: function(client_company_id) {
       let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
       return client ? client.name : ''
+    },
+    searchProject: function(option, label, search) {
+      let search_value = search.toLowerCase()
+      return (
+        option.name.toLowerCase().indexOf(search_value) > -1 ||
+        this.client_name(option.client_company_id)
+          .toLowerCase()
+          .indexOf(search_value) > -1
+      )
     }
   }
 }
