@@ -48,11 +48,14 @@
             <tbody class="row-2017-2-18">
               <tr class="row-date">
                 <td colspan="100">
-                  <b-badge>Total Time: {{ Math.trunc(total_time / 3600) }}:{{ Math.trunc((total_time % 3600) / 60) }}&nbsp;</b-badge>
-                  <b-badge variant="primary">Entries: {{ timers.length }}&nbsp;</b-badge>
-                  <span v-if="show_paid" style="color: olive;">Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }}&nbsp;</span>
-                  <span>Unpaid: ${{ Math.trunc(total_unpaid * 100) / 100 }}&nbsp;</span>
-                  <span>Total: ${{ Math.trunc(total_invoiceable * 100) / 100 }}&nbsp;</span>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;"> Total Time: {{ timeToDecimal(Math.trunc(total_time / 3600), Math.trunc((total_time % 3600) / 60)) }} </b-badge>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;"> Entries: {{ timers.length }} </b-badge>
+                  <b-badge v-if="show_paid" variant="dark" style="font-size: 13px; background:none;"> Total Earned: ${{ Math.trunc(total_earned * 100) / 100 }} </b-badge>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;"> Unpaid: {{ totalToDecimal('unpaid', total_unpaid) }} </b-badge>
+                  <b-badge variant="dark" style="font-size: 13px; background:none;"> Total: {{ totalToDecimal('earned', total_earned) }} </b-badge>
+                  <!--<b-badge variant="dark" style="font-size: 13px; background:none;">
+                    Profit: 25%
+                  </b-badge>-->
                 </td>
               </tr>
               <tr class="row-date">
@@ -116,6 +119,7 @@
 import Vue from 'vue'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
+import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
 
 export default {
   name: 'invoiceable-template',
@@ -247,6 +251,8 @@ export default {
     this.getData()
   },
   methods: {
+    totalToDecimal,
+    timeToDecimal,
     initStartDate() {
       const current_date = new Date()
       const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
@@ -472,8 +478,10 @@ export default {
       for (const timer of timers) {
         this.total_time += timer.duration
         this.total_earned += (timer.duration / 3600) * timer.user_rate
-        if (!timer.is_paid) {
+        console.log(timer.is_paid)
+        if (timer.is_paid == 0) {
           this.total_unpaid += (timer.duration / 3600) * timer.user_rate
+          console.log(this.total_unpaid)
         }
         if (!timer.is_billable) {
           this.total_unbillable++
