@@ -561,7 +561,7 @@ export default {
       sessionStorage.setItem('user_report', queryString)
 
       if (this.isAdmin()) {
-        const { invoice_items, timers } = await this.$http().post('/invoiceable-timers', data)
+        const { invoice_items, timers } = await this.$http().post('/payable-timers', data)
 
         this.invoice_items = invoice_items
         this.timers = timers
