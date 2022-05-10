@@ -164,7 +164,6 @@
             </tbody>
 
             <tbody>
-              <tr :item="item" v-for="item in invoice_items" :key="item.id" :checkbox_all_checked="checkbox_all_checked" is="invoiceable-item-row"></tr>
               <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" :is_user_report="is_user_report" is="report-timer-row"></tr>
             </tbody>
             <tbody>

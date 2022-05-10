@@ -10,11 +10,11 @@
     </td>
     <td v-else></td>
     <td v-if="isAdmin()" @click="editTimer(timer)">
-      <div v-if="timer.client_rate > 0">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} {{ is_user_report ? '' : `$(${timer.client_rate})` }}</div>
-      <div v-else-if="is_user_report === false" style="color: red;">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
-      <!--<div v-if="isTecharound()">${{ Math.trunc((timer.client_rate * timer.invoice_duration / 3600 - timer.user_rate * timer.duration / 3600) * 100) / 100 }} (${{ timer.client_rate - timer.user_rate }})</div>-->
-      <div v-if="isAdmin()">
-        <span v-if="timer.user_rate > 0">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span><span v-else style="color: red;">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span>
+      <div v-if="timer.client_rate > 0" style="color: lightgreen;">${{ Math.trunc(((timer.client_rate * timer.invoice_duration) / 3600) * 100) / 100 }} (${{ timer.client_rate }})</div>
+      <div v-else style="color: red;">$0</div>
+      <div>
+        <span v-if="timer.user_rate * timer.duration > 0">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span><span v-else style="color: red;">${{ Math.trunc(((timer.user_rate * timer.duration) / 3600) * 100) / 100 }} (${{ timer.user_rate }})</span>
+        <div v-else style="color: red;">$0</div>
       </div>
     </td>
     <td v-else>

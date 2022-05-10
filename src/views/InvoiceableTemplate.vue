@@ -83,12 +83,12 @@
                 </div>
               </div>
               <div class="inputs d-flex justify-content-start flex-wrap align-items-start w-100">
-                <b-form-input class="mt-3" placeholder="task ID"></b-form-input>
+                <!--<b-form-input class="mt-3" placeholder="task ID"></b-form-input>-->
                 <!-- <b-form-input class="mt-3" placeholder="Paid Check #"></b-form-input>
                 <b-form-input class="mt-3" placeholder="Received Check #"></b-form-input>
                 <b-form-input class="mt-3" placeholder="Client Rate"></b-form-input>
                 <b-form-input class="mt-3" placeholder="User Rate"></b-form-input> -->
-                <b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>
+                <!--<b-form-input class="mt-3" placeholder="Invoice #"></b-form-input>-->
 
                 <!-- <input placeholder="task ID" type="text" name="task_id" />
                 <input placeholder="Paid Check #" type="text" name="paid_check_number" />
