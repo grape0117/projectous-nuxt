@@ -435,7 +435,6 @@ export default {
       if (!this.current_company.id) {
         //return
       }
-      //$('#client').val(this.chosen_clients)
 
       let form = await document.querySelector('#invoiceable-form')
       console.log(form, self.chosen_users, self.chosen_users.length)
@@ -445,6 +444,12 @@ export default {
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
       }
+
+      if (where == 'show_paid' && this.show_paid == true) {
+        console.log('here')
+        data.set('show_paid', 1)
+      }
+
       let chosen_filter = ''
       if (where !== 'chosen_users' && self.chosen_users.length > 0) {
         for (const user of self.chosen_users) {
@@ -453,7 +458,7 @@ export default {
       }
       console.log(chosen_filter)
       const queryString = new URLSearchParams(data).toString()
-      this.$router.push({ path: '/payable?' + chosen_filter + queryString }).catch(() => {})
+      this.$router.push({ path: '/payable?' + chosen_filter + queryString.replace('show_paid=true', 'show_paid=1') }).catch(() => {})
       console.log('queryString', queryString)
       sessionStorage.setItem('payable', queryString)
 
