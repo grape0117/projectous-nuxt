@@ -352,7 +352,6 @@ export default {
   methods: {
     timeToDecimal,
     totalToDecimal,
-    timeToDecimal,
     initStartDate() {
       const current_date = new Date()
       const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-01'
