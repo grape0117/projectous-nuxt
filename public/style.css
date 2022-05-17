@@ -921,3 +921,7 @@ div:hover > .hover-action {
 .dropdown-item:hover, .dropdown-item:focus {
     background-color: #ffffff47 !important;
 }
+
+#report-menu-link {
+    color: white !important
+}
