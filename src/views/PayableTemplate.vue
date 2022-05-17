@@ -138,8 +138,8 @@ export default {
       total_unpaid: 0,
       total_unbillable: 0,
       total_invoiceable: 0,
-      anytime: this.$route.query.anytime == 1,
-      show_paid: this.$route.query.is_paid == 1,
+      anytime: this.$route.query.anytime,
+      show_paid: this.$route.query.show_paid == true,
       current_date: new Date(),
       start: this.initStartDate(),
       end: this.initEndDate(),
@@ -243,7 +243,9 @@ export default {
   beforeCreate: function() {
     console.log(sessionStorage.getItem('payable'))
     if (sessionStorage.getItem('payable')) {
-      this.$router.push({ path: '/payable?' + new URLSearchParams(sessionStorage.getItem('payable')).toString() }).catch(() => {})
+      this.$router.push({ path: '/payable?' + new URLSearchParams(sessionStorage.getItem('payable')).toString() }).catch(() => {
+        console.log('catching redundant navigation link')
+      })
     }
   },
   mounted() {
@@ -443,7 +445,7 @@ export default {
       }
 
       let form = await document.querySelector('#invoiceable-form')
-      console.log(form, self.chosen_users, self.chosen_users.length)
+
       let data = new FormData(form)
 
       if (!data) {
@@ -451,21 +453,23 @@ export default {
         return
       }
 
-      if (where == 'show_paid' && this.show_paid == true) {
-        console.log('here')
+      if (self.show_paid == true) {
+        data.delete('show_paid')
         data.set('show_paid', 1)
       }
 
-      let chosen_filter = ''
-      if (where !== 'chosen_users' && self.chosen_users.length > 0) {
+      if (self.chosen_users.length > 0) {
+        data.delete('user[]')
         for (const user of self.chosen_users) {
-          chosen_filter += `user[]=${user}&`
+          data.append('user[]', user)
         }
       }
-      console.log(chosen_filter)
+
       const queryString = new URLSearchParams(data).toString()
-      this.$router.push({ path: '/payable?' + chosen_filter + queryString.replace('show_paid=true', 'show_paid=1') }).catch(() => {})
-      console.log('queryString', queryString)
+      this.$router.push({ path: '/payable?' + queryString }).catch(() => {
+        console.log('catching redundant navigation link')
+      })
+
       sessionStorage.setItem('payable', queryString)
 
       const { timers } = await this.$http().post('/payable-timers', data)
@@ -478,10 +482,9 @@ export default {
       for (const timer of timers) {
         this.total_time += timer.duration
         this.total_earned += (timer.duration / 3600) * timer.user_rate
-        console.log(timer.is_paid)
+
         if (timer.is_paid == 0) {
           this.total_unpaid += (timer.duration / 3600) * timer.user_rate
-          console.log(this.total_unpaid)
         }
         if (!timer.is_billable) {
           this.total_unbillable++
