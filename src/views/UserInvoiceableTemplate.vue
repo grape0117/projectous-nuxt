@@ -211,8 +211,8 @@ export default {
       total_unpaid: 0,
       total_unbillable: 0,
       total_invoiceable: 0,
-      anytime: this.$route.query.anytime == 1,
-      show_paid: this.$route.query.is_paid == 1,
+      anytime: this.$route.query.anytime,
+      show_paid: this.$route.query.show_paid == true,
       current_date: new Date(),
       start: this.initStartDate(),
       end: this.initEndDate(),
@@ -549,14 +549,28 @@ export default {
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
       }
-      if (where == 'show_paid' && this.show_paid == true) {
-        console.log('here')
+      if (self.show_paid == true) {
+        data.delete('show_paid')
         data.set('show_paid', 1)
       }
 
+      if (self.chosen_clients.length > 0) {
+        data.delete('client[]')
+        for (const client of self.chosen_clients) {
+          data.append('client[]', client)
+        }
+      }
+
+      if (self.chosen_projects.length > 0) {
+        data.delete('project[]')
+        for (const project of self.chosen_projects) {
+          data.append('project[]', project)
+        }
+      }
+
       const queryString = new URLSearchParams(data).toString()
-      console.log('queryString', queryString)
-      this.$router.push({ path: `/user_report?${queryString.replace('show_paid=true', 'show_paid=1')}` })
+
+      this.$router.push({ path: `/user_report?${queryString}` })
       sessionStorage.setItem('user_report', queryString)
 
       if (this.isAdmin()) {

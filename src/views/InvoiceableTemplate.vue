@@ -230,7 +230,7 @@ export default {
       total_unpaid: 0,
       total_unbillable: 0,
       total_invoiceable: 0,
-      anytime: this.$route.query.anytime == 1,
+      anytime: this.$route.query.anytime,
       show_paid: this.$route.query.is_paid == 1,
       current_date: new Date(),
       start: this.initStartDate(),
@@ -243,7 +243,7 @@ export default {
       not_projects: this.$route.query.not_project == 1,
       utc: this.$route.query.utc == 1,
       sort: 'date', //TODO
-      show_invoiced: this.$route.query.is_invoiced == 1 ? 1 : 0,
+      show_invoiced: this.$route.query.show_invoiced,
       invoice_id: null,
       timers: [],
       invoice_items: [],
@@ -342,7 +342,9 @@ export default {
   beforeCreate: function() {
     //labeledConsole('beforeCreate', $('#project').val())
     if (sessionStorage.getItem('invoiceable')) {
-      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() }).catch(() => {})
+      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() }).catch(() => {
+        console.log('catching redundant navigation link')
+      })
     }
   },
   mounted() {
@@ -419,7 +421,7 @@ export default {
       view_invoice_container.innerHTML = ''
       let timers = document.querySelectorAll('.timer-action:checked') //TODO: remove jquery
       let itemIds = document.querySelectorAll('.item-action:checked') //TODO: remove jquery
-      console.log(itemIds, timers)
+
       let timer_ids = []
       for (const timer of timers) {
         const timer_id = parseInt(timer.name.replace('action[', '').replace(']', ''))
@@ -575,15 +577,43 @@ export default {
 
       let form = await document.querySelector('#invoiceable-form')
       let data = new FormData(form)
-      console.log(data)
+
       if (!data) {
-        console.log('!!!!!!!!!!!!!!!!')
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
       }
+
+      if (self.show_invoiced == 'true') {
+        data.delete('is_invoiced')
+        data.delete('show_invoiced')
+        data.set('show_invoiced', true)
+      }
+
+      if (self.chosen_users.length > 0) {
+        data.delete('user[]')
+        for (const user of self.chosen_users) {
+          data.append('user[]', user)
+        }
+      }
+
+      if (self.chosen_clients.length > 0) {
+        data.delete('client[]')
+        for (const client of self.chosen_clients) {
+          data.append('client[]', client)
+        }
+      }
+
+      if (self.chosen_projects.length > 0) {
+        data.delete('project[]')
+        for (const project of self.chosen_projects) {
+          data.append('project[]', project)
+        }
+      }
+
       const queryString = new URLSearchParams(data).toString()
+
       this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {
-        console.log('getData')
+        console.log('catching redundant navigation link')
       })
       sessionStorage.setItem('invoiceable', queryString)
 
