@@ -15,11 +15,11 @@
         </router-link>
         <div>
           <b-dropdown id="dropdown-divider" class="transparent-button" text="Reports">
-            <b-dropdown-item-button><router-link to="/days">Days</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link to="/invoiceable">Invoiceable</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link to="/payable">Payable</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link to="/profit">Profit</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link to="/user_report">My Report</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link id="report-menu-link" to="/days">Days</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link id="report-menu-link" to="/invoiceable">Invoiceable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link id="report-menu-link" to="/payable">Payable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link id="report-menu-link" to="/profit">Profit</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button><router-link id="report-menu-link" to="/user_report">My Report</router-link></b-dropdown-item-button>
           </b-dropdown>
         </div>
       </div>
@@ -123,13 +123,13 @@ export default Vue.extend({
         {
           name: 'Colors',
           options: [
-            'rgba(255, 0, 0, 0.6)', //paletteRed
-            'rgba(0, 128, 0, 0.6)', //paletteGreen
-            'rgba(0, 0, 255, 0.6)', //paletteBlue
-            'rgba(255, 165, 0, 0.6)', //paletteOrange
-            'rgba(255, 192, 203, 0.6)', //palettePink
-            'rgba(238, 130, 238, 0.6)', //paletteViolet
-            'rgba(255, 255, 0, 0.6)' //paletteYellow
+            'rgb(255, 0, 0)', //paletteRed
+            'rgb(0, 128, 0)', //paletteGreen
+            'rgb(0, 0, 255)', //paletteBlue
+            'rgb(255, 165, 0)', //paletteOrange
+            'rgb(255, 192, 203)', //palettePink
+            'rgb(238, 130, 238)', //paletteViolet
+            'rgb(255, 255, 0)' //paletteYellow
           ]
         },
         {
@@ -325,7 +325,7 @@ export default Vue.extend({
         this.bgStyle = bgStyle
       }
     } else {
-      const style_color = 'rgba(255, 165, 0, 0.6)'
+      const style_color = 'rgba(255, 165, 0)'
       this.bgStyle = style_color
       this.setCookie('style', style_color)
     }

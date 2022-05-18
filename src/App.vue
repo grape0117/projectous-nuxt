@@ -266,7 +266,7 @@ export default {
         this.bgStyle = bgStyle
       }
     } else {
-      const style_color = 'rgba(255, 165, 0, 0.6)'
+      const style_color = 'rgba(255, 165, 0)'
       this.bgStyle = style_color
       this.setCookie('style', style_color)
     }
