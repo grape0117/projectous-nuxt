@@ -25,11 +25,7 @@
         <div class="col-sm-8">
           <select class="form-control" id="client-modal-client-id" name="status" v-model="project.status">
             <option value="open">Open</option>
-            <option value="lead">Lead</option>
-            <option value="new">New</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="archived">Archived</option>
+            <option value="close">Close</option>
           </select>
         </div>
       </div>
