@@ -25,7 +25,7 @@
         <div class="col-sm-8">
           <select class="form-control" id="client-modal-client-id" name="status" v-model="project.status">
             <option value="open">Open</option>
-            <option value="close">Close</option>
+            <option value="closed">Closed</option>
           </select>
         </div>
       </div>
