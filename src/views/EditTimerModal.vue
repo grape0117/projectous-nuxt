@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close">
+  <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close" @shown="updateButtonStyle()">
     <template #modal-title>
       <copy-url-template :link="timer_link" :title="title"></copy-url-template>
     </template>
@@ -33,9 +33,14 @@
                           <template slot="option" slot-scope="option"> {{ client_name(option.client_company_id) }} - {{ option.name }} <b-badge v-if="option.is_new" variant="success">New</b-badge></template>
                         </v-select>
                       </div>
-                      <div class="col-sm-2 edit-ClientProject">
+                      <!-- <div class="col-sm-2 edit-ClientProject">
                         <a v-on:click="editClient()" class="edit-ClientProject-a-tag">Edit Client</a>
                         <a v-on:click="editProject()" class="edit-ClientProject-a-tag">Edit Project</a>
+                      </div> -->
+                      <div class="col-sm-12">
+                        <b-badge variant="primary" :style="buttonStyle" class="mr-1 mt-2" style="cursor: pointer;" @click="editClient()">Edit Client</b-badge>
+                        <b-badge variant="primary" :style="buttonStyle" class="mr-1" style="cursor: pointer;" @click="editProject()">Edit Project</b-badge>
+                        <b-badge variant="primary" :style="buttonStyle" class="mr-1" style="cursor: pointer;" @click="addProject()">Add Project</b-badge>
                       </div>
                     </div>
                     <div class="form-group">
@@ -226,8 +231,9 @@ import TimerModalTimeStandard from './TimerModalTimeStandard.vue'
 import TimerFifteenTemplate from './TimerFifteenTemplate.vue'
 import CopyUrlTemplate from './CopyUrlTemplate.vue'
 import Vue from 'vue'
-import { getCookie } from '@/utils/util-functions'
+import { getCookie, applyTheme } from '@/utils/util-functions'
 import { cloneDeep, groupBy } from 'lodash'
+import uuid from 'uuid'
 
 export default {
   name: 'timer-modal',
@@ -244,22 +250,12 @@ export default {
       showInvoiceNotes: false,
       showAdminNotes: false,
       timer_link: null,
-      buttonStyle: ''
+      buttonStyle: '',
+      client: null
     }
   },
   created() {
-    let bgStyle = getCookie('bg-style')
-    if (bgStyle) {
-      try {
-        let style = JSON.parse(bgStyle)
-        this.buttonStyle = `background-color:${style}`
-      } catch (error) {
-        this.buttonStyle = `background-color:${buttonStyle}`
-      }
-    } else {
-      const style_color = 'rgba(255, 165, 0, 0.6)'
-      this.buttonStyle = `background-color:${style_color}`
-    }
+    this.buttonStyle = this.applyTheme()
   },
   computed: {
     title() {
@@ -336,6 +332,7 @@ export default {
   },
   watch: {
     'timer.id': async function() {
+      this.buttonStyle = this.applyTheme()
       const timer_url = `${window.location.origin}?timer_id=${this.timer.id}`
       this.timer_link = timer_url
       const resp = await this.$http().get('/timer/' + this.timer.id + '/history')
@@ -346,6 +343,11 @@ export default {
       this.history = resp.history
     },
     'timer.project_id': function() {
+      const all_projects = this.openprojects()
+      const project_id = this.timer.project_id
+      const client_company_id = all_projects.filter(e => e.id == project_id)[0].client_company_id
+      this.client = this.clients.filter(e => e.client_company_id == client_company_id)[0]
+
       if (this.timer.project_id === 'create') {
         this.$store.dispatch('settings/closeModal', {
           modal: 'timer',
@@ -358,6 +360,7 @@ export default {
     }
   },
   methods: {
+    applyTheme,
     updateDuration(duration) {
       this.timer.duration = duration
     },
@@ -578,6 +581,15 @@ export default {
           .toLowerCase()
           .indexOf(search_value) > -1
       )
+    },
+    addProject: function() {
+      this.$router.push({ query: { new_project_client_company_id: this.client.client_company_id } })
+      this.$store.state.settings.current_edit_project = { id: uuid.v4() }
+      this.$store.commit('settings/setCurrentEditProjectStatus', 'add')
+      this.$store.dispatch('settings/openModal', 'project')
+    },
+    updateButtonStyle: function() {
+      this.buttonStyle = this.applyTheme()
     }
   }
 }
