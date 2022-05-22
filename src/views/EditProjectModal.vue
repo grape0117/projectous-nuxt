@@ -21,6 +21,15 @@
         </div>
       </div>
       <div class="form-group">
+        <label class="control-label col-sm-3" for="companyClientSelect">Status: </label>
+        <div class="col-sm-8">
+          <select class="form-control" id="client-modal-client-id" name="status" v-model="project.status">
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
         <label class="control-label col-sm-4" for="projectTargetEdit">Project Monthly Invoice Target: </label>
         <div class="col-sm-8">$<input id="projectTargetEdit" class="form-control" type="text" name="url" placeholder="Project Target" v-model="project.monthly_target" /></div>
       </div>
@@ -142,6 +151,7 @@ export default {
   },
   watch: {
     edit_project(edit_project) {
+      console.log(edit_project)
       // this.project = cloneDeep(edit_project)
       if (edit_project && Object.keys(edit_project).length === 1) {
         Vue.set(this.project, 'id', this.project_id)
