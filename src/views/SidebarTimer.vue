@@ -40,7 +40,7 @@
 <script>
 import Vue from 'vue'
 import moment from 'moment'
-import { format_report_at, datetimeToJS } from '../utils/util-functions'
+import { format_report_at, datetimeToJS, applyTheme } from '../utils/util-functions'
 import { colorThemes } from '@/mixins/colorThemes'
 
 import { EventBus } from '@/components/event-bus'
@@ -179,6 +179,7 @@ export default {
     this.checkPathTimerId()
   },
   methods: {
+    applyTheme,
     async bumpItUp() {
       const timer = await _.cloneDeep(this.timer)
       timer.duration = 600
@@ -318,6 +319,7 @@ export default {
     },
     editTimer: function() {
       console.log('editTimer')
+      this.applyTheme()
       this.$store.commit('settings/setCurrentEditTimerStatus', 'edit')
       Vue.set(this.$store.state.settings, 'current_edit_timer', this.timer)
       console.log(this.$store.state.settings.current_edit_timer)

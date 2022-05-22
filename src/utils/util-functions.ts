@@ -154,6 +154,6 @@ export function applyTheme() {
     const style_color = 'rgba(255, 165, 0, 0.6)'
     bgStyle = `background-color:${style_color}`
   }
-
+  console.log(bgStyle)
   return bgStyle
 }

@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close">
+  <b-modal id="timer-modal" tabindex="-1" :title="title" class="modal fade" role="dialog" @ok="saveTimer" @hidden="close" @shown="updateButtonStyle()">
     <template #modal-title>
       <copy-url-template :link="timer_link" :title="title"></copy-url-template>
     </template>
@@ -33,12 +33,12 @@
                           <template slot="option" slot-scope="option"> {{ client_name(option.client_company_id) }} - {{ option.name }} <b-badge v-if="option.is_new" variant="success">New</b-badge></template>
                         </v-select>
                       </div>
-                      <div class="col-sm-2 edit-ClientProject">
+                      <!-- <div class="col-sm-2 edit-ClientProject">
                         <a v-on:click="editClient()" class="edit-ClientProject-a-tag">Edit Client</a>
                         <a v-on:click="editProject()" class="edit-ClientProject-a-tag">Edit Project</a>
-                      </div>
+                      </div> -->
                       <div class="col-sm-12">
-                        <b-badge variant="primary" :style="buttonStyle" class="mr-1" style="cursor: pointer;" @click="editClient()">Edit Client</b-badge>
+                        <b-badge variant="primary" :style="buttonStyle" class="mr-1 mt-2" style="cursor: pointer;" @click="editClient()">Edit Client</b-badge>
                         <b-badge variant="primary" :style="buttonStyle" class="mr-1" style="cursor: pointer;" @click="editProject()">Edit Project</b-badge>
                         <b-badge variant="primary" :style="buttonStyle" class="mr-1" style="cursor: pointer;" @click="addProject()">Add Project</b-badge>
                       </div>
@@ -256,7 +256,6 @@ export default {
   },
   created() {
     this.buttonStyle = this.applyTheme()
-    console.log(this.buttonStyle)
   },
   computed: {
     title() {
@@ -344,6 +343,11 @@ export default {
       this.history = resp.history
     },
     'timer.project_id': function() {
+      const all_projects = this.openprojects()
+      const project_id = this.timer.project_id
+      const client_company_id = all_projects.filter(e => e.id == project_id)[0].client_company_id
+      this.client = this.clients.filter(e => e.client_company_id == client_company_id)[0]
+
       if (this.timer.project_id === 'create') {
         this.$store.dispatch('settings/closeModal', {
           modal: 'timer',
@@ -579,12 +583,13 @@ export default {
       )
     },
     addProject: function() {
-      let client = this.$store.getters['clients/getById'](this.timer.client_id)
-      console.log(client)
-      this.$router.push({ query: { new_project_client_company_id: client.client_company_id } })
+      this.$router.push({ query: { new_project_client_company_id: this.client.client_company_id } })
       this.$store.state.settings.current_edit_project = { id: uuid.v4() }
       this.$store.commit('settings/setCurrentEditProjectStatus', 'add')
       this.$store.dispatch('settings/openModal', 'project')
+    },
+    updateButtonStyle: function() {
+      this.buttonStyle = this.applyTheme()
     }
   }
 }
