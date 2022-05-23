@@ -24,7 +24,7 @@
                             {{ project.name }}
                           </option> 
                         </select> -->
-                        <v-select :options="open_projects" :reduce="project => project.id" label="name" :filter-by="searchProject" v-model="timer.project_id" placeholder="Select a project">
+                        <v-select :options="openprojects()" :reduce="project => project.id" label="name" :filter-by="searchProject" v-model="timer.project_id" placeholder="Select a project">
                           <template slot="selected-option" slot-scope="option">
                             <div class="flex">
                               <div class="col">{{ client_name(option.client_company_id) }} - {{ option.name }}</div>
@@ -307,21 +307,6 @@ export default {
     clients: function() {
       const clients = this.$store.getters['clients/getActiveCompanyClients']
       return clients
-    },
-    open_projects: function() {
-      let all_projects = this.$store.state.projects.projects.filter(e => e.projects)
-      let open_proj = this.openprojects()
-
-      if (all_projects.length > 0) {
-        const new_project = all_projects[0].projects
-        new_project.is_new = true
-        let check_if_exists = open_proj.filter(e => e.id === new_project.id)
-        if (check_if_exists.length === 0) {
-          open_proj.unshift(new_project)
-        }
-      }
-
-      return open_proj
     }
   },
   mounted: function() {

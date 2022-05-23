@@ -18,6 +18,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     //console.log('openprojects')
     let active_clients = rootGetters['clients/getActiveCompanyClients']
     // @ts-ignore
+    let new_projects = state.projects.filter(e => e.projects)
+    // @ts-ignore
     let projects = []
     if (!active_clients.length) {
       return
@@ -62,6 +64,21 @@ export const getters: GetterTree<IModuleState, IRootState> = {
         })
       )
     })
+
+    // console.log("PROJECTS", projects)
+    if (new_projects.length > 0) {
+      new_projects.forEach(function(proj) {
+        // @ts-ignore
+        const { projects: new_proj } = proj
+        // @ts-ignore
+        new_proj.is_new = true
+        // @ts-ignore
+        let check_if_exists = projects.filter(e => e.id == new_proj.id).length
+        if (check_if_exists === 0) {
+          projects.unshift(new_proj)
+        }
+      })
+    }
     // @ts-ignore
     return projects
   },
