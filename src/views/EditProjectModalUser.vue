@@ -1,27 +1,18 @@
 <template>
   <div class="form-group">
-    <div class="col-sm-12">
-      <!--
-            <input type="checkbox" v-model="user_checked" />
--->
-      <b-input-group :prepend="user.name" class="mt-12" size="sm">
-        <b-input-group-prepend append="$">
-          <b-button :variant="buttonVariant('visible')" @click="toggleRole('visible')">Visible</b-button>
-          <b-button :variant="buttonVariant('assigned')" @click="toggleRole('assigned')">Assigned</b-button>
-          <b-button :variant="buttonVariant('reviewer')" @click="toggleRole('reviewer')">Reviewer</b-button>
-          <b-button :variant="buttonVariant('manager')" @click="toggleRole('manager')">Watcher</b-button>
-        </b-input-group-prepend>
-        <b-input-group prepend="$" v-if="project_user && project_user.role">
-          <b-form-input type="number" :class="userRateClass()" :placeholder="userRatePlaceholder()" v-model="default_user_rate"></b-form-input>
-        </b-input-group>
+    <!-- <div class="col-sm-12"> -->
+    <b-input-group :prepend="user.name" class="mt-12" size="sm">
+      <b-input-group-prepend append="$">
+        <b-button :variant="buttonVariant('visible')" @click="toggleRole('visible')">Visible</b-button>
+        <b-button :variant="buttonVariant('assigned')" @click="toggleRole('assigned')">Assigned</b-button>
+        <b-button :variant="buttonVariant('reviewer')" @click="toggleRole('reviewer')">Reviewer</b-button>
+        <b-button :variant="buttonVariant('manager')" @click="toggleRole('manager')">Watcher</b-button>
+      </b-input-group-prepend>
+      <b-input-group prepend="$" v-if="project_user && project_user.role">
+        <b-form-input type="number" :class="userRateClass()" :placeholder="userRatePlaceholder()" v-model="default_user_rate"></b-form-input>
       </b-input-group>
-
-      <!--<select v-model="role">
-                <option value="assigned">Assigned</option>
-                <option value="reviewer">Reviewer</option>
-                <option value="manager">Manager</option>
-            </select>-->
-    </div>
+    </b-input-group>
+    <!-- </div> -->
   </div>
 </template>
 <script>
