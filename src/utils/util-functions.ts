@@ -140,3 +140,20 @@ export function formatTime(duration: any) {
   let decimal = timeToDecimal(Math.trunc(duration / 3600), Math.trunc((duration % 3600) / 60))
   return `${hours} (${decimal})`
 }
+
+export function applyTheme() {
+  let bgStyle = getCookie('bg-style')
+  if (bgStyle) {
+    try {
+      let style = JSON.parse(bgStyle)
+      bgStyle = `background-color:${style}`
+    } catch (error) {
+      bgStyle = `background-color:${bgStyle}`
+    }
+  } else {
+    const style_color = 'rgba(255, 165, 0, 0.6)'
+    bgStyle = `background-color:${style_color}`
+  }
+  console.log(bgStyle)
+  return bgStyle
+}
