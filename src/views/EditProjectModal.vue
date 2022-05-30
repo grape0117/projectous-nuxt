@@ -1,67 +1,73 @@
 <template>
-  <b-modal ref="project-modal" id="project-modal" :title="`${has_route_query_newProjectClientCompanyId ? 'Add' : 'Edit'} Project`" class="modal fade" role="dialog" @ok="saveProject" @hidden="closeModal">
-    <form id="editProjectForm" class="form-horizontal row ml-1 mr-1">
-      <input id="projectIDEdit" class="form-control" type="hidden" name="id" v-model="project.id" />
-      <div class="form-group col-sm-6">
-        <label class="control-label" for="projectNameEdit">Project Name: </label>
-        <input id="projectNameEdit" class="form-control" type="text" name="name" placeholder="Project Name" v-model="project.name" />
-      </div>
-      <div class="form-group col-sm-6">
-        <label class="control-label" for="projectAcronymEdit">Acronym: </label>
-        <input id="projectAcronymEdit" class="form-control" type="text" name="acronym" placeholder="Project Acronym" v-model="project.acronym" />
-      </div>
-      <div class="form-group col-sm-12">
-        <label class="control-label" for="projectAcronymEdit">Url: </label>
-        <input id="projectAcronymEdit" class="form-control" type="text" name="url" placeholder="Project Acronym" v-model="project.url" />
-      </div>
-      <div class="form-group col-sm-6">
-        <label class="control-label" for="companyClientSelect">Status: </label>
-        <select class="form-control" id="client-modal-client-id" name="status" v-model="project.status">
-          <option value="open">Open</option>
-          <option value="closed">Closed</option>
-        </select>
-      </div>
-      <div class="form-group col-sm-6">
-        <label class="control-label" for="projectTargetEdit">Monthly Invoice Target: </label>
-        <input id="projectTargetEdit" class="form-control" type="text" name="url" placeholder="Project Target" v-model="project.monthly_target" />
-      </div>
-      <div class="form-group col-sm-12">
-        <label class="control-label" for="companyClientSelect">Client: </label>
-        <v-select :options="sorted_clients" :reduce="client => client.client_company_id" label="name" v-model="project.client_company_id" placeholder="Select a client">
-          <template slot="selected-option" slot-scope="option">
-            <div class="flex">
-              <div class="col">{{ option.name }}</div>
-            </div>
-          </template>
-          <template slot="option" slot-scope="option"> {{ option.name }} <b-badge v-if="option.is_new" variant="success">New</b-badge></template>
-        </v-select>
-        <b-badge variant="primary" class="mr-1 mt-2" style="cursor: pointer;" @click="editClient()">Edit Client</b-badge>
-        <b-badge variant="primary" class="mr-1 mt-2" style="cursor: pointer;" @click="createClient()">Add Client</b-badge>
-      </div>
-      <div class="form-group col-sm-6">
-        <label class="control-label" for="projectDueDate">Due Date: </label>
-        <input id="projectDueDate" class="form-control" type="date" name="due_at" placeholder="Due Date" v-model="due_date" />
-      </div>
-      <div class="form-group col-sm-6">
-        <label class="control-label" for="projectEditEstimate">Estimate: </label>
-        <input id="projectEditEstimate" class="form-control" type="text" name="estimate" placeholder="Estimate" v-model="project.estimate" />
-      </div>
-      <div class="form-group col-sm-12">
-        <label class="control-label" for="projectEditDescription">Description: </label>
-        <textarea id="projectEditDescription" class="form-control" name="description" placeholder="Description" v-model="project.description"> </textarea>
-      </div>
+  <b-modal ref="project-modal" id="project-modal" class="modal fade" role="dialog" @ok="saveProject" ok-variant="light" ok-title="Save" @hidden="closeModal" @shown="updateButtonStyle()">
+    <template #modal-title>
+      <h5 class="white-text">{{ has_route_query_newProjectClientCompanyId ? 'Add' : 'Edit' }} Project</h5>
+    </template>
+    <slot name="content">
+      <form id="editProjectForm" class="form-horizontal row ml-1 mr-1">
+        <input id="projectIDEdit" class="form-control" type="hidden" name="id" v-model="project.id" />
+        <div class="form-group col-sm-6">
+          <label class="control-label white-text" for="projectNameEdit">Project Name: </label>
+          <input id="projectNameEdit" class="form-control" type="text" name="name" placeholder="Project Name" v-model="project.name" />
+        </div>
+        <div class="form-group col-sm-6">
+          <label class="control-label white-text" for="projectAcronymEdit">Acronym: </label>
+          <input id="projectAcronymEdit" class="form-control" type="text" name="acronym" placeholder="Project Acronym" v-model="project.acronym" />
+        </div>
+        <div class="form-group col-sm-12">
+          <label class="control-label white-text" for="projectAcronymEdit">Url: </label>
+          <input id="projectAcronymEdit" class="form-control" type="text" name="url" placeholder="Project Acronym" v-model="project.url" />
+        </div>
+        <div class="form-group col-sm-6">
+          <label class="control-label white-text" for="companyClientSelect">Status: </label>
+          <select class="form-control" id="client-modal-client-id" name="status" v-model="project.status">
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div class="form-group col-sm-6">
+          <label class="control-label white-text" for="projectTargetEdit">Monthly Invoice Target: </label>
+          <input id="projectTargetEdit" class="form-control" type="text" name="url" placeholder="Project Target" v-model="project.monthly_target" />
+        </div>
+        <div class="form-group col-sm-12">
+          <label class="control-label white-text" for="companyClientSelect">Client: </label>
+          <v-select :options="sorted_clients" :reduce="client => client.client_company_id" label="name" v-model="project.client_company_id" placeholder="Select a client" style="background:white; border-radius: 5px">
+            <template slot="selected-option" slot-scope="option">
+              <div class="flex">
+                <div class="col">{{ option.name }}</div>
+              </div>
+            </template>
+            <template slot="option" slot-scope="option"> {{ option.name }} <b-badge v-if="option.is_new" variant="success">New</b-badge></template>
+          </v-select>
+          <b-badge variant="light" class="mr-1 mt-2" style="cursor: pointer;" @click="editClient()">Edit Client</b-badge>
+          <b-badge variant="light" class="mr-1 mt-2" style="cursor: pointer;" @click="createClient()">Add Client</b-badge>
+        </div>
+        <div class="form-group col-sm-6">
+          <label class="control-label white-text" for="projectDueDate">Due Date: </label>
+          <input id="projectDueDate" class="form-control" type="date" name="due_at" placeholder="Due Date" v-model="due_date" />
+        </div>
+        <div class="form-group col-sm-6">
+          <label class="control-label white-text" for="projectEditEstimate">Estimate: </label>
+          <input id="projectEditEstimate" class="form-control" type="text" name="estimate" placeholder="Estimate" v-model="project.estimate" />
+        </div>
+        <div class="form-group col-sm-12">
+          <label class="control-label white-text" for="projectEditDescription">Description: </label>
+          <textarea id="projectEditDescription" class="form-control" name="description" placeholder="Description" v-model="project.description"> </textarea>
+        </div>
 
-      <div v-if="isAdmin()" class="form-group col-sm-12">
-        <label class="control-label" for="projectEditDescription">Users: </label>
-        <edit-project-modal-user v-for="user in users" :key="user.id" @toggle="toggleUser" :client_user="projectClientUser(user.id)" :project="project" :project_user="projectUser(project.id, user.id)" :user="user" />
-      </div>
-    </form>
+        <div v-if="isAdmin()" class="form-group col-sm-12">
+          <label class="control-label white-text" for="projectEditDescription">Users: </label>
+          <edit-project-modal-user v-for="user in users" :key="user.id" @toggle="toggleUser" :client_user="projectClientUser(user.id)" :project="project" :project_user="projectUser(project.id, user.id)" :user="user" />
+        </div>
+      </form>
+    </slot>
   </b-modal>
 </template>
 
 <script>
 import EditProjectModalUser from './EditProjectModalUser.vue'
 import Vue from 'vue'
+import { applyTheme } from '@/utils/util-functions'
 
 export default {
   name: 'project-modal',
@@ -71,8 +77,12 @@ export default {
   data: function() {
     return {
       changed_project_users: [],
-      project: {}
+      project: {},
+      buttonStyle: ''
     }
+  },
+  created() {
+    this.updateButtonStyle()
   },
   computed: {
     has_route_query_newProjectClientCompanyId() {
@@ -114,7 +124,6 @@ export default {
   },
   watch: {
     edit_project(edit_project) {
-      console.log(edit_project)
       // this.project = cloneDeep(edit_project)
       if (edit_project && Object.keys(edit_project).length === 1) {
         Vue.set(this.project, 'id', this.project_id)
@@ -144,6 +153,7 @@ export default {
     }
   },
   methods: {
+    applyTheme,
     checkProject() {
       console.log(this.project)
     },
@@ -230,6 +240,18 @@ export default {
     },
     createClient: function() {
       this.$store.dispatch('clients/createClient')
+    },
+    updateButtonStyle: function() {
+      const updated_style = this.applyTheme()
+      this.buttonStyle = updated_style
+      const header = document.querySelector('.modal-header')
+      if (header) {
+        header.style = updated_style
+        const body = document.querySelector('.modal-body')
+        body.style = updated_style
+        const footer = document.querySelector('.modal-footer')
+        footer.style = updated_style
+      }
     }
   }
 }

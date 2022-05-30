@@ -6,7 +6,7 @@
         <b-button :variant="buttonVariant('visible')" @click="toggleRole('visible')">Visible</b-button>
         <b-button :variant="buttonVariant('assigned')" @click="toggleRole('assigned')">Assigned</b-button>
         <b-button :variant="buttonVariant('reviewer')" @click="toggleRole('reviewer')">Reviewer</b-button>
-        <b-button :variant="buttonVariant('manager')" @click="toggleRole('manager')">Watcher</b-button>
+        <b-button :variant="buttonVariant('manager')" @click="toggleRole('manager')" style="border-radius:0px 5px 5px 0px">Watcher</b-button>
       </b-input-group-prepend>
       <b-input-group prepend="$" v-if="project_user && project_user.role">
         <b-form-input type="number" :class="userRateClass()" :placeholder="userRatePlaceholder()" v-model="default_user_rate"></b-form-input>
