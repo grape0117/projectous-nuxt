@@ -546,8 +546,14 @@ export default {
           }
         }
       }
-      this.timer.user_rate = document.getElementById('user_rate').value
-      this.timer.client_rate = document.getElementById('client_rate').value
+
+      try {
+        this.timer.user_rate = document.getElementById('user_rate').value
+        this.timer.client_rate = document.getElementById('client_rate').value
+      } catch (err) {
+        console.log(err)
+      }
+
       let result = this.$store.dispatch('timers/saveTimer', this.timer)
 
       if (this.editTimerStatus === 'add') {
