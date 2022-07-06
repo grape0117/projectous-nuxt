@@ -122,13 +122,13 @@
                     <div v-if="isAdmin" class="form-group">
                       <label class="control-label col-sm-4" for="report_at">User Rate: </label>
                       <div class="col-sm-8">
-                        <input name="user_rate" type="datetime" id="user_rate" :placeholder="user_rate_value()" class="form-control" :v-model="user_rate_value()" />
+                        <input name="user_rate" type="datetime" id="user_rate" :placeholder="user_rate_placeholder()" class="form-control" :value="user_rate_value()" />
                       </div>
                     </div>
                     <div v-if="isAdmin" class="form-group">
                       <label class="control-label col-sm-4" for="client_rate">Client Rate: </label>
                       <div class="col-sm-8">
-                        <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_value()" class="form-control" :v-model="client_rate_value()" />
+                        <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value()" />
                       </div>
                     </div>
                     <!-- <div class="form-group">
