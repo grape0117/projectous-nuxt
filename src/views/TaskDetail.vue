@@ -16,6 +16,10 @@
             <span class="field-title">Task:</span>
             <b-form-textarea class="task-textarea" type="text" v-model="task.title" placeholder="Task Title" rows="2" max-rows="4"> </b-form-textarea>
           </b-form-group>
+          <b-form-group style="margin-bottom: 0">
+            <span class="field-title">Notes:</span>
+            <b-form-textarea class="task-textarea" type="text" v-model="task.note" placeholder="Notes" rows="2" max-rows="4"> </b-form-textarea>
+          </b-form-group>
           <!-- <b-form-group label="Resources">
             <div @click="onSelectResource(resource)" v-for="resource in getResources" :key="resource.id" :href="resource.href">
               <div class="resource-title">
