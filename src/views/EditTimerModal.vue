@@ -24,7 +24,7 @@
                             {{ project.name }}
                           </option> 
                         </select> -->
-                        <v-select :options="openprojects()" :reduce="project => project.id" label="name" :filter-by="searchProject" v-model="timer.project_id" placeholder="Select a project">
+                        <v-select :options="openprojects()" :reduce="project => project.id" label="name" :filter-by="searchProject" v-model="timer_data.project_id" placeholder="Select a project">
                           <template slot="selected-option" slot-scope="option">
                             <div class="flex">
                               <div class="col">{{ client_name(option.client_company_id) }} - {{ option.name }}</div>
@@ -44,7 +44,7 @@
                       </div>
                     </div>
                     <div class="form-group">
-                      <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer" @update-duration="updateDuration" @update-invoice-duration="updateInvoiceDuration"></timer-modal-time-standard>
+                      <timer-modal-time-standard v-if="!isIHI()" v-bind:timer="timer_data" @update-duration="updateDuration" @update-invoice-duration="updateInvoiceDuration"></timer-modal-time-standard>
                     </div>
 
                     <div class="form-group">
@@ -91,16 +91,16 @@
                     <div class="form-group">
                       <label class="control-label col-sm-4" for="timerTaskSelect">Task: </label>
                       <div class="col-sm-8">
-                        <select name="task_id" id="timerTaskSelect" class="form-control" v-model="timer.task_id">
+                        <select name="task_id" id="timerTaskSelect" class="form-control" v-model="timer_data.task_id">
                           <option value="0">***** Select Task *****</option>
-                          <option v-for="task in projecttasks(timer.project_id)" :value="task.id" :key="task.id">{{ task.title }}</option>
+                          <option v-for="task in projecttasks(timer_data.project_id)" :value="task.id" :key="task.id">{{ task.title }}</option>
                         </select>
                       </div>
                     </div>
                     <div v-if="isAdmin" class="form-group">
                       <label class="control-label col-sm-4" for="timerUserSelect">User: </label>
                       <div class="col-sm-8">
-                        <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer.company_user_id">
+                        <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer_data.company_user_id">
                           <option value="">***** Select User *****</option>
                           <option :selected="isTimerUser(user.id)" v-for="user in users.filter(u => u.user_type === 'user')" :key="user.id" :value="user.id">
                             {{ user.name }}
@@ -114,7 +114,7 @@
                       <div class="col-sm-8">
                         <div class="checkbox">
                           <label>
-                            <input name="is_billable" type="checkbox" id="blankCheckbox" value="1" v-model="timer.is_billable" aria-label="..." />
+                            <input name="is_billable" type="checkbox" id="blankCheckbox" value="1" v-model="timer_data.is_billable" aria-label="..." />
                           </label>
                         </div>
                       </div>
@@ -141,7 +141,7 @@
                     <div class="form-group">
                       <label class="control-label col-sm-4" for="report_at">Started at: </label>
                       <div class="col-sm-8">
-                        <input name="report_at" type="datetime" id="report_at" class="form-control" v-model="timer.report_at" />
+                        <input name="report_at" type="datetime" id="report_at" class="form-control" v-model="timer_data.report_at" />
                       </div>
                     </div>
                   </form>
@@ -251,7 +251,8 @@ export default {
       showAdminNotes: false,
       timer_link: null,
       buttonStyle: '',
-      client: null
+      client: null,
+      timer_data: {}
     }
   },
   created() {
@@ -317,6 +318,8 @@ export default {
   },
   watch: {
     'timer.id': async function() {
+      this.timer_data = { ...this.timer }
+      console.log(this.timer_data)
       this.buttonStyle = this.applyTheme()
       const timer_url = `${window.location.origin}?timer_id=${this.timer.id}`
       this.timer_link = timer_url
@@ -347,36 +350,37 @@ export default {
   methods: {
     applyTheme,
     updateDuration(duration) {
-      this.timer.duration = duration
+      console.log(duration)
+      this.timer_data.duration = duration
     },
     updateInvoiceDuration(invoice_duration) {
-      this.timer.invoice_duration = invoice_duration
+      this.timer_data.invoice_duration = invoice_duration
     },
     close() {
       this.$store.commit('settings/setCurrentEditTimerStatus', null)
     },
     clearInvoiceNotes() {
       this.showInvoiceNotes = !this.showInvoiceNotes
-      this.timer.invoice_notes = null
+      this.timer_data.invoice_notes = null
     },
     clearAdminNotes() {
       this.showAdminNotes = !this.showAdminNotes
-      this.timer.admin_notes = null
+      this.timer_data.admin_notes = null
     },
     client_rate_placeholder: function() {
-      return this.timer.default_client_rate
+      return this.timer_data.default_client_rate
     },
     client_rate_value: function() {
-      return this.timer.default_client_rate != this.timer.client_rate ? this.timer.client_rate : ''
+      return this.timer_data.default_client_rate != this.timer_data.client_rate ? this.timer_data.client_rate : ''
     },
     user_rate_placeholder: function() {
-      return this.timer.default_user_rate
+      return this.timer_data.default_user_rate
     },
     user_rate_value: function() {
-      return this.timer.default_user_rate != this.timer.user_rate ? this.timer.user_rate : ''
+      return this.timer_data.default_user_rate != this.timer_data.user_rate ? this.timer_data.user_rate : ''
     },
     isBillable: function() {
-      return this.timer.is_billable == 1 ? 'checked' : ''
+      return this.timer_data.is_billable == 1 ? 'checked' : ''
     },
     checkNotes: function(notes) {
       if (notes) {
@@ -511,17 +515,17 @@ export default {
     },
     setNotes(e) {
       let notes = e.target.innerHTML
-      this.timer.notes = notes
+      this.timer_data.notes = notes
     },
     setInvoiceNotes(e) {
       let invoiceNotes = e.target.innerHTML
-      if (!invoiceNotes) return (this.timer.invoice_notes = '')
-      this.timer.invoice_notes = invoiceNotes
+      if (!invoiceNotes) return (this.timer_data.invoice_notes = '')
+      this.timer_data.invoice_notes = invoiceNotes
     },
     setAdminNotes(e) {
       let adminNotes = e.target.innerHTML
-      if (!adminNotes) return (this.timer.admin_notes = '')
-      this.timer.admin_notes = adminNotes
+      if (!adminNotes) return (this.timer_data.admin_notes = '')
+      this.timer_data.admin_notes = adminNotes
     },
     async startTimer() {
       const { client_id, project_id, task_id, report_at } = this.timer
@@ -537,24 +541,37 @@ export default {
     },
 
     async saveTimer() {
-      if (this.timer.project_id) {
-        let project = this.$store.getters['projects/getById'](this.timer.project_id)
+      if (this.timer_data.project_id) {
+        let project = this.$store.getters['projects/getById'](this.timer_data.project_id)
         if (project) {
           let client = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
           if (client) {
-            this.timer.client_id = client.id
+            this.timer_data.client_id = client.id
           }
         }
       }
 
       try {
-        this.timer.user_rate = document.getElementById('user_rate').value
-        this.timer.client_rate = document.getElementById('client_rate').value
+        this.timer_data.user_rate = document.getElementById('user_rate').value
+        this.timer_data.client_rate = document.getElementById('client_rate').value
       } catch (err) {
         console.log(err)
       }
 
-      let result = this.$store.dispatch('timers/saveTimer', this.timer)
+      this.$store.dispatch('UPDATE_ATTRIBUTE', {
+        module: 'timers',
+        id: this.timer.id,
+        attribute: 'duration',
+        value: this.timer_data.duration
+      })
+
+      this.$store.dispatch('UPDATE_ATTRIBUTE', {
+        module: 'timers',
+        id: this.timer.id,
+        attribute: 'invoice_duration',
+        value: this.timer_data.invoice_duration
+      })
+      let result = this.$store.dispatch('timers/saveTimer', this.timer_data)
 
       if (this.editTimerStatus === 'add') {
         //this.startTimer()

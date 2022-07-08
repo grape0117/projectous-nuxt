@@ -149,25 +149,11 @@ export default {
       duration += seconds !== null ? seconds * 1 : this.seconds * 1
 
       if (this.timer.duration !== duration) {
-        const { timers } = await this.$store.dispatch('UPDATE_ATTRIBUTE', {
-          module: 'timers',
-          id: this.timer.id,
-          attribute: 'duration',
-          value: duration
-        })
-
-        this.$emit('update-duration', timers.duration)
+        this.$emit('update-duration', duration)
       }
 
       if (this.timer.duration === this.timer.invoice_duration) {
-        const { timers } = await this.$store.dispatch('UPDATE_ATTRIBUTE', {
-          module: 'timers',
-          id: this.timer.id,
-          attribute: 'invoice_duration',
-          value: duration
-        })
-
-        this.$emit('update-invoice-duration', timers.invoice_duration)
+        this.$emit('update-invoice-duration', duration)
       }
     },
     async updateInvoiceDuration(hours, minutes, seconds) {
@@ -176,14 +162,7 @@ export default {
       duration += seconds !== null ? seconds * 1 : this.seconds * 1
 
       if (this.timer.invoice_duration !== duration) {
-        let { timers } = await this.$store.dispatch('UPDATE_ATTRIBUTE', {
-          module: 'timers',
-          id: this.timer.id,
-          attribute: 'invoice_duration',
-          value: duration
-        })
-
-        this.$emit('update-invoice-duration', timers.invoice_duration)
+        this.$emit('update-invoice-duration', duration)
       }
     }
   }
