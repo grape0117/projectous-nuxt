@@ -141,7 +141,8 @@
                     <div class="form-group">
                       <label class="control-label col-sm-4" for="report_at">Started at: </label>
                       <div class="col-sm-8">
-                        <input name="report_at" type="datetime" id="report_at" class="form-control" v-model="timer_data.report_at" />
+                        <!-- <input name="report_at" type="datetime" id="report_at" class="form-control" v-model="timer_data.report_at" /> -->
+                        <datetime type="datetime" v-model="timer_data.report_at" class="form-control" format="yyyy-MM-dd HH:mm:ss"></datetime>
                       </div>
                     </div>
                   </form>
@@ -234,13 +235,17 @@ import Vue from 'vue'
 import { getCookie, applyTheme } from '@/utils/util-functions'
 import { cloneDeep, groupBy } from 'lodash'
 import uuid from 'uuid'
+import { Datetime } from 'vue-datetime'
+import 'vue-datetime/dist/vue-datetime.css'
+import moment from 'moment'
 
 export default {
   name: 'timer-modal',
   components: {
     'timer-modal-time-standard': TimerModalTimeStandard,
     'timer-fifteen-template': TimerFifteenTemplate,
-    'copy-url-template': CopyUrlTemplate
+    'copy-url-template': CopyUrlTemplate,
+    datetime: Datetime
   },
   data: function() {
     return {
@@ -252,7 +257,8 @@ export default {
       timer_link: null,
       buttonStyle: '',
       client: null,
-      timer_data: {}
+      timer_data: {},
+      started_at: null
     }
   },
   created() {
@@ -319,7 +325,7 @@ export default {
   watch: {
     'timer.id': async function() {
       this.timer_data = { ...this.timer }
-      console.log(this.timer_data)
+      this.timer_data.report_at = new Date(this.timer_data.report_at).toISOString()
       this.buttonStyle = this.applyTheme()
       const timer_url = `${window.location.origin}?timer_id=${this.timer.id}`
       this.timer_link = timer_url
