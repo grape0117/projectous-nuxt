@@ -13,8 +13,8 @@
       </div>
     </div>
     <div class="timer-modal_duration col-sm-12">
-      <span class="timer-modal_button" @click="setInvoiceDuration" v-if="(timer.status !== 'running' && isAdmin() && !is_set_invoice_duration) || timer.duration === timer.invoice_duration">Set Invoice Duration</span>
-      <div class="form-group" v-else-if="timer.status !== 'running' && isAdmin()">
+      <!-- <span class="timer-modal_button" @click="setInvoiceDuration" v-if="(timer.status !== 'running' && isAdmin() && !is_set_invoice_duration)">Set Invoice Duration</span> -->
+      <div class="form-group" v-if="(timer.status !== 'running' && isAdmin() && timer.invoice_duration) || is_set_invoice_duration">
         <label class="control-label" for="timerUserNotes">Invoice Duration: </label>
         <div id="timerDuration" class="form-control-static">
           <div class="timer-modal_timer">
@@ -24,6 +24,7 @@
           <div class="timer-modal_timer-label">(Hours : Minutes : Seconds)</div>
         </div>
       </div>
+      <span class="timer-modal_button" @click="setInvoiceDuration" v-else="timer.status !== 'running' && isAdmin() && !is_set_invoice_duration">Set Invoice Duration</span>
     </div>
     <!--<div>
 
@@ -117,7 +118,7 @@ export default {
     },
     async setInvoiceDuration() {
       this.is_set_invoice_duration = true
-      this.updateDuration(this.hours, this.minutes, this.seconds)
+      this.updateInvoiceDuration(this.hours, this.minutes, this.seconds)
     },
     /* updateHours(hours) {
       console.log('hours', hours, this.hours)
@@ -157,9 +158,9 @@ export default {
       }
     },
     async updateInvoiceDuration(hours, minutes, seconds) {
-      let duration = hours !== null ? hours * 3600 : this.hours * 3600
-      duration += minutes !== null ? minutes * 60 : this.minutes * 60
-      duration += seconds !== null ? seconds * 1 : this.seconds * 1
+      let duration = hours !== null ? hours * 3600 : this.invoice_hours * 3600
+      duration += minutes !== null ? minutes * 60 : this.invoice_minutes * 60
+      duration += seconds !== null ? seconds * 1 : this.invoice_seconds * 1
 
       if (this.timer.invoice_duration !== duration) {
         this.$emit('update-invoice-duration', duration)

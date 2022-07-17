@@ -50,13 +50,13 @@
                     <div class="form-group">
                       <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
                       <div class="timer-modal_notes" style="padding-left: 14px">
-                        <div contenteditable="true" id="timerUserNotes" class="form-control" style="min-height: 60px; height: auto;" v-html="checkNotes(timer.notes)" @blur="setNotes"></div>
+                        <div contenteditable="true" id="timerUserNotes" class="form-control" style="min-height: 60px; height: auto;" v-html="checkNotes(timer_data.notes)" @blur="setNotes"></div>
                       </div>
                     </div>
 
                     <div v-if="isAdmin" class="form-group">
                       <label class="control-label col-sm-4" for="timerInvoiceId">Invoice Number:</label>
-                      <input name="invoice_id" id="timerInvoiceId" v-model="timer.invoice_id" />
+                      <input name="invoice_id" id="timerInvoiceId" v-model="timer_data.invoice_id" />
                     </div>
 
                     <div class="form-group">
@@ -394,27 +394,6 @@ export default {
       } else {
         return ''
       }
-    },
-    invoiceDurationHours: function() {
-      if (!this.timer.invoice_duration) this.timer.invoice_duration = this.timer.duration
-      if (typeof this.timer.invoice_duration !== 'number') {
-        return ''
-      }
-      return Math.floor(this.timer.invoice_duration / 3600)
-    },
-    invoiceDurationMinutes: function() {
-      if (!this.timer.invoice_duration) this.timer.invoice_duration = this.timer.duration
-      if (typeof this.timer.invoice_duration !== 'number') {
-        return ''
-      }
-      return ('00' + Math.floor((this.timer.invoice_duration % 3600) / 60)).slice(-2)
-    },
-    invoiceDurationSeconds: function() {
-      if (!this.timer.invoice_duration) this.timer.invoice_duration = this.timer.duration
-      if (typeof this.timer.invoice_duration !== 'number') {
-        return ''
-      }
-      return Math.floor(this.timer.invoice_duration % 60)
     },
     isIHI: function() {
       return this.$store.getters['settings/isIHI']
