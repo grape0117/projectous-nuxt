@@ -925,3 +925,7 @@ div:hover > .hover-action {
 #report-menu-link {
     color: white !important
 }
+
+.vdatetime-input {
+    border:none
+}
