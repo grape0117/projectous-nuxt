@@ -279,29 +279,32 @@ export default {
 
       return moment(T_date).isSame(c_date)
     },
+    checkDayDifference(start, end) {
+      return moment(end).diff(start, 'd')
+    },
     restartedAt() {
       const timezone = moment.tz.guess()
       // Same timezone from database
-      const actual_date = moment.tz(this.timer.report_at, 'America/Danmarkshavn')
+      const actual_date = moment.tz(this.timer.report_at, 'GMT')
       // Date/Time conversion depending on current timezone
       const timezone_date = actual_date
         .clone()
         .tz(timezone)
-        .format('YYYY-MM-DD HH:mm:ss')
-
+        .format('YYYY-MM-DD')
       const TODAY = moment(new Date()).format('YYYY-MM-DD')
       const YESTERDAY = moment(timezone_date)
         .subtract(1, 'days')
         .format('YYYY-MM-DD')
 
-      if (this.checkDay(timezone_date, TODAY)) {
+      const difference = this.checkDayDifference(timezone_date, TODAY)
+      if (difference === 0) {
         return actual_date
           .clone()
           .tz(timezone)
           .format('h:mm a')
-      } else if (this.checkDay(YESTERDAY, moment(TODAY).subtract(1, 'days'))) {
+      } else if (difference === 1) {
         return (
-          'Yesterday' +
+          'Yesterday ' +
           actual_date
             .clone()
             .tz(timezone)
