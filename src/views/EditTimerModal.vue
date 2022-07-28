@@ -325,7 +325,14 @@ export default {
   watch: {
     'timer.id': async function() {
       this.timer_data = { ...this.timer }
-      this.timer_data.report_at = new Date(this.timer_data.report_at).toISOString()
+      const timezone = moment.tz.guess()
+      let gmt_date = moment.tz(this.timer_data.report_at, 'GMT')
+      let actual_datetime = gmt_date
+        .clone()
+        .tz(timezone)
+        .format('YYYY-MM-DD HH:mm:ss')
+      this.timer_data.report_at = new Date(actual_datetime).toISOString()
+
       this.buttonStyle = this.applyTheme()
       const timer_url = `${window.location.origin}?timer_id=${this.timer.id}`
       this.timer_link = timer_url
@@ -539,13 +546,19 @@ export default {
       try {
         this.timer_data.user_rate = document.getElementById('user_rate').value
         this.timer_data.client_rate = document.getElementById('client_rate').value
-        this.timer_data.report_at = document.getElementById('started_at').value
+        const updated_date = new Date(document.getElementById('started_at').value).toISOString()
+        const timezone = moment.tz.guess()
+        const timezone_date = moment.tz(updated_date, timezone)
+        const gmt_date = timezone_date
+          .clone()
+          .tz('GMT')
+          .format('YYYY-MM-DD HH:mm:ss')
+        this.timer_data.report_at = gmt_date
       } catch (err) {
         console.log(err)
       }
 
       this.$store.dispatch('timers/saveTimer', this.timer_data).then(function(response) {
-        self.timer_data.report_at = new Date(response.timer.report_at).toISOString()
         if (self.timer_data.duration != self.timer.duration) {
           self.$store.dispatch('UPDATE_ATTRIBUTE', {
             module: 'timers',
@@ -564,10 +577,6 @@ export default {
           })
         }
       })
-
-      if (this.editTimerStatus === 'add') {
-        //this.startTimer()
-      }
     },
     client_name: function(client_company_id) {
       let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
