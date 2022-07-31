@@ -14,7 +14,7 @@
       <div class="row-no-padding">
         <Header v-on:reload="reload" />
         <div class="d-flex justify-content-between">
-          <div class="router-view-class">
+          <div class="router-view-class" style="width: 1px">
             <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" />
             <router-view style="width: 100%; height: 100%" />
           </div>
@@ -486,6 +486,24 @@ export default {
     },
     dateInterval() {
       this.$store.commit('lists/createListsByDays')
+    },
+    handleScroll1: function() {
+      if (this.scrolling) {
+        this.scrolling = false
+        return
+      }
+      this.scrolling = true
+      console.log(this.scrolling, this.$refs['wrapper1'].scrollLeft)
+      this.$refs['wrapper2'].scrollLeft = this.$refs['wrapper1'].scrollLeft
+    },
+    handleScroll2: function() {
+      if (this.scrolling) {
+        this.scrolling = false
+        return
+      }
+      this.scrolling = true
+      console.log(this.scrolling, this.$refs['wrapper2'].scrollLeft)
+      this.$refs['wrapper1'].scrollLeft = this.$refs['wrapper2'].scrollLeft
     }
   }
 }
@@ -540,6 +558,30 @@ export default {
   width: 100%;
   height: 100%;
   position: absolute;
+}
+
+.wrapper1,
+.wrapper2 {
+  width: 600px;
+  border: none 0px RED;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+.wrapper1 {
+  height: 20px;
+}
+.wrapper2 {
+  height: auto;
+}
+.div1 {
+  width: 1000px;
+  height: 20px;
+}
+.div2 {
+  width: 1000px;
+  height: 200px;
+  background-color: #88ff88;
+  overflow: auto;
 }
 
 // background-color options
