@@ -142,7 +142,7 @@
                       <label class="control-label col-sm-4" for="report_at">Started at: </label>
                       <div class="col-sm-8">
                         <!-- <input name="report_at" type="datetime" id="report_at" class="form-control" v-model="timer_data.report_at" /> -->
-                        <datetime type="datetime" v-model="timer_data.report_at" class="form-control" format="yyyy-MM-dd HH:mm:ss"></datetime>
+                        <datetime input-id="started_at" type="datetime" v-model="timer_data.report_at" class="form-control" format="yyyy-MM-dd HH:mm:ss"></datetime>
                       </div>
                     </div>
                   </form>
@@ -325,7 +325,14 @@ export default {
   watch: {
     'timer.id': async function() {
       this.timer_data = { ...this.timer }
-      this.timer_data.report_at = new Date(this.timer_data.report_at).toISOString()
+      const timezone = moment.tz.guess()
+      let gmt_date = moment.tz(this.timer_data.report_at, 'GMT')
+      let actual_datetime = gmt_date
+        .clone()
+        .tz(timezone)
+        .format('YYYY-MM-DD HH:mm:ss')
+      this.timer_data.report_at = new Date(actual_datetime).toISOString()
+
       this.buttonStyle = this.applyTheme()
       const timer_url = `${window.location.origin}?timer_id=${this.timer.id}`
       this.timer_link = timer_url
@@ -356,7 +363,6 @@ export default {
   methods: {
     applyTheme,
     updateDuration(duration) {
-      console.log(duration)
       this.timer_data.duration = duration
     },
     updateInvoiceDuration(invoice_duration) {
@@ -526,6 +532,7 @@ export default {
     },
 
     async saveTimer() {
+      var self = this
       if (this.timer_data.project_id) {
         let project = this.$store.getters['projects/getById'](this.timer_data.project_id)
         if (project) {
@@ -539,28 +546,37 @@ export default {
       try {
         this.timer_data.user_rate = document.getElementById('user_rate').value
         this.timer_data.client_rate = document.getElementById('client_rate').value
+        const updated_date = new Date(document.getElementById('started_at').value).toISOString()
+        const timezone = moment.tz.guess()
+        const timezone_date = moment.tz(updated_date, timezone)
+        const gmt_date = timezone_date
+          .clone()
+          .tz('GMT')
+          .format('YYYY-MM-DD HH:mm:ss')
+        this.timer_data.report_at = gmt_date
       } catch (err) {
         console.log(err)
       }
 
-      this.$store.dispatch('UPDATE_ATTRIBUTE', {
-        module: 'timers',
-        id: this.timer.id,
-        attribute: 'duration',
-        value: this.timer_data.duration
-      })
+      this.$store.dispatch('timers/saveTimer', this.timer_data).then(function(response) {
+        if (self.timer_data.duration != self.timer.duration) {
+          self.$store.dispatch('UPDATE_ATTRIBUTE', {
+            module: 'timers',
+            id: self.timer.id,
+            attribute: 'duration',
+            value: self.timer_data.duration
+          })
+        }
 
-      this.$store.dispatch('UPDATE_ATTRIBUTE', {
-        module: 'timers',
-        id: this.timer.id,
-        attribute: 'invoice_duration',
-        value: this.timer_data.invoice_duration
+        if (self.timer_data.invoice_duration != self.timer.invoice_duration) {
+          self.$store.dispatch('UPDATE_ATTRIBUTE', {
+            module: 'timers',
+            id: self.timer.id,
+            attribute: 'invoice_duration',
+            value: self.timer_data.invoice_duration
+          })
+        }
       })
-      let result = this.$store.dispatch('timers/saveTimer', this.timer_data)
-
-      if (this.editTimerStatus === 'add') {
-        //this.startTimer()
-      }
     },
     client_name: function(client_company_id) {
       let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
