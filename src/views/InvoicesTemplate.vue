@@ -377,7 +377,7 @@ export default {
       return { invoices, invoice_years, open_invoice_count }
     },
     async getData() {
-      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear('2021')
+      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear(new Date().getFullYear())
 
       console.log({ invoices })
 
