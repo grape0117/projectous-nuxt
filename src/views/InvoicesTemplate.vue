@@ -476,7 +476,7 @@ export default {
     .total-closed,
     .total-open {
       margin: 5px 5px;
-      width: 10px;
+      /*width: 10px;*/
       font-size: 12px;
       border-radius: 4px;
       padding: 0 5px;
