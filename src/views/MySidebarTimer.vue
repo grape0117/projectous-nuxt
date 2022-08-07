@@ -129,16 +129,13 @@ export default {
         //   }
         // })
         .sort(function(a, b) {
+          if (a.status === 'running') {
+            return -1
+          }
           let aDate = new Date(a.status_changed_at)
           let bDate = new Date(b.status_changed_at)
 
           if (aDate > bDate) return -1
-          if (a.status_changed_at == b.status_changed_at) {
-            if (a.status === 'running') {
-              return -1
-            }
-            return 1
-          }
           if (aDate < bDate) return 1
 
           return 0
