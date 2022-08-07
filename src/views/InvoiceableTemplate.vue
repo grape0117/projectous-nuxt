@@ -401,7 +401,7 @@ export default {
         .then(function(response) {
           const view_invoice_container = document.getElementById('actionLink')
           view_invoice_container.innerHTML = ''
-          view_invoice_container.innerHTML += '<a id="createInvoiceButton" target="_blank" href="https://release.projectous.com/invoice/' + invoice_id + '">View Invoice</a>'
+          view_invoice_container.innerHTML += '<a id="createInvoiceButton" target="_blank" href="https://old.projectous.com/invoice/' + invoice_id + '">View Invoice</a>'
           const create_invoice_button = document.getElementById('createInvoiceButton')
           create_invoice_button.classList.add('btn')
           create_invoice_button.classList.add('btn-primary')
@@ -480,10 +480,10 @@ export default {
         })
         return
       } else if (this.invoice_action == 'download-csv') {
-        window.open('https://release.projectous.com/timers/' + action + '?' + timers)
+        window.open('https://old.projectous.com/timers/' + action + '?' + timers)
         return
       } else if (this.invoice_action == 'download-xls') {
-        window.open('https://release.projectous.com/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
+        window.open('https://old.projectous.com/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
         return
       } else if (this.invoice_action == 'custom-xls') {
         this.$http().get('/test/set/modaldata/' + timers)

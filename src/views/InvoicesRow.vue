@@ -86,7 +86,7 @@ export default {
       this.invoice.note = invoices.note
     },
     redirect(to) {
-      const path = 'http://release.projectous.com/'
+      const path = 'http://old.projectous.com/'
       const invoice = `invoice/${this.invoice.invoice_id}`
       const csv = `export/csv/invoice/${this.invoice.invoice_id}`
 

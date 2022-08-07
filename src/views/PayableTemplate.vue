@@ -351,10 +351,10 @@ export default {
         })
         return
       } else if (this.invoice_action == 'download-csv') {
-        window.open('https://release.projectous.com/timers/' + action + '?' + timers)
+        window.open('https://old.projectous.com/timers/' + action + '?' + timers)
         return
       } else if (this.invoice_action == 'download-xls') {
-        window.open('https://release.projectous.com/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
+        window.open('https://old.projectous.com/timers/' + action + '?' + timers + '&start=' + document.getElementById('start').value + '&end=' + document.getElementById('end').value)
         return
       } else if (this.invoice_action == 'custom-xls') {
         this.$http().get('/test/set/modaldata/' + timers)
