@@ -67,7 +67,7 @@ export default {
         const today = moment().startOf('day')
 
         //Difference in number of days
-        return moment.duration(today.diff(invoice_date)).asDays()
+        return Math.Floor(moment.duration(today.diff(invoice_date)).asDays()) + ' Days'
       } else {
         return null
       }
