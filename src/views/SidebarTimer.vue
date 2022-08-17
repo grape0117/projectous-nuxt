@@ -362,7 +362,7 @@ export default {
           this.timer.project_id = projects_by_acronym[0].id
           // notes = notes.replace(acronym_match[0], '')
           console.log('acronym', acronym_match[0], notesWithAcronym.replace(acronym_match[0], ''))
-          notes = notesWithAcronym.split(projectRegex)[1] ? notesWithAcronym.split(projectRegex)[1] : ''
+          notes = notesWithAcronym.replace(acronym_match[0], '')
         } else {
           notes = notesWithAcronym
         }
