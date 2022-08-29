@@ -73,9 +73,9 @@
             <!-- <input type="checkbox" :value="data.item.id" class="invoice-checkbox" :name="'item[' + data.item.id + ']'" /> -->
             <b-form-checkbox name="selected-invoice" v-model="selected_invoice_id" :value="data.item.invoice_id"> </b-form-checkbox>
             <b-button-group size="sm" style="height:30px">
-              <b-button @click="updateInvoiceStatus(data.item.id, 'open')" :style="{ 'background-color': status_filter === 'open' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'rgba(0, 0, 0, 0.6)', border: 'none' }">Open</b-button>
-              <b-button @click="updateInvoiceStatus(data.item.id, 'paid')" :style="{ 'background-color': status_filter === 'paid' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'rgba(0, 0, 0, 0.6)', border: 'none' }">Paid</b-button>
-              <b-button @click="updateInvoiceStatus(data.item.id, 'voided')" :style="{ 'background-color': status_filter === 'voided' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'rgba(0, 0, 0, 0.6)', border: 'none' }">Voided</b-button>
+              <b-button @click="updateStatus(data.item.id, 'open')" :style="{ background: backgroundColor('open', data.item), border: 'none' }">Open</b-button>
+              <b-button @click="updateStatus(data.item.id, 'paid')" :style="{ background: backgroundColor('paid', data.item), border: 'none' }">Paid</b-button>
+              <b-button @click="updateStatus(data.item.id, 'voided')" :style="{ background: backgroundColor('voided', data.item), border: 'none' }">Voided</b-button>
             </b-button-group>
           </span>
         </template>
@@ -109,7 +109,7 @@
             <b-button-group size="sm" style="height:30px">
               <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('invoice', data.item.invoice_id)"><i class="icon-open_in_new"/></b-button>
               <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('csv', data.item.invoice_id)">CSV</b-button>
-              <b-button style="border:none" variant="danger"><i class="icon-delete_outline"/></b-button>
+              <b-button style="border:none" variant="danger" @click="deleteInvoice(data.item)"><i class="icon-delete_outline"/></b-button>
               <b-button style="border:none" variant="primary" @click="applyPayment(data.item)">Payment</b-button>
             </b-button-group>
           </span>
@@ -169,7 +169,6 @@ export default {
     invoice_filter() {
       if (this.show_all_status) return this.invoiceSort
       this.is_busy = false
-      console.log(this.invoiceSort.filter(invoice => invoice.status === this.status_filter))
       return this.invoiceSort.filter(invoice => invoice.status === this.status_filter)
     },
     status_filter: {
@@ -402,16 +401,16 @@ export default {
         return (sortBy.type = 'desc')
       }
     },
-    // updateInvoiceStatus({ id, status }) {
-    //   const invoice = this.invoices.find(i => i.id === id)
+    updateInvoiceStatus({ id, status }) {
+      const invoice = this.invoices.find(i => i.id === id)
 
-    //   const index = this.invoices.indexOf(invoice)
+      const index = this.invoices.indexOf(invoice)
 
-    //   this.invoices[index].status = status
+      this.invoices[index].status = status
 
-    //   console.log({ id })
-    //   console.log({ status })
-    // },
+      console.log({ id })
+      console.log({ status })
+    },
     // getStatus(invoices, status) {
     //   return invoices.filter(i => i.status === status)
     // },
@@ -448,12 +447,13 @@ export default {
       let self = this
       console.log(this.action)
       if (this.action === 'export') {
+        const export_path = `path/to/export/`
         console.log(this.selected_invoice_id)
       }
     },
-    async updateInvoiceStatus(id, status) {
+    async updateStatus(id, status) {
       const { invoices } = await this.$http().patch('/invoices/', id, { attribute: 'status', value: status })
-      this.$emit('update-invoice-status', invoices)
+      this.updateInvoiceStatus(invoices)
     },
     redirect(to, invoice_id) {
       const path = 'http://old.projectous.com/'
@@ -465,6 +465,24 @@ export default {
     },
     applyPayment(selected_invoice) {
       EventBus.$emit('apply-payment', selected_invoice)
+    },
+    backgroundColor(status, invoice) {
+      return this.is_theme_colors ? this.statusBgStyle(status, invoice) : invoice.status === status ? this.default_theme_color : false
+    },
+    statusBgStyle(invoice_status, invoice) {
+      if (invoice.status !== invoice_status) return 'rgba(0, 0, 0, 0.6)'
+      return this.bgStyle
+    },
+    async deleteInvoice(data) {
+      let invoice_id = data.invoice_id
+      let id = data.id
+      if (confirm('Are you sure you want to delete invoice ' + invoice_id + '?')) {
+        console.log(invoice_id, id, data)
+        // let self = this
+        // console.log(self.invoice)
+        const testapi = await this.$http().delete('/invoices', id)
+        // this.invoice = invoice
+      }
     }
   }
 }
