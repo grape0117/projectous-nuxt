@@ -447,8 +447,11 @@ export default {
       let self = this
       console.log(this.action)
       if (this.action === 'export') {
-        const export_path = `path/to/export/`
-        console.log(this.selected_invoice_id)
+        this.$http()
+          .post('/invoices/quickbooks', this.selected_invoice_id)
+          .then(function() {
+            // Do something with the response
+          })
       }
     },
     async updateStatus(id, status) {
@@ -477,11 +480,7 @@ export default {
       let invoice_id = data.invoice_id
       let id = data.id
       if (confirm('Are you sure you want to delete invoice ' + invoice_id + '?')) {
-        console.log(invoice_id, id, data)
-        // let self = this
-        // console.log(self.invoice)
-        const testapi = await this.$http().delete('/invoices', id)
-        // this.invoice = invoice
+        await this.$http().delete('/invoices', id)
       }
     }
   }
