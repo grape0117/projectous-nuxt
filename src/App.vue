@@ -375,7 +375,7 @@ export default {
       }
     },
     async getAppData() {
-      this.$store.state.loading = true
+      this.$store.state.loading = false //Right now it's just blocking everything
       let indexDBExists = true
       let request = window.indexedDB.open('projectous-data')
 

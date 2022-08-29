@@ -532,7 +532,7 @@ export default {
     },
 
     async saveTimer() {
-      var self = this
+      let self = this
       if (this.timer_data.project_id) {
         let project = this.$store.getters['projects/getById'](this.timer_data.project_id)
         if (project) {

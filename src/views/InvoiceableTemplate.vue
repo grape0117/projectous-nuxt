@@ -15,10 +15,10 @@
                 <div>
                   <ul class="nav nav-pills nav-pills-sm">
                     <li class="nav-item">
-                      <a :class="!settings.show_all_clients ? 'nav-link active' : 'nav-link'" @click="settings.show_all_clients = false" href="javascript:void(0)">Active</a>
+                      <a :class="!settings.show_all_clients ? 'nav-link active' : 'nav-link'" :style="buttonStyle" @click="settings.show_all_clients = false" href="javascript:void(0)">Active</a>
                     </li>
                     <li class="nav-item">
-                      <a :class="settings.show_all_clients ? 'nav-link active' : 'nav-link'" @click="settings.show_all_clients = true" href="javascript:void(0)">All</a>
+                      <a :class="settings.show_all_clients ? 'nav-link active' : 'nav-link'" :style="buttonStyle" @click="settings.show_all_clients = true" href="javascript:void(0)">All</a>
                     </li>
                   </ul>
                 </div>
@@ -60,8 +60,10 @@
             <div class="form-inline">
               <!-- {{ start }} -->
               <div class="d-flex justify-content-between w-100 flex-wrap">
-                <div class="d-flex">
+                <div class="d-flex color-white">
+                  <input type="checkbox" v-model="use_start_date" /> Use Start Date
                   <b-form-datepicker name="start" id="start-datepicker" :value="start" @input="setStart" class="mb-2 mr-2"></b-form-datepicker>
+                  <input type="checkbox" v-model="use_end_date" /> Use End Date
                   <b-form-datepicker name="end" id="end-datepicker" v-model="end" @input="setEnd" class="mb-2 mr-2"></b-form-datepicker>
                 </div>
                 <div class="d-flex align-items-center flex-wrap color-white">
@@ -78,8 +80,8 @@
                 </div>
 
                 <div class="d-flex flex-wrap">
-                  <b-button variant="primary" @click="lastMonth()" class="mr-3">Last Month</b-button>
-                  <b-button variant="primary" @click="thisMonth()">This Month</b-button>
+                  <b-button variant="primary" :style="buttonStyle" @click="lastMonth()" class="mr-3">Last Month</b-button>
+                  <b-button variant="primary" :style="buttonStyle" @click="thisMonth()">This Month</b-button>
                 </div>
               </div>
               <div class="inputs d-flex justify-content-start flex-wrap align-items-start w-100">
@@ -126,11 +128,11 @@
                         <b-form-select-option value="download-xls">Download XLS</b-form-select-option>
                         <b-form-select-option value="create_invoice">Create Invoice</b-form-select-option>
                       </b-form-select>
-                      <b-button variant="primary" @click="applyAction()">Go</b-button>
+                      <b-button variant="primary" :style="buttonStyle" @click="applyAction()">Go</b-button>
                     </div>
                     <div style="width: 100%" class="ml-3">
                       <span id="actionLink"> </span>
-                      <button style="float:right" class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
+                      <button :style="buttonStyle" class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
                     </div>
                   </div>
                 </td>
@@ -212,6 +214,7 @@ import moment from 'moment'
 import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
 import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
+import { applyTheme } from '@/utils/util-functions'
 
 export default {
   name: 'invoiceable-template',
@@ -235,6 +238,9 @@ export default {
       current_date: new Date(),
       start: this.initStartDate(),
       end: this.initEndDate(),
+      use_start_date: 1,
+      use_end_date: 1,
+      buttonStyle: '',
       chosen_projects: this.$route.query['project[]'] ? (Array.isArray(this.$route.query['project[]']) ? this.$route.query['project[]'] : [this.$route.query['project[]']]) : [],
       chosen_users: this.$route.query['user[]'] ? (Array.isArray(this.$route.query['user[]']) ? this.$route.query['user[]'] : [this.$route.query['user[]']]) : [],
       chosen_clients: this.$route.query['client[]'] ? (Array.isArray(this.$route.query['client[]']) ? this.$route.query['client[]'] : [this.$route.query['client[]']]) : [],
@@ -347,11 +353,20 @@ export default {
       })
     }
   },
+  created() {
+    this.buttonStyle = this.applyTheme()
+  },
   mounted() {
     console.log('reports mounted', this.$route.query, this.$route, this.chosen_clients, this.total_time, 'test')
     this.getData()
+
+    // background
+    EventBus.$on('changeBackground', ({ option, theme }) => {
+      this.buttonStyle = this.applyTheme()
+    })
   },
   methods: {
+    applyTheme,
     timeToDecimal,
     totalToDecimal,
     initStartDate() {
@@ -581,6 +596,13 @@ export default {
       if (!data) {
         //TODO: for some reason, if you visit invoiceable, then go to dashboard, the element is still created so this function area is triggered on emit refresh
         return
+      }
+
+      if (!self.use_start_date || self.anytime) {
+        data.delete('start')
+      }
+      if (!self.use_end_date || self.anytime) {
+        data.delete('end')
       }
 
       if (self.show_invoiced == 'true') {

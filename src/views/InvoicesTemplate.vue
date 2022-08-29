@@ -5,6 +5,10 @@
     </div>
     <div class="d-flex justify-content-between">
       <div class="year-buttons">
+        <div class="year-button" :class="'open' === selectedYear ? 'selected-year' : null" @click="selectYear('open')">
+          <span>Open</span>
+          <span class="total-open" :style="{ 'background-color': default_theme_color }">{{ total_open_invoice_count }}</span>
+        </div>
         <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="{ year, total } in invoice_years_data" :key="year" @click="selectYear(year)">
           <span>{{ year }}</span>
           <span class="total-open" :style="{ 'background-color': default_theme_color }">{{ total }}</span>
@@ -49,9 +53,10 @@
             Invoice ID
           </span>
           <span class="text-right pr-3" @click="setSortBy('client')">
-            <i :class="sortClass('client')" />
-            Recipient</span
-          >
+            <i :class="sortClass('client')"/>
+            Recipient <input v-model="client_search"
+          /></span>
+
           <span class="text-right pr-3" @click="setSortBy('amount')">
             <i :class="sortClass('amount')" />
             Amount
@@ -104,7 +109,9 @@ export default {
       invoices: [],
       invoice_years: [],
       open_invoice_count: [],
-      selectedYear: moment(new Date()).format('YYYY'),
+      total_open_invoice_count: 0,
+      selectedYear: 'open', //moment(new Date()).format('YYYY'),
+      client_search: '',
       bgStyle: null,
       bgTheme: null,
       sortBy: {},
@@ -136,7 +143,7 @@ export default {
     invoice_filter() {
       if (this.show_all_status) return this.invoiceSort
 
-      return this.invoiceSort.filter(invoice => invoice.status === this.status_filter)
+      return this.invoiceSort.filter(invoice => invoice.status === this.status_filter && (!invoice.client || invoice.client.name.indexOf(this.client_search) !== -1))
     },
     status_filter: {
       get() {
@@ -227,8 +234,8 @@ export default {
       }
       if (sortBy.col_name === 'client') {
         return this.invoices.sort((a, b) => {
-          let client_1 = a.client.name
-          let client_2 = b.client.name
+          let client_1 = a.client ? a.client.name : ''
+          let client_2 = b.client ? b.client.name : ''
 
           if (ASC) {
             return client_1 > client_2 ? 1 : client_1 < client_2 ? -1 : 0
@@ -248,13 +255,20 @@ export default {
     invoice_years_data() {
       let invoice = []
 
+      let total_open_invoice_count = 0
       for (const { year } of this.invoice_years) {
-        for (const open_year of this.open_invoice_count) {
-          if (open_year.year === year) {
-            invoice.push({ year: year.toString(), total: open_year['count(id)'] })
-          }
+        let open_year = this.open_invoice_count.find(function(year_count) {
+          console.log(year_count.year, ' === ', year)
+          return year_count.year === year
+        })
+        if (open_year) {
+          total_open_invoice_count += open_year['count(id)']
         }
+
+        invoice.push({ year: year.toString(), total: open_year ? open_year['count(id)'] : '' })
       }
+
+      this.total_open_invoice_count = total_open_invoice_count
 
       return invoice
     }
@@ -281,6 +295,11 @@ export default {
     }
   },
   methods: {
+    async get_count() {
+      const counts = await this.$http().get('/invoices/counts')
+      this.invoice_years = counts.invoice_years
+      this.open_invoice_count = counts.open_invoice_count
+    },
     total_invoices_payment(filter) {
       const invoices_payments = () => {
         if (this.status_filter) {
@@ -356,6 +375,7 @@ export default {
 
       console.log({ id })
       console.log({ status })
+      this.get_count()
     },
     // getStatus(invoices, status) {
     //   return invoices.filter(i => i.status === status)
@@ -377,7 +397,7 @@ export default {
       return { invoices, invoice_years, open_invoice_count }
     },
     async getData() {
-      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear(new Date().getFullYear())
+      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear('open') //new Date().getFullYear()
 
       console.log({ invoices })
 

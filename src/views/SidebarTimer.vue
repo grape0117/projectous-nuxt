@@ -348,20 +348,18 @@ export default {
     },
     saveNotes: async function(event) {
       let notesWithAcronym = event.target.innerHTML
+
       // Check for ABC: //TODO: move somewhere else to common area?
       const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
       const acronym_match = notesWithAcronym ? notesWithAcronym.match(projectRegex) : null
-      // console.log('saveNotes', acronym_match)
+
       // We have an acronym. Look for a matching project
       let notes
       if (acronym_match && acronym_match[1]) {
         const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === acronym_match[1])
         if (projects_by_acronym.length === 1) {
-          console.log('match found: ', projects_by_acronym[0].name)
           //TODO: update history
           this.timer.project_id = projects_by_acronym[0].id
-          // notes = notes.replace(acronym_match[0], '')
-          console.log('acronym', acronym_match[0], notesWithAcronym.replace(acronym_match[0], ''))
           notes = notesWithAcronym.replace(acronym_match[0], '')
         } else {
           notes = notesWithAcronym
@@ -369,7 +367,6 @@ export default {
       } else {
         notes = notesWithAcronym
       }
-      console.log('UPDATED NOTES', notes)
       this.timer.notes = notes
       event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
 

@@ -18,10 +18,10 @@
     <div v-html="invoice.note ? invoice.note : ''" contenteditable="true" @input="setNoteValue"></div>
     <div class="text-right pr-3">{{ invoice_age }}</div>
     <!-- <div class="text-right pr-3" style="min-width: 135px">{{ invoice.created_at }}</div> -->
-    <div class="text-right pr-3">{{ invoice.created_at | moment('MMM DD') }}</div>
-    <div class="text-right pr-3">{{ invoice.start_date | moment('MMM DD') }}</div>
+    <div class="text-right pr-3">{{ invoice.created_at | moment('MMM D YYYY') }}</div>
+    <div class="text-right pr-3">{{ invoice.start_date | moment('MMM D YYYY') }}</div>
     <!-- <div class="text-right pr-3">{{ invoice.end_date | moment('MMM do')}}</div> -->
-    <div class="text-right pr-3">{{ invoice.end_date | moment('MMM DD') }}</div>
+    <div class="text-right pr-3">{{ invoice.end_date | moment('MMM D YYYY') }}</div>
     <div class="buttons">
       <div class="invoices-buttons">
         <div class="invoices-button" :style="{ background: default_theme_color }" @click="redirect('invoice')">
