@@ -89,8 +89,7 @@
           {{ `$${data.item.total}` }}
         </template>
         <template #cell(note)="data">
-          <div v-html="data.item.note ? data.item.note : ''" contenteditable="true"></div>
-          <!--@input="setNoteValue"-->
+          <div v-html="data.item.note ? data.item.note : ''" contenteditable="true" @input="setNoteValue($event, data.item)"></div>
         </template>
         <template #cell(age)="data">
           {{ invoice_age(data.item) }}
@@ -150,11 +149,39 @@ export default {
       fields: [
         { key: 'id', sortable: false },
         { key: 'invoice_id', sortable: true },
-        { key: 'recipient', sortable: true },
-        { key: 'amount', sortable: true },
-        { key: 'note', sortable: true },
-        { key: 'age', sortable: true },
-        { key: 'date_created', sortable: true },
+        {
+          key: 'recipient',
+          sortable: true,
+          sortByFormatted: (value, key, item) => {
+            return item.client.name
+          }
+        },
+        {
+          key: 'amount',
+          sortable: true,
+          sortByFormatted: (value, key, item) => {
+            return parseInt(item.total)
+          }
+        },
+        {
+          key: 'note',
+          sortable: true
+        },
+        {
+          key: 'age',
+          sortable: true,
+          sortByFormatted: (value, key, item) => {
+            const age = this.invoice_age(item)
+            return age.replace(' Days', '')
+          }
+        },
+        {
+          key: 'date_created',
+          sortable: true,
+          sortByFormatted: (value, key, item) => {
+            return this.formatDate(item.created_at)
+          }
+        },
         { key: 'start_date', sortable: true },
         { key: 'end_date', sortable: true },
         { key: 'options', sortable: false }
@@ -482,6 +509,15 @@ export default {
       if (confirm('Are you sure you want to delete invoice ' + invoice_id + '?')) {
         await this.$http().delete('/invoices', id)
       }
+    },
+    setNoteValue: _.debounce(function(e, invoice) {
+      let note = e.target.innerText
+      this.saveNotes(note, invoice)
+    }, 500),
+    async saveNotes(note, invoice) {
+      const { id } = invoice
+
+      const { invoices } = await this.$http().patch('/invoices/', id, { attribute: 'note', value: note })
     }
   }
 }
