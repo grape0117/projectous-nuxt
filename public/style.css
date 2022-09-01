@@ -929,3 +929,8 @@ div:hover > .hover-action {
 .vdatetime-input {
     border:none
 }
+
+.table-header-background{
+    color: white !important;
+    background-color: rgba(0, 0, 0, 0.6);
+}

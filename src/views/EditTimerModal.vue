@@ -383,12 +383,18 @@ export default {
       return this.timer_data.default_client_rate
     },
     client_rate_value: function() {
+      if (this.timer_data.invoice_id) {
+        return this.timer_data.client_rate
+      }
       return this.timer_data.default_client_rate != this.timer_data.client_rate ? this.timer_data.client_rate : ''
     },
     user_rate_placeholder: function() {
       return this.timer_data.default_user_rate
     },
     user_rate_value: function() {
+      if (this.timer_data.invoice_id) {
+        return this.timer_data.user_rate
+      }
       return this.timer_data.default_user_rate != this.timer_data.user_rate ? this.timer_data.user_rate : ''
     },
     isBillable: function() {

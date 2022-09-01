@@ -77,7 +77,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   async editTimer(context, timer) {
     if (!context.getters['settings/isAdmin'] && (timer.is_paid || timer.invoice_id)) {
-      alert('This timer has already been processed. No changes can be made.')
+      // alert('This timer has already been processed. No changes can be made.')
     }
     //TODO: if reviewed, prevent access
 

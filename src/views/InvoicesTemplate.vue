@@ -3,33 +3,60 @@
     <div class="row">
       <div class="col-sm-12 form-group form-inline"></div>
     </div>
-    <div class="d-flex justify-content-between">
-      <div class="year-buttons">
-        <div class="year-button" :class="'open' === selectedYear ? 'selected-year' : null" @click="selectYear('open')">
-          <span>Open</span>
-          <span class="total-open" :style="{ 'background-color': default_theme_color }">{{ total_open_invoice_count }}</span>
+    <div>
+      <div class="d-flex justify-content-between mb-2">
+        <div class="year-buttons">
+          <div class="year-button" :class="'open' === selectedYear ? 'selected-year' : null" @click="selectYear('open')">
+            <span>Open</span>
+            <span class="total-open" :style="{ 'background-color': default_theme_color }">{{ total_open_invoice_count }}</span>
+          </div>
+          <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="{ year, total } in invoice_years_data" :key="year" @click="selectYear(year)">
+            <span>{{ year }}</span>
+            <span class="total-open" :style="{ 'background-color': default_theme_color }">{{ total }}</span>
+          </div>
         </div>
-        <div class="year-button" :class="year === selectedYear ? 'selected-year' : null" v-for="{ year, total } in invoice_years_data" :key="year" @click="selectYear(year)">
-          <span>{{ year }}</span>
-          <span class="total-open" :style="{ 'background-color': default_theme_color }">{{ total }}</span>
+        <div>
+          <div style="float:right">
+            <div class="year-buttons">
+              <div class="year-button">
+                <span>Paid: </span>
+                <span> ${{ total_invoices_payment('paid') | numberWithCommas }}</span>
+              </div>
+              <div class="year-button">
+                <span>Unpaid: </span>
+                <span> ${{ total_invoices_payment('open') | numberWithCommas }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div>
-        <div class="invoices-total-paid">
-          <span>Paid:</span>
-          <span> ${{ total_invoices_payment('paid') | numberWithCommas }}</span>
-        </div>
-        <div class="invoices-total-paid">
-          <span>Unpaid:</span>
-          <span> ${{ total_invoices_payment('open') | numberWithCommas }}</span>
-        </div>
-      </div>
-    </div>
-    <div class="tab-content mt-2">
-      <div class="invoices-table">
-        <div class="invoices-header">
-          <span class="status d-flex justify-content-between">
-            <div class="switch">
+      <b-table responsive :items="invoice_filter" :fields="fields" thead-class="table-header-background" tbody-class="table-header-background" :busy="is_busy" style="max-height: 86vh; overflow: auto;">
+        <template #thead-top="data">
+          <b-tr>
+            <b-th colspan="1">
+              <div style="display:flex;align-items:center;">
+                <b-form-checkbox id="checkbox-all" v-model="check_all" name="checkbox-all" />
+                <b-form-select id="action" v-model="action">
+                  <b-form-select-option :value="null" disabled>Select Action</b-form-select-option>
+                  <b-form-select-option value="export">Export to quickbooks</b-form-select-option>
+                </b-form-select>
+              </div>
+            </b-th>
+            <b-th colspan="1">
+              <b-button @click="applyAction()">Go</b-button>
+            </b-th>
+            <b-th colspan="8"></b-th>
+          </b-tr>
+        </template>
+        <template #table-busy>
+          <div class="text-center my-2">
+            <b-spinner class="align-middle"></b-spinner>
+            <strong>Loading...</strong>
+          </div>
+        </template>
+        <template #head(id)="data">
+          <span class="status d-flex">
+            <div class="switch mr-2">
               <div class="checkbox-switch" @click="toggleShowAllStatus" :style="{ 'background-color': show_all_status ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : null }">
                 <div :style="{ 'margin-left': show_all_status ? '10px' : null }"></div>
               </div>
@@ -37,54 +64,60 @@
             </div>
 
             <div class="status-buttons">
-              <span class="p-1" @click="setStatusFilter('open')" :style="{ 'background-color': status_filter === 'open' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : null }">
-                Open
-              </span>
-              <span class="p-1" @click="setStatusFilter('paid')" :style="{ 'background-color': status_filter === 'paid' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : null }">
-                Paid
-              </span>
-              <span class="p-1" @click="setStatusFilter('voided')" :style="{ 'background-color': status_filter === 'voided' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : null }">
-                Voided
-              </span>
+              <b-button-group size="sm" style="height:30px">
+                <b-button @click="setStatusFilter('open')" :style="{ 'background-color': status_filter === 'open' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none' }">Open</b-button>
+                <b-button @click="setStatusFilter('paid')" :style="{ 'background-color': status_filter === 'paid' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none' }">Paid</b-button>
+                <b-button @click="setStatusFilter('voided')" :style="{ 'background-color': status_filter === 'voided' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none' }">Voided</b-button>
+              </b-button-group>
             </div>
           </span>
-          <span class="text-right pr-3" @click="setSortBy('invoice_id')">
-            <i :class="sortClass('invoice_id')" />
-            Invoice ID
+        </template>
+        <template #cell(id)="data">
+          <span class="status d-flex">
+            <!-- <input type="checkbox" :value="data.item.id" class="invoice-checkbox" :name="'item[' + data.item.id + ']'" /> -->
+            <b-form-checkbox name="selected-invoice" v-model="selected_invoice_id" :value="data.item.invoice_id"> </b-form-checkbox>
+            <b-button-group size="sm" style="height:30px">
+              <b-button @click="updateStatus(data.item.id, 'open')" :style="{ background: backgroundColor('open', data.item), border: 'none' }">Open</b-button>
+              <b-button @click="updateStatus(data.item.id, 'paid')" :style="{ background: backgroundColor('paid', data.item), border: 'none' }">Paid</b-button>
+              <b-button @click="updateStatus(data.item.id, 'voided')" :style="{ background: backgroundColor('voided', data.item), border: 'none' }">Voided</b-button>
+            </b-button-group>
           </span>
-          <span class="text-right pr-3" @click="setSortBy('client')">
-            <i :class="sortClass('client')"/>
-            Recipient <input v-model="client_search"
-          /></span>
-
-          <span class="text-right pr-3" @click="setSortBy('amount')">
-            <i :class="sortClass('amount')" />
-            Amount
+        </template>
+        <template #cell(recipient)="data">
+          <b v-if="data && data.item.client">{{ data.item.client.name }}</b>
+          <div v-for="(project, project_index) in data.item.projects" :key="project_index" v-bind:project="project" style="font-size: smaller">
+            <span v-if="project">{{ project.name }}</span>
+          </div>
+        </template>
+        <template #cell(amount)="data">
+          {{ `$${data.item.total}` }}
+        </template>
+        <template #cell(note)="data">
+          <div v-html="data.item.note ? data.item.note : ''" contenteditable="true" @input="setNoteValue($event, data.item)"></div>
+        </template>
+        <template #cell(age)="data">
+          {{ invoice_age(data.item) }}
+        </template>
+        <template #cell(date_created)="data">
+          {{ formatDate(data.item.created_at) }}
+        </template>
+        <template #cell(start_date)="data">
+          {{ formatDate(data.item.start_date) }}
+        </template>
+        <template #cell(end_date)="data">
+          {{ formatDate(data.item.end_date) }}
+        </template>
+        <template #cell(options)="data">
+          <span class="status d-flex">
+            <b-button-group size="sm" style="height:30px">
+              <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('invoice', data.item.invoice_id)"><i class="icon-open_in_new"/></b-button>
+              <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('csv', data.item.invoice_id)">CSV</b-button>
+              <b-button style="border:none" variant="danger" @click="deleteInvoice(data.item)"><i class="icon-delete_outline"/></b-button>
+              <b-button style="border:none" variant="primary" @click="applyPayment(data.item)">Payment</b-button>
+            </b-button-group>
           </span>
-          <span>Note</span>
-          <span class="text-right pr-3" @click="setSortBy('age')">
-            <i :class="sortClass('age')" class="" />
-            Age</span
-          >
-          <span class="text-right pr-3" @click="setSortBy('date_created')">
-            <!-- <i class="icon-keyboard_arrow_down" /> -->
-            <i :class="sortClass('date_created')" class="" />
-            Date Created
-          </span>
-          <span class="text-right pr-3" @click="setSortBy('date_start')">
-            <i :class="sortClass('date_start')" />
-            Start Date
-          </span>
-          <span class="text-right pr-3" @click="setSortBy('date_end')">
-            <i :class="sortClass('date_end')" />
-            End Date
-          </span>
-          <span>Options</span>
-        </div>
-        <div v-for="invoice in invoice_filter" :key="invoice.id">
-          <invoices-row v-bind:invoice="invoice" @update-invoice-status="updateInvoiceStatus" />
-        </div>
-      </div>
+        </template>
+      </b-table>
     </div>
     <invoices-apply-payment />
   </div>
@@ -95,6 +128,7 @@ import moment from 'moment'
 import { colorThemes } from '@/mixins/colorThemes'
 
 import InvoicesRow from './InvoicesRow.vue'
+import { EventBus } from '@/components/event-bus'
 // import { getCookie } from '@/utils/util-functions'
 
 export default {
@@ -115,34 +149,59 @@ export default {
       bgStyle: null,
       bgTheme: null,
       sortBy: {},
-      show_all_status: false
+      show_all_status: false,
+      selected_invoice_id: [],
+      check_all: null,
+      fields: [
+        { key: 'id', sortable: false },
+        { key: 'invoice_id', sortable: true },
+        {
+          key: 'recipient',
+          sortable: true,
+          sortByFormatted: (value, key, item) => {
+            return item.client.name
+          }
+        },
+        {
+          key: 'amount',
+          sortable: true,
+          sortByFormatted: (value, key, item) => {
+            return parseInt(item.total)
+          }
+        },
+        {
+          key: 'note',
+          sortable: true
+        },
+        {
+          key: 'age',
+          sortable: true,
+          sortByFormatted: (value, key, item) => {
+            const age = this.invoice_age(item)
+            return age.replace(' Days', '')
+          }
+        },
+        {
+          key: 'date_created',
+          sortable: true,
+          sortByFormatted: (value, key, item) => {
+            return this.formatDate(item.created_at)
+          }
+        },
+        { key: 'start_date', sortable: true },
+        { key: 'end_date', sortable: true },
+        { key: 'options', sortable: false }
+      ],
+      items: [{ id: 'radio here', invoice_id: 1234, recipient: 'someone', amount: 222, note: 'test', age: '2 days', date_created: 'Aug 19', start_date: 'Aug 19', end_date: 'Aug 30', options: 'wqewwe' }],
+      is_busy: false,
+      action: null
     }
   },
-  created() {
-    // if (getCookie('bg-style')) {
-    //   let bgStyle = getCookie('bg-style')
-    //   this.bgStyle = JSON.parse(bgStyle)
-    // }
-    // console.log('bgStyle')
-    // console.log(bgStyle)
-    // let bgStyle = getCookie('bg-style')
-    // if (bgStyle) {
-    //   // If bgStyle is an object
-    //   if (bgStyle && Object.keys(bgStyle).length > 0) {
-    //     this.bgStyle = JSON.parse(bgStyle)
-    //   } else {
-    //     // If bgStyle is a string
-    //     this.bgStyle = bgStyle
-    //   }
-    // }
-    // if (getCookie('bg-theme')) {
-    //   this.bgTheme = getCookie('bg-theme')
-    // }
-  },
+  created() {},
   computed: {
     invoice_filter() {
       if (this.show_all_status) return this.invoiceSort
-
+      this.is_busy = false
       return this.invoiceSort.filter(invoice => invoice.status === this.status_filter && (!invoice.client || invoice.client.name.indexOf(this.client_search) !== -1))
     },
     status_filter: {
@@ -292,6 +351,16 @@ export default {
   watch: {
     current_company() {
       this.getData()
+    },
+    selected_invoice_id() {
+      console.log(this.selected_invoice_id)
+    },
+    check_all() {
+      if (this.check_all) {
+        this.selected_invoice_id = this.invoice_filter.filter(e => e.invoice_id).map(({ invoice_id }) => invoice_id)
+      } else {
+        this.selected_invoice_id = []
+      }
     }
   },
   methods: {
@@ -299,6 +368,17 @@ export default {
       const counts = await this.$http().get('/invoices/counts')
       this.invoice_years = counts.invoice_years
       this.open_invoice_count = counts.open_invoice_count
+    },
+    invoice_age(invoice) {
+      if (invoice.status === 'open') {
+        const invoice_date = moment(invoice.created_at, 'YYYY-MM-DD')
+        const today = moment().startOf('day')
+
+        //Difference in number of days
+        return Math.floor(moment.duration(today.diff(invoice_date)).asDays()) + ' Days'
+      } else {
+        return null
+      }
     },
     total_invoices_payment(filter) {
       const invoices_payments = () => {
@@ -381,6 +461,7 @@ export default {
     //   return invoices.filter(i => i.status === status)
     // },
     async selectYear(year) {
+      this.is_busy = true
       if (this.selectedYear === year) return
 
       this.selectedYear = year
@@ -404,6 +485,58 @@ export default {
       this.invoices = invoices
       this.invoice_years = invoice_years
       this.open_invoice_count = open_invoice_count
+    },
+    formatDate(date) {
+      return moment(date).format('MMM DD')
+    },
+    applyAction() {
+      let self = this
+      console.log(this.action)
+      if (this.action === 'export') {
+        this.$http()
+          .post('/invoices/quickbooks', this.selected_invoice_id)
+          .then(function() {
+            // Do something with the response
+          })
+      }
+    },
+    async updateStatus(id, status) {
+      const { invoices } = await this.$http().patch('/invoices/', id, { attribute: 'status', value: status })
+      this.updateInvoiceStatus(invoices)
+    },
+    redirect(to, invoice_id) {
+      const path = 'http://old.projectous.com/'
+      const invoice = `invoice/${invoice_id}`
+      const csv = `export/csv/invoice/${invoice_id}`
+
+      if (to === 'invoice') return window.open(`${path}${invoice}`, '_blank')
+      if (to === 'csv') return window.open(`${path}${csv}`, '_blank')
+    },
+    applyPayment(selected_invoice) {
+      EventBus.$emit('apply-payment', selected_invoice)
+    },
+    backgroundColor(status, invoice) {
+      return this.is_theme_colors ? this.statusBgStyle(status, invoice) : invoice.status === status ? this.default_theme_color : false
+    },
+    statusBgStyle(invoice_status, invoice) {
+      if (invoice.status !== invoice_status) return 'rgba(0, 0, 0, 0.6)'
+      return this.bgStyle
+    },
+    async deleteInvoice(data) {
+      let invoice_id = data.invoice_id
+      let id = data.id
+      if (confirm('Are you sure you want to delete invoice ' + invoice_id + '?')) {
+        await this.$http().delete('/invoices', id)
+      }
+    },
+    setNoteValue: _.debounce(function(e, invoice) {
+      let note = e.target.innerText
+      this.saveNotes(note, invoice)
+    }, 500),
+    async saveNotes(note, invoice) {
+      const { id } = invoice
+
+      const { invoices } = await this.$http().patch('/invoices/', id, { attribute: 'note', value: note })
     }
   }
 }
