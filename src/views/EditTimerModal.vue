@@ -100,10 +100,10 @@
                     <div v-if="isAdmin" class="form-group">
                       <label class="control-label col-sm-4" for="timerUserSelect">User: </label>
                       <div class="col-sm-8">
-                        <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer_data.company_user_id">
+                        <select name="user_id" id="timerUserSelect" class="form-control" v-model="timer_data.user_id">
                           <option value="">***** Select User *****</option>
-                          <option :selected="isTimerUser(user.id)" v-for="user in users.filter(u => u.user_type === 'user')" :key="user.id" :value="user.id">
-                            {{ user.name }}
+                          <option :selected="isTimerUser(company_user.user_id)" v-for="company_user in company_users.filter(u => u.user_type === 'user')" :key="company_user.id" :value="company_user.user_id">
+                            {{ company_user.name }}
                           </option>
                           <option>Selected or Current User if Editing Timer?</option>
                         </select>
@@ -290,7 +290,7 @@ export default {
     timer: function() {
       return this.$store.state.settings.current_edit_timer
     },
-    users: function() {
+    company_users: function() {
       return this.$store.state.company_users.company_users //TODO: include inactive user if user is on the timer? And a checkbox for showing inactive users?
     },
     current_company_user: function() {
@@ -496,8 +496,9 @@ export default {
     isTimerProjectTask: function(project_id) {
       return this.timer.project_id === project_id
     },
-    isTimerUser: function(id) {
-      return this.timer.company_user_id === id
+    isTimerUser: function(user_id) {
+      console.log(this.timer.user_id, user_id)
+      return this.timer.user_id === user_id
     },
     checkInputValue: function(input) {
       if (!input.length) {
