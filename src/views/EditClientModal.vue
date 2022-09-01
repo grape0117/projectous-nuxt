@@ -1,9 +1,6 @@
 <template>
-  <b-modal id="client-modal" class="modal fade" tabindex="-1" role="dialog" title="Add/Edit Client" @ok="saveClient" @hidden="hide">
-    <!-- <pre>
-      {{ client }}
-      {{ this.$store.state.settings.current_edit_client.id}}
-    </pre> -->
+  <b-modal id="client-modal" class="modal fade" tabindex="-1" role="dialog" @ok="saveClient" @hidden="hide">
+    <template #modal-title> {{ modal_title }} Client </template>
     <div v-if="client.history !== 'null'">
       <div v-for="(event, eventIndex) in typeof client.history === 'string' ? JSON.parse(client.history) : client.history" :key="eventIndex">{{ event.message }} | {{ event.timestamp }}</div>
     </div>
@@ -245,13 +242,14 @@ export default {
         'brown',
         'maroon'
       ],
-      client: {}
+      client: {},
+      modal_title: 'Add'
     }
   },
   watch: {
     '$store.state.settings.current_edit_client'(client) {
       const { id, status, url, acronym, name, address1, address2, default_client_rate, city, state, zip, phone, color } = client
-
+      this.modal_title = client.status ? 'Edit' : 'Add'
       this.client = { id, name, url, acronym, status: status ? status : 'new', default_client_rate, address1, address2, city, state, zip, phone, color }
     }
   },
