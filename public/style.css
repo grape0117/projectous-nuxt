@@ -936,11 +936,12 @@ div:hover > .hover-action {
 }
 
 .transparent-input-note {
-    color: white;
-    background: none;
-    border: none;
-    width: 350px !important;
-    min-width: 250px !important;
-    height: auto !important;
-    max-height: 500px !important;
+    color: white !important;
+    background: none !important;
+    border: none !important;
+    overflow: auto !important;
+}
+
+.transparent-input-note:focus {
+    box-shadow: none !important;
 }

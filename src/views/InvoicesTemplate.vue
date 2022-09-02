@@ -89,7 +89,7 @@
           {{ `$${data.item.total}` }}
         </template>
         <template #cell(note)="data">
-          <textarea rows="5" cols="50" class="transparent-input-note" v-model="data.item.note" @change="setNoteValue($event, data.item)" />
+          <b-form-textarea class="transparent-input-note" v-model="data.item.note" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
         </template>
         <template #cell(age)="data">
           {{ invoice_age(data.item) }}
@@ -510,9 +510,8 @@ export default {
         await this.$http().delete('/invoices', id)
       }
     },
-    setNoteValue: _.debounce(function(e, invoice) {
-      let note = e.target.value
-      this.saveNotes(note, invoice)
+    setNoteValue: _.debounce(function(value, invoice) {
+      this.saveNotes(value, invoice)
     }, 500),
     async saveNotes(note, invoice) {
       const { id } = invoice
