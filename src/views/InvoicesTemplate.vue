@@ -351,7 +351,7 @@ export default {
   },
   watch: {
     current_company() {
-      this.getData()
+      // this.getData()
     },
     selected_invoice_id() {
       console.log(this.selected_invoice_id)
