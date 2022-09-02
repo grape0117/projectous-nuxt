@@ -83,6 +83,12 @@
             </b-button-group>
           </span>
         </template>
+        <template #cell(age)="data">
+          {{ invoice_age(data.item) }}
+        </template>
+        <template #cell(date_created)="data">
+          {{ formatDate(data.item.created_at) }}
+        </template>
         <template #cell(recipient)="data">
           <b v-if="data && data.item.client">{{ data.item.client.name }}</b>
           <div v-for="(project, project_index) in data.item.projects" :key="project_index" v-bind:project="project" style="font-size: smaller">
@@ -93,13 +99,7 @@
           {{ `$${data.item.total}` }}
         </template>
         <template #cell(note)="data">
-          <b-form-textarea class="transparent-input-note" v-model="data.item.note" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
-        </template>
-        <template #cell(age)="data">
-          {{ invoice_age(data.item) }}
-        </template>
-        <template #cell(date_created)="data">
-          {{ formatDate(data.item.created_at) }}
+          <b-form-textarea style="min-width: 100px" class="transparent-input-note" v-model="data.item.note" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
         </template>
         <template #cell(start_date)="data">
           {{ formatDate(data.item.start_date) }}
@@ -156,6 +156,21 @@ export default {
         { key: 'id', sortable: false },
         { key: 'invoice_id', sortable: true },
         {
+          key: 'age',
+          sortable: true,
+          sortByFormatted: (value, key, item) => {
+            const age = this.invoice_age(item)
+            return age.replace(' Days', '')
+          }
+        },
+        {
+          key: 'date_created',
+          sortable: true,
+          sortByFormatted: (value, key, item) => {
+            return this.formatDate(item.created_at)
+          }
+        },
+        {
           key: 'recipient',
           sortable: true,
           sortByFormatted: (value, key, item) => {
@@ -173,21 +188,7 @@ export default {
           key: 'note',
           sortable: true
         },
-        {
-          key: 'age',
-          sortable: true,
-          sortByFormatted: (value, key, item) => {
-            const age = this.invoice_age(item)
-            return age.replace(' Days', '')
-          }
-        },
-        {
-          key: 'date_created',
-          sortable: true,
-          sortByFormatted: (value, key, item) => {
-            return this.formatDate(item.created_at)
-          }
-        },
+
         { key: 'start_date', sortable: true },
         { key: 'end_date', sortable: true },
         { key: 'options', sortable: false }
