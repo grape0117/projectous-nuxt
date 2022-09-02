@@ -935,8 +935,13 @@ div:hover > .hover-action {
     background-color: rgba(0, 0, 0, 0.6);
 }
 
-.transparent-input {
-    color: white;
-    background: none;
-    border: none;
+.transparent-input-note {
+    color: white !important;
+    background: none !important;
+    border: none !important;
+    overflow: auto !important;
+}
+
+.transparent-input-note:focus {
+    box-shadow: none !important;
 }
