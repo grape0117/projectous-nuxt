@@ -318,14 +318,14 @@ export default {
       let total_open_invoice_count = 0
       for (const { year } of this.invoice_years) {
         let open_year = this.open_invoice_count.find(function(year_count) {
-          console.log(year_count.year, ' === ', year)
+          // console.log(year_count.year, ' === ', year)
           return year_count.year === year
         })
         if (open_year) {
           total_open_invoice_count += open_year['count(id)']
         }
 
-        invoice.push({ year: year.toString(), total: open_year ? open_year['count(id)'] : '' })
+        invoice.push({ year: year.toString(), total: open_year && open_year['count(id)'] ? open_year['count(id)'] : '' })
       }
 
       this.total_open_invoice_count = total_open_invoice_count
