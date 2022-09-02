@@ -93,7 +93,7 @@
           {{ `$${data.item.total}` }}
         </template>
         <template #cell(note)="data">
-          <div v-html="data.item.note ? data.item.note : ''" contenteditable="true" @input="setNoteValue($event, data.item)"></div>
+          <div v-html="data.item.note ? data.item.note : ' '" contenteditable="true" @input="setNoteValue($event, data.item)"></div>
         </template>
         <template #cell(age)="data">
           {{ invoice_age(data.item) }}
