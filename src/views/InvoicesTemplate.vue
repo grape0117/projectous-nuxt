@@ -92,9 +92,7 @@
         <template #cell(amount)="data">
           {{ `$${data.item.total}` }}
         </template>
-        <template #cell(note)="data">
-          <input type="text" class="transparent-input" v-model="data.item.note" @change="setNoteValue($event, data.item)" />
-        </template>
+        <template #cell(note)="data"><div contenteditable v-html="data.item.note" @blur="setNoteValue($event, data.item)" style="width: 100%; max-width: 150px; overflow-x: scroll; min-height: 20px; border: 1px solid white"></div></template>
         <template #cell(age)="data">
           {{ invoice_age(data.item) }}
         </template>
@@ -529,10 +527,11 @@ export default {
         await this.$http().delete('/invoices', id)
       }
     },
-    setNoteValue: _.debounce(function(e, invoice) {
-      let note = e.target.value
+    setNoteValue(e, invoice) {
+      console.log(e.target.innerHTML, invoice)
+      let note = e.target.innerHTML
       this.saveNotes(note, invoice)
-    }, 500),
+    },
     async saveNotes(note, invoice) {
       const { id } = invoice
 

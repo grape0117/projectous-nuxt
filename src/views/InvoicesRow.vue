@@ -15,7 +15,7 @@
       </div>
     </div>
     <div class="text-right pr-3">{{ `$${invoice.total}` }}</div>
-    <div v-html="invoice.note ? invoice.note : ''" contenteditable="true" @input="setNoteValue"></div>
+    <div v-html="invoice.note" contenteditable="true" @input="setNoteValue" style="min-height: 20px; border: 1px solid white"></div>
     <div class="text-right pr-3">{{ invoice_age }}</div>
     <!-- <div class="text-right pr-3" style="min-width: 135px">{{ invoice.created_at }}</div> -->
     <div class="text-right pr-3">{{ invoice.created_at | moment('MMM D YYYY') }}</div>
