@@ -934,3 +934,9 @@ div:hover > .hover-action {
     color: white !important;
     background-color: rgba(0, 0, 0, 0.6);
 }
+
+.transparent-input {
+    color: white;
+    background: none;
+    border: none;
+}

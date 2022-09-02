@@ -89,7 +89,7 @@
           {{ `$${data.item.total}` }}
         </template>
         <template #cell(note)="data">
-          <div v-html="data.item.note ? data.item.note : ' '" contenteditable="true" @input="setNoteValue($event, data.item)"></div>
+          <input type="text" class="transparent-input" v-model="data.item.note" @change="setNoteValue($event, data.item)" />
         </template>
         <template #cell(age)="data">
           {{ invoice_age(data.item) }}
@@ -511,7 +511,7 @@ export default {
       }
     },
     setNoteValue: _.debounce(function(e, invoice) {
-      let note = e.target.innerText
+      let note = e.target.value
       this.saveNotes(note, invoice)
     }, 500),
     async saveNotes(note, invoice) {
