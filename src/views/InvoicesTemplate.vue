@@ -529,17 +529,9 @@ export default {
         await this.$http().delete('/invoices', id)
       }
     },
-<<<<<<< HEAD
-    setNoteValue(e, invoice) {
-      console.log(e.target.innerHTML, invoice)
-      let note = e.target.innerHTML
-      this.saveNotes(note, invoice)
-    },
-=======
     setNoteValue: _.debounce(function(value, invoice) {
       this.saveNotes(value, invoice)
     }, 500),
->>>>>>> origin/responsive-invoice-table
     async saveNotes(note, invoice) {
       const { id } = invoice
 
