@@ -92,7 +92,7 @@
         <template #cell(amount)="data">
           {{ `$${data.item.total}` }}
         </template>
-        <template #cell(note)="data"><div contenteditable v-html="data.item.note" @blur="setNoteValue($event, data.item)" style="width: 100%; max-width: 150px; overflow-x: scroll; min-height: 20px; border: 1px solid white"></div></template>
+        <template #cell(note)="data"><div contenteditable v-html="data.item.note" @blur="setNoteValue($event, data.item)" style="width: 100%; max-width: 150px; overflow-x: scroll; min-height: 30px; border: 1px solid white"></div></template>
         <template #cell(age)="data">
           {{ invoice_age(data.item) }}
         </template>
