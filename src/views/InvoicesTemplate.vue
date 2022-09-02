@@ -89,7 +89,7 @@
           {{ `$${data.item.total}` }}
         </template>
         <template #cell(note)="data">
-          <input type="text" class="transparent-input" v-model="data.item.note" @change="setNoteValue($event, data.item)" />
+          <textarea rows="5" cols="50" class="transparent-input-note" v-model="data.item.note" @change="setNoteValue($event, data.item)" />
         </template>
         <template #cell(age)="data">
           {{ invoice_age(data.item) }}
