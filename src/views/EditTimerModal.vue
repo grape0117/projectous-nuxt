@@ -50,7 +50,7 @@
                     <div class="form-group">
                       <label class="control-label col-sm-4" for="timerUserNotes">Notes: </label>
                       <div class="timer-modal_notes" style="padding-left: 14px">
-                        <div contenteditable="true" id="timerUserNotes" class="form-control" style="min-height: 60px; height: auto;" v-html="checkNotes(timer_data.notes)" @blur="setNotes"></div>
+                        <b-form-textarea v-model="timer_data.notes" rows="2" max-rows="30" cols="300"></b-form-textarea>
                       </div>
                     </div>
 
@@ -71,7 +71,7 @@
                     <div v-if="isAdmin" class="form-group">
                       <label v-if="showInvoiceNotes" class="control-label col-sm-4" for="timerInvoiceNotes">Invoice Notes: </label>
                       <div v-if="showInvoiceNotes" class="col-sm-12 invoice-notes" style="padding-right: 0;">
-                        <div contenteditable="true" id="timerInvoiceNotes" class="form-control" style="min-height: 60px; max-height: 90px; overflow-y: auto;" v-html="getInvoiceNotes" @blur="setInvoiceNotes"></div>
+                        <b-form-textarea style="overflow-y: hidden;" v-model="timer_data.invoice_notes" rows="2" max-rows="30" cols="300"></b-form-textarea>
                         <div class="clear-set-input">
                           <a href="javascript:void(0)" @click="clearInvoiceNotes">Clear and hide</a>
                         </div>
@@ -82,7 +82,7 @@
                     <div v-if="isAdmin" class="form-group">
                       <label v-if="showAdminNotes" class="control-label col-sm-4" for="timerInvoiceNotes">Admin Notes:</label>
                       <div v-if="showAdminNotes" class="col-sm-12" style="padding-right: 0;">
-                        <div contenteditable="true" id="timerAdminNotes" class="form-control" style="min-height: 60px; max-height: 90px; overflow-y: auto" v-html="getAdminNotes" @blur="setAdminNotes"></div>
+                        <b-form-textarea style="overflow-y: hidden;" v-model="timer_data.admin_notes" rows="2" max-rows="30" cols="300"></b-form-textarea>
                         <div class="clear-set-input">
                           <a href="javascript:void(0)" @click="clearAdminNotes">Clear and hide</a>
                         </div>
@@ -510,10 +510,6 @@ export default {
       }
 
       return true
-    },
-    setNotes(e) {
-      let notes = e.target.innerHTML
-      this.timer_data.notes = notes
     },
     setInvoiceNotes(e) {
       let invoiceNotes = e.target.innerHTML

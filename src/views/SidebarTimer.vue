@@ -344,7 +344,7 @@ export default {
       await this.$store.dispatch('timers/saveTimer', this.timer)
     },
     saveNotes: async function(event) {
-      let notesWithAcronym = event.target.innerHTML
+      let notesWithAcronym = this.timer.notes
 
       // Check for ABC: //TODO: move somewhere else to common area?
       const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
@@ -365,7 +365,7 @@ export default {
         notes = notesWithAcronym
       }
       this.timer.notes = notes
-      event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
+      // event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
 
       // await this.$store.dispatch('timers/saveTimer', this.timer)
       await this.saveTimer()
