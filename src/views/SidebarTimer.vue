@@ -26,11 +26,8 @@
 
     <div class="sidebar-timer-report-at">{{ restartedAt() }}</div>
 
-    <div class="sidebar-timer-notes" v-if="timer.notes">
-      <div placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes"></div>
-    </div>
-    <div v-else>
-      <div ref="noteInput" placeholder="Notes..." class="sidebar-timer-timer-task" :class="'timer-task ' + notesClass()" v-on:blur="saveNotes" contenteditable="true" v-html="timer.notes" style="background: rgba(240, 52, 52, 0.4)"></div>
+    <div class="sidebar-timer-notes">
+      <b-form-textarea style="overflow-y: hidden; font-size: smaller; min-width: 100px; background: none; border-left: white solid 1px" v-on:blur="saveNotes" class="sidebar-timer-timer-task" v-model="timer.notes" debounce="500" rows="2" max-rows="30" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
     <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
