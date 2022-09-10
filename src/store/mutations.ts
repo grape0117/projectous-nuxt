@@ -21,7 +21,7 @@ export const mutations: MutationTree<IRootState> = {
       console.error('Module ' + module + ' does not exist.')
       return
     }
-    //console.log(module, entities)
+    console.log(module, entities)
     //@ts-ignore
     entities.forEach((entity, index) => {
       try {
@@ -44,7 +44,7 @@ export const mutations: MutationTree<IRootState> = {
           }
 
           // @ts-ignore
-          this.commit('updateCreateIndexDBEntity', { module, entity })
+          // this.commit('updateCreateIndexDBEntity', { module, entity }) TODO: restore IDB
         } else {
           // @ts-ignore
           this.commit('DELETE', { module, entity })
