@@ -7,12 +7,11 @@
         <div>
           <div :class="'task-title task-' + task.id" :data-target_task_id="task.id" :data-project_id="task.project_id" :data-id="task.id" contenteditable v-on:blur="saveTaskTitle(task.id)" v-on:keydown.enter="createAfter" v-html="task.title"></div>
           <task-note v-if="!hide_notes || show_notes" v-bind:task="task" class="task-note"></task-note>
-          <div>{{ creator(task) }}</div>
         </div>
       </div>
       <div>
         <div style="color: red; border: red solid 1px; display: inline-block; font-size: 10px; padding: 3px; font-weight: bold;" v-if="due_date()">{{ due_date() }}</div>
-        <div v-for="user in task_users()" :style="isUnderlined(user)"><span v-html="checkUser(user)"></span><i v-if="user && user.role == 'manager'" class="glyphicon glyphicon-flash"></i><i v-else-if="user && user.pivot.role == 'reviewer'" class="glyphicon glyphicon-thumbs-up"></i>&nbsp;{{ user.name }}</div>
+        <div v-for="user in task_users()" :style="isUnderlined(user)"><span v-html="checkUser(user)"></span><i v-if="user && user.role === 'manager'" class="glyphicon glyphicon-flash"></i><i v-else-if="user && user.role === 'reviewer'" class="glyphicon glyphicon-thumbs-up"></i>&nbsp;{{ user.name }}</div>
       </div>
       <div>
         <div class="btn-group">
@@ -302,11 +301,7 @@ export default {
     taskProjectName(project_id) {
       return this.$store.getters['projects/projectProjectName'](project_id)
     },
-    creatortask() {
-      if (task.creator) {
-        return task.creator.name
-      }
-    },
+
     isAdmin() {
       return this.$store.getters['settings/isAdmin']
     },

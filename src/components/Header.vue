@@ -106,7 +106,7 @@ export default Vue.extend({
         logo: { name: '#FFFFFF' }
       },
       icons: [
-        { name: 'tasks', icon: 'icon-library_books' },
+        // { name: 'tasks', icon: 'icon-library_books' }, //revising api for tasks
         { name: 'chat', icon: 'icon-chat' },
         { name: 'timers', icon: 'icon-timer' },
         { name: 'paint', icon: 'icon-format_paint' }

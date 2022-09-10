@@ -9,7 +9,7 @@ Vue.use(Router)
 const router = new Router({
   mode: 'history',
   routes: [
-    { path: '/', name: 'home', redirect: '/projects' },
+    { path: '/', name: 'home', redirect: '/user-tasks' },
     {
       path: '/profit',
       name: 'Profit',

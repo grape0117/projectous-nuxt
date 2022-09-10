@@ -3,42 +3,21 @@
     <td>{{ taskClientNameFromProject(task.project_id) }}</td>
     <td>{{ taskProjectName(task.project_id) }}</td>
     <td>
-      <a @click="editTask(task)">{{ task.title }}</a> <button @click="getNeed()">Set Need</button>
-      <div v-if="task.settings && task.settings.needs">{{ task.settings.needs }}</div>
-      <task-note v-if="!hide_notes" v-bind:task="task"></task-note>
+      <a @click="editTask(task)">{{ task.title }}</a>
     </td>
     <td style="white-space: nowrap">
       <div v-for="task_user in task_users()"><i v-if="task_user.role === 'manager'" class="glyphicon glyphicon-flash"></i><i v-else-if="task_user.role === 'reviewer'" class="glyphicon glyphicon-thumbs-up"></i>&nbsp; {{ user_from_task_user(task_user) }} {{ task_user.role }}</div>
     </td>
     <td>
       <div class="btn-group">
-        <button class="btn btn-xs btn-default task-option-hidden" v-if="!forToday(task)" @click="markForToday(task.id)">Today</button>
-        <button class="btn btn-xs btn-primary" v-else="" @click="markNotToday(task.id)">
-          {{ task.next_work_day }}
-        </button>
-        <button class="btn btn-xs btn-default task-option-hidden" @click="markTomorrow(task.id)">
-          <i class="glyphicon glyphicon-menu-right"></i>
-        </button>
-        <button class="btn btn-xs btn-defaul task-option-hidden" @click="markNextWeek(task.id)">
-          <i class="glyphicon glyphicon-forward"></i>
-        </button>
-        <button :class="'btn btn-xs dropdown-toggle task-option-hidden ' + todayClass()" data-toggle="dropdown">
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-          <!-- dropdown menu links -->
-          <li @click="setNextWorkDay(interval)" v-for="interval in [1, 2, 3, 4, 5, 6, 7]">
-            <a>{{ getWorkDayName(interval) }}</a>
-          </li>
-        </ul>
+        <select v-model="task.priority">
+          <option v-for="priority in priorities" :selected="getNumericPriority(priority) === getNumericPriority(task.priority)">{{ priority }}</option>
+        </select>
       </div>
 
-      <button :class="'btn btn-xs btn-' + taskStatusClass() + ' task-option-hidden'" v-if="isVisibleToUser()" @click="moveStatusForward()"><i class="glyphicon glyphicon-check"></i></button>
-      <button class="btn btn-xs btn-default task-option-hidden" @click="startTaskTimer(task)"><i class="glyphicon glyphicon-play"></i></button>
-      <!--<button v-if="!current_project_id" class="btn btn-xs btn-default task-option-hidden" @click="goToProject(task.project_id)">View Project
-            </button>-->
-      <button class="btn btn-xs btn-default task-option-hidden" @click="editTask(task)"><i class="glyphicon glyphicon-pencil"></i></button>
-      <button class="btn btn-xs btn-default task-option-hidden" @click="toggle_notes()">Show Notes</button>
+      <button @click="moveStatusForward()"><i class="glyphicon glyphicon-check">Check</i></button>
+      <button @click="startTimer()"><i class="glyphicon glyphicon-play">Play</i></button>
+      <button @click="showTaskDetail">Go to Task</button>
     </td>
     <td>{{ task.due_date }}</td>
   </tr>
@@ -50,7 +29,45 @@ export default {
   props: ['task'],
   extends: TaskActionRow,
   name: 'tasks-tab-row',
+  data() {
+    return {
+      priorities: ['high', 'regular', 'low', 'hold']
+    }
+  },
+  watch: {
+    'task.priority'(value) {
+      console.log('priority watcher')
+      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: value })
+    }
+  },
   methods: {
+    startTimer() {
+      let timer = {
+        task_id: task.id
+      }
+      if (task.project_id) {
+        const project = this.$store.getters['projects/getById'](task.project_id)
+        timer.project_id = project.id
+      }
+      this.$store.dispatch('timers/startTimer', timer)
+    },
+    getNumericPriority(priority) {
+      switch (priority) {
+        case 'high':
+        case 'today':
+          return 3
+        case 'active':
+        case 'regular':
+        case 'this week':
+          return 2
+        case 'low':
+        case 'when possible':
+          return 1
+        case 'hold':
+        default:
+          return 0
+      }
+    },
     user_from_task_user(task_user) {
       return this.$store.getters['company_users/getById'](task_user.company_user_id)['name']
     },
@@ -58,9 +75,7 @@ export default {
       await this.$router.push({ query: { task: this.task.id, showChatSection: 'true' } })
     },
     task_users() {
-      const task_users = this.$store.getters['task_users/getByTaskId'](this.task.id)
-      console.log('task_users', task_users)
-      return task_users
+      return this.$store.getters['task_users/getByTaskId'](this.task.id)
     },
     getNeed() {
       const need = prompt('What is blocking this task?', this.task.settings ? (this.task.settings.needs ? this.task.settings.needs : '') : '')

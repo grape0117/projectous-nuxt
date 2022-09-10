@@ -29,9 +29,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
         .sort(Vue.nameSort)
     )
   },
-  getNotMe: (state, _getters, rootState) => {
+  getActiveNotMe: (state, _getters, rootState) => {
     return state.company_users.filter((user: ICompanyUser) => {
-      return user.id != rootState.settings.current_company_user_id
+      return user.id != rootState.settings.current_company_user_id && user.status == 'active'
     })
   },
   getMe: (state, _getters, rootState, rootGetters) => {
