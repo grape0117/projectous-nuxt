@@ -43,11 +43,10 @@ export default {
   methods: {
     startTimer() {
       let timer = {
-        task_id: task.id
+        task_id: this.task.id
       }
-      if (task.project_id) {
-        const project = this.$store.getters['projects/getById'](task.project_id)
-        timer.project_id = project.id
+      if (this.task.project_id) {
+        timer.project_id = this.task.project_id
       }
       this.$store.dispatch('timers/startTimer', timer)
     },
