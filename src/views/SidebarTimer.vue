@@ -8,6 +8,7 @@
       <project-icon v-bind:project="project"></project-icon>
       <span v-if="project.id" class="sidebar-timer-client-project">{{ project.name }}</span>
       <span v-else class="sidebar-timer-client-no-project-title">{{ project.name }}</span>
+      <div v-if="timer.task_id">{{ task.title }}</div>
     </div>
 
     <div class="status-icon-with-timer">
