@@ -15,9 +15,12 @@
         </select>
       </div>
 
-      <button @click="moveStatusForward()"><i class="glyphicon glyphicon-check">Check</i></button>
-      <button @click="startTimer()"><i class="glyphicon glyphicon-play">Play</i></button>
-      <button @click="showTaskDetail">Go to Task</button>
+      <div class="status-icons">
+        <i class="icon-check_circle" style="font-size: 20px; color: #007bff; cursor: pointer;" @click="moveStatusForward()"></i>
+        <i class="icon-play_arrow icon-class" @click="startTimer()" v-if="!getTimers(task.id, true)"></i>
+        <i class="icon-stop icon-class" style="color: red" @click="stopTimer()" v-if="getTimers(task.id, true)"></i>
+      </div>
+      <b-badge variant="primary" @click="showTaskDetail" style="cursor:pointer">Open task</b-badge>
     </td>
     <td>{{ task.due_date }}</td>
   </tr>
@@ -41,6 +44,23 @@ export default {
     }
   },
   methods: {
+    getTimers(id, check_length) {
+      let data = this.$store.state.timers.timers.find(e => e.status === 'running' && e.task_id === id)
+      if (check_length) {
+        data = data ? true : false
+      }
+      return data
+    },
+    restartTimer(timer) {
+      this.$store.dispatch('timers/restartTimer', timer)
+    },
+    stopTimer() {
+      const timer = this.getTimers(this.task.id)
+      this.$store.dispatch('timers/stopTimer', timer)
+    },
+    pauseTimer(timer) {
+      this.$store.dispatch('timers/pauseTimer', timer)
+    },
     startTimer() {
       let timer = {
         task_id: this.task.id
@@ -97,5 +117,15 @@ export default {
 <style scoped>
 tr {
   display: table-row;
+}
+.status-icons {
+  display: flex;
+  margin-right: 5px;
+}
+.icon-class {
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  color: green;
 }
 </style>
