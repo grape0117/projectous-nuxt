@@ -45,9 +45,9 @@ export default {
   },
   methods: {
     getTimers(id, check_length) {
-      let data = this.$store.state.timers.timers.filter(e => e.status === 'running' && e.task_id === id)
+      let data = this.$store.state.timers.timers.find(e => e.status === 'running' && e.task_id === id)
       if (check_length) {
-        data = data.length > 0
+        data = data ? true : false
       }
       return data
     },
@@ -55,11 +55,8 @@ export default {
       this.$store.dispatch('timers/restartTimer', timer)
     },
     stopTimer() {
-      const timers = this.getTimers(this.task.id)
-      for (let timer of timers) {
-        console.log(timer)
-        this.$store.dispatch('timers/stopTimer', timer)
-      }
+      const timer = this.getTimers(this.task.id)
+      this.$store.dispatch('timers/stopTimer', timer)
     },
     pauseTimer(timer) {
       this.$store.dispatch('timers/pauseTimer', timer)
