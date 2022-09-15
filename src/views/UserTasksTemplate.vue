@@ -105,7 +105,8 @@ export default {
     },
 
     usersNotMe() {
-      return this.$store.getters['company_users/getActiveNotMe']
+      this.other_users = this.$store.getters['company_users/getActiveNotMe']
+      return this.other_users
     },
     tasks() {
       return this.$store.state.tasks.tasks
@@ -133,7 +134,8 @@ export default {
       show_completed: this.$route.query.start ? true : false,
       tab: this.$route.query.tab ? this.$route.query.tab : 'my_tasks',
       new_task_title: '',
-      new_task_project_id: null
+      new_task_project_id: null,
+      other_users: null
     }
   },
   watch: {
@@ -155,11 +157,15 @@ export default {
     tab() {
       this.getData()
       this.storeChanges()
+    },
+    other_users() {
+      const { tab } = this.$route.query
+      if (tab) {
+        this.setCompanyUserId(parseInt(tab))
+      }
     }
   },
   beforeCreate() {
-    console.log('beforeCreate')
-    console.log(this.$store.state.settings.current_company)
     if (this.$store.state.settings.current_company.id) {
       console.log('current_company_id')
       if (sessionStorage.getItem('tasks')) {
@@ -287,7 +293,7 @@ export default {
     async getData() {
       if (this.current_company_user_id) {
         const response = await this.$http().get('/company_users/' + this.current_company_user_id + '/tasks')
-        // console.log({response})
+        console.log(response)
 
         this.$store.dispatch('PROCESS_INCOMING_DATA', response)
       }
