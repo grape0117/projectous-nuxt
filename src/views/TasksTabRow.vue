@@ -59,7 +59,14 @@ export default {
           break
         case 'restart_timer':
           const latest_task_timer = timers.find(e => e.task_id === id)
-          const is_same_day = latest_task_timer ? moment(new Date()).isSame(latest_task_timer.created_at, 'day') : false
+
+          //guess timezone
+          const timezone = moment.tz.guess()
+          const tz_date = moment(new Date()).tz(timezone)
+          //convert current date to database timezone
+          const gmt_date = tz_date.clone().tz('GMT')
+          const is_same_day = latest_task_timer ? moment(gmt_date).isSame(latest_task_timer.report_at, 'day') : false
+
           return_data = is_same_day ? latest_task_timer : null
           break
       }
