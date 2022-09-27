@@ -301,6 +301,9 @@ export default {
     taskProjectName(project_id) {
       return this.$store.getters['projects/projectProjectName'](project_id)
     },
+    getProject(project_id) {
+      return this.$store.getters['projects/getById'](project_id)
+    },
 
     isAdmin() {
       return this.$store.getters['settings/isAdmin']

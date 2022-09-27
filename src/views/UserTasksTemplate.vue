@@ -42,11 +42,12 @@
         </ul>
         <div role="tabpanel" class="tab-pane active" id="active">
           <h3 v-if="current_project_id">{{ getCurrentProjectNameById() }}</h3>
-          <div class="table-responsive">
-            <ul class="table timer-table">
-              <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab"> </tasks-tab>
-            </ul>
-          </div>
+          <!-- <div class="table-responsive"> -->
+          <!-- <ul class="table timer-table"> -->
+          <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab"> </tasks-tab>
+          <!-- <user-task-row v-bind:tasks="filtered_tasks" v-bind:tab="tab"> </user-task-row> -->
+          <!-- </ul> -->
+          <!-- </div> -->
         </div>
       </div>
     </div>
@@ -70,6 +71,7 @@ export default {
       return this.$store.getters['settings/isAdmin']
     },
     filtered_tasks() {
+      console.log('111111')
       let self = this
       let user_id = null
       if (this.tab === 'all_tasks') {
@@ -202,6 +204,7 @@ export default {
     },
     setTab(tab) {
       console.log('tab: ' + tab)
+      console.log(this.$store.state.timers.timers)
       this.tab = tab
       this.getData()
     },

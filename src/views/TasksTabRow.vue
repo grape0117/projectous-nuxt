@@ -48,26 +48,26 @@ export default {
   methods: {
     getTaskTimers(id, type) {
       let timers = this.$store.state.timers.timers
-      let running_timers = timers.find(e => e.status === 'running' && e.task_id === id)
+      let running_timers = timers.filter(e => e.status === 'running' && e.task_id === id)
       let return_data
       switch (type) {
         case 'button_status':
-          return_data = running_timers ? true : false
+          return_data = running_timers.length > 0 ? true : false
           break
         case 'stop_timer':
-          return_data = running_timers
+          return_data = timers.find(e => e.status === 'running' && e.task_id === id)
           break
         case 'restart_timer':
-          const latest_task_timer = timers.find(e => e.task_id === id)
-
+          const latest_task_timer = timers.filter(e => e.task_id === id)
+          const latest_timer = latest_task_timer[latest_task_timer.length - 1]
           //guess timezone
           const timezone = moment.tz.guess()
           const tz_date = moment(new Date()).tz(timezone)
           //convert current date to database timezone
           const gmt_date = tz_date.clone().tz('GMT')
-          const is_same_day = latest_task_timer ? moment(gmt_date).isSame(latest_task_timer.report_at, 'day') : false
+          const is_same_day = latest_timer ? moment(moment(gmt_date).format('YYYY-MM-DD')).isSame(moment(latest_timer.report_at).format('YYYY-MM-DD'), 'day') : false
 
-          return_data = is_same_day ? latest_task_timer : null
+          return_data = { is_same_day, latest_timer }
           break
       }
       return return_data
@@ -90,9 +90,9 @@ export default {
         timer.project_id = this.task.project_id
       }
 
-      const task_timer = this.getTaskTimers(this.task.id, 'restart_timer')
-      if (task_timer) {
-        this.restartTimer(task_timer)
+      const { is_same_day, latest_timer } = this.getTaskTimers(this.task.id, 'restart_timer')
+      if (is_same_day) {
+        this.restartTimer(latest_timer)
       } else {
         this.$store.dispatch('timers/startTimer', timer)
       }
