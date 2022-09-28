@@ -5,32 +5,35 @@
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
             <h6 class="card-text">
-              <!-- <span data-v-24a82bfa="" class="project-icon mr-2" style="background-color: lime;"><span></span><span class="dragzone-project-acronym"> RWR </span></span> -->
-              <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(task.project_id)">{{ getProjectDetails(task.project_id) }}</b-badge>
+              <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id) && taskProjectName(task.project_id)">
+                {{ getProjectDetails(task.project_id) }}
+              </b-badge>
+              <b-badge @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer"> <i class="icon-play_arrow" style="color:green;"></i>Play </b-badge>
+              <b-badge @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer"> <i class="icon-stop" style="color:red;"></i>Stop </b-badge>
+              <!-- <b-badge variant="danger mr-2" style="cursor:pointer">{{ task.priority ? capitalizeFirstLetter(task.priority) : 'Priority' }}</b-badge> -->
+              <b-dropdown id="priorities-dropdown" :text="task.priority ? capitalizeFirstLetter(task.priority) : ''" variant="danger" style="border:none">
+                <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
+                <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
+                <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
+                <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
+                <b-dropdown-item>
+                  <input id="task-list-due-date" class="badge badge-danger" type="date" name="due_at" placeholder="Due Date" v-model="task.due_date" />
+                </b-dropdown-item>
+              </b-dropdown>
               <b>
-                {{ taskProjectName(task.project_id) ? taskProjectName(task.project_id) : 'No Project' }} | {{ task.title ? task.title : '---' }}
+                | {{ task.title ? task.title : '---' }}
                 <span v-for="user in task.users">
-                  <span data-v-0d6e703a="" :title="getCompanyUserDetails(user.company_user_id).name" class="avatar mr-1 pointer" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }"
-                    ><!-- background-color: #007bff; display:inline-flex; cursor: pointer; -->
+                  <span data-v-0d6e703a="" :title="getCompanyUserDetails(user.company_user_id).name" class="avatar mr-1 pointer" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
                   </span>
                 </span>
-                <!-- <span v-if="task.users.length > 0" :title="company_users.filter(c_user => c_user.id === user.company_user_id)[0].name" class="avatar mr-1 pointer" :style="{ 'background-color': company_users.filter(c_user => c_user.id === user.company_user_id)[0].color }">
-                        {{ abbrName(company_users.filter(c_user => c_user.id === user.company_user_id)[0].name) }}
-                        </span> -->
               </b>
             </h6>
           </div>
           <div class="col-md-3" style="align-self:center">
-            <div v-if="!is_select_priority">
-              <b-badge @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer; float:right"> <i class="icon-play_arrow" style="color:green;"></i>Play </b-badge>
-              <b-badge @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer; float:right"> <i class="icon-stop" style="color:red;"></i>Stop </b-badge>
+            <div>
               <b-badge variant="primary mr-2" style="cursor:pointer; float:right" @click="showTaskDetail"><i class="icon-open_in_new"></i>Open task</b-badge>
-              <b-badge variant="danger mr-2" style="cursor:pointer; float:right" @click="enableSelectPriority">! {{ task.priority }}</b-badge>
-              <b-badge variant="warning mr-2" v-if="task.due_date" style="cursor:pointer; float:right"><i class="icon-timer"></i>{{ dueDate(task.due_date) }}</b-badge>
-            </div>
-            <div v-if="is_select_priority">
-              <b-form-select v-model="task.priority" :options="priorities" size="sm" style="width:90px; float: right; background-color: #ffa500; color:white; border: none;"></b-form-select>
+              <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-2" style="float:right; display: flex;" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" />
             </div>
           </div>
         </div>
@@ -60,17 +63,19 @@ export default {
         { value: 'regular', text: 'Regular' },
         { value: 'low', text: 'Low' },
         { value: 'hold', text: 'Hold' }
-      ],
-      is_select_priority: false
+      ]
     }
   },
-  watch: {
-    'task.priority'(value) {
-      this.is_select_priority = false
-      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: value })
-    }
-  },
+  watch: {},
   methods: {
+    updatePriority(priority) {
+      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: priority })
+    },
+    capitalizeFirstLetter(string) {
+      const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1)
+
+      return capitalize(string)
+    },
     abbrName,
     getCompanyUserDetails(company_user_id) {
       const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
@@ -89,11 +94,16 @@ export default {
       }
       return project ? project.acronym : false
     },
-    enableSelectPriority() {
-      this.is_select_priority = true
-    },
     dueDate(due_date) {
-      return moment(due_date).format('MMM D')
+      let formatted_date
+      if (due_date) {
+        formatted_date = moment(new Date(due_date)).format('yyyy-MM-DD')
+      }
+      return formatted_date
+    },
+    saveDueDate(e) {
+      const due_date = e.target.value
+      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'due_date', value: due_date })
     },
     getTaskTimers(id, type) {
       let timers = this.$store.state.timers.timers
@@ -115,7 +125,7 @@ export default {
           const tz_date = moment(new Date()).tz(timezone)
           //convert current date to database timezone
           const gmt_date = tz_date.clone().tz('GMT')
-          // console.log(moment(gmt_date).format("YYYY-MM-DD"), moment(latest_timer.report_at).format("YYYY-MM-DD"))
+
           const is_same_day = latest_timer ? moment(moment(gmt_date).format('YYYY-MM-DD')).isSame(moment(latest_timer.report_at).format('YYYY-MM-DD'), 'day') : false
           console.log(is_same_day)
 
@@ -194,7 +204,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style type="text/css">
 tr {
   display: table-row;
 }
@@ -207,5 +217,26 @@ tr {
   font-size: 20px;
   cursor: pointer;
   color: green;
+}
+
+#priorities-dropdown > .btn {
+  padding: 0px 5px !important;
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+}
+
+#task-list-due-date {
+  color: white !important;
+  border: none !important;
+  text-align: center !important;
+  width: 135px !important;
+  height: 20px;
 }
 </style>
