@@ -16,9 +16,6 @@
                 <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
                 <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
                 <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
-                <b-dropdown-item>
-                  <input id="task-list-due-date" class="badge badge-danger" type="date" name="due_at" placeholder="Due Date" v-model="task.due_date" />
-                </b-dropdown-item>
               </b-dropdown>
               <b>
                 | {{ task.title ? task.title : '---' }}
@@ -33,7 +30,7 @@
           <div class="col-md-3" style="align-self:center">
             <div>
               <b-badge variant="primary mr-2" style="cursor:pointer; float:right" @click="showTaskDetail"><i class="icon-open_in_new"></i>Open task</b-badge>
-              <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-2" style="float:right; display: flex;" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" />
+              <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-2" :style="{ float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
             </div>
           </div>
         </div>
@@ -100,6 +97,36 @@ export default {
         formatted_date = moment(new Date(due_date)).format('yyyy-MM-DD')
       }
       return formatted_date
+    },
+    dueDateDetails(due_date, return_color) {
+      const timezone = moment.tz.guess()
+      const timezone_date = moment()
+        .tz(timezone)
+        .format('YYYY-MM-DD')
+      const task_due_date = moment(due_date).format('YYYY-MM-DD')
+
+      const diff = moment.duration(moment(task_due_date).diff(moment(timezone_date)))
+      const days = diff.asDays()
+      const near_due_date = [1, 2, 3]
+      let return_value
+      let color
+      if (days < 0) {
+        return_value = 'Past due'
+        color = '#ffc107'
+      } else if (days === 0) {
+        return_value = 'Due today'
+        color = 'red'
+      } else if (near_due_date.includes(days)) {
+        return_value = `Due in ${days} ${days === 1 ? 'day' : 'days'}`
+        color = 'orange'
+      } else {
+        return_value = `Due on ${moment(due_date).format('MMMM DD')}`
+        color = '#17a2b8'
+      }
+      if (return_color) {
+        return_value = color
+      }
+      return return_value
     },
     saveDueDate(e) {
       const due_date = e.target.value
