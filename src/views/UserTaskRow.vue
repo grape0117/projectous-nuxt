@@ -20,10 +20,16 @@
               <b>
                 | {{ task.title ? task.title : '---' }}
                 <span v-for="user in task.users">
-                  <span data-v-0d6e703a="" :title="getCompanyUserDetails(user.company_user_id).name" class="avatar mr-1 pointer" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+                  <span data-v-0d6e703a="" :title="getCompanyUserDetails(user.company_user_id).name" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
                   </span>
                 </span>
+                <span v-if="isMyTask()">
+                  <b-button v-if="!isCompletedTask()" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></b-button>
+                  <b-button v-else variant="outline-success" @click="notCompleteMyTask(task.id)" pill><i class="icon-close"/></b-button>
+                </span>
+
+                <b-button v-if="isAdmin" variant="outline-light" @click="addDeveloper(task.id)" pill><i class="icon-person_add"/></b-button>
               </b>
             </h6>
           </div>
@@ -46,7 +52,7 @@ import moment from 'moment'
 import { Datetime } from 'vue-datetime'
 import { abbrName } from '@/utils/util-functions'
 export default {
-  props: ['task'],
+  props: ['task', 'isAdmin'],
   extends: TaskActionRow,
   components: {
     datetime: Datetime
@@ -60,11 +66,50 @@ export default {
         { value: 'regular', text: 'Regular' },
         { value: 'low', text: 'Low' },
         { value: 'hold', text: 'Hold' }
-      ]
+      ],
+      users_in_task: this.task.users,
+      user_info: {}
     }
   },
   watch: {},
   methods: {
+    isCompletedTask() {
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
+      return this.user_info && this.user_info.status === 'completed'
+    },
+    isMyTask() {
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      return this.task.users.findIndex(user => user.company_user_id === current_user_id) > -1
+    },
+    addDeveloper(task_id) {
+      this.$emit('showModal', task_id)
+    },
+    async completeMyTask(task_id) {
+      const task_progress_info = {
+        company_user_id: 'me',
+        status: 'completed',
+        notes: ''
+      }
+      const result = await this.$http().post(`/tasks-progress/${task_id}`, task_progress_info)
+      if (result.status === 'success') {
+        this.$emit('updateStatus', { status: 'completed', task_id: task_id })
+      }
+    },
+    async notCompleteMyTask(task_id) {
+      const task_progress_info = {
+        company_user_id: 'me',
+        status: 'test',
+        notes: ''
+      }
+      const result = await this.$http().post(`/tasks-progress/${task_id}`, task_progress_info)
+      if (result.status === 'success') {
+        this.$emit('updateStatus', { status: 'test', task_id: task_id })
+      }
+    },
+    updateUser(user) {
+      this.$emit('showUpdateModal', user)
+    },
     updatePriority(priority) {
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: priority })
     },
@@ -265,5 +310,9 @@ tr {
   text-align: center !important;
   width: 135px !important;
   height: 20px;
+}
+.completed {
+  border: solid 4px #28a745;
+  padding: 14px;
 }
 </style>

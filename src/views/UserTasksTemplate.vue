@@ -44,7 +44,7 @@
           <h3 v-if="current_project_id">{{ getCurrentProjectNameById() }}</h3>
           <!-- <div class="table-responsive"> -->
           <!-- <ul class="table timer-table"> -->
-          <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab"> </tasks-tab>
+          <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab" @updateData="updateData"> </tasks-tab>
           <!-- <user-task-row v-bind:tasks="filtered_tasks" v-bind:tab="tab"> </user-task-row> -->
           <!-- </ul> -->
           <!-- </div> -->
@@ -85,7 +85,7 @@ export default {
 
       let tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
 
-      return tasks
+      const filtered_result = tasks
         .filter(task => {
           if (self.current_project_id && task.project_id != self.current_project_id) {
             return false
@@ -104,6 +104,7 @@ export default {
           }
           return new Date(b.created_at) - new Date(a.created_at)
         })
+      return filtered_result
     },
 
     usersNotMe() {
@@ -137,7 +138,8 @@ export default {
       tab: this.$route.query.tab ? this.$route.query.tab : 'my_tasks',
       new_task_title: '',
       new_task_project_id: null,
-      other_users: null
+      other_users: null,
+      tasks: []
     }
   },
   watch: {
@@ -301,6 +303,9 @@ export default {
         this.$store.dispatch('PROCESS_INCOMING_DATA', response)
       }
       return
+    },
+    async updateData() {
+      // const result = await this.getData();
     }
   }
 }
