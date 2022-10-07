@@ -146,6 +146,7 @@ export default {
       const task_index = this.tasks.findIndex(task => task.id === statusInfo.task_id)
       const user_index = this.task_list[task_index].users.findIndex(user => user.company_user_id === current_user_id)
       this.task_list[task_index].users[user_index].status = statusInfo.status
+      this.makeToast('success', 'Status changed!')
     },
     updateNotes(e) {
       this.notes = e.target.value
@@ -230,7 +231,7 @@ export default {
         this.task_notes = null
         this.user_rate = ''
       } else {
-        this.makeToast('Error', `Update Failed`)
+        this.makeToast('Error', result.message)
       }
     },
     async deleteStep(bvModalEvent) {

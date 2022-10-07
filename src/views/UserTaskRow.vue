@@ -74,6 +74,13 @@ export default {
   },
   watch: {},
   methods: {
+    makeToast(variant = null, content = '') {
+      this.$bvToast.toast(content, {
+        title: `${variant === 'success' ? 'Success' : 'Error'}`,
+        variant: variant,
+        solid: true
+      })
+    },
     isCompletedTask() {
       const current_user_id = this.$store.state.settings.current_company_user_id
       this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
@@ -95,17 +102,21 @@ export default {
       const result = await this.$http().post(`/tasks-progress/${task_id}`, task_progress_info)
       if (result.status === 'success') {
         this.$emit('updateStatus', { status: 'completed', task_id: task_id })
+      } else {
+        this.makeToast('danger', result.message)
       }
     },
     async notCompleteMyTask(task_id) {
       const task_progress_info = {
         company_user_id: 'me',
-        status: 'test',
+        status: '',
         notes: ''
       }
       const result = await this.$http().post(`/tasks-progress/${task_id}`, task_progress_info)
       if (result.status === 'success') {
-        this.$emit('updateStatus', { status: 'test', task_id: task_id })
+        this.$emit('updateStatus', { status: '', task_id: task_id })
+      } else {
+        this.makeToast('danger', result.message)
       }
     },
     updateUser(user) {
