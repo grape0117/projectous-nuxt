@@ -20,16 +20,17 @@
               <b>
                 | {{ task.title ? task.title : '---' }}
                 <span v-for="user in task.users">
-                  <span data-v-0d6e703a="" :title="getCompanyUserDetails(user.company_user_id).name" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+                  <span :title="getCompanyUserDetails(user.company_user_id).name" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
                   </span>
                 </span>
                 <span v-if="isMyTask()">
-                  <b-button v-if="!isCompletedTask()" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></b-button>
-                  <b-button v-else variant="outline-success" @click="notCompleteMyTask(task.id)" pill><i class="icon-close"/></b-button>
+                  <span title="Complete" class="add-dev-btn" v-if="!isCompletedTask()" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></span>
+                  <span title="Cancel Complete" class="add-dev-btn" v-else variant="outline-success" @click="notCompleteMyTask(task.id)" pill><i class="icon-close"/></span>
                 </span>
+                <span title="Add developer" v-if="isAdmin" class="add-dev-btn" @click="addDeveloper(task.id)" pill><i class="icon-add"/></span>
 
-                <b-button v-if="isAdmin" variant="outline-light" @click="addDeveloper(task.id)" pill><i class="icon-person_add"/></b-button>
+                <!-- <b-button v-if="isAdmin" variant="outline-light" @click="addDeveloper(task.id)" pill><i class="icon-person_add"/></b-button> -->
               </b>
             </h6>
           </div>
@@ -314,5 +315,78 @@ tr {
 .completed {
   border: solid 4px #28a745;
   padding: 14px;
+}
+.add-dev-btn {
+  border-radius: 50%;
+  border: solid 1px;
+  padding: 2px 0px 3px;
+  margin-left: 4px;
+}
+.add-dev-btn:hover {
+  cursor: pointer;
+  color: #fff;
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.add-dev-btn i {
+  font-size: 19px;
+  font-weight: bold;
+}
+
+span.avatar.notes:before {
+  content: '';
+  background: url(notes.png) no-repeat;
+  display: block;
+  width: 15px;
+  height: 15px;
+  margin-right: -25px;
+  margin-top: -17px;
+  background-size: contain;
+  position: absolute;
+}
+span.avatar.test:after {
+  background: url(../assets/icons/test.png) no-repeat;
+  content: '';
+  display: block;
+  width: 30px;
+  height: 30px;
+  margin-right: -5px;
+  margin-top: 31px;
+  background-size: contain;
+  position: absolute;
+}
+span.avatar.feedback:after {
+  background: url(../assets/icons/feedback.png) no-repeat;
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin-right: -5px;
+  margin-top: 31px;
+  background-size: contain;
+  position: absolute;
+}
+span.avatar.notify:after {
+  background: url(../assets/icons/notify.png) no-repeat;
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin-right: -5px;
+  margin-top: 31px;
+  background-size: contain;
+  position: absolute;
+}
+span.avatar.publish:after {
+  background: url(../assets/icons/publish.png) no-repeat;
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin-right: -5px;
+  margin-top: 31px;
+  background-size: contain;
+  position: absolute;
 }
 </style>
