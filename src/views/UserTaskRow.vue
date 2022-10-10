@@ -20,7 +20,7 @@
               <b>
                 | {{ task.title ? task.title : '---' }}
                 <span v-for="user in task.users">
-                  <span :title="getCompanyUserDetails(user.company_user_id).name" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+                  <span :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step}:${user.notes}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
                   </span>
                 </span>
@@ -33,6 +33,9 @@
                 <!-- <b-button v-if="isAdmin" variant="outline-light" @click="addDeveloper(task.id)" pill><i class="icon-person_add"/></b-button> -->
               </b>
             </h6>
+            <h5 v-if="isMyTask()">
+              {{ myStepAndNotes() }}
+            </h5>
           </div>
           <div class="col-md-3" style="align-self:center">
             <div>
@@ -85,6 +88,11 @@ export default {
       const current_user_id = this.$store.state.settings.current_company_user_id
       this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
       return this.user_info && this.user_info.status === 'completed'
+    },
+    myStepAndNotes() {
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
+      return this.user_info && `${this.user_info.step}: ${this.user_info.notes}`
     },
     isMyTask() {
       const current_user_id = this.$store.state.settings.current_company_user_id
@@ -356,7 +364,7 @@ span.avatar.notes:before {
   background-size: contain;
   position: absolute;
 }
-span.avatar.test:after {
+/* span.avatar.test:after {
   background: url(../assets/icons/test.png) no-repeat;
   content: '';
   display: block;
@@ -399,5 +407,5 @@ span.avatar.publish:after {
   margin-top: 31px;
   background-size: contain;
   position: absolute;
-}
+} */
 </style>
