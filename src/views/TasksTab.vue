@@ -261,6 +261,16 @@ export default {
       }
     },
     async deleteStep(bvModalEvent) {
+      const title = this.$createElement('span', { class: ['text-info'] }, 'Delete step')
+      const message = 'Are you sure want to delete this step?'
+      const response = await this.$bvModal.msgBoxConfirm(message, {
+        title: [title],
+        noFade: true
+      })
+      if (!response) {
+        return
+      }
+
       const task_progress_info = {
         task_id: this.selected_task,
         company_user_id: this.selected_user.id
