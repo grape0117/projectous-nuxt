@@ -73,7 +73,7 @@
           <b-form-group class="mb-5" id="fieldset-user-select" label="Select users:" label-for="select-user">
             <div class="d-flex" id="select-user">
               <span v-for="user in notAssignedUsers()" :title="user.name" @click="addUser(user.id)" :class="`ml-2 select-user ${assigned_users.indexOf(user.id) > -1 ? 'selected' : ''}`">
-                <b-avatar :text="abbrName(user.name)" variant="primary"></b-avatar>
+                <b-avatar :text="abbrName(user.name)" :style="{ 'background-color': getCompanyUserDetails(user.id).color }"></b-avatar>
               </span>
             </div>
           </b-form-group>
@@ -333,7 +333,7 @@ export default {
 }
 .select-user:hover > span,
 .select-user.selected:hover > span {
-  background-color: #28a745;
+  background-color: #28a745 !important;
 }
 .select-user.selected > span {
   /* background-color: #055718; */
