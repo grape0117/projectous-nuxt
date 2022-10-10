@@ -125,6 +125,9 @@ export const actions: ActionTree<IRootState, IRootState> = {
           case 'current_company_user_id':
             rootState.settings.current_company_user_id = data[module]
             break
+          case 'my_tasks':
+            rootState.tasks.my_tasks = data[module]
+            break
           case 'last_poll_timestamp':
             window.sessionStorage.last_poll_timestamp = data[module]
             break

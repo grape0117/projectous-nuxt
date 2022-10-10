@@ -31,7 +31,7 @@
         </ul>
       </div>
     </div>
-    <div class="col-md-12">
+    <div class="col-md-12" v-if="isAdmin">
       <div class="tab-content">
         <ul>
           <li>
@@ -51,6 +51,9 @@
         </div>
       </div>
     </div>
+    <div v-if="!isAdmin">
+      <tasks-tab v-bind:tasks="my_tasks" @updateData="updateData"> </tasks-tab>
+    </div>
   </div>
 </template>
 
@@ -69,6 +72,9 @@ export default {
     },
     isAdmin() {
       return this.$store.getters['settings/isAdmin']
+    },
+    my_tasks() {
+      return this.$store.state.tasks.my_tasks
     },
     filtered_tasks() {
       console.log('111111')

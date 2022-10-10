@@ -19,7 +19,7 @@
               </b-dropdown>
               <b>
                 | {{ task.title ? task.title : '---' }}
-                <span v-for="user in task.users">
+                <span v-for="user in task.users" v-if="isAdmin">
                   <span :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step}:${user.notes}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
                   </span>

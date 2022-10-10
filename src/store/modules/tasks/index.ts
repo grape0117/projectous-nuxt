@@ -20,6 +20,7 @@ const state = {
   this_week_tasks: [],
   today_tasks: [],
   tasks: [],
+  my_tasks: [],
   tasks_by_project: [],
   lookup: {}
 }
