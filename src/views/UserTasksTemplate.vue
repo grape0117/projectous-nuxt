@@ -42,7 +42,7 @@
         </ul>
         <b style="font-size:13px;">Project: </b>
         <b v-for="project_id in project_list">
-          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'background-color': isActiveProjectFilter(project_id) ? getClientAcronymColor(project_id) : 'gray' }" v-b-tooltip.hover :title="taskProjectName(project_id) && taskProjectName(project_id)">
+          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'background-color': isActiveProjectFilter(project_id) ? getClientAcronymColor(project_id) : 'white', color: isActiveProjectFilter(project_id) ? 'white' : 'black' }" v-b-tooltip.hover :title="taskProjectName(project_id) && taskProjectName(project_id)">
             {{ getProjectDetails(project_id) }}
           </b-badge>
         </b>
