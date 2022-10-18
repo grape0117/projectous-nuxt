@@ -36,8 +36,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
   async saveTimer(context, timer) {
     // @ts-ignore
+    context.commit('UPSERT', { module: 'timers', entity: timer }, { root: true })
     const response = await this._vm.$http().post('/timer/save/' + timer.id, timer)
-    context.commit('UPSERT', { module: 'timers', entity: response.timer }, { root: true })
   },
   async startTimer(context, timer) {
     // @ts-ignore
