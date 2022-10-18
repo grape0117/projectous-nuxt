@@ -73,7 +73,11 @@ import { EventBus } from '@/components/event-bus'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
+import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
+import 'bootstrap/scss/bootstrap.scss'
+
 Vue.component('v-select', vSelect)
+Vue.component('vue-bootstrap-typeahead', VueBootstrapTypeahead)
 
 export default {
   components: {
@@ -88,7 +92,8 @@ export default {
     InviteUserModal,
     EditTaskModal,
     EditTimerModal,
-    EditProjectModal
+    EditProjectModal,
+    VueBootstrapTypeahead
   },
   data() {
     return {

@@ -17,8 +17,8 @@
 
       <div class="status-icons">
         <i class="icon-check_circle" style="font-size: 20px; color: #007bff; cursor: pointer;" @click="moveStatusForward()"></i>
-        <i class="icon-play_arrow icon-class" @click="startTimer()" v-if="!getTimers(task.id, true)"></i>
-        <i class="icon-stop icon-class" style="color: red" @click="stopTimer()" v-if="getTimers(task.id, true)"></i>
+        <i class="icon-play_arrow icon-class" @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')"></i>
+        <i class="icon-stop icon-class" style="color: red" @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')"></i>
       </div>
       <b-badge variant="primary" @click="showTaskDetail" style="cursor:pointer">Open task</b-badge>
     </td>
@@ -28,6 +28,8 @@
 
 <script>
 import TaskActionRow from './TaskActionRow.vue'
+import ProjectIcon from '../components/ui/ProjectIcon'
+import moment from 'moment'
 export default {
   props: ['task'],
   extends: TaskActionRow,
@@ -44,18 +46,37 @@ export default {
     }
   },
   methods: {
-    getTimers(id, check_length) {
-      let data = this.$store.state.timers.timers.find(e => e.status === 'running' && e.task_id === id)
-      if (check_length) {
-        data = data ? true : false
+    getTaskTimers(id, type) {
+      let timers = this.$store.state.timers.timers
+      let running_timers = timers.filter(e => e.status === 'running' && e.task_id === id)
+      let return_data
+      switch (type) {
+        case 'button_status':
+          return_data = running_timers.length > 0 ? true : false
+          break
+        case 'stop_timer':
+          return_data = timers.find(e => e.status === 'running' && e.task_id === id)
+          break
+        case 'restart_timer':
+          const latest_task_timer = timers.filter(e => e.task_id === id)
+          const latest_timer = latest_task_timer[latest_task_timer.length - 1]
+          //guess timezone
+          const timezone = moment.tz.guess()
+          const tz_date = moment(new Date()).tz(timezone)
+          //convert current date to database timezone
+          const gmt_date = tz_date.clone().tz('GMT')
+          const is_same_day = latest_timer ? moment(moment(gmt_date).format('YYYY-MM-DD')).isSame(moment(latest_timer.report_at).format('YYYY-MM-DD'), 'day') : false
+
+          return_data = { is_same_day, latest_timer }
+          break
       }
-      return data
+      return return_data
     },
     restartTimer(timer) {
       this.$store.dispatch('timers/restartTimer', timer)
     },
     stopTimer() {
-      const timer = this.getTimers(this.task.id)
+      const timer = this.getTaskTimers(this.task.id, 'stop_timer')
       this.$store.dispatch('timers/stopTimer', timer)
     },
     pauseTimer(timer) {
@@ -68,7 +89,13 @@ export default {
       if (this.task.project_id) {
         timer.project_id = this.task.project_id
       }
-      this.$store.dispatch('timers/startTimer', timer)
+
+      const { is_same_day, latest_timer } = this.getTaskTimers(this.task.id, 'restart_timer')
+      if (is_same_day) {
+        this.restartTimer(latest_timer)
+      } else {
+        this.$store.dispatch('timers/startTimer', timer)
+      }
     },
     getNumericPriority(priority) {
       switch (priority) {

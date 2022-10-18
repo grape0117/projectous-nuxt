@@ -47,9 +47,10 @@ export default {
         }
       })
     Vue.projectSort = function(a, b) {
+      // console.log(a,b)
       try {
         if (a.client_id && b.client_id)
-          if (a.client_id != b.client_id) {
+          if (a.client_id !== b.client_id) {
             let aclient = store.getters['clients/getByClientCompanyId'](a.client_id)
             let bclient = store.getters['clients/getByClientCompanyId'](b.client_id)
             return Vue.simpleSort(aclient.name.toLowerCase(), bclient.name.toLowerCase())

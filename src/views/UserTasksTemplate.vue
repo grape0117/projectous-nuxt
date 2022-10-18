@@ -31,7 +31,7 @@
         </ul>
       </div>
     </div>
-    <div class="col-md-12">
+    <div class="col-md-12" v-if="isAdmin">
       <div class="tab-content">
         <ul>
           <li>
@@ -40,21 +40,40 @@
             </span>
           </li>
         </ul>
+        <b style="font-size:13px;">Project: </b>
+        <b v-for="project_id in project_list">
+          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'background-color': isActiveProjectFilter(project_id) ? getClientAcronymColor(project_id) : 'white', color: isActiveProjectFilter(project_id) ? 'white' : 'black' }" v-b-tooltip.hover :title="taskProjectName(project_id) && taskProjectName(project_id)">
+            {{ getProjectDetails(project_id) }}
+          </b-badge>
+        </b>
+        <div>
+          <b style="font-size:13px;">Status: </b>
+          <b-badge @click="updateStatusFilter('open')" :variant="isActiveStatusFilter('open') ? 'secondary' : 'light'" class="mr-1" style="cursor:pointer">Open</b-badge>
+          <b-badge @click="updateStatusFilter('turned-in')" :variant="isActiveStatusFilter('turned-in') ? 'info' : 'light'" class="mr-1" style="cursor:pointer">Turned-In</b-badge>
+          <b-badge @click="updateStatusFilter('reviewed')" :variant="isActiveStatusFilter('reviewed') ? 'primary' : 'light'" class="mr-1" style="cursor:pointer">Reviewed</b-badge>
+          <b-badge @click="updateStatusFilter('completed')" :variant="isActiveStatusFilter('completed') ? 'success' : 'light'" class="mr-1" style="cursor:pointer">Completed</b-badge>
+          <b-badge @click="updateStatusFilter('closed')" :variant="isActiveStatusFilter('closed') ? 'danger' : 'light'" class="mr-1" style="cursor:pointer">Closed</b-badge>
+        </div>
         <div role="tabpanel" class="tab-pane active" id="active">
           <h3 v-if="current_project_id">{{ getCurrentProjectNameById() }}</h3>
-          <div class="table-responsive">
-            <ul class="table timer-table">
-              <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab"> </tasks-tab>
-            </ul>
-          </div>
+          <!-- <div class="table-responsive"> -->
+          <!-- <ul class="table timer-table"> -->
+          <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab" @updateData="updateData"> </tasks-tab>
+          <!-- <user-task-row v-bind:tasks="filtered_tasks" v-bind:tab="tab"> </user-task-row> -->
+          <!-- </ul> -->
+          <!-- </div> -->
         </div>
       </div>
+    </div>
+    <div v-if="!isAdmin">
+      <tasks-tab v-bind:tasks="my_tasks" @updateData="updateData"> </tasks-tab>
     </div>
   </div>
 </template>
 
 <script>
 import TasksTab from './TasksTab'
+import TaskActionRow from './TaskActionRow.vue'
 export default {
   name: 'user-dashboard-template',
   components: {
@@ -69,6 +88,10 @@ export default {
     isAdmin() {
       return this.$store.getters['settings/isAdmin']
     },
+    my_tasks() {
+      return this.$store.state.tasks.my_tasks
+    },
+    getUserProjects(user_tasks) {},
     filtered_tasks() {
       let self = this
       let user_id = null
@@ -83,13 +106,32 @@ export default {
 
       let tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
 
+      //const filtered_result = tasks
+      tasks.forEach(data => {
+        const { project_id } = data
+        if (!self.project_list.includes(project_id)) {
+          if (project_id) {
+            self.project_list.push(project_id)
+          }
+        }
+      })
       return tasks
         .filter(task => {
-          if (self.current_project_id && task.project_id != self.current_project_id) {
+          if (self.current_project_id && task.project_id !== self.current_project_id) {
             return false
           }
           if (!task.title.toLowerCase().includes(self.task_filter)) {
             return false
+          }
+
+          if (self.project_filter.length > 0 || self.status_filter.length > 0) {
+            const check_project_filter = self.project_filter.includes(task.project_id)
+            const check_status_filter = self.status_filter.includes(task.status)
+            if (check_project_filter || check_status_filter) {
+              return true
+            } else {
+              return false
+            }
           }
           return true
         })
@@ -102,10 +144,12 @@ export default {
           }
           return new Date(b.created_at) - new Date(a.created_at)
         })
+      //return filtered_result
     },
 
     usersNotMe() {
-      return this.$store.getters['company_users/getActiveNotMe']
+      this.other_users = this.$store.getters['company_users/getActiveNotMe']
+      return this.other_users
     },
     tasks() {
       return this.$store.state.tasks.tasks
@@ -124,16 +168,21 @@ export default {
     return {
       current_user_id: null,
       current_company_user_id: null,
-      hide_notes: this.$route.query.hide_notes ? true : false,
+      hide_notes: !!this.$route.query.hide_notes,
       current_project_id: this.$route.query.current_project_id ? this.$route.query.current_project_id : null,
       current_task: this.$route.query.current_task_id ? this.$store.getters['tasks/getTaskById'](this.$route.query.current_task_id) : null,
       sort: 'priority',
       direction: 'desc',
       task_filter: this.$route.query.task_filter ? decodeURIComponent(this.$route.query.task_filter) : '',
-      show_completed: this.$route.query.start ? true : false,
+      show_completed: !!this.$route.query.start,
       tab: this.$route.query.tab ? this.$route.query.tab : 'my_tasks',
       new_task_title: '',
-      new_task_project_id: null
+      new_task_project_id: null,
+      other_users: null,
+      tasks: [],
+      status_filter: [],
+      project_filter: [],
+      project_list: []
     }
   },
   watch: {
@@ -155,11 +204,15 @@ export default {
     tab() {
       this.getData()
       this.storeChanges()
+    },
+    other_users() {
+      const { tab } = this.$route.query
+      if (tab) {
+        this.setCompanyUserId(parseInt(tab))
+      }
     }
   },
   beforeCreate() {
-    console.log('beforeCreate')
-    console.log(this.$store.state.settings.current_company)
     if (this.$store.state.settings.current_company.id) {
       console.log('current_company_id')
       if (sessionStorage.getItem('tasks')) {
@@ -168,6 +221,55 @@ export default {
     }
   },
   methods: {
+    getClientAcronymColor(project_id) {
+      return this.getProjectDetails(project_id, true)
+    },
+    getProjectDetails(project_id, is_color) {
+      const project = this.$store.getters['projects/getById'](project_id)
+      let client_data = null
+      if (is_color && project) {
+        client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
+        return client_data.color
+      }
+      return project.acronym ? project.acronym : project.name
+    },
+    updateStatusFilter(status) {
+      if (this.status_filter.includes(status)) {
+        this.status_filter = this.status_filter.filter(e => e !== status)
+      } else {
+        this.status_filter.push(status)
+      }
+    },
+    isActiveStatusFilter(status) {
+      let is_selected
+      if (this.status_filter.includes(status)) {
+        is_selected = false
+      } else {
+        is_selected = true
+      }
+
+      return is_selected
+    },
+    updateProjectFilter(project_id) {
+      if (this.project_filter.includes(project_id)) {
+        this.project_filter = this.project_filter.filter(e => e !== project_id)
+      } else {
+        this.project_filter.push(project_id)
+      }
+    },
+    isActiveProjectFilter(project_id) {
+      let is_selected
+      if (this.project_filter.includes(project_id)) {
+        is_selected = false
+      } else {
+        is_selected = true
+      }
+
+      return is_selected
+    },
+    taskProjectName(project_id) {
+      return this.$store.getters['projects/projectProjectName'](project_id)
+    },
     getNumericPriority(priority) {
       switch (priority) {
         case 'high':
@@ -195,12 +297,13 @@ export default {
       this.setTab(company_user_id)
     },
     setTab(tab) {
-      console.log('tab: ' + tab)
+      this.project_list = []
+      this.project_filter = []
       this.tab = tab
       this.getData()
     },
     tabClass(tab) {
-      if (this.tab == tab) {
+      if (this.tab === tab) {
         return 'active'
       }
     },
@@ -287,11 +390,14 @@ export default {
     async getData() {
       if (this.current_company_user_id) {
         const response = await this.$http().get('/company_users/' + this.current_company_user_id + '/tasks')
-        // console.log({response})
+        console.log(response)
 
         this.$store.dispatch('PROCESS_INCOMING_DATA', response)
       }
       return
+    },
+    async updateData() {
+      // const result = await this.getData();
     }
   }
 }
