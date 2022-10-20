@@ -28,7 +28,7 @@
     <div class="sidebar-timer-report-at">{{ restartedAt() }}</div>
 
     <div class="sidebar-timer-notes">
-      <b-form-textarea ref="noteInput" style="overflow-y: hidden; color: white; font-size: smaller; min-width: 100px; background: none; border-left: white solid 1px" v-on:blur="saveNotes" class="sidebar-timer-timer-task" rows="2" max-rows="30" cols="300" v-model="timer.notes"></b-form-textarea>
+      <b-form-textarea ref="noteInput" style="overflow-y: hidden; color: white; font-size: smaller; min-width: 100px; background: none; border-left: white solid 1px; border-radius: 0px;" v-on:blur="saveNotes" class="sidebar-timer-timer-task" rows="2" max-rows="30" cols="300" v-model="timer.notes"></b-form-textarea>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
     <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
