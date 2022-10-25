@@ -945,3 +945,16 @@ div:hover > .hover-action {
 .transparent-input-note:focus {
     box-shadow: none !important;
 }
+
+#new-task-menu {
+    background-color: rgb(255, 165, 0);
+}
+#new-task-menu .dropdown-menu {
+    background-color: rgb(78, 55, 10);
+    width: 777px;
+    transform: translate3d(-340px, 38px, 0px)!important;
+    padding: 45px;
+}
+.new-task-container {
+    display: flex;
+}

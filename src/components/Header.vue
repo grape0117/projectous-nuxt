@@ -21,6 +21,39 @@
             <b-dropdown-item-button><router-link id="report-menu-link" to="/profit">Profit</router-link></b-dropdown-item-button>
             <b-dropdown-item-button><router-link id="report-menu-link" to="/user_report">My Report</router-link></b-dropdown-item-button>
           </b-dropdown>
+          <b-dropdown id="new-task-menu" class="transparent-button" text="New Task" @click="openMenu()">
+            <div class="new-task-container">
+              <select v-model="new_task_project_id" id="task-project-id2" class="form-control select2-select" name="project_id" style="width: 30%;">
+                <option value="">No Project</option>
+                <option>Personal</option>
+                <option v-for="project in openprojects()" :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
+              </select>
+              <input type="text" id="task" ref="noteInput" v-model="new_task_title" class="form-control" placeholder="@assign" @keyup.enter="createTask()" @input="creatingTask" style="width: 70%;" />
+            </div>
+            <div class="search_result" v-if="showResult">
+              <h6 class="card-text">
+                <b-badge :style="{ 'background-color': getClientAcronymColor(new_task_project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(new_task_project_id)" v-b-tooltip.hover :title="taskProjectName(new_task_project_id)">
+                  {{ getProjectDetails(new_task_project_id) }}
+                </b-badge>
+                <b-dropdown id="priorities-dropdown" :text="'Activate'" variant="danger" style="border:none">
+                  <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
+                  <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
+                  <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
+                  <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
+                </b-dropdown>
+                <b>
+                  | {{ new_task_title }}
+
+                  <span v-if="new_company_user_id">
+                    <span :title="`${getCompanyUserDetails(new_company_user_id).name}   ${assignedUser.step}:${assignedUser.notes}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${assignedUser.status} ${assignedUser.step} ${assignedUser.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(new_company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+                      {{ abbrName(getCompanyUserDetails(new_company_user_id).name) }}
+                    </span>
+                  </span>
+                </b>
+              </h6>
+              <!-- end result -->
+            </div>
+          </b-dropdown>
         </div>
       </div>
     </div>
@@ -85,10 +118,18 @@ import Vue from 'vue'
 import { EventBus } from '@/components/event-bus'
 import { idbKeyval } from '@/plugins/idb.ts'
 import { getCookie } from '@/utils/util-functions'
+import TaskActionRow from '../views/TaskActionRow.vue'
+import { abbrName } from '@/utils/util-functions'
+import _ from 'lodash'
 
 export default Vue.extend({
+  extends: TaskActionRow,
   data() {
     return {
+      new_task_title: '',
+      task_content: '',
+      new_company_user_id: false,
+      new_user_name: '',
       showMenu: false,
       timerEmptyFields: 0,
       timerRunning: false,
@@ -209,7 +250,10 @@ export default Vue.extend({
         }
       ],
       isShowReload: false,
-      bgStyle: ''
+      bgStyle: '',
+      new_task_project_id: null,
+      showResult: false,
+      assignedUser: {}
     }
   },
   computed: {
@@ -262,12 +306,6 @@ export default Vue.extend({
       console.log(state)
       this.isShowReload = state
     },
-    // goTo(path) {
-    //   this.showMenu = false
-    //   if (this.$route.path === `/${path}`) return
-
-    //   this.$router.push({ path: `/${path}` })
-    // },
     logout() {
       document.cookie = 'auth_token=' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
       window.location.reload()
@@ -282,6 +320,80 @@ export default Vue.extend({
       EventBus.$emit('changeBackground', { option, theme })
       this.updateBackground(option)
     },
+    openprojects() {
+      return this.$store.getters['projects/openprojects']()
+    },
+    client_name(client_company_id) {
+      let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
+      return client ? client.name : ''
+    },
+    createTask() {
+      this.$store.dispatch('tasks/createTask', {
+        title: this.new_task_title,
+        project_id: this.new_task_project_id,
+        sort_order: 0,
+        status: 'open',
+        temp: false
+      })
+      this.new_task_title = ''
+      this.new_task_project_id = null
+      this.new_company_user_id = null
+      this.showResult = false
+    },
+    creatingTask: _.debounce(function(e) {
+      let notesWithTaskTile = this.new_task_title
+      const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+))', 'g')
+
+      const acronym_matchs = notesWithTaskTile ? notesWithTaskTile.match(projectRegex) : null
+      if (!acronym_matchs) {
+        return
+      }
+      let project_captured = false
+      let user_name_captured = false
+      let title_captured = false
+      let user_name = null
+      let task_title = null
+      let project_title = null
+      console.log('acronym_matchs', acronym_matchs)
+      for (let i = 0; i < acronym_matchs.length; i++) {
+        const acronym_match = acronym_matchs[i]
+
+        user_name = acronym_match.indexOf('@') >= 0 ? acronym_match.split('@')[1] : user_name
+        project_title = acronym_match.indexOf(':') > 0 ? acronym_match.split(':')[0] : project_title
+        task_title = acronym_match.indexOf(':') < 0 && acronym_match.indexOf('@') < 0 ? acronym_match : task_title
+      }
+
+      if (project_title) {
+        console.log('project_title', project_title)
+        project_captured = true
+        const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === project_title)
+        if (projects_by_acronym.length === 1) {
+          this.new_task_project_id = projects_by_acronym[0].id
+        }
+      }
+
+      if (user_name) {
+        user_name_captured = true
+        console.log('user_name', user_name)
+        this.new_user_name = user_name
+        let new_company_user = this.$store.getters['company_users/getByAlias'](user_name)
+        if (new_company_user) {
+          this.new_company_user_id = new_company_user['id']
+          this.assignedUser = new_company_user
+        } else {
+          this.new_company_user_id = null
+        }
+      }
+      if (task_title) {
+        title_captured = true
+        console.log('title', task_title)
+        this.new_task_title = task_title
+      }
+      if (project_captured || title_captured || user_name_captured) {
+        this.showResult = true
+      }
+    }, 700),
+
     async toggle(iconName) {
       if (iconName === 'reload') {
         this.$emit('reload')
@@ -297,6 +409,35 @@ export default Vue.extend({
         this.toggles[iconName] = !this.toggles[iconName]
         EventBus.$emit(`toggle_${iconName}`, this.toggles[iconName])
       }
+    },
+    openMenu() {
+      this.$refs['noteInput'].focus()
+    },
+    abbrName,
+    getCompanyUserDetails(company_user_id) {
+      const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
+
+      return user_details
+    },
+    getClientAcronymColor(project_id) {
+      return this.getProjectDetails(project_id, true)
+    },
+    getProjectDetails(project_id, is_color) {
+      const project = this.getProject(project_id)
+      let client_data = null
+      if (is_color && project) {
+        client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
+        return client_data.color
+      }
+      return project ? project.acronym : false
+    },
+    capitalizeFirstLetter(string) {
+      const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1)
+
+      return capitalize(string)
+    },
+    updatePriority(priority) {
+      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: priority })
     }
   },
   created() {
@@ -636,6 +777,10 @@ export default Vue.extend({
   background-repeat: no-repeat !important;
   background-size: cover !important;
   cursor: pointer;
+}
+.search_result {
+  color: white;
+  margin-top: 27px;
 }
 
 /* paletteColors: ['red', 'green', 'blue', 'rgba($color: orange, $alpha: 0.6)', 'pink', 'violet', 'rgba(255, 165, 0, 0.6)' ] */
