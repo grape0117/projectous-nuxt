@@ -333,7 +333,8 @@ export default Vue.extend({
         project_id: this.new_task_project_id,
         sort_order: 0,
         status: 'open',
-        temp: false
+        temp: false,
+        users: [this.new_company_user_id]
       })
       this.new_task_title = ''
       this.new_task_project_id = null
