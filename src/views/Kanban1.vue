@@ -1,6 +1,6 @@
 <template>
   <div class="kanban-page">
-    <b-container fluid>
+    <b-container fluid class="overflow-hidden">
       <b-row class="kanban-page-innerwrapper">
         <b-col class="client-section scroll-col">
           <div class="d-flex justify-content-center mb-3">
@@ -88,7 +88,7 @@
             </div>
           </div>
 
-          <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
+          <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
       </b-row>
     </b-container>
@@ -519,8 +519,8 @@ export default class Custom extends Vue {
 }
 .kanban-draggable {
   width: 100px;
-  height: calc(100vh - 50px);
-  overflow-x: auto;
+  height: calc(100vh - 77px);
+  overflow-x: hidden;
   overflow-y: hidden;
 }
 .client-section-acronym {
@@ -562,7 +562,7 @@ export default class Custom extends Vue {
 .project-item-status {
 }
 .scroll-col {
-  height: calc(100vh - 40px);
+  height: calc(100vh - 50px);
   overflow-y: auto;
 }
 /* .custom-width {
@@ -570,6 +570,7 @@ export default class Custom extends Vue {
 } */
 .kanban-page-title {
   color: white;
+  margin-bottom: 0px;
 }
 .client-name {
   display: flex;

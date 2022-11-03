@@ -69,6 +69,11 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "Project" */ '@/views/Kanban.vue')
     },
     {
+      path: '/projects1',
+      name: 'Projects1',
+      component: () => import(/* webpackChunkName: "Project" */ '@/views/Kanban1.vue')
+    },
+    {
       path: '/users',
       name: 'Company Users',
       meta: { adminOnly: true },
