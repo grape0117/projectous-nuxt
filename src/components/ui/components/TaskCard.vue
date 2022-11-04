@@ -1,25 +1,42 @@
 <template>
-  <div class="bg-white shadow rounded px-3 pt-3 pb-2 border border-white card-content" v-if="task.type !== 'new'" ref="card_element">
-    <div class="flex justify-between">
-      <p class="text-gray-700 font-semibold font-sans tracking-wide text-sm">{{ task.title }}</p>
+  <div>
+    <div class="bg-white shadow rounded px-3 pt-3 pb-2 border border-white card-content" v-if="task.type !== 'new'" ref="card_element">
+      <div class="flex justify-content-between">
+        <p style="font-size: 14px;">{{ task.title }}</p>
+      </div>
+      <div class="d-flex mt-4 justify-content-between items-center">
+        <span style="font-size: 14px; color: gray;" v-show="task.date"><i class="icon-date_range"></i>{{ task.date }}</span>
+        <badge v-if="task.level" :color="badgeColor" :level="task.level">{{ task.level }}</badge>
+      </div>
+      <div class="assigned-members d-flex">
+        <span v-for="member_id in task.assignedMembers">
+          <span :title="`${getCompanyUserDetails(member_id).name}`" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(member_id).color, cursor: 'pointer', display: 'inline-flex' }">
+            {{ abbrName(getCompanyUserDetails(member_id).name) }}
+          </span>
+        </span>
+      </div>
+      <a href="#none">
+        <i class="icon-edit" @click="editTask"></i>
+      </a>
     </div>
-    <div class="flex mt-4 justify-between items-center">
-      <span class="text-sm text-gray-600">{{ task.date }}</span>
-      <badge v-if="task.type" :color="badgeColor">{{ task.type }}</badge>
+    <div class="bg-white shadow rounded px-3 pt-3 pb-2 border border-white" id="new-task" ref="new_task" v-else>
+      <div class="flex justify-content-between">
+        <textarea type="text" name="new_task_title" placeholder="Enter a title for this task" v-model="new_task_title" v-on:keyup.enter="addTaskWithEnter" @input="changeTitle" v-on:blur=""></textarea>
+      </div>
+      <div class="assigned-members  d-flex">
+        <span v-for="member_id in task.assignedMembers">
+          <span :title="`${getCompanyUserDetails(member_id).name}`" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(member_id).color, cursor: 'pointer', display: 'inline-flex' }">
+            {{ abbrName(getCompanyUserDetails(member_id).name) }}
+          </span>
+        </span>
+      </div>
+      <button @click="addTask" class="btn-primary rounded">Add task</button> <i class="icon-close ml-2" @click="cancelAdd"></i>
     </div>
-    <a href="#none">
-      <i class="icon-edit" @click="editTask"></i>
-    </a>
-  </div>
-  <div class="bg-white shadow rounded px-3 pt-3 pb-2 border border-white" id="new-task" v-else>
-    <div class="flex justify-between">
-      <textarea type="text" name="new_task_title" placeholder="Enter a title for this task" v-model="new_task_title" v-on:keyup.enter="addTaskWithEnter" @input="changeTitle" v-on:blur=""></textarea>
-    </div>
-    <button @click="addTask" class="btn-primary rounded">Add task</button> <i class="icon-close ml-2" @click="cancelAdd"></i>
   </div>
 </template>
 <script>
 import Badge from './Badge.vue'
+import { abbrName } from '@/utils/util-functions'
 export default {
   components: {
     Badge
@@ -38,13 +55,67 @@ export default {
   computed: {
     badgeColor() {
       const mappings = {
-        Design: 'purple',
-        'Feature Request': 'teal',
-        Backend: 'blue',
-        QA: 'green',
-        default: 'teal'
+        Design: '#6f42c1',
+        'Feature Request': '#20c997',
+        Backend: '#007bff',
+        QA: '#28a745',
+        default: '#20c997',
+        Urgent: '#dc3545',
+        'Top Priority': '#dc3545',
+        'Medimun Priority': '#ffc107',
+        'Low Priority': '#28a745',
+        'Very Low Priority': '#17a2b8',
+        'On Staging': '#D974B0',
+        Done: '#B4EFD6',
+        ToDo: '#0086C0',
+        Working: '#C4C4C4',
+        Hold: '#FF158A',
+        Testing: '#037F4C'
+
+        // blue: '#007bff',
+        // blue_back: '#007bff4b',
+        // indigo: '#6610f2',
+        // indigo_back: '#6610f24b',
+        // purple: '#6f42c1',
+        // purple_back: '#6f42c14b',
+        // pink: '#e83e8c',
+        // pink_back: '#e83e8c4b',
+        // red: '#dc3545',
+        // red_back: '#dc35454b',
+        // orange: '#fd7e14',
+        // orange_back: '#fd7e144b',
+        // yellow: '#ffc107',
+        // yellow_back: '#ffc1074b',
+        // green: '#28a745',
+        // green_back: '#28a7454b',
+        // teal: '#20c997',
+        // teal_back: '#20c9974b',
+        // cyan: '#17a2b8',
+        // cyan_back: '#17a2b84b',
+        // white: '#fff',
+        // white_back: '#fff4b',
+        // gray: '#6c757d',
+        // gray_back: '#6c757d4b',
+        // gray_dark: '#343a40',
+        // gray_dark_back: '#343a404b',
+        // primary: '#007bff',
+        // primary_back: '#007bff4b',
+        // secondary: '#6c757d',
+        // secondary_back: '#6c757d4b',
+        // success: '#28a745',
+        // success_back: '#28a7454b',
+        // info: '#17a2b8',
+        // info_back: '#17a2b84b',
+        // warning: '#ffc107',
+        // warning_back: '#ffc1074b',
+        // danger: '#dc3545',
+        // danger_back: '#dc35454b',
+        // light: '#f8f9fa',
+        // light_back: '#f8f9fa4b',
+        // dark: '#343a40',
+        // dark_back: '#343a404b',
       }
-      return mappings[this.task.type] || mappings.default
+      return mappings[this.task.level] || mappings.default
     }
   },
   methods: {
@@ -62,7 +133,48 @@ export default {
       if (!this.new_task_title || this.new_task_title == '\n') {
         return
       }
-      console.log('add new task')
+
+      const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+))', 'g')
+      const acronym_matchs = this.new_task_title ? this.new_task_title.match(projectRegex) : null
+      if (!acronym_matchs) {
+        return
+      }
+      let project_captured = false
+      let user_name_captured = false
+      let title_captured = false
+      let user_name = null
+      let task_title = null
+      let project_title = null
+
+      for (let i = 0; i < acronym_matchs.length; i++) {
+        const acronym_match = acronym_matchs[i]
+        user_name = acronym_match.indexOf('@') >= 0 ? acronym_match.split('@')[1] : user_name
+        task_title = acronym_match.indexOf('@') < 0 && acronym_match != '\n' ? acronym_match : task_title
+      }
+
+      if (user_name) {
+        user_name_captured = true
+        this.new_user_name = user_name
+        let new_company_users = this.$store.getters['company_users/getUsersByAlias'](user_name)
+        if (new_company_users.length > 0) {
+          const member = new_company_users[0]
+          const member_index = this.task['assignedMembers'].indexOf(member['id'])
+          if (member_index < 0) {
+            this.task.assignedMembers.push(member['id'])
+          } else {
+            this.task.assignedMembers.splice(member_index, 1)
+          }
+        } else {
+          task_title = this.new_task_title
+        }
+      }
+      if (task_title) {
+        title_captured = true
+        this.new_task_title = task_title
+      } else if (!task_title || task_title == '\n') {
+        this.new_task_title = ''
+        return
+      }
       this.task['title'] = this.new_task_title
       this.task['type'] = ''
       this.$emit('addTask', '')
@@ -72,6 +184,9 @@ export default {
     },
     changeTitle: _.debounce(function(e) {
       this.task['title'] = this.new_task_title
+      const left = this.$refs.new_task.getBoundingClientRect().left
+      const top = this.$refs.new_task.getBoundingClientRect().top
+      this.$emit('creatingTask', { new_task_title: this.new_task_title, left: left, top: top })
     }, 500),
     editTask() {
       const left = this.$refs.card_element.getBoundingClientRect().left
@@ -79,6 +194,11 @@ export default {
       const height = this.$refs.card_element.getBoundingClientRect().height
       const width = this.$refs.card_element.getBoundingClientRect().width
       this.$emit('editTask', { top, left, height, width, task: this.task })
+    },
+    abbrName,
+    getCompanyUserDetails(company_user_id) {
+      const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
+      return user_details
     }
   }
 }

@@ -45,5 +45,11 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       console.log(user.aliases, '==', alias, user.aliases && user.aliases.trim() == alias.trim())
       return user.aliases && user.aliases.trim() == alias.trim() //TODO: trim and split by comma?
     })
+  },
+  getUsersByAlias: state => (alias: string) => {
+    const results = state.company_users.filter((user: ICompanyUser) => {
+      return user.aliases && user.aliases.trim().indexOf(alias.trim()) >= 0 //TODO: trim and split by comma?
+    })
+    return results
   }
 }

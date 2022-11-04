@@ -13,9 +13,9 @@
             </div>
 
             <draggable :animation="200" ghost-class="ghost-card" group="tasks" class="task-card-container px-2" @start="isDragging = true" @end="isDragging = false" v-model="columns[index].tasks">
-              <task-card v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @cancelAdd="cancelAdd" @editTask="editTask($event, index, task_index)"></task-card>
+              <task-card v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @cancelAdd="cancelAdd" @editTask="editTask($event, index, task_index)" @creatingTask="creatingTask($event, index)"></task-card>
             </draggable>
-            <div class="field" v-show="newTaskIndex !== index">
+            <div class="field" v-show="newColumnIndex !== index">
               <button class="add-task" @click="addTask(index)"><i class="icon-add" />Add a Task</button>
             </div>
           </div>
@@ -27,19 +27,19 @@
     </div>
 
     <!-- edit -->
-    <div class="quick-card-editor" v-show="edit_task">
+    <div class="quick-card-editor" v-show="edit_task" @click="hideEditCard">
       <span class="icon-lg icon-close quick-card-editor-close-icon js-close-editor" @click="edit_task = false"></span>
       <div class="quick-card-editor-card" :style="{ top: cadInfo.top + 'px', left: cadInfo.left + 'px', height: cadInfo.height + 'px', width: cadInfo.width + 'px' }">
         <div class="list-card list-card-quick-edit js-stop">
           <div class="list-card-details js-card-details">
-            <textarea class="list-card-edit-title js-edit-card-title" ref="updateTextRef" dir="auto" data-autosize="true" style="overflow: hidden; overflow-wrap: break-word; resize: none; border: none;" :style="{ height: cadInfo.height + 'px', width: cadInfo.width + 'px' }" v-model="card_title" v-on:keyup.enter="updateTask"></textarea>
+            <textarea class="list-card-edit-title js-edit-card-title" ref="updateTextRef" dir="auto" data-autosize="true" style="overflow: hidden; overflow-wrap: break-word; resize: none; border: none;" :style="{ height: cadInfo.height + 'px', width: cadInfo.width + 'px' }" v-model="new_task_title" v-on:keyup.enter="updateTask"></textarea>
             <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"></span><span class="js-plugin-badges"></span></div>
             <div class="list-card-members js-list-card-members"></div>
           </div>
         </div>
         <b-button variant="primary" @click="updateTask">Save</b-button>
         <div class="quick-card-editor-buttons fade-in" :style="{ top: card_editor_button_top + 'px' }">
-          <a class="quick-card-editor-buttons-item" href="/c/3exZ2blP/5-adfasd-adfa-adf-adfad-adfadf-adfadfa-asdfasdfadf"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open card</span></a
+          <a class="quick-card-editor-buttons-item" href="#"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open card</span></a
           ><a class="quick-card-editor-buttons-item js-edit-labels" href="#"><span class="icon-sm icon-label light"></span><span class="quick-card-editor-buttons-item-text">Edit labels</span></a
           ><a class="quick-card-editor-buttons-item js-edit-members" href="#"><span class="icon-sm icon-member light"></span><span class="quick-card-editor-buttons-item-text">Change members</span></a
           ><a class="quick-card-editor-buttons-item js-edit-cover" href="#"><span class="icon-sm icon-card-cover light"></span><span class="quick-card-editor-buttons-item-text">Change cover</span></a
@@ -47,6 +47,30 @@
           ><a class="quick-card-editor-buttons-item js-copy-card" href="#"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Copy</span></a
           ><a class="quick-card-editor-buttons-item js-edit-due-date" href="#"><span class="icon-sm icon-clock light"></span><span class="quick-card-editor-buttons-item-text">Edit dates</span></a
           ><a class="quick-card-editor-buttons-item js-archive" href="#"><span class="icon-sm icon-archive light"></span><span class="quick-card-editor-buttons-item-text">Archive</span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- select user -->
+    <div class="pop-over" :style="{ left: select_user_position_left + 'px', top: select_user_position_top + 'px' }" data-elevation="1" v-show="showResult">
+      <div class="no-back">
+        <div class="pop-over-header js-pop-over-header"><span class="pop-over-header-title">Select members</span><a href="#" class="pop-over-header-close-btn icon-sm icon-close" @click="showResult = false"></a></div>
+        <div>
+          <div class="pop-over-content js-pop-over-content u-fancy-scrollbar js-tab-parent" style="max-height: 829px;">
+            <ul class="pop-over-member-list checkable js-members-list">
+              <li class="item js-member-item active selected" v-for="member in members">
+                <span class="d-flex justify-content-between" @click="assignUser(member)">
+                  <span>
+                    <span :title="`${getCompanyUserDetails(member['id']).name}`" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(member['id']).color, cursor: 'pointer', display: 'inline-flex' }">
+                      {{ abbrName(getCompanyUserDetails(member['id']).name) }}
+                    </span>
+                    <span>{{ getCompanyUserDetails(member['id']).name }}</span>
+                  </span>
+                  <i v-if="assignedMembers.indexOf(member['id']) >= 0" class="icon-check"></i>
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -60,7 +84,12 @@
 
 import draggable from 'vuedraggable'
 import TaskCard from './components/TaskCard.vue'
+// import TaskActionRow from ''
+import TaskActionRow from '../../views/TaskActionRow.vue'
+import { abbrName } from '@/utils/util-functions'
+import _ from 'lodash'
 export default {
+  extends: TaskActionRow,
   name: 'Draggable1',
   components: {
     TaskCard,
@@ -76,30 +105,37 @@ export default {
               id: 1,
               title: 'Add discount code to checkout page',
               date: 'Sep 14',
-              type: 'Feature Request'
+              type: 'Feature Request',
+              assignedMembers: [],
+              level: 'Urgent'
             },
             {
               id: 2,
               title: 'Provide documentation on integrations',
-              date: 'Sep 12'
+              date: 'Sep 12',
+              assignedMembers: [],
+              level: 'Top Priority'
             },
             {
               id: 3,
               title: 'Design shopping cart dropdown',
               date: 'Sep 9',
-              type: 'Design'
+              type: 'Design',
+              level: 'Medimun Priority'
             },
             {
               id: 4,
               title: 'Add discount code to checkout page',
               date: 'Sep 14',
-              type: 'Feature Request'
+              type: 'Feature Request',
+              level: 'Low Priority'
             },
             {
               id: 5,
               title: 'Test checkout flow',
               date: 'Sep 15',
-              type: 'QA'
+              type: 'QA',
+              level: 'Very Low Priority'
             }
           ]
         },
@@ -194,16 +230,24 @@ export default {
       delayedDragging: false,
       delayedListDragging: false,
       editField: 'empty',
-      newTaskIndex: null,
+      newColumnIndex: null,
       edit_task: false,
       cadInfo: {
         left: 0,
         top: 0
       },
       card_editor_button_top: 0,
-      card_title: '',
+      new_task_title: '',
       edit_task_index: 0,
-      edit_list_index: 0
+      edit_list_index: 0,
+      task_content: '',
+      new_user_name: '',
+      new_task_project_id: null,
+      showResult: false,
+      members: [],
+      assignedMembers: [],
+      select_user_position_top: 0,
+      select_user_position_left: 0
     }
   },
   watch: {
@@ -230,6 +274,11 @@ export default {
     }
   },
   methods: {
+    hideEditCard($event) {
+      if ($event.target.classList.contains('quick-card-editor')) {
+        this.edit_task = false
+      }
+    },
     addList() {
       const number_of_lists = this.columns.length
       this.columns[number_of_lists - 1].type = ''
@@ -256,29 +305,88 @@ export default {
       return this.editField == index
     },
     addTask(index) {
-      if (this.newTaskIndex !== null) {
-        this.columns[this.newTaskIndex].tasks = this.columns[this.newTaskIndex].tasks.filter(function(task) {
+      this.showResult = false
+      if (this.newColumnIndex !== null) {
+        this.columns[this.newColumnIndex].tasks = this.columns[this.newColumnIndex].tasks.filter(function(task) {
           return task.type !== 'new'
         })
       }
       this.columns[index].tasks.push({
         title: '',
-        type: 'new'
+        type: 'new',
+        assignedMembers: []
       })
-      this.newTaskIndex = index
+      this.assignedMembers = []
+      this.newColumnIndex = index
       this.$nextTick(() => {
         this.scrollToBottom(index)
         document.querySelector('#new-task textarea').focus()
       })
     },
+    creatingTask(new_task_info, index) {
+      this.newColumnIndex = index
+      let notesWithTaskTile = new_task_info.new_task_title
+      this.select_user_position_top = new_task_info.top
+      this.select_user_position_left = new_task_info.left
+      const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+))', 'g')
+
+      const acronym_matchs = notesWithTaskTile ? notesWithTaskTile.match(projectRegex) : null
+      if (!acronym_matchs) {
+        return
+      }
+      let project_captured = false
+      let user_name_captured = false
+      let title_captured = false
+      let user_name = null
+      let task_title = null
+      let project_title = null
+      console.log('acronym_matchs', acronym_matchs)
+      for (let i = 0; i < acronym_matchs.length; i++) {
+        const acronym_match = acronym_matchs[i]
+
+        user_name = acronym_match.indexOf('@') >= 0 ? acronym_match.split('@')[1] : user_name
+        project_title = acronym_match.indexOf(':') > 0 ? acronym_match.split(':')[0] : project_title
+        task_title = acronym_match.indexOf(':') < 0 && acronym_match.indexOf('@') < 0 ? acronym_match : task_title
+      }
+
+      if (project_title) {
+        console.log('project_title', project_title)
+        project_captured = true
+        const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === project_title)
+        if (projects_by_acronym.length === 1) {
+          this.new_task_project_id = projects_by_acronym[0].id
+        }
+      }
+
+      if (user_name) {
+        user_name_captured = true
+        console.log('user_name', user_name)
+        this.new_user_name = user_name
+        let new_company_users = this.$store.getters['company_users/getUsersByAlias'](user_name)
+        if (new_company_users.length > 0) {
+          this.members = new_company_users
+          this.showResult = true
+        } else {
+          this.showResult = false
+          this.assignedMembers = []
+        }
+      }
+      if (task_title) {
+        title_captured = true
+        console.log('title', task_title)
+        this.new_task_title = task_title
+      }
+    },
     updateTask() {
-      this.columns[this.edit_list_index].tasks[this.edit_task_index].title = this.card_title
+      this.columns[this.edit_list_index].tasks[this.edit_task_index].title = this.new_task_title
       this.edit_task = false
+      this.showResult = false
+      this.assignedMembers = []
     },
     editTask(cadInfo, list_index, task_index) {
       this.cadInfo = cadInfo
       this.card_editor_button_top = cadInfo.top > 200 ? -114 : 0
-      this.card_title = cadInfo.task.title
+      this.new_task_title = cadInfo.task.title
       this.edit_list_index = list_index
       this.edit_task_index = task_index
       this.edit_task = true
@@ -288,14 +396,51 @@ export default {
       })
     },
     cancelAdd() {
-      this.columns[this.newTaskIndex].tasks = this.columns[this.newTaskIndex].tasks.filter(function(task) {
+      this.showResult = false
+      this.assignedMembers = []
+
+      this.columns[this.newColumnIndex].tasks = this.columns[this.newColumnIndex].tasks.filter(function(task) {
         return task.type !== 'new'
       })
-      this.newTaskIndex = null
+      this.newColumnIndex = null
+    },
+    assignUser(member) {
+      const new_task_index = this.columns[this.newColumnIndex].tasks.length
+      const member_index = this.columns[this.newColumnIndex].tasks[new_task_index - 1]['assignedMembers'].indexOf(member['id'])
+      if (member_index < 0) {
+        this.columns[this.newColumnIndex].tasks[new_task_index - 1]['assignedMembers'].push(member['id'])
+        this.assignedMembers.push(member['id'])
+      } else {
+        this.columns[this.newColumnIndex].tasks[new_task_index - 1]['assignedMembers'].splice(member_index, 1)
+        this.assignedMembers.splice(member_index, 1)
+      }
     },
     scrollToBottom(index) {
       const element = document.getElementsByClassName('task-card-container')[index]
       element.scrollTop = element.scrollHeight
+    },
+    abbrName,
+    getCompanyUserDetails(company_user_id) {
+      const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
+
+      return user_details
+    },
+    getClientAcronymColor(project_id) {
+      return this.getProjectDetails(project_id, true)
+    },
+    getProjectDetails(project_id, is_color) {
+      const project = this.getProject(project_id)
+      let client_data = null
+      if (is_color && project) {
+        client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
+        return client_data.color
+      }
+      return project ? project.acronym : false
+    },
+    capitalizeFirstLetter(string) {
+      const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1)
+
+      return capitalize(string)
     }
   }
 }
@@ -307,8 +452,8 @@ export default {
 }
 
 .column-width {
-  min-width: 320px;
-  width: 320px;
+  min-width: 280px;
+  width: 280px;
 }
 
 .ghost-card {
@@ -355,6 +500,7 @@ export default {
 .field-value {
   padding: 4px 14px;
   margin-bottom: 0px;
+  width: fit-content;
 }
 
 input.field-value {
@@ -368,9 +514,9 @@ input.field-value {
 }
 
 .add-task {
-  width: 295px;
+  width: 100%;
   padding: 3px;
-  margin: 5px 7px;
+  margin: 5px 0px;
   border-radius: 5px;
   color: #5e6c84;
   border: none;
@@ -426,6 +572,7 @@ input.field-value {
   top: 0;
   z-index: 10;
 }
+
 .quick-card-editor-close-icon {
   color: var(--ds-icon-subtle, #fff9);
   padding: 9px;
@@ -435,12 +582,14 @@ input.field-value {
   transition-duration: 0.15s;
   transition-property: transform, color;
 }
+
 .quick-card-editor-card {
   position: absolute;
   top: 232px;
   left: 560px;
   width: 248px;
 }
+
 .quick-card-editor .list-card {
   cursor: default;
 }
@@ -448,10 +597,12 @@ input.field-value {
 .list-card-quick-edit {
   z-index: 1;
 }
+
 .list-card,
 .list-card:hover {
   text-decoration: none;
 }
+
 .list-card {
   background-color: var(--ds-surface-raised, #fff);
   border-radius: 3px;
@@ -464,6 +615,7 @@ input.field-value {
   position: relative;
   z-index: 0;
 }
+
 .list-card-cover {
   background-position: 50%;
   background-repeat: no-repeat;
@@ -471,6 +623,7 @@ input.field-value {
   -webkit-user-select: none;
   user-select: none;
 }
+
 .list-card-stickers-area {
   border-radius: 3px;
   bottom: 0;
@@ -481,10 +634,12 @@ input.field-value {
   top: 0;
   z-index: 5;
 }
+
 .quick-card-editor-buttons.fade-in {
   opacity: 1;
   transform: translateX(0);
 }
+
 .quick-card-editor-buttons {
   left: 100%;
   opacity: 0;
@@ -495,6 +650,7 @@ input.field-value {
   width: 240px;
   z-index: 0;
 }
+
 .quick-card-editor-buttons-item {
   background: #0009;
   border-radius: 3px;
@@ -507,12 +663,15 @@ input.field-value {
   text-decoration: none;
   transition: transform 85ms ease-in;
 }
+
 .quick-card-editor-buttons-item > .icon-sm.light {
   color: #c7d1db;
 }
+
 .quick-card-editor-buttons-item-text {
   margin-left: 4px;
 }
+
 .quick-card-editor-buttons-item {
   background: #0009;
   border-radius: 3px;
@@ -525,20 +684,84 @@ input.field-value {
   text-decoration: none;
   transition: transform 85ms ease-in;
 }
+
 .quick-card-editor-buttons-item:hover {
   background: #000c;
   color: #fff;
   text-decoration: none;
   transform: translateX(5px);
 }
+
 .list-card-edit-title,
 .list-card-edit-title:focus,
 .list-card-edit-title:hover {
   background-color: initial;
   box-shadow: none;
 }
+
 textarea {
   resize: vertical;
   width: 100%;
+}
+.pop-over {
+  background: var(--ds-surface-overlay, #fff);
+  border-radius: 3px;
+  box-shadow: var(--ds-shadow-overlay, 0 8px 16px -4px #091e4240, 0 0 0 1px var(--ds-border, #091e4214));
+  /* display: none; */
+  overflow: hidden;
+  position: absolute;
+  right: -9999px;
+  top: -9999px;
+  -webkit-transform: translateZ(0);
+  width: 304px;
+  z-index: 70;
+}
+.pop-over-header {
+  height: 40px;
+  margin-bottom: 8px;
+  position: relative;
+  text-align: center;
+}
+.pop-over-header-title {
+  border-bottom: 1px solid var(--ds-border, #091e4221);
+  box-sizing: border-box;
+  color: var(--ds-text-subtle, #5e6c84);
+  display: block;
+  line-height: 40px;
+  margin: 0 12px;
+  overflow: hidden;
+  padding: 0 32px;
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 1;
+}
+.pop-over-header-close-btn {
+  color: var(--ds-icon-subtle, #6b778c);
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 2;
+}
+.pop-over-header-close-btn:hover {
+  text-decoration-line: none;
+}
+.pop-over-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0 12px 12px;
+}
+.pop-over-member-list {
+  list-style: none;
+  padding: 0px;
+  padding-left: 10px;
+  margin: 0px;
+}
+.pop-over-member-list .item {
+  padding: 5px 0px;
+}
+.pop-over-member-list .item:hover {
+  cursor: pointer;
+  background-color: rgba(88, 85, 85, 0.2);
 }
 </style>

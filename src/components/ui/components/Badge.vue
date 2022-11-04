@@ -1,7 +1,9 @@
 <template>
-  <div class="px-3 h-6 rounded-full text-xs font-semibold flex items-center" :class="`bg-${color}-100 text-${color}-700`">
-    <span class="w-2 h-2 rounded-full mr-1" :class="`bg-${color}-400`"></span>
-    <span>
+  <div class="d-flex rounded px-2" :style="{ backgroundColor: level == 'Urgent' ? color : color + '4b' }" style="align-items: center;">
+    <i v-if="level == 'Urgent'" class="icon-fire"></i>
+    <p v-else class="rounded m-auto" :class="`bg-${color}-400`" :style="{ backgroundColor: color + 'FF' }" style="width: 10px; height: 10px;"></p>
+
+    <span class="ml-1" :style="{ color: level == 'Urgent' ? '#FFF' : '#172b4d' }" style="font-size: 0.75em;">
       <slot></slot>
     </span>
   </div>
@@ -12,6 +14,10 @@ export default {
     color: {
       type: String,
       default: 'teal'
+    },
+    level: {
+      type: String,
+      default: ''
     }
   }
 }
