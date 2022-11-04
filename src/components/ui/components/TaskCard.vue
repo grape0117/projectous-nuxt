@@ -1,12 +1,14 @@
 <template>
-  <div>
-    <div class="bg-white shadow rounded px-3 pt-3 pb-2 border border-white card-content" v-if="task.type !== 'new'" ref="card_element">
+  <div @click="showEditMoal">
+    <div class="bg-white shadow rounded px-1 pt-1 pb-1 border border-white card-content" v-if="task.type !== 'new'" ref="card_element">
+      <div class="badge-container" v-if="task.labels">
+        <badge v-for="label in task.labels" :color="badgeColor(label)" :label="label">{{ label }}</badge>
+      </div>
       <div class="flex justify-content-between">
         <p style="font-size: 14px;">{{ task.title }}</p>
       </div>
       <div class="d-flex mt-4 justify-content-between items-center">
         <span style="font-size: 14px; color: gray;" v-show="task.date"><i class="icon-date_range"></i>{{ task.date }}</span>
-        <badge v-if="task.level" :color="badgeColor" :level="task.level">{{ task.level }}</badge>
       </div>
       <div class="assigned-members d-flex">
         <span v-for="member_id in task.assignedMembers">
@@ -52,8 +54,8 @@ export default {
       default: () => ({})
     }
   },
-  computed: {
-    badgeColor() {
+  methods: {
+    badgeColor(label) {
       const mappings = {
         Design: '#6f42c1',
         'Feature Request': '#20c997',
@@ -115,10 +117,11 @@ export default {
         // dark: '#343a40',
         // dark_back: '#343a404b',
       }
-      return mappings[this.task.level] || mappings.default
-    }
-  },
-  methods: {
+      return mappings[label] || mappings.default
+    },
+    showEditMoal() {
+      this.$emit('showEditModal')
+    },
     addTask() {
       if (!this.new_task_title) {
         return
@@ -204,6 +207,12 @@ export default {
 }
 </script>
 <style>
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: 4px;
+}
 #new-task textarea {
   width: 100%;
   border: none;

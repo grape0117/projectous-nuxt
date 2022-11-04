@@ -13,7 +13,7 @@
             </div>
 
             <draggable :animation="200" ghost-class="ghost-card" group="tasks" class="task-card-container px-2" @start="isDragging = true" @end="isDragging = false" v-model="columns[index].tasks">
-              <task-card v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @cancelAdd="cancelAdd" @editTask="editTask($event, index, task_index)" @creatingTask="creatingTask($event, index)"></task-card>
+              <task-card @showEditModal="showEditMoal(task, index)" v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @cancelAdd="cancelAdd" @editTask="editTask($event, index, task_index)" @creatingTask="creatingTask($event, index)"></task-card>
             </draggable>
             <div class="field" v-show="newColumnIndex !== index">
               <button class="add-task" @click="addTask(index)"><i class="icon-add" />Add a Task</button>
@@ -39,20 +39,20 @@
         </div>
         <b-button variant="primary" @click="updateTask">Save</b-button>
         <div class="quick-card-editor-buttons fade-in" :style="{ top: card_editor_button_top + 'px' }">
-          <a class="quick-card-editor-buttons-item" href="#"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open card</span></a
-          ><a class="quick-card-editor-buttons-item js-edit-labels" href="#"><span class="icon-sm icon-label light"></span><span class="quick-card-editor-buttons-item-text">Edit labels</span></a
-          ><a class="quick-card-editor-buttons-item js-edit-members" href="#"><span class="icon-sm icon-member light"></span><span class="quick-card-editor-buttons-item-text">Change members</span></a
-          ><a class="quick-card-editor-buttons-item js-edit-cover" href="#"><span class="icon-sm icon-card-cover light"></span><span class="quick-card-editor-buttons-item-text">Change cover</span></a
-          ><a class="quick-card-editor-buttons-item js-move-card" href="#"><span class="icon-sm icon-move light"></span><span class="quick-card-editor-buttons-item-text">Move</span></a
-          ><a class="quick-card-editor-buttons-item js-copy-card" href="#"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Copy</span></a
-          ><a class="quick-card-editor-buttons-item js-edit-due-date" href="#"><span class="icon-sm icon-clock light"></span><span class="quick-card-editor-buttons-item-text">Edit dates</span></a
-          ><a class="quick-card-editor-buttons-item js-archive" href="#"><span class="icon-sm icon-archive light"></span><span class="quick-card-editor-buttons-item-text">Archive</span></a>
+          <a class="quick-card-editor-buttons-item" href="#"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open card</span></a>
+          <a class="quick-card-editor-buttons-item js-edit-labels" href="#" @click="showAddLabels"><span class="icon-sm icon-label light"></span><span class="quick-card-editor-buttons-item-text">Edit labels</span></a>
+          <a class="quick-card-editor-buttons-item js-edit-members" href="#"><span class="icon-sm icon-member light"></span><span class="quick-card-editor-buttons-item-text">Change members</span></a>
+          <a class="quick-card-editor-buttons-item js-edit-cover" href="#"><span class="icon-sm icon-card-cover light"></span><span class="quick-card-editor-buttons-item-text">Change cover</span></a>
+          <a class="quick-card-editor-buttons-item js-move-card" href="#"><span class="icon-sm icon-move light"></span><span class="quick-card-editor-buttons-item-text">Move</span></a>
+          <a class="quick-card-editor-buttons-item js-copy-card" href="#"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Copy</span></a>
+          <a class="quick-card-editor-buttons-item js-edit-due-date" href="#"><span class="icon-sm icon-clock light"></span><span class="quick-card-editor-buttons-item-text">Edit dates</span></a>
+          <a class="quick-card-editor-buttons-item js-archive" href="#"><span class="icon-sm icon-archive light"></span><span class="quick-card-editor-buttons-item-text">Archive</span></a>
         </div>
       </div>
     </div>
 
     <!-- select user -->
-    <div class="pop-over" :style="{ left: select_user_position_left + 'px', top: select_user_position_top + 'px' }" data-elevation="1" v-show="showResult">
+    <div class="pop-over" :style="{ left: select_position_left + 'px', top: select_position_top + 'px' }" data-elevation="1" v-show="showResult">
       <div class="no-back">
         <div class="pop-over-header js-pop-over-header"><span class="pop-over-header-title">Select members</span><a href="#" class="pop-over-header-close-btn icon-sm icon-close" @click="showResult = false"></a></div>
         <div>
@@ -74,6 +74,75 @@
         </div>
       </div>
     </div>
+
+    <!-- Add Label -->
+    <div class="pop-over" :style="{ left: select_position_left + 'px', top: select_position_top + 'px' }" data-elevation="1" v-if="show_add_labels">
+      <div class="no-back">
+        <div class="pop-over-header js-pop-over-header"><span class="pop-over-header-title">Labels</span><a href="#" class="pop-over-header-close-btn icon-sm icon-close" @click="show_add_labels = false"></a></div>
+        <div>
+          <div class="pop-over-content js-pop-over-content u-fancy-scrollbar js-tab-parent" style="max-height: 829px;">
+            <ul class="pop-over-member-list checkable js-members-list">
+              <b-form-checkbox-group id="flavors" v-model="editTaskData.labels" :options="labels" name="flavors" class="ml-4" stacked></b-form-checkbox-group>
+              <!-- <li class="item js-member-item active selected" v-for="label in labels">
+                <span class="d-flex justify-content-between" @click="addLabel(label)">
+                  <b-form-checkbox size="lg">
+                    <badge  :color="badgeColor(label)" :label="label" size="lg">{{ label }}</badge>
+                  </b-form-checkbox>
+                </span>
+              </li> -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <b-modal id="add-user-modal" v-model="show_edit_modal" class="add-user-modal" style="min-height: 500px" :size="'lg'" v-if="editTaskData">
+      <template #modal-header>
+        <div class="header">
+          <div class="d-flex justify-content-between">{{ editTaskData.title }}</div>
+          <p>in list {{ editTaskData.list }}</p>
+        </div>
+      </template>
+      <div no-body>
+        <div class="form">
+          <b-form-group class="mb-5" id="labels" label="Select Labels:" label-for="select-label">
+            <div class="badge-container" id="select-label" v-if="editTaskData.labels" ref="add_label">
+              <badge v-for="label in editTaskData.labels" :color="badgeColor(label)" :label="label" size="lg">{{ label }}</badge>
+              <a class="add-label" href="#" @click="showAddLabels">
+                <i class="icon-add"></i>
+              </a>
+            </div>
+          </b-form-group>
+          <b-form-group class="mb-5" id="fieldset-user-select" label="Members:" label-for="select-user">
+            <div class="d-flex" id="select-user">
+              <!-- <span v-for="user in notAssignedUsers()" :title="user.name" @click="addUser(user.id)" :class="`ml-2 select-user ${assigned_users.indexOf(user.id) > -1 ? 'selected' : ''}`">
+                <b-avatar :text="abbrName(user.name)" :style="{ 'background-color': getCompanyUserDetails(user.id).color }"></b-avatar>
+              </span> -->
+            </div>
+          </b-form-group>
+          <!-- <v-select class="mb-5" :options="companyUsers()" @input="changeUser" :reduce="user => user.id" label="name" :filter-by="searchUsers" v-model="selected_user" placeholder="Select a user" id="assign-user">
+            <template v-slot:option="option"> - {{ option.name }} </template>
+          </v-select> -->
+
+          <!-- <vue-bootstrap-typeahead class="mb-5" id="step" placeholder="Select a step" v-model="selected_step" :minMatchingChars="1" :data="steps" @hit="selected_step = $event" ref="assignTypeahead" />
+          <div class="textarea-grow-wrap mb-5">
+            <textarea placeholder="Notes" name="text" id="notes" v-model="task_notes" @input="updateNotes"></textarea>
+          </div>
+  
+          <b-form-group class="mb-5" id="fieldset-user-rate" label="User Rate:" label-for="user-rate">
+            <b-form-input id="user-rate" v-model="user_rate" type="text" readonly="readonly"></b-form-input>
+          </b-form-group> -->
+        </div>
+      </div>
+      <div slot="modal-footer" class="w-100">
+        <!-- <b-button variant="primary" size="md" class="float-right ml-2" @click="assignUser">
+          OK
+        </b-button> -->
+        <b-button variant="secondary" size="md" class="float-right ml-2" @click="show_edit_modal = false">
+          Cancel
+        </b-button>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -83,6 +152,7 @@
 // import { EventBus } from '@/components/event-bus'
 
 import draggable from 'vuedraggable'
+import Badge from './components/Badge.vue'
 import TaskCard from './components/TaskCard.vue'
 // import TaskActionRow from ''
 import TaskActionRow from '../../views/TaskActionRow.vue'
@@ -93,7 +163,8 @@ export default {
   name: 'Draggable1',
   components: {
     TaskCard,
-    draggable
+    draggable,
+    Badge
   },
   data() {
     return {
@@ -107,35 +178,35 @@ export default {
               date: 'Sep 14',
               type: 'Feature Request',
               assignedMembers: [],
-              level: 'Urgent'
+              labels: ['Urgent', 'Top Priority', 'Medimun Priority']
             },
             {
               id: 2,
               title: 'Provide documentation on integrations',
               date: 'Sep 12',
               assignedMembers: [],
-              level: 'Top Priority'
+              labels: ['Top Priority']
             },
             {
               id: 3,
               title: 'Design shopping cart dropdown',
               date: 'Sep 9',
               type: 'Design',
-              level: 'Medimun Priority'
+              labels: ['Medimun Priority']
             },
             {
               id: 4,
               title: 'Add discount code to checkout page',
               date: 'Sep 14',
               type: 'Feature Request',
-              level: 'Low Priority'
+              labels: ['Low Priority']
             },
             {
               id: 5,
               title: 'Test checkout flow',
               date: 'Sep 15',
               type: 'QA',
-              level: 'Very Low Priority'
+              labels: ['Very Low Priority']
             }
           ]
         },
@@ -246,9 +317,16 @@ export default {
       showResult: false,
       members: [],
       assignedMembers: [],
-      select_user_position_top: 0,
-      select_user_position_left: 0
+      select_position_top: 0,
+      select_position_left: 0,
+      show_edit_modal: false,
+      show_add_labels: false,
+      editTaskData: null,
+      labels: ['Design', 'Feature Request', 'Backend', 'QA', 'default', 'Urgent', 'Top Priority', 'Medimun Priority', 'Low Priority', 'Very Low Priority', 'On Staging', 'Done', 'ToDo', 'Working', 'Hold', 'Testing']
     }
+  },
+  mounted() {
+    this.editTaskData = this.columns[0].tasks[0]
   },
   watch: {
     isDragging(newValue) {
@@ -274,9 +352,48 @@ export default {
     }
   },
   methods: {
+    showAddLabels() {
+      this.show_add_labels = true
+      this.select_position_left = this.$refs.add_label ? this.$refs.add_label.getBoundingClientRect().left : this.cadInfo.left
+      this.select_position_top = this.$refs.add_label ? this.$refs.add_label.getBoundingClientRect().top : this.cadInfo.top
+    },
+    badgeColor(label) {
+      const mappings = {
+        Design: '#6f42c1',
+        'Feature Request': '#20c997',
+        Backend: '#007bff',
+        QA: '#28a745',
+        default: '#20c997',
+        Urgent: '#dc3545',
+        'Top Priority': '#dc3545',
+        'Medimun Priority': '#ffc107',
+        'Low Priority': '#28a745',
+        'Very Low Priority': '#17a2b8',
+        'On Staging': '#D974B0',
+        Done: '#B4EFD6',
+        ToDo: '#0086C0',
+        Working: '#C4C4C4',
+        Hold: '#FF158A',
+        Testing: '#037F4C'
+      }
+      return mappings[label] || mappings.default
+    },
+    showEditMoal(task, columnIndex) {
+      this.show_edit_modal = true
+      this.editTaskData = task
+      this.editTaskData['list'] = this.columns[columnIndex].title
+    },
     hideEditCard($event) {
       if ($event.target.classList.contains('quick-card-editor')) {
         this.edit_task = false
+      }
+    },
+    addLabel(label) {
+      const label_index = this.editTaskData.labels.indexOf(label)
+      if (label_index < 0) {
+        this.editTaskData.labels.push(label)
+      } else {
+        this.editTaskData.labels.splice(label_index, 1)
       }
     },
     addList() {
@@ -326,8 +443,8 @@ export default {
     creatingTask(new_task_info, index) {
       this.newColumnIndex = index
       let notesWithTaskTile = new_task_info.new_task_title
-      this.select_user_position_top = new_task_info.top
-      this.select_user_position_left = new_task_info.left
+      this.select_position_top = new_task_info.top
+      this.select_position_left = new_task_info.left
       const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+))', 'g')
 
       const acronym_matchs = notesWithTaskTile ? notesWithTaskTile.match(projectRegex) : null
@@ -447,6 +564,12 @@ export default {
 </script>
 
 <style scoped>
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+}
 .draggable-container {
   overflow-x: auto;
 }
@@ -714,7 +837,7 @@ textarea {
   top: -9999px;
   -webkit-transform: translateZ(0);
   width: 304px;
-  z-index: 70;
+  z-index: 1070;
 }
 .pop-over-header {
   height: 40px;
@@ -763,5 +886,12 @@ textarea {
 .pop-over-member-list .item:hover {
   cursor: pointer;
   background-color: rgba(88, 85, 85, 0.2);
+}
+.add-label {
+  background-color: rgba(88, 85, 85, 0.2);
+  font-size: 1.5rem;
+}
+.add-label:hover {
+  background-color: rgba(150, 147, 147, 0.2);
 }
 </style>
