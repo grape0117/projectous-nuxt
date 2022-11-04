@@ -1,6 +1,6 @@
 <template>
-  <div @click="showEditMoal">
-    <div class="bg-white shadow rounded px-1 pt-1 pb-1 border border-white card-content" v-if="task.type !== 'new'" ref="card_element">
+  <div>
+    <div class="bg-white shadow rounded px-1 pt-1 pb-1 border border-white card-content" v-if="task.type !== 'new'" ref="card_element" @click="showEditMoal">
       <div class="badge-container" v-if="task.labels">
         <badge v-for="label in task.labels" :color="badgeColor(label)" :label="label">{{ label }}</badge>
       </div>
@@ -8,9 +8,9 @@
         <p style="font-size: 14px;">{{ task.title }}</p>
       </div>
       <div class="d-flex mt-4 justify-content-between items-center">
-        <span style="font-size: 14px; color: gray;" v-show="task.date"><i class="icon-date_range"></i>{{ task.date }}</span>
+        <span style="font-size: 14px; color: gray;" v-show="task.due"><i class="icon-date_range"></i>{{ dueDate(task.due) }}</span>
       </div>
-      <div class="assigned-members d-flex">
+      <div class="assigned-members d-flex" v-if="task.assignedMembers">
         <span v-for="member_id in task.assignedMembers">
           <span :title="`${getCompanyUserDetails(member_id).name}`" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(member_id).color, cursor: 'pointer', display: 'inline-flex' }">
             {{ abbrName(getCompanyUserDetails(member_id).name) }}
@@ -39,6 +39,7 @@
 <script>
 import Badge from './Badge.vue'
 import { abbrName } from '@/utils/util-functions'
+import moment from 'moment'
 export default {
   components: {
     Badge
@@ -55,6 +56,9 @@ export default {
     }
   },
   methods: {
+    dueDate(date) {
+      return moment(date).format('MM/DD')
+    },
     badgeColor(label) {
       const mappings = {
         Design: '#6f42c1',

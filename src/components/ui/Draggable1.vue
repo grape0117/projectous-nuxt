@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center draggable-container h-100">
+  <div class="flex justify-center draggable-container h-100" @click="hidePopOver">
     <!-- <div class="flex justify-center draggable-container h-100" oncontextmenu="return false;"> -->
     <div class="min-h-screen overflow-x-scroll py-12  d-flex h-100">
       <draggable :animation="200" class="d-flex" ghost-class="ghost-card" @start="isListDragging = true" @end="isListDragging = false" v-model="columns">
@@ -13,7 +13,7 @@
             </div>
 
             <draggable :animation="200" ghost-class="ghost-card" group="tasks" class="task-card-container px-2" @start="isDragging = true" @end="isDragging = false" v-model="columns[index].tasks">
-              <task-card @showEditModal="showEditMoal(task, index)" v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @cancelAdd="cancelAdd" @editTask="editTask($event, index, task_index)" @creatingTask="creatingTask($event, index)"></task-card>
+              <task-card @showEditModal="showEditMoal(task, index, task_index)" v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @cancelAdd="cancelAdd" @editTask="editTask($event, index, task_index)" @creatingTask="creatingTask($event, index)"></task-card>
             </draggable>
             <div class="field" v-show="newColumnIndex !== index">
               <button class="add-task" @click="addTask(index)"><i class="icon-add" />Add a Task</button>
@@ -52,9 +52,9 @@
     </div>
 
     <!-- select user -->
-    <div class="pop-over" :style="{ left: select_position_left + 'px', top: select_position_top + 'px' }" data-elevation="1" v-show="showResult">
+    <div class="pop-over" id="add-member-pop-over" :style="{ left: select_position_left + 'px', top: select_position_top + 'px' }" data-elevation="1" v-show="showMembers">
       <div class="no-back">
-        <div class="pop-over-header js-pop-over-header"><span class="pop-over-header-title">Select members</span><a href="#" class="pop-over-header-close-btn icon-sm icon-close" @click="showResult = false"></a></div>
+        <div class="pop-over-header js-pop-over-header"><span class="pop-over-header-title">Select members</span><a href="#" class="pop-over-header-close-btn icon-sm icon-close" @click="showMembers = false"></a></div>
         <div>
           <div class="pop-over-content js-pop-over-content u-fancy-scrollbar js-tab-parent" style="max-height: 829px;">
             <ul class="pop-over-member-list checkable js-members-list">
@@ -76,7 +76,7 @@
     </div>
 
     <!-- Add Label -->
-    <div class="pop-over" :style="{ left: select_position_left + 'px', top: select_position_top + 'px' }" data-elevation="1" v-if="show_add_labels">
+    <div class="pop-over" id="add-label-pop-over" :style="{ left: select_position_left + 'px', top: select_position_top + 'px' }" data-elevation="1" v-if="show_add_labels">
       <div class="no-back">
         <div class="pop-over-header js-pop-over-header"><span class="pop-over-header-title">Labels</span><a href="#" class="pop-over-header-close-btn icon-sm icon-close" @click="show_add_labels = false"></a></div>
         <div>
@@ -96,61 +96,51 @@
       </div>
     </div>
 
-    <b-modal id="add-user-modal" v-model="show_edit_modal" class="add-user-modal" style="min-height: 500px" :size="'lg'" v-if="editTaskData">
+    <b-modal id="add-user-modal" v-model="show_edit_modal" class="task-edit-modal" style="min-height: 500px" :size="'lg'" v-if="editTaskData">
       <template #modal-header>
         <div class="header">
-          <div class="d-flex justify-content-between">{{ editTaskData.title }}</div>
-          <p>in list {{ editTaskData.list }}</p>
+          <h2 class="d-flex justify-content-between title">{{ editTaskData.title }}</h2>
+          <p>
+            in list <strong>{{ editTaskData.list }}</strong>
+          </p>
         </div>
       </template>
       <div no-body>
-        <div class="form">
+        <div class="form" @click="hidePopOver">
           <b-form-group class="mb-5" id="labels" label="Select Labels:" label-for="select-label">
-            <div class="badge-container" id="select-label" v-if="editTaskData.labels" ref="add_label">
-              <badge v-for="label in editTaskData.labels" :color="badgeColor(label)" :label="label" size="lg">{{ label }}</badge>
+            <div class="badge-container" id="select-label" ref="add_label">
+              <badge v-if="editTaskData.labels" v-for="label in editTaskData.labels" :color="badgeColor(label)" :label="label" size="lg">{{ label }}</badge>
               <a class="add-label" href="#" @click="showAddLabels">
                 <i class="icon-add"></i>
               </a>
             </div>
           </b-form-group>
-          <b-form-group class="mb-5" id="fieldset-user-select" label="Members:" label-for="select-user">
-            <div class="d-flex" id="select-user">
-              <!-- <span v-for="user in notAssignedUsers()" :title="user.name" @click="addUser(user.id)" :class="`ml-2 select-user ${assigned_users.indexOf(user.id) > -1 ? 'selected' : ''}`">
-                <b-avatar :text="abbrName(user.name)" :style="{ 'background-color': getCompanyUserDetails(user.id).color }"></b-avatar>
-              </span> -->
+          <b-form-group class="mb-5" label="Members:" label-for="select-user">
+            <div class="assigned-members d-flex" ref="add_member">
+              <span v-for="member_id in editTaskData.assignedMembers">
+                <span :title="`${getCompanyUserDetails(member_id).name}`" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(member_id).color, cursor: 'pointer', display: 'inline-flex' }">
+                  {{ abbrName(getCompanyUserDetails(member_id).name) }}
+                </span>
+              </span>
+              <a class="add-label" href="#" @click="showMembersPopOver">
+                <i class="icon-add"></i>
+              </a>
             </div>
           </b-form-group>
-          <!-- <v-select class="mb-5" :options="companyUsers()" @input="changeUser" :reduce="user => user.id" label="name" :filter-by="searchUsers" v-model="selected_user" placeholder="Select a user" id="assign-user">
-            <template v-slot:option="option"> - {{ option.name }} </template>
-          </v-select> -->
-
-          <!-- <vue-bootstrap-typeahead class="mb-5" id="step" placeholder="Select a step" v-model="selected_step" :minMatchingChars="1" :data="steps" @hit="selected_step = $event" ref="assignTypeahead" />
-          <div class="textarea-grow-wrap mb-5">
-            <textarea placeholder="Notes" name="text" id="notes" v-model="task_notes" @input="updateNotes"></textarea>
-          </div>
-  
-          <b-form-group class="mb-5" id="fieldset-user-rate" label="User Rate:" label-for="user-rate">
-            <b-form-input id="user-rate" v-model="user_rate" type="text" readonly="readonly"></b-form-input>
-          </b-form-group> -->
+          <b-form-group class="mb-5" label="Due due:" label-for="task-due-date">
+            <b-form-datepicker id="task-due-date" v-model="editTaskData.due" class="mb-2"></b-form-datepicker>
+          </b-form-group>
+          <b-form-group class="mb-5" label="Description:" label-for="task-description">
+            <b-form-textarea id="task-description" v-model="editTaskData.description" placeholder="Enter something..." rows="3" max-rows="6"></b-form-textarea>
+          </b-form-group>
         </div>
       </div>
-      <div slot="modal-footer" class="w-100">
-        <!-- <b-button variant="primary" size="md" class="float-right ml-2" @click="assignUser">
-          OK
-        </b-button> -->
-        <b-button variant="secondary" size="md" class="float-right ml-2" @click="show_edit_modal = false">
-          Cancel
-        </b-button>
-      </div>
+      <div slot="modal-footer" class="w-100"></div>
     </b-modal>
   </div>
 </template>
 
 <script>
-// import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-// import { groupBy, cloneDeep, uniq, invert } from 'lodash'
-// import { EventBus } from '@/components/event-bus'
-
 import draggable from 'vuedraggable'
 import Badge from './components/Badge.vue'
 import TaskCard from './components/TaskCard.vue'
@@ -175,7 +165,8 @@ export default {
             {
               id: 1,
               title: 'Add discount code to checkout page',
-              date: 'Sep 14',
+              description: 'Here is a description',
+              due: 'Sep 14',
               type: 'Feature Request',
               assignedMembers: [],
               labels: ['Urgent', 'Top Priority', 'Medimun Priority']
@@ -183,29 +174,36 @@ export default {
             {
               id: 2,
               title: 'Provide documentation on integrations',
-              date: 'Sep 12',
+              description: 'Here is a description',
+              due: 'Sep 12',
               assignedMembers: [],
               labels: ['Top Priority']
             },
             {
               id: 3,
               title: 'Design shopping cart dropdown',
-              date: 'Sep 9',
+              description: 'Here is a description',
+              due: 'Sep 9',
               type: 'Design',
-              labels: ['Medimun Priority']
+              labels: ['Medimun Priority'],
+              assignedMembers: []
             },
             {
               id: 4,
               title: 'Add discount code to checkout page',
-              date: 'Sep 14',
+              description: 'Here is a description',
+              due: 'Sep 14',
               type: 'Feature Request',
+              assignedMembers: [],
               labels: ['Low Priority']
             },
             {
               id: 5,
               title: 'Test checkout flow',
-              date: 'Sep 15',
+              description: 'Here is a description',
+              due: 'Sep 15',
               type: 'QA',
+              assignedMembers: [],
               labels: ['Very Low Priority']
             }
           ]
@@ -216,20 +214,26 @@ export default {
             {
               id: 6,
               title: 'Design shopping cart dropdown',
-              date: 'Sep 9',
-              type: 'Design'
+              description: 'Here is a description',
+              due: 'Sep 9',
+              type: 'Design',
+              assignedMembers: []
             },
             {
               id: 7,
               title: 'Add discount code to checkout page',
-              date: 'Sep 14',
-              type: 'Feature Request'
+              description: 'Here is a description',
+              due: 'Sep 14',
+              type: 'Feature Request',
+              assignedMembers: []
             },
             {
               id: 8,
               title: 'Provide documentation on integrations',
-              date: 'Sep 12',
-              type: 'Backend'
+              description: 'Here is a description',
+              due: 'Sep 12',
+              type: 'Backend',
+              assignedMembers: []
             }
           ]
         },
@@ -239,30 +243,38 @@ export default {
             {
               id: 9,
               title: 'Provide documentation on integrations',
-              date: 'Sep 12'
+              description: 'Here is a description',
+              due: 'Sep 12',
+              assignedMembers: []
             },
             {
               id: 10,
               title: 'Design shopping cart dropdown',
-              date: 'Sep 9',
-              type: 'Design'
+              description: 'Here is a description',
+              due: 'Sep 9',
+              type: 'Design',
+              assignedMembers: []
             },
             {
               id: 11,
               title: 'Add discount code to checkout page',
-              date: 'Sep 14',
-              type: 'Feature Request'
+              description: 'Here is a description',
+              due: 'Sep 14',
+              type: 'Feature Request',
+              assignedMembers: []
             },
             {
               id: 12,
               title: 'Design shopping cart dropdown',
-              date: 'Sep 9',
+              description: 'Here is a description',
+              due: 'Sep 9',
               type: 'Design'
             },
             {
               id: 13,
               title: 'Add discount code to checkout page',
-              date: 'Sep 14',
+              description: 'Here is a description',
+              due: 'Sep 14',
               type: 'Feature Request'
             }
           ]
@@ -273,19 +285,22 @@ export default {
             {
               id: 14,
               title: 'Add discount code to checkout page',
-              date: 'Sep 14',
+              description: 'Here is a description',
+              due: 'Sep 14',
               type: 'Feature Request'
             },
             {
               id: 15,
               title: 'Design shopping cart dropdown',
-              date: 'Sep 9',
+              description: 'Here is a description',
+              due: 'Sep 9',
               type: 'Design'
             },
             {
               id: 16,
               title: 'Add discount code to checkout page',
-              date: 'Sep 14',
+              description: 'Here is a description',
+              due: 'Sep 14',
               type: 'Feature Request'
             }
           ]
@@ -314,7 +329,7 @@ export default {
       task_content: '',
       new_user_name: '',
       new_task_project_id: null,
-      showResult: false,
+      showMembers: false,
       members: [],
       assignedMembers: [],
       select_position_top: 0,
@@ -322,7 +337,8 @@ export default {
       show_edit_modal: false,
       show_add_labels: false,
       editTaskData: null,
-      labels: ['Design', 'Feature Request', 'Backend', 'QA', 'default', 'Urgent', 'Top Priority', 'Medimun Priority', 'Low Priority', 'Very Low Priority', 'On Staging', 'Done', 'ToDo', 'Working', 'Hold', 'Testing']
+      labels: ['Design', 'Feature Request', 'Backend', 'QA', 'default', 'Urgent', 'Top Priority', 'Medimun Priority', 'Low Priority', 'Very Low Priority', 'On Staging', 'Done', 'ToDo', 'Working', 'Hold', 'Testing'],
+      isEdit: true
     }
   },
   mounted() {
@@ -349,9 +365,29 @@ export default {
         console.log('list dragging')
         console.log(this.columns)
       })
+    },
+    showMembers(newValue) {
+      if (!newValue) {
+        this.assignedMembers = []
+      }
+    },
+    show_edit_modal(newValue) {
+      if (!newValue) {
+        this.add_label_pop_over = false
+        this.add_member_pop_over = false
+      }
     }
   },
   methods: {
+    hidePopOver(event) {
+      const add_member_pop_over = document.getElementById('add-member-pop-over')
+      const add_label_pop_over = document.getElementById('add-label-pop-over')
+      if ((add_member_pop_over && add_member_pop_over.contains(event.target)) || event.target.className == 'icon-add' || (add_label_pop_over && add_label_pop_over.contains(event.target))) {
+        return
+      }
+      this.showMembers = false
+      this.show_add_labels = false
+    },
     showAddLabels() {
       this.show_add_labels = true
       this.select_position_left = this.$refs.add_label ? this.$refs.add_label.getBoundingClientRect().left : this.cadInfo.left
@@ -378,10 +414,12 @@ export default {
       }
       return mappings[label] || mappings.default
     },
-    showEditMoal(task, columnIndex) {
+    showEditMoal(task, list_index, task_index) {
       this.show_edit_modal = true
+      this.edit_list_index = list_index
+      this.edit_task_index = task_index
       this.editTaskData = task
-      this.editTaskData['list'] = this.columns[columnIndex].title
+      this.editTaskData['list'] = this.columns[list_index].title
     },
     hideEditCard($event) {
       if ($event.target.classList.contains('quick-card-editor')) {
@@ -422,7 +460,7 @@ export default {
       return this.editField == index
     },
     addTask(index) {
-      this.showResult = false
+      this.showMembers = false
       if (this.newColumnIndex !== null) {
         this.columns[this.newColumnIndex].tasks = this.columns[this.newColumnIndex].tasks.filter(function(task) {
           return task.type !== 'new'
@@ -433,7 +471,6 @@ export default {
         type: 'new',
         assignedMembers: []
       })
-      this.assignedMembers = []
       this.newColumnIndex = index
       this.$nextTick(() => {
         this.scrollToBottom(index)
@@ -482,10 +519,10 @@ export default {
         let new_company_users = this.$store.getters['company_users/getUsersByAlias'](user_name)
         if (new_company_users.length > 0) {
           this.members = new_company_users
-          this.showResult = true
+          this.is_edit = false
+          this.showMembers = true
         } else {
-          this.showResult = false
-          this.assignedMembers = []
+          this.showMembers = false
         }
       }
       if (task_title) {
@@ -497,8 +534,14 @@ export default {
     updateTask() {
       this.columns[this.edit_list_index].tasks[this.edit_task_index].title = this.new_task_title
       this.edit_task = false
-      this.showResult = false
-      this.assignedMembers = []
+      this.showMembers = false
+    },
+    showMembersPopOver() {
+      this.members = this.$store.getters['company_users/getActive']
+      this.is_edit = true
+      this.showMembers = true
+      this.select_position_left = this.$refs.add_member ? this.$refs.add_member.getBoundingClientRect().left : this.cadInfo.left
+      this.select_position_top = this.$refs.add_member ? this.$refs.add_member.getBoundingClientRect().top : this.cadInfo.top
     },
     editTask(cadInfo, list_index, task_index) {
       this.cadInfo = cadInfo
@@ -513,8 +556,7 @@ export default {
       })
     },
     cancelAdd() {
-      this.showResult = false
-      this.assignedMembers = []
+      this.showMembers = false
 
       this.columns[this.newColumnIndex].tasks = this.columns[this.newColumnIndex].tasks.filter(function(task) {
         return task.type !== 'new'
@@ -522,14 +564,25 @@ export default {
       this.newColumnIndex = null
     },
     assignUser(member) {
-      const new_task_index = this.columns[this.newColumnIndex].tasks.length
-      const member_index = this.columns[this.newColumnIndex].tasks[new_task_index - 1]['assignedMembers'].indexOf(member['id'])
-      if (member_index < 0) {
-        this.columns[this.newColumnIndex].tasks[new_task_index - 1]['assignedMembers'].push(member['id'])
-        this.assignedMembers.push(member['id'])
+      if (this.is_edit) {
+        this.editTaskData['assignedMembers'] = this.editTaskData['assignedMembers'] || []
+        this.assignedMembers = this.editTaskData['assignedMembers']
+        const member_index = this.editTaskData['assignedMembers'].indexOf(member['id'])
+        if (member_index < 0) {
+          this.assignedMembers.push(member['id'])
+        } else {
+          this.assignedMembers.splice(member_index, 1)
+        }
       } else {
-        this.columns[this.newColumnIndex].tasks[new_task_index - 1]['assignedMembers'].splice(member_index, 1)
-        this.assignedMembers.splice(member_index, 1)
+        const new_task_index = this.columns[this.newColumnIndex].tasks.length
+        const member_index = this.columns[this.newColumnIndex].tasks[new_task_index - 1]['assignedMembers'].indexOf(member['id'])
+        if (member_index < 0) {
+          this.columns[this.newColumnIndex].tasks[new_task_index - 1]['assignedMembers'].push(member['id'])
+          this.assignedMembers.push(member['id'])
+        } else {
+          this.columns[this.newColumnIndex].tasks[new_task_index - 1]['assignedMembers'].splice(member_index, 1)
+          this.assignedMembers.splice(member_index, 1)
+        }
       }
     },
     scrollToBottom(index) {
@@ -893,5 +946,12 @@ textarea {
 }
 .add-label:hover {
   background-color: rgba(150, 147, 147, 0.2);
+}
+.modal-header .title {
+  font-size: 20px;
+  margin: -4px -8px;
+  min-height: 24px;
+  padding: 4px 8px;
+  resize: none;
 }
 </style>
