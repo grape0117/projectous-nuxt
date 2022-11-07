@@ -21,13 +21,14 @@
             <b-dropdown-item-button><router-link id="report-menu-link" to="/profit">Profit</router-link></b-dropdown-item-button>
             <b-dropdown-item-button><router-link id="report-menu-link" to="/user_report">My Report</router-link></b-dropdown-item-button>
           </b-dropdown>
-          <b-dropdown id="new-task-menu" class="transparent-button" text="New Task">
+          <b-dropdown id="new-task-menu" class="transparent-button" text="New Task" ref="newtask_dropdown">
             <div class="new-task-container">
-              <select v-model="new_task_project_id" id="task-project-id2" class="form-control select2-select" name="project_id" style="width: 30%;">
+              <!-- <select v-model="new_task_project_id" id="task-project-id2" class="form-control select2-select" name="project_id" style="width: 30%;">
                 <option value="">No Project</option>
                 <option>Personal</option>
                 <option v-for="project in openprojects()" :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
-              </select>
+              </select> -->
+              <vue-bootstrap-typeahead :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
               <input type="text" id="task" ref="noteInput" v-model="new_task_title" class="form-control" placeholder="@assign" @keyup.enter="createTask()" @input="creatingTask" style="width: 70%;" />
             </div>
             <div class="search_result" v-if="showResult">
@@ -53,6 +54,7 @@
               </h6>
               <!-- end result -->
             </div>
+            <b-button class="float-right" variant="outline-primary" @click="closeNewTask">Close</b-button>
           </b-dropdown>
         </div>
       </div>
@@ -124,8 +126,16 @@ import _ from 'lodash'
 
 export default Vue.extend({
   extends: TaskActionRow,
+  watch: {
+    projectSearch: _.debounce(function(project_name) {
+      let projects = this.openprojects()
+      projects = projects.filter(project => project.name.toLowerCase().indexOf(project_name.toLowerCase()) >= 0)
+      return projects
+    }, 500)
+  },
   data() {
     return {
+      projectSearch: '',
       new_task_title: '',
       task_content: '',
       new_company_user_id: false,
@@ -253,7 +263,8 @@ export default Vue.extend({
       bgStyle: '',
       new_task_project_id: null,
       showResult: false,
-      assignedUser: {}
+      assignedUser: {},
+      hideNewTask: true
     }
   },
   computed: {
@@ -297,7 +308,14 @@ export default Vue.extend({
       if (bvEvent.componentId === 'new-task-menu') {
         setTimeout(() => {
           this.$refs.noteInput.focus()
-        }, 100)
+        }, 400)
+      }
+    })
+    this.$root.$on('bv::dropdown::hide', bvEvent => {
+      if (!this.hideNewTask) {
+        bvEvent.preventDefault()
+      } else {
+        this.hideNewTask = false
       }
     })
   },
@@ -306,6 +324,23 @@ export default Vue.extend({
       alert('Non-functional')
       return
       this.$emit('reload')
+    },
+    closeNewTask() {
+      this.projectSearch = ''
+      this.new_task_title = ''
+      this.new_company_user_id = false
+      this.new_user_name = ''
+      this.new_task_project_id = null
+      this.showResult = false
+      this.hideNewTask = true
+      setTimeout(() => {
+        this.$refs.newtask_dropdown.hide()
+      }, 100)
+      // document.getElementsByClassName("new-task-container")[0].parentElement.className = 'dropdown-menu'
+    },
+    selectProject($event) {
+      this.new_task_project_id = $event.id
+      this.showResult = true
     },
     closeModal() {
       this.toggles.paint = false
@@ -399,6 +434,8 @@ export default Vue.extend({
       }
       if (project_captured || title_captured || user_name_captured) {
         this.showResult = true
+      } else {
+        this.showResult = false
       }
     }, 700),
 
