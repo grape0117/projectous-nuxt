@@ -21,7 +21,7 @@
             <b-dropdown-item-button><router-link id="report-menu-link" to="/profit">Profit</router-link></b-dropdown-item-button>
             <b-dropdown-item-button><router-link id="report-menu-link" to="/user_report">My Report</router-link></b-dropdown-item-button>
           </b-dropdown>
-          <b-dropdown id="new-task-menu" class="transparent-button" text="New Task" @click="openMenu()">
+          <b-dropdown id="new-task-menu" class="transparent-button" text="New Task">
             <div class="new-task-container">
               <select v-model="new_task_project_id" id="task-project-id2" class="form-control select2-select" name="project_id" style="width: 30%;">
                 <option value="">No Project</option>
@@ -292,6 +292,14 @@ export default Vue.extend({
     })
 
     this.updateBackground()
+    this.$root.$on('bv::dropdown::show', bvEvent => {
+      console.log('Dropdown is about to be shown', bvEvent)
+      if (bvEvent.componentId === 'new-task-menu') {
+        setTimeout(() => {
+          this.$refs.noteInput.focus()
+        }, 100)
+      }
+    })
   },
   methods: {
     reload() {
@@ -370,6 +378,7 @@ export default Vue.extend({
         const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === project_title)
         if (projects_by_acronym.length === 1) {
           this.new_task_project_id = projects_by_acronym[0].id
+          this.new_task_title = task_title
         }
       }
 
@@ -381,14 +390,12 @@ export default Vue.extend({
         if (new_company_user) {
           this.new_company_user_id = new_company_user['id']
           this.assignedUser = new_company_user
-        } else {
-          this.new_company_user_id = null
+          this.new_task_title = task_title
         }
       }
       if (task_title) {
         title_captured = true
         console.log('title', task_title)
-        this.new_task_title = task_title
       }
       if (project_captured || title_captured || user_name_captured) {
         this.showResult = true
@@ -410,9 +417,6 @@ export default Vue.extend({
         this.toggles[iconName] = !this.toggles[iconName]
         EventBus.$emit(`toggle_${iconName}`, this.toggles[iconName])
       }
-    },
-    openMenu() {
-      this.$refs['noteInput'].focus()
     },
     abbrName,
     getCompanyUserDetails(company_user_id) {
