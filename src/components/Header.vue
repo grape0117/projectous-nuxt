@@ -370,8 +370,8 @@ export default Vue.extend({
       let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
       return client ? client.name : ''
     },
-    createTask() {
-      this.$store.dispatch('tasks/createTask', {
+    async createTask() {
+      const newTask = await this.$store.dispatch('tasks/createTask', {
         title: this.new_task_title,
         project_id: this.new_task_project_id,
         sort_order: 0,
@@ -379,6 +379,7 @@ export default Vue.extend({
         temp: false,
         users: [this.new_company_user_id]
       })
+      EventBus.$emit('update', { company_user_id: this.new_company_user_id })
       this.new_task_title = ''
       this.new_task_project_id = null
       this.new_company_user_id = null

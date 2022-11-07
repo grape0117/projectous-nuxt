@@ -72,12 +72,19 @@
 </template>
 
 <script>
+import { EventBus } from '@/components/event-bus'
 import TasksTab from './TasksTab'
 import TaskActionRow from './TaskActionRow.vue'
 export default {
   name: 'user-dashboard-template',
   components: {
     'tasks-tab': TasksTab
+  },
+  mounted() {
+    EventBus.$on('update', ({ company_user_id }) => {
+      console.log('company_user_id', company_user_id)
+      this.setTab(company_user_id)
+    })
   },
   computed: {
     current_company_user() {
@@ -144,7 +151,6 @@ export default {
           }
           return new Date(b.created_at) - new Date(a.created_at)
         })
-      //return filtered_result
     },
 
     usersNotMe() {
