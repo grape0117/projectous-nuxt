@@ -377,7 +377,8 @@ export default Vue.extend({
         sort_order: 0,
         status: 'open',
         temp: false,
-        users: [this.new_company_user_id]
+        users: [this.new_company_user_id],
+        owner: this.$store.state.settings.current_company_user_id
       })
       EventBus.$emit('update', { company_user_id: this.new_company_user_id })
       this.new_task_title = ''
