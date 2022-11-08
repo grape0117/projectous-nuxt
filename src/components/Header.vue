@@ -264,7 +264,7 @@ export default Vue.extend({
       new_task_project_id: null,
       showResult: false,
       assignedUser: {},
-      hideNewTask: true
+      hideNewTask: false
     }
   },
   computed: {
@@ -336,7 +336,6 @@ export default Vue.extend({
       setTimeout(() => {
         this.$refs.newtask_dropdown.hide()
       }, 100)
-      // document.getElementsByClassName("new-task-container")[0].parentElement.className = 'dropdown-menu'
     },
     selectProject($event) {
       this.showResult = true
