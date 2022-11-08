@@ -28,7 +28,7 @@
                 <option>Personal</option>
                 <option v-for="project in openprojects()" :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
               </select> -->
-              <vue-bootstrap-typeahead :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
+              <vue-bootstrap-typeahead ref="projectsTypeahead" :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
               <input type="text" id="task" ref="noteInput" v-model="new_task_title" class="form-control" placeholder="@assign" @keyup.enter="createTask()" @input="creatingTask" style="width: 70%;" />
             </div>
             <div class="search_result" v-if="showResult">
@@ -339,8 +339,10 @@ export default Vue.extend({
       // document.getElementsByClassName("new-task-container")[0].parentElement.className = 'dropdown-menu'
     },
     selectProject($event) {
-      this.new_task_project_id = $event.id
       this.showResult = true
+      setTimeout(() => {
+        this.new_task_project_id = $event.id
+      }, 100)
     },
     closeModal() {
       this.toggles.paint = false
@@ -416,6 +418,8 @@ export default Vue.extend({
         if (projects_by_acronym.length === 1) {
           this.new_task_project_id = projects_by_acronym[0].id
           this.new_task_title = task_title
+          const project_full_title = this.client_name(projects_by_acronym[0].client_company_id) + '-' + projects_by_acronym[0].name
+          this.$refs.projectsTypeahead.inputValue = project_full_title
         }
       }
 
