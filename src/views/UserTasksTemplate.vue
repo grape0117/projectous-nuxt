@@ -116,9 +116,11 @@ export default {
       //const filtered_result = tasks
       tasks.forEach(data => {
         const { project_id } = data
-        if (!self.project_list.includes(project_id)) {
-          if (project_id) {
-            self.project_list.push(project_id)
+        if (typeof project_id !== 'undefined') {
+          if (!self.project_list.includes(project_id)) {
+            if (project_id) {
+              self.project_list.push(project_id)
+            }
           }
         }
       })
