@@ -312,7 +312,7 @@ export default Vue.extend({
       }
     })
     this.$root.$on('bv::dropdown::hide', bvEvent => {
-      if (!this.hideNewTask) {
+      if (!this.hideNewTask && bvEvent.componentId === 'new-task-menu') {
         bvEvent.preventDefault()
       } else {
         this.hideNewTask = false
