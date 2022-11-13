@@ -49,7 +49,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
     state.tasks_by_project = tasks.filter((task: ITask) => (task.project_id = project_id))
   },
-  async createTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, users = [], owner }: any) {
+  async createTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, users = [], owner, priority = 'active' }: any) {
     const task = {
       ...createDefaultTask(),
       title,
@@ -57,7 +57,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       sort_order,
       status,
       users,
-      owner
+      owner,
+      priority
     }
     let newTask
     if (temp) {

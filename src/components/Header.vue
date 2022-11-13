@@ -28,7 +28,7 @@
                 <option>Personal</option>
                 <option v-for="project in openprojects()" :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
               </select> -->
-              <vue-bootstrap-typeahead :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
+              <vue-bootstrap-typeahead ref="projectsTypeahead" :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
               <input type="text" id="task" ref="noteInput" v-model="new_task_title" class="form-control" placeholder="@assign" @keyup.enter="createTask()" @input="creatingTask" style="width: 70%;" />
             </div>
             <div class="search_result" v-if="showResult">
@@ -36,7 +36,7 @@
                 <b-badge :style="{ 'background-color': getClientAcronymColor(new_task_project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(new_task_project_id)" v-b-tooltip.hover :title="taskProjectName(new_task_project_id)">
                   {{ getProjectDetails(new_task_project_id) }}
                 </b-badge>
-                <b-dropdown id="priorities-dropdown" :text="'Activate'" variant="danger" style="border:none">
+                <b-dropdown id="priorities-dropdown" :text="new_priority ? capitalizeFirstLetter(new_priority) : ''" variant="danger" style="border:none">
                   <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
                   <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
                   <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
@@ -140,6 +140,7 @@ export default Vue.extend({
       task_content: '',
       new_company_user_id: false,
       new_user_name: '',
+      new_priority: 'active',
       showMenu: false,
       timerEmptyFields: 0,
       timerRunning: false,
@@ -264,7 +265,7 @@ export default Vue.extend({
       new_task_project_id: null,
       showResult: false,
       assignedUser: {},
-      hideNewTask: true
+      hideNewTask: false
     }
   },
   computed: {
@@ -304,15 +305,16 @@ export default Vue.extend({
 
     this.updateBackground()
     this.$root.$on('bv::dropdown::show', bvEvent => {
-      console.log('Dropdown is about to be shown', bvEvent)
       if (bvEvent.componentId === 'new-task-menu') {
         setTimeout(() => {
-          this.$refs.noteInput.focus()
+          if (this.$refs.noteInput) {
+            this.$refs.noteInput.focus()
+          }
         }, 400)
       }
     })
     this.$root.$on('bv::dropdown::hide', bvEvent => {
-      if (!this.hideNewTask) {
+      if (!this.hideNewTask && bvEvent.componentId === 'new-task-menu') {
         bvEvent.preventDefault()
       } else {
         this.hideNewTask = false
@@ -336,11 +338,12 @@ export default Vue.extend({
       setTimeout(() => {
         this.$refs.newtask_dropdown.hide()
       }, 100)
-      // document.getElementsByClassName("new-task-container")[0].parentElement.className = 'dropdown-menu'
     },
     selectProject($event) {
-      this.new_task_project_id = $event.id
       this.showResult = true
+      setTimeout(() => {
+        this.new_task_project_id = $event.id
+      }, 100)
     },
     closeModal() {
       this.toggles.paint = false
@@ -378,7 +381,8 @@ export default Vue.extend({
         status: 'open',
         temp: false,
         users: [this.new_company_user_id],
-        owner: this.$store.state.settings.current_company_user_id
+        owner: this.$store.state.settings.current_company_user_id,
+        priority: this.new_priority
       })
       EventBus.$emit('update', { company_user_id: this.new_company_user_id })
       this.new_task_title = ''
@@ -416,6 +420,8 @@ export default Vue.extend({
         if (projects_by_acronym.length === 1) {
           this.new_task_project_id = projects_by_acronym[0].id
           this.new_task_title = task_title
+          const project_full_title = this.client_name(projects_by_acronym[0].client_company_id) + '-' + projects_by_acronym[0].name
+          this.$refs.projectsTypeahead.inputValue = project_full_title
         }
       }
 
@@ -481,7 +487,7 @@ export default Vue.extend({
       return capitalize(string)
     },
     updatePriority(priority) {
-      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: priority })
+      this.new_priority = priority
     }
   },
   created() {
