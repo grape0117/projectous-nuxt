@@ -36,7 +36,7 @@
                 <b-badge :style="{ 'background-color': getClientAcronymColor(new_task_project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(new_task_project_id)" v-b-tooltip.hover :title="taskProjectName(new_task_project_id)">
                   {{ getProjectDetails(new_task_project_id) }}
                 </b-badge>
-                <b-dropdown id="priorities-dropdown" :text="'Activate'" variant="danger" style="border:none">
+                <b-dropdown id="priorities-dropdown" :text="new_priority ? capitalizeFirstLetter(new_priority) : ''" variant="danger" style="border:none">
                   <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
                   <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
                   <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
@@ -140,6 +140,7 @@ export default Vue.extend({
       task_content: '',
       new_company_user_id: false,
       new_user_name: '',
+      new_priority: 'active',
       showMenu: false,
       timerEmptyFields: 0,
       timerRunning: false,
@@ -304,10 +305,11 @@ export default Vue.extend({
 
     this.updateBackground()
     this.$root.$on('bv::dropdown::show', bvEvent => {
-      console.log('Dropdown is about to be shown', bvEvent)
       if (bvEvent.componentId === 'new-task-menu') {
         setTimeout(() => {
-          this.$refs.noteInput.focus()
+          if (this.$refs.noteInput) {
+            this.$refs.noteInput.focus()
+          }
         }, 400)
       }
     })
@@ -379,7 +381,8 @@ export default Vue.extend({
         status: 'open',
         temp: false,
         users: [this.new_company_user_id],
-        owner: this.$store.state.settings.current_company_user_id
+        owner: this.$store.state.settings.current_company_user_id,
+        priority: this.new_priority
       })
       EventBus.$emit('update', { company_user_id: this.new_company_user_id })
       this.new_task_title = ''
@@ -484,7 +487,7 @@ export default Vue.extend({
       return capitalize(string)
     },
     updatePriority(priority) {
-      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: priority })
+      this.new_priority = priority
     }
   },
   created() {
