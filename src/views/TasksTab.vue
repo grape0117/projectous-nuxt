@@ -171,7 +171,6 @@ export default {
       const task_index = this.tasks.findIndex(task => task.id === statusInfo.task_id)
       const user_index = this.task_list[task_index].users.findIndex(user => user.company_user_id === current_user_id)
       this.task_list[task_index].users[user_index].status = statusInfo.status
-      this.makeToast('success', 'Status changed!')
     },
     updateNotes(e) {
       this.notes = e.target.value
@@ -243,7 +242,6 @@ export default {
       }
       const result = await this.$http().post(`/tasks-progress/${this.selected_task}`, task_progress_info)
       if (result.status === 'success') {
-        this.makeToast('success', `Status changed to ${status}`)
         const task_index = this.tasks.findIndex(task => task.id === this.selected_task)
         const user_index = this.tasks[task_index].users.findIndex(user => user.company_user_id === result.user.company_user_id)
         let users = [...this.tasks[task_index].users]

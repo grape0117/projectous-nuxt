@@ -29,7 +29,7 @@
                 <option v-for="project in openprojects()" :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
               </select> -->
               <vue-bootstrap-typeahead ref="projectsTypeahead" :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
-              <input type="text" id="task" ref="noteInput" v-model="new_task_title" class="form-control" placeholder="@assign" @keyup.enter="createTask()" @input="creatingTask" style="width: 70%;" />
+              <input type="text" id="task" ref="noteInput" class="form-control" placeholder="@assign" @keyup.enter="createTask()" @input="creatingTask" style="width: 70%;" />
             </div>
             <div class="search_result" v-if="showResult">
               <h6 class="card-text">
@@ -391,8 +391,8 @@ export default Vue.extend({
       this.showResult = false
     },
     creatingTask: _.debounce(function(e) {
-      let notesWithTaskTile = this.new_task_title
-      const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+))', 'g')
+      let notesWithTaskTile = e.target.value
+      const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+)|([a-z][A-Z]@+))', 'g')
 
       const acronym_matchs = notesWithTaskTile ? notesWithTaskTile.match(projectRegex) : null
       if (!acronym_matchs) {

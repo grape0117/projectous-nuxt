@@ -5,18 +5,13 @@
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
             <h6 class="card-text">
+              <i class="icon-play_arrow" @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" style="color:green;cursor:pointer;"></i>
+              <i class="icon-stop" @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" style="color:red;cursor:pointer;"></i>
+              <!-- <b-badge @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer"> <i class="icon-stop" style="color:red;"></i>Stop </b-badge> -->
               <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
                 {{ getProjectDetails(task.project_id) }}
               </b-badge>
-              <b-badge @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer"> <i class="icon-play_arrow" style="color:green;"></i>Play </b-badge>
-              <b-badge @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer"> <i class="icon-stop" style="color:red;"></i>Stop </b-badge>
               <!-- <b-badge variant="danger mr-2" style="cursor:pointer">{{ task.priority ? capitalizeFirstLetter(task.priority) : 'Priority' }}</b-badge> -->
-              <b-dropdown id="priorities-dropdown" :text="task.priority ? capitalizeFirstLetter(task.priority) : ''" variant="danger" style="border:none">
-                <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
-                <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
-                <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
-                <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
-              </b-dropdown>
               <b>
                 | {{ task.title ? task.title : '---' }}
                 <span v-for="user in task.users" v-if="isAdmin">
@@ -40,7 +35,13 @@
           <div class="col-md-3" style="align-self:center">
             <div>
               <b-badge variant="primary mr-2" style="cursor:pointer; float:right" @click="showTaskDetail"><i class="icon-open_in_new"></i>Open task</b-badge>
-              <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-2" :style="{ float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
+              <b-dropdown class="mr-3" id="priorities-dropdown" :text="task.priority ? capitalizeFirstLetter(task.priority) : ''" variant="danger" style="border:none; float: right;">
+                <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
+                <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
+                <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
+                <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
+              </b-dropdown>
+              <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-3" :style="{ width: task.due_date ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
             </div>
           </div>
         </div>
@@ -77,6 +78,9 @@ export default {
   },
   watch: {},
   methods: {
+    date_pick() {
+      document.getElementById('task-list-due-date').click()
+    },
     makeToast(variant = null, content = '') {
       this.$bvToast.toast(content, {
         title: `${variant === 'success' ? 'Success' : 'Error'}`,
@@ -90,9 +94,13 @@ export default {
       return this.user_info && this.user_info.status === 'completed'
     },
     myStepAndNotes() {
-      const current_user_id = this.$store.state.settings.current_company_user_id
-      this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
-      return this.user_info && `${this.user_info.step}: ${this.user_info.notes}`
+      if (this.user_info.step && this.user_info.notes) {
+        const current_user_id = this.$store.state.settings.current_company_user_id
+        this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
+        return this.user_info && `${this.user_info.step}: ${this.user_info.notes}`
+      } else {
+        return
+      }
     },
     isMyTask() {
       const current_user_id = this.$store.state.settings.current_company_user_id
