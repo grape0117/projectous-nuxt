@@ -23,10 +23,18 @@
       <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist">
           <li @click="setTab(current_company_user.id)" :class="tabClass('tab-' + current_company_user.id)" role="presentation">
-            <a aria-controls="closed" role="tab" data-toggle="tab">My Tasks <span v-if="filter_task_count(current_company_user.id) > 0" class="badge label-primary" v-html="filter_task_count(current_company_user.id)"></span></a>
+            <a aria-controls="closed" role="tab" data-toggle="tab"
+              >My Tasks
+              <span v-if="filter_task_count(current_company_user.id) > 0" class="badge badge-primary label-primary" v-html="filter_task_count(current_company_user.id)"></span>
+              <span v-if="my_high_count" class="badge badge-danger label-primary" v-html="my_high_count"></span>
+            </a>
           </li>
           <li @click="setCompanyUserId(user.id)" :class="tabClass(user.id)" role="presentation" v-for="user in usersNotMe" v-bind:user="user">
-            <a aria-controls="closed" role="tab" data-toggle="tab">{{ user.name }} <span v-if="filter_task_count(user.id) > 0" :class="badgeClass(user)" v-html="filter_task_count(user.id)"></span></a>
+            <a aria-controls="closed" role="tab" data-toggle="tab"
+              >{{ user.name }}
+              <span v-if="filter_task_count(user.id) > 0" :class="badgeClass(user)" v-html="filter_task_count(user.id)"></span>
+              <span v-if="filter_task_high_count(user.id).length > 0" class="badge badge-danger label-primary" v-html="filter_task_high_count(user.id)[0]['count']"></span>
+            </a>
           </li>
         </ul>
       </div>
@@ -107,6 +115,7 @@ export default {
       } else if (this.tab === 'my_tasks') {
         user_id = self.current_company_user.id
         tasks = this.$store.state.tasks.my_tasks
+        this.my_high_count = tasks.filter(task => task.priority == 'high').length
       } else if (this.tab === 'managing') {
       } else if (isFinite(this.tab)) {
         user_id = this.tab
@@ -189,10 +198,11 @@ export default {
       new_task_title: '',
       new_task_project_id: null,
       other_users: null,
-      // tasks: [],
       status_filter: [],
       project_filter: [],
-      project_list: []
+      project_list: [],
+      my_high_count: 0,
+      high_count_of_users: []
     }
   },
   watch: {
@@ -372,7 +382,7 @@ export default {
         }
       })
       if (badgeClass === '') {
-        return 'badge' //badgeClass = 'badge for-today';
+        return 'badge badge-secondary' //badgeClass = 'badge for-today';
       } else {
         return badgeClass
       }
@@ -394,6 +404,9 @@ export default {
     filter_task_count(company_user_id) {
       return this.$store.getters['task_users/getByCompanyUserId'](company_user_id).length
     },
+    filter_task_high_count(company_user_id) {
+      return this.high_count_of_users.filter(({ user_id }) => user_id == company_user_id)
+    },
     client_name(client_company_id) {
       let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
       return client ? client.name : ''
@@ -402,7 +415,13 @@ export default {
       if (this.current_company_user_id) {
         const response = await this.$http().get('/company_users/' + this.current_company_user_id + '/tasks')
         console.log(response)
-
+        let count_of_heigh = response.tasks.filter(task => task.priority == 'high').length
+        if (this.high_count_of_users.filter(({ user_id }) => user_id == this.current_company_user_id).length == 0) {
+          this.high_count_of_users.push({
+            user_id: this.current_company_user_id,
+            count: count_of_heigh
+          })
+        }
         this.$store.dispatch('PROCESS_INCOMING_DATA', response)
       }
       return
