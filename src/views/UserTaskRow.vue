@@ -8,12 +8,12 @@
               <i class="icon-play_arrow" @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" style="color:green;cursor:pointer;"></i>
               <i class="icon-stop" @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" style="color:red;cursor:pointer;"></i>
               <!-- <b-badge @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer"> <i class="icon-stop" style="color:red;"></i>Stop </b-badge> -->
-              <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
-                {{ getProjectDetails(task.project_id) }}
-              </b-badge>
               <!-- <b-badge variant="danger mr-2" style="cursor:pointer">{{ task.priority ? capitalizeFirstLetter(task.priority) : 'Priority' }}</b-badge> -->
               <b>
-                | {{ task.title ? task.title : '---' }}
+                {{ task.title ? task.title : '---' }}
+                <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
+                  {{ getProjectDetails(task.project_id) }}
+                </b-badge>
                 <span v-for="user in task.users" v-if="isAdmin">
                   <span :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step}:${user.notes}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
@@ -94,12 +94,16 @@ export default {
       return this.user_info && this.user_info.status === 'completed'
     },
     myStepAndNotes() {
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
       if (this.user_info.step && this.user_info.notes) {
-        const current_user_id = this.$store.state.settings.current_company_user_id
-        this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
-        return this.user_info && `${this.user_info.step}: ${this.user_info.notes}`
+        return `${this.user_info.step}: ${this.user_info.notes}`
+      } else if (this.user_info.step) {
+        return `${this.user_info.step}: --`
+      } else if (this.user_info.notes) {
+        return `--: ${this.user_info.notes}`
       } else {
-        return
+        return ''
       }
     },
     isMyTask() {
