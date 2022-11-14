@@ -29,7 +29,7 @@
                 <option v-for="project in openprojects()" :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
               </select> -->
               <vue-bootstrap-typeahead ref="projectsTypeahead" :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
-              <input type="text" id="task" ref="noteInput" class="form-control" placeholder="@assign" @keyup.enter="createTask()" @input="creatingTask" style="width: 70%;" />
+              <input type="text" id="task" ref="noteInput" class="form-control" placeholder="@assign" @keyup.enter="createTask" @input="creatingTask" style="width: 70%;" />
             </div>
             <div class="search_result" v-if="showResult">
               <h6 class="card-text">
@@ -374,6 +374,12 @@ export default Vue.extend({
       return client ? client.name : ''
     },
     async createTask() {
+      if (!this.new_company_user_id) {
+        return
+      }
+      this.$refs.noteInput.value = ''
+      this.$refs.projectsTypeahead.inputValue = ''
+      this.showResult = false
       const newTask = await this.$store.dispatch('tasks/createTask', {
         title: this.new_task_title,
         project_id: this.new_task_project_id,
@@ -388,7 +394,6 @@ export default Vue.extend({
       this.new_task_title = ''
       this.new_task_project_id = null
       this.new_company_user_id = null
-      this.showResult = false
     },
     creatingTask: _.debounce(function(e) {
       let notesWithTaskTile = e.target.value
