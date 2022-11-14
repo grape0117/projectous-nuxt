@@ -36,7 +36,7 @@
                 <b-badge :style="{ 'background-color': getClientAcronymColor(new_task_project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(new_task_project_id)" v-b-tooltip.hover :title="taskProjectName(new_task_project_id)">
                   {{ getProjectDetails(new_task_project_id) }}
                 </b-badge>
-                <b-dropdown id="priorities-dropdown" :text="new_priority ? capitalizeFirstLetter(new_priority) : ''" variant="danger" style="border:none">
+                <b-dropdown id="priorities-dropdown" :text="new_priority ? capitalizeFirstLetter(new_priority) : ''" :variant="priorityColor(new_priority)" style="border:none">
                   <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
                   <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
                   <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
@@ -326,6 +326,31 @@ export default Vue.extend({
       alert('Non-functional')
       return
       this.$emit('reload')
+    },
+    priorityColor(priority) {
+      let color = 'primary'
+      switch (priority) {
+        case 'high':
+          color = 'danger'
+          break
+        case 'active':
+          color = 'success'
+          break
+        case 'regular':
+          color = 'success'
+          break
+        case 'low':
+          color = 'warning'
+          break
+        case 'hold':
+          color = 'secondary'
+          break
+
+        default:
+          color = 'primary'
+          break
+      }
+      return color
     },
     closeNewTask() {
       this.projectSearch = ''

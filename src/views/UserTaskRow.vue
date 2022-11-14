@@ -35,7 +35,7 @@
           <div class="col-md-3" style="align-self:center">
             <div>
               <b-badge variant="primary mr-2" style="cursor:pointer; float:right" @click="showTaskDetail"><i class="icon-open_in_new"></i>Open task</b-badge>
-              <b-dropdown class="mr-3" id="priorities-dropdown" :text="task.priority ? capitalizeFirstLetter(task.priority) : ''" variant="danger" style="border:none; float: right;">
+              <b-dropdown class="mr-3" id="priorities-dropdown" :text="task.priority ? capitalizeFirstLetter(task.priority) : ''" :variant="priorityColor(task.priority)" style="border:none; float: right;">
                 <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
                 <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
                 <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
@@ -78,6 +78,31 @@ export default {
   },
   watch: {},
   methods: {
+    priorityColor(priority) {
+      let color = 'primary'
+      switch (priority) {
+        case 'high':
+          color = 'danger'
+          break
+        case 'active':
+          color = 'primary'
+          break
+        case 'regular':
+          color = 'success'
+          break
+        case 'low':
+          color = 'warning'
+          break
+        case 'hold':
+          color = 'secondary'
+          break
+
+        default:
+          color = 'primary'
+          break
+      }
+      return color
+    },
     date_pick() {
       document.getElementById('task-list-due-date').click()
     },
@@ -204,6 +229,9 @@ export default {
       } else {
         return_value = `Due on ${moment(due_date).format('MMMM DD')}`
         color = '#17a2b8'
+      }
+      if (!due_date) {
+        color = '#28a745'
       }
       if (return_color) {
         return_value = color
