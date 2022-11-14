@@ -833,5 +833,14 @@ export default Vue.extend({
   margin-top: 27px;
 }
 
+.btn-outline-primary {
+  color: #fff;
+  border-color: #fff;
+}
+.btn-outline-primary:hover {
+  color: #fff;
+  background-color: #ffa500;
+  border-color: #fff;
+}
 /* paletteColors: ['red', 'green', 'blue', 'rgba($color: orange, $alpha: 0.6)', 'pink', 'violet', 'rgba(255, 165, 0, 0.6)' ] */
 </style>

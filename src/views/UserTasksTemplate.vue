@@ -23,7 +23,7 @@
       <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist">
           <li @click="setTab(current_company_user.id)" :class="tabClass('tab-' + current_company_user.id)" role="presentation">
-            <a aria-controls="closed" role="tab" data-toggle="tab">My Tasks <span v-if="filter_task_count(current_company_user.id) > 0" class="badge label-primary" v-html="filter_task_count(current_company_user.id).length"></span></a>
+            <a aria-controls="closed" role="tab" data-toggle="tab">My Tasks <span v-if="filter_task_count(current_company_user.id) > 0" class="badge label-primary" v-html="filter_task_count(current_company_user.id)"></span></a>
           </li>
           <li @click="setCompanyUserId(user.id)" :class="tabClass(user.id)" role="presentation" v-for="user in usersNotMe" v-bind:user="user">
             <a aria-controls="closed" role="tab" data-toggle="tab">{{ user.name }} <span v-if="filter_task_count(user.id) > 0" :class="badgeClass(user)" v-html="filter_task_count(user.id)"></span></a>
@@ -126,7 +126,7 @@ export default {
       })
       return tasks
         .filter(task => {
-          if (!task.project_id || (self.current_project_id && task.project_id !== self.current_project_id) || !task.title.toLowerCase().includes(self.task_filter)) {
+          if ((self.current_project_id && task.project_id !== self.current_project_id) || !task.title.toLowerCase().includes(self.task_filter)) {
             return false
           }
 
