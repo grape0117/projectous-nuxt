@@ -25,7 +25,7 @@
           <li @click="setTab(current_company_user.id)" :class="tabClass('tab-' + current_company_user.id)" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >My Tasks
-              <span v-if="filter_task_count(current_company_user.id) > 0" class="badge badge-primary label-primary" v-html="filter_task_count(current_company_user.id)"></span>
+              <span v-if="my_tasks.length > 0" class="badge badge-primary label-primary" v-html="my_tasks.length"></span>
               <span v-if="my_high_count > 0" class="badge badge-danger label-primary" v-html="my_high_count"></span>
             </a>
           </li>
@@ -47,7 +47,7 @@
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >{{ user.name }}
               <span v-if="filter_task_count(user.id) > 0" :class="badgeClass(user)" v-html="filter_task_count(user.id)"></span>
-              <span v-if="filter_task_high_count(user.id).length > 0" class="badge badge-danger label-primary" v-html="filter_task_high_count(user.id)[0]['count']"></span>
+              <span v-if="filter_task_high_count(user.id).length > 0 && filter_task_high_count(user.id)[0]['count'] > 0" class="badge badge-danger label-primary" v-html="filter_task_high_count(user.id)[0]['count']"></span>
             </a>
           </li>
         </ul>
