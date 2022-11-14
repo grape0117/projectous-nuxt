@@ -26,7 +26,21 @@
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >My Tasks
               <span v-if="filter_task_count(current_company_user.id) > 0" class="badge badge-primary label-primary" v-html="filter_task_count(current_company_user.id)"></span>
-              <span v-if="my_high_count" class="badge badge-danger label-primary" v-html="my_high_count"></span>
+              <span v-if="my_high_count > 0" class="badge badge-danger label-primary" v-html="my_high_count"></span>
+            </a>
+          </li>
+          <li @click="setTab('all')" :class="tabClass('tab-' + current_company_user.id)" role="presentation">
+            <a aria-controls="closed" role="tab" data-toggle="tab"
+              >All
+              <span v-if="all_count > 0 || all_tasks.length > 0" class="badge badge-primary label-primary" v-html="all_count || all_tasks.length"></span>
+              <span v-if="all_high_count > 0" class="badge badge-danger label-primary" v-html="all_high_count"></span>
+            </a>
+          </li>
+          <li @click="setTab('others')" :class="tabClass('tab-' + current_company_user.id)" role="presentation">
+            <a aria-controls="closed" role="tab" data-toggle="tab"
+              >Assigned to Others
+              <span v-if="others_count > 0 || others_tasks.length > 0" class="badge badge-primary label-primary" v-html="others_count || others_tasks.length"></span>
+              <span v-if="others_high_count > 0" class="badge badge-danger label-primary" v-html="others_high_count"></span>
             </a>
           </li>
           <li @click="setCompanyUserId(user.id)" :class="tabClass(user.id)" role="presentation" v-for="user in usersNotMe" v-bind:user="user">
@@ -64,12 +78,7 @@
         </div>
         <div role="tabpanel" class="tab-pane active" id="active">
           <h3 v-if="current_project_id">{{ getCurrentProjectNameById() }}</h3>
-          <!-- <div class="table-responsive"> -->
-          <!-- <ul class="table timer-table"> -->
           <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab" @updateData="updateData"> </tasks-tab>
-          <!-- <user-task-row v-bind:tasks="filtered_tasks" v-bind:tab="tab"> </user-task-row> -->
-          <!-- </ul> -->
-          <!-- </div> -->
         </div>
       </div>
     </div>
@@ -104,14 +113,30 @@ export default {
       return this.$store.getters['settings/isAdmin']
     },
     my_tasks() {
+      this.my_high_count = this.$store.state.tasks.my_tasks.filter(({ priority }) => priority == 'high').length
       return this.$store.state.tasks.my_tasks
+    },
+    all_tasks() {
+      this.all_high_count = this.$store.state.tasks.all_tasks.filter(({ priority }) => priority == 'high').length
+      return this.$store.state.tasks.all_tasks
+    },
+    others_tasks() {
+      this.others_high_count = this.$store.state.tasks.others_tasks.filter(({ priority }) => priority == 'high').length
+      return this.$store.state.tasks.others_tasks
     },
     getUserProjects(user_tasks) {},
     filtered_tasks() {
       let self = this
       let user_id = null
       let tasks = []
-      if (this.tab === 'all_tasks') {
+      if (this.tab === 'all') {
+        tasks = this.$store.state.tasks.tasks
+        this.all_count = tasks.length
+        this.all_high_count = tasks.filter(({ priority }) => priority == 'high').length
+      } else if (this.tab === 'others') {
+        tasks = this.$store.state.tasks.others_tasks
+        this.others_count = tasks.length
+        this.others_high_count = tasks.filter(({ priority }) => priority == 'high').length
       } else if (this.tab === 'my_tasks') {
         user_id = self.current_company_user.id
         tasks = this.$store.state.tasks.my_tasks
@@ -135,10 +160,9 @@ export default {
       })
       return tasks
         .filter(task => {
-          if ((self.current_project_id && task.project_id !== self.current_project_id) || !task.title.toLowerCase().includes(self.task_filter)) {
+          if ((self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter))) {
             return false
           }
-
           if (self.project_filter.length > 0 || self.status_filter.length > 0) {
             const check_project_filter = self.project_filter.includes(task.project_id)
             const check_status_filter = self.status_filter.includes(task.status)
@@ -202,7 +226,11 @@ export default {
       project_filter: [],
       project_list: [],
       my_high_count: 0,
-      high_count_of_users: []
+      high_count_of_users: [],
+      all_count: 0,
+      all_high_count: 0,
+      others_count: 0,
+      others_high_count: 0
     }
   },
   watch: {
