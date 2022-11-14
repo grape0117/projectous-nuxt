@@ -13,6 +13,10 @@
                 <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
                   {{ getProjectDetails(task.project_id) }}
                 </b-badge>
+                <b-badge v-else :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2">
+                  {{ getProject(task.project_id).name }}
+                </b-badge>
+
                 {{ task.title ? task.title : '---' }}
                 <span v-for="user in task.users" v-if="isAdmin">
                   <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step}:${user.notes}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
