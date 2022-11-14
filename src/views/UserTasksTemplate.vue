@@ -22,21 +22,21 @@
     <div class="row-no-padding" v-if="isAdmin">
       <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist">
-          <li @click="setTab(current_company_user.id)" :class="tabClass('tab-' + current_company_user.id)" role="presentation">
+          <li @click="setTab('my_tasks')" :class="tabClass('my_tasks')" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >My Tasks
               <span v-if="my_tasks.length > 0" class="badge badge-primary label-primary" v-html="my_tasks.length"></span>
               <span v-if="my_high_count > 0" class="badge badge-danger label-primary" v-html="my_high_count"></span>
             </a>
           </li>
-          <li @click="setTab('all')" :class="tabClass('tab-' + current_company_user.id)" role="presentation">
+          <li @click="setTab('all')" :class="tabClass('all')" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >All
               <span v-if="all_count > 0 || all_tasks.length > 0" class="badge badge-primary label-primary" v-html="all_count || all_tasks.length"></span>
               <span v-if="all_high_count > 0" class="badge badge-danger label-primary" v-html="all_high_count"></span>
             </a>
           </li>
-          <li @click="setTab('others')" :class="tabClass('tab-' + current_company_user.id)" role="presentation">
+          <li @click="setTab('others')" :class="tabClass('others')" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >Assigned to Others
               <span v-if="others_count > 0 || others_tasks.length > 0" class="badge badge-primary label-primary" v-html="others_count || others_tasks.length"></span>
@@ -571,24 +571,40 @@ table {
   color: white;
 }
 
+.nav-tabs {
+  border-bottom: 1px solid #bb7c08;
+}
 .nav-tabs li {
-  border-radius: 0 !important;
-  border-top: solid 3px #fff;
-  background: #f8f8f8;
+  /* border-radius: 2px !important; */
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  border-top: solid 3px #7e5813;
+  background: #7e5813;
   margin-bottom: 0;
   margin-right: 2px;
+  cursor: pointer;
+  padding: 4px;
+}
+.nav-tabs li:hover {
+  background: #ffa500 !important;
 }
 
 .nav-tabs li a {
-  color: #363636;
+  color: #dbc0c0;
   border-radius: 0 !important;
   margin-right: 0 !important;
 }
 
 .nav-tabs li.active {
-  background: #f8f8f8;
-  border-top: solid 3px #337ab7;
+  background: #ffa500;
+  border-top: solid 3px #007bff;
+  border-left: solid 2px #bb7c08;
+  border-right: solid 2px #bb7c08;
   margin-bottom: 1px;
+  font-weight: bold;
+}
+.nav-tabs li.active a {
+  color: #242222 !important;
 }
 
 .nav-tabs li:hover {
