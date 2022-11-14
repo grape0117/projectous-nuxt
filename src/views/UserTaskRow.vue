@@ -409,6 +409,16 @@ span.avatar.notes:before {
   background-size: contain;
   position: absolute;
 }
+.icon-play_arrow,
+.icon-stop {
+  border: solid 2px white;
+  border-radius: 50%;
+  font-size: 17px;
+}
+.icon-play_arrow:hover,
+.icon-stop:hover {
+  background-color: #fff;
+}
 /* span.avatar.test:after {
   background: url(../assets/icons/test.png) no-repeat;
   content: '';
