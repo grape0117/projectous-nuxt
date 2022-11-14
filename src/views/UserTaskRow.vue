@@ -160,10 +160,15 @@ export default {
       let formatted_date
       if (due_date) {
         formatted_date = moment(new Date(due_date)).format('yyyy-MM-DD')
+      } else {
+        return ''
       }
       return formatted_date
     },
     dueDateDetails(due_date, return_color) {
+      if (!due_date && !return_color) {
+        return ''
+      }
       const timezone = moment.tz.guess()
       const timezone_date = moment()
         .tz(timezone)

@@ -102,16 +102,16 @@ export default {
     filtered_tasks() {
       let self = this
       let user_id = null
+      let tasks = []
       if (this.tab === 'all_tasks') {
       } else if (this.tab === 'my_tasks') {
         user_id = self.current_company_user.id
+        tasks = this.$store.state.tasks.my_tasks
       } else if (this.tab === 'managing') {
-      }
-      if (isFinite(this.tab)) {
+      } else if (isFinite(this.tab)) {
         user_id = this.tab
+        tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
       }
-
-      let tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
 
       //const filtered_result = tasks
       tasks.forEach(data => {
@@ -126,10 +126,7 @@ export default {
       })
       return tasks
         .filter(task => {
-          if (self.current_project_id && task.project_id !== self.current_project_id) {
-            return false
-          }
-          if (!task.title.toLowerCase().includes(self.task_filter)) {
+          if (!task.project_id || (self.current_project_id && task.project_id !== self.current_project_id) || !task.title.toLowerCase().includes(self.task_filter)) {
             return false
           }
 
@@ -146,10 +143,15 @@ export default {
         })
         .sort((a, b) => {
           if (a.priority !== b.priority) {
+            if (b.priority == a.priority) {
+              if (a.due_date || b.due_date) {
+                if (!a.due_date && b.due_date) {
+                  return new Date(b.due_date) - new Date(a.due_date)
+                }
+                return new Date(a.due_date) - new Date(b.due_date)
+              }
+            }
             return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
-          }
-          if (a.due_date || b.due_date) {
-            return new Date(b.due_date) - new Date(a.due_date)
           }
           return new Date(b.created_at) - new Date(a.created_at)
         })
@@ -187,7 +189,7 @@ export default {
       new_task_title: '',
       new_task_project_id: null,
       other_users: null,
-      tasks: [],
+      // tasks: [],
       status_filter: [],
       project_filter: [],
       project_list: []
@@ -308,6 +310,7 @@ export default {
       this.project_list = []
       this.project_filter = []
       this.tab = tab
+      this.current_company_user_id = tab
       this.getData()
     },
     tabClass(tab) {
