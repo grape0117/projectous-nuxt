@@ -25,21 +25,21 @@
           <li @click="setTab('my_tasks')" :class="tabClass('my_tasks')" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >My Tasks
-              <span v-if="my_tasks.length > 0" class="badge badge-primary label-primary" v-html="my_tasks.length"></span>
+              <span v-if="my_tasks.length > 0" class="badge badge-secondary label-primary" v-html="my_tasks.length"></span>
               <span v-if="my_high_count > 0" class="badge badge-danger label-primary" v-html="my_high_count"></span>
             </a>
           </li>
           <li @click="setTab('all')" :class="tabClass('all')" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >All
-              <span v-if="all_count > 0 || all_tasks.length > 0" class="badge badge-primary label-primary" v-html="all_count || all_tasks.length"></span>
+              <span v-if="all_count > 0 || all_tasks.length > 0" class="badge badge-secondary label-primary" v-html="all_count || all_tasks.length"></span>
               <span v-if="all_high_count > 0" class="badge badge-danger label-primary" v-html="all_high_count"></span>
             </a>
           </li>
           <li @click="setTab('others')" :class="tabClass('others')" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >Assigned to Others
-              <span v-if="others_count > 0 || others_tasks.length > 0" class="badge badge-primary label-primary" v-html="others_count || others_tasks.length"></span>
+              <span v-if="others_count > 0 || others_tasks.length > 0" class="badge badge-secondary label-primary" v-html="others_count || others_tasks.length"></span>
               <span v-if="others_high_count > 0" class="badge badge-danger label-primary" v-html="others_high_count"></span>
             </a>
           </li>
