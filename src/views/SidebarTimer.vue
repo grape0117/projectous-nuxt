@@ -28,7 +28,7 @@
     <div class="sidebar-timer-report-at">{{ restartedAt() }}</div>
 
     <div class="sidebar-timer-notes">
-      <b-form-textarea ref="noteInput" style="overflow-y: hidden; color: white; font-size: smaller; min-width: 100px; background: none; border-left: white solid 1px; border-radius: 0px;" v-on:blur="saveNotes" class="sidebar-timer-timer-task" rows="2" max-rows="30" cols="300" v-model="timer.notes"></b-form-textarea>
+      <b-form-textarea ref="noteInput" style="overflow-y: hidden; color: white; font-size: smaller; min-width: 100px; background: none; border-left: white solid 1px; border-radius: 0px;" v-on:blur="saveNotes" class="sidebar-timer-timer-task" rows="2" max-rows="30" cols="300"></b-form-textarea>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
     <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
@@ -345,6 +345,7 @@ export default {
       await this.$store.dispatch('timers/saveTimer', this.timer)
     },
     saveNotes: async function(event) {
+      this.timer.notes = event.target.value
       let notesWithAcronym = this.timer.notes
       console.log('notesWithAcronym', notesWithAcronym)
       // Check for ABC: //TODO: move somewhere else to common area?
@@ -371,6 +372,7 @@ export default {
       }
       console.log('NOTES', notes)
       this.timer.notes = notes
+      event.target.value = notes
       // event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
 
       // await this.$store.dispatch('timers/saveTimer', this.timer)
