@@ -28,7 +28,7 @@
     <div class="sidebar-timer-report-at">{{ restartedAt() }}</div>
 
     <div class="sidebar-timer-notes">
-      <b-form-textarea ref="noteInput" style="overflow-y: hidden; color: white; font-size: smaller; min-width: 100px; background: none; border-left: white solid 1px; border-radius: 0px;" v-on:blur="saveNotes" class="sidebar-timer-timer-task" rows="2" max-rows="30" cols="300"></b-form-textarea>
+      <textarea @keyup="resize" @focus="resize" ref="noteInput" style="overflow-y: hidden; color: white; font-size: smaller; min-width: 100px; background: none; border-left: white solid 1px; border-radius: 0px;" v-on:blur="saveNotes" class="sidebar-timer-timer-task" rows="2" max-rows="30" cols="300"></textarea>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
     <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
@@ -159,9 +159,11 @@ export default {
     // }
   },
   mounted: function() {
+    this.$refs.noteInput.value = this.timer.notes
     if (this.index === 0 && this.timer.notes === null) {
       this.$refs['noteInput'].focus()
     }
+    this.resize()
     /**
      * load in current running project if one exists
      */
@@ -177,6 +179,10 @@ export default {
     this.checkPathTimerId()
   },
   methods: {
+    resize() {
+      const { noteInput } = this.$refs
+      noteInput.style.height = noteInput.scrollHeight + 'px'
+    },
     applyTheme,
     async bumpItUp() {
       const timer = await _.cloneDeep(this.timer)
