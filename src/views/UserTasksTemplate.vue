@@ -147,7 +147,6 @@ export default {
         tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
       }
 
-      //const filtered_result = tasks
       tasks.forEach(data => {
         const { project_id } = data
         if (typeof project_id !== 'undefined') {
@@ -176,17 +175,13 @@ export default {
         })
         .sort((a, b) => {
           if (a.priority !== b.priority) {
-            if (b.priority == a.priority) {
-              if (a.due_date || b.due_date) {
-                if (!a.due_date && b.due_date) {
-                  return new Date(b.due_date) - new Date(a.due_date)
-                }
-                return new Date(a.due_date) - new Date(b.due_date)
-              }
-            }
             return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
+          } else {
+            const distantFuture = new Date(8640000000000000)
+            let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
+            let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
+            return dateA.getTime() - dateB.getTime()
           }
-          return new Date(b.created_at) - new Date(a.created_at)
         })
     },
 
@@ -322,9 +317,10 @@ export default {
       switch (priority) {
         case 'high':
         case 'today':
+          return 4
+        case 'regular':
           return 3
         case 'active':
-        case 'regular':
         case 'this week':
           return 2
         case 'low':
