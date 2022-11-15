@@ -62,12 +62,12 @@ export default {
     'timer.status'(status) {
       EventBus.$emit('timerStatus', status)
     },
-    'timer.notes'(notes) {
-      if (notes === null) return
-      if ((notes.includes('&#8203;') && notes.length === 7) || notes === '') {
-        this.timer.notes = ''
-      }
-    },
+    // 'timer.notes'(notes) {
+    //   if (notes === null) return
+    //   if ((notes.includes('&#8203;') && notes.length === 7) || notes === '') {
+    //     this.timer.notes = ''
+    //   }
+    // },
     $route(to, from) {
       this.checkPathTimerId()
     }
