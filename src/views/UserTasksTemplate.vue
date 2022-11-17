@@ -64,7 +64,7 @@
         </ul>
         <b style="font-size:13px;">Project: </b>
         <b v-for="project_id in project_list">
-          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'background-color': isActiveProjectFilter(project_id) ? getClientAcronymColor(project_id) : 'white', color: isActiveProjectFilter(project_id) ? 'white' : 'black' }" v-b-tooltip.hover :title="taskProjectName(project_id) && taskProjectName(project_id)">
+          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'background-color': isActiveProjectFilter(project_id) ? getClientAcronymColor(project_id) : 'white', color: isActiveProjectFilter(project_id) ? 'white' : 'black', cursor: 'pointer' }" v-b-tooltip.hover :title="taskProjectName(project_id) && taskProjectName(project_id)">
             {{ getProjectDetails(project_id) }}
           </b-badge>
         </b>
@@ -75,6 +75,13 @@
           <b-badge @click="updateStatusFilter('reviewed')" :variant="isActiveStatusFilter('reviewed') ? 'primary' : 'light'" class="mr-1" style="cursor:pointer">Reviewed</b-badge>
           <b-badge @click="updateStatusFilter('completed')" :variant="isActiveStatusFilter('completed') ? 'success' : 'light'" class="mr-1" style="cursor:pointer">Completed</b-badge>
           <b-badge @click="updateStatusFilter('closed')" :variant="isActiveStatusFilter('closed') ? 'danger' : 'light'" class="mr-1" style="cursor:pointer">Closed</b-badge>
+        </div>
+        <div>
+          <b style="font-size:13px;">Step: </b>
+          <b-badge @click="updateStepFilter('publish')" :variant="isActiveStepFilter('publish') ? 'secondary' : 'light'" class="mr-1" style="cursor:pointer">Publish</b-badge>
+          <b-badge @click="updateStepFilter('test')" :variant="isActiveStepFilter('test') ? 'info' : 'light'" class="mr-1" style="cursor:pointer">Test</b-badge>
+          <b-badge @click="updateStepFilter('get client feedback')" :variant="isActiveStepFilter('get client feedback') ? 'primary' : 'light'" class="mr-1" style="cursor:pointer">Get Client Feedback</b-badge>
+          <b-badge @click="updateStepFilter('notify client')" :variant="isActiveStepFilter('notify client') ? 'success' : 'light'" class="mr-1" style="cursor:pointer">Notify Client</b-badge>
         </div>
         <div role="tabpanel" class="tab-pane active" id="active">
           <h3 v-if="current_project_id">{{ getCurrentProjectNameById() }}</h3>
@@ -152,10 +159,18 @@ export default {
           if ((self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter))) {
             return false
           }
-          if (self.project_filter.length > 0 || self.status_filter.length > 0) {
+          if (self.project_filter.length > 0 || self.status_filter.length > 0 || self.step_filter.length > 0) {
             const check_project_filter = self.project_filter.includes(task.project_id)
             const check_status_filter = self.status_filter.includes(task.status)
-            if (check_project_filter || check_status_filter) {
+            let check_step_filter = false
+            for (let i = 0; i < task.users.length; i++) {
+              const user = task.users[i]
+              if (user.step === self.step_filter[0]) {
+                check_step_filter = true
+                break
+              }
+            }
+            if (check_project_filter || check_status_filter || check_step_filter) {
               return true
             } else {
               return false
@@ -225,6 +240,7 @@ export default {
       new_task_project_id: null,
       other_users: null,
       status_filter: [],
+      step_filter: [],
       project_filter: [],
       project_list: [],
       my_high_count: 0,
@@ -287,7 +303,14 @@ export default {
       if (this.status_filter.includes(status)) {
         this.status_filter = this.status_filter.filter(e => e !== status)
       } else {
-        this.status_filter.push(status)
+        this.status_filter = [status]
+      }
+    },
+    updateStepFilter(step) {
+      if (this.step_filter.includes(step)) {
+        this.step_filter = this.step_filter.filter(e => e !== step)
+      } else {
+        this.step_filter = [step]
       }
     },
     isActiveStatusFilter(status) {
@@ -300,11 +323,21 @@ export default {
 
       return is_selected
     },
+    isActiveStepFilter(step) {
+      let is_selected
+      if (this.step_filter.includes(step)) {
+        is_selected = false
+      } else {
+        is_selected = true
+      }
+
+      return is_selected
+    },
     updateProjectFilter(project_id) {
       if (this.project_filter.includes(project_id)) {
         this.project_filter = this.project_filter.filter(e => e !== project_id)
       } else {
-        this.project_filter.push(project_id)
+        this.project_filter = [project_id]
       }
     },
     isActiveProjectFilter(project_id) {
