@@ -173,7 +173,7 @@ export default {
             return dateA.getTime() - dateB.getTime()
           }
         })
-      let tmp_priority = tasks[0].priority
+      let tmp_priority = tasks.length > 0 ? tasks[0].priority : ''
       tasks.forEach((task, i) => {
         const { project_id } = task
         if (typeof project_id !== 'undefined') {
@@ -324,16 +324,17 @@ export default {
       switch (priority) {
         case 'high':
         case 'today':
-          return 4
+          return 5
         case 'regular':
-          return 3
+          return 4
         case 'active':
         case 'this week':
-          return 2
+          return 3
         case 'low':
         case 'when possible':
-          return 1
+          return 2
         case 'hold':
+          return 1
         default:
           return 0
       }
