@@ -147,17 +147,7 @@ export default {
         tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
       }
 
-      tasks.forEach(data => {
-        const { project_id } = data
-        if (typeof project_id !== 'undefined') {
-          if (!self.project_list.includes(project_id)) {
-            if (project_id) {
-              self.project_list.push(project_id)
-            }
-          }
-        }
-      })
-      return tasks
+      tasks = tasks
         .filter(task => {
           if ((self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter))) {
             return false
@@ -183,6 +173,23 @@ export default {
             return dateA.getTime() - dateB.getTime()
           }
         })
+      let tmp_priority = tasks[0].priority
+      tasks.forEach((task, i) => {
+        const { project_id } = task
+        if (typeof project_id !== 'undefined') {
+          if (!self.project_list.includes(project_id)) {
+            if (project_id) {
+              self.project_list.push(project_id)
+            }
+          }
+        }
+        if (task.priority !== tmp_priority) {
+          task['hasMargin'] = true
+          tmp_priority = task.priority
+        }
+      })
+      console.log(tasks)
+      return tasks
     },
 
     usersNotMe() {

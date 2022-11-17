@@ -1,6 +1,6 @@
 <template>
   <div class="col-md-12">
-    <div class="card" style="margin:5px 15px;background-color: rgba(0,0,0,.4); color:white;">
+    <div class="card" :style="{ margin: task['hasMargin'] ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white' }">
       <div class="card-body" style="padding: 10px 20px 10px 25px">
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
