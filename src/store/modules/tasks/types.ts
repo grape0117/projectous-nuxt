@@ -52,4 +52,7 @@ export interface ITask {
   settings: object
   last_task_message_id?: string | null
   last_task_message_created_at?: string | null
+  idList?: string | null
+  labels?: string[]
+  assignedMembers: []
 }

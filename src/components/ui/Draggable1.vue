@@ -13,7 +13,7 @@
             </div>
 
             <draggable :animation="200" ghost-class="ghost-card" group="tasks" class="task-card-container px-2" @start="isDragging = true" @end="isDragging = false" v-model="columns[index].tasks">
-              <task-card @showEditModal="showEditMoal(task, index, task_index)" v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @cancelAdd="cancelAdd" @editTask="editTask($event, index, task_index)" @creatingTask="creatingTask($event, index)"></task-card>
+              <task-card @showEditModal="showEditMoal(task, index, task_index)" v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @completeAddTask="completeAddTask" @editTask="editTask($event, index, task_index)" @creatingTask="creatingTask($event, index)" :idList="column.idList"></task-card>
             </draggable>
             <div class="field" v-show="newColumnIndex !== index">
               <button class="add-task" @click="addTask(index)"><i class="icon-add" />Add a Task</button>
@@ -96,7 +96,7 @@
       </div>
     </div>
 
-    <b-modal id="add-user-modal" v-model="show_edit_modal" class="task-edit-modal" style="min-height: 500px" :size="'lg'" v-if="editTaskData">
+    <b-modal ref="taskEditModal" id="task-card-edit" v-model="show_edit_modal" class="task-edit-modal" style="min-height: 500px" :size="'lg'" v-if="editTaskData">
       <template #modal-header>
         <div class="header">
           <h2 class="d-flex justify-content-between title">{{ editTaskData.title }}</h2>
@@ -142,6 +142,7 @@
 
 <script>
 import draggable from 'vuedraggable'
+import { groupBy, cloneDeep, uniq, invert } from 'lodash'
 import Badge from './components/Badge.vue'
 import TaskCard from './components/TaskCard.vue'
 // import TaskActionRow from ''
@@ -156,6 +157,7 @@ export default {
     draggable,
     Badge
   },
+  props: ['data'],
   data() {
     return {
       columns: [
@@ -343,6 +345,12 @@ export default {
   },
   mounted() {
     this.editTaskData = this.columns[0].tasks[0]
+
+    this.$root.$on('bv::modal::hidden', e => {
+      if (e.componentId === 'task-card-edit') {
+        this.hideModalHandle()
+      }
+    })
   },
   watch: {
     isDragging(newValue) {
@@ -376,9 +384,17 @@ export default {
         this.add_label_pop_over = false
         this.add_member_pop_over = false
       }
+    },
+    data(newValue) {
+      // console.log("data", newValue)
+      this.columns = cloneDeep(newValue)
     }
   },
   methods: {
+    hideModalHandle() {
+      let task = this.editTaskData
+      this.$store.dispatch('tasks/updateTask', this.editTaskData)
+    },
     hidePopOver(event) {
       const add_member_pop_over = document.getElementById('add-member-pop-over')
       const add_label_pop_over = document.getElementById('add-label-pop-over')
@@ -555,13 +571,18 @@ export default {
         this.$refs.updateTextRef.select()
       })
     },
-    cancelAdd() {
+    completeAddTask(task) {
       this.showMembers = false
 
       this.columns[this.newColumnIndex].tasks = this.columns[this.newColumnIndex].tasks.filter(function(task) {
         return task.type !== 'new'
       })
       this.newColumnIndex = null
+
+      if (task) {
+        console.log(task)
+        this.$emit('createItem', task)
+      }
     },
     assignUser(member) {
       if (this.is_edit) {

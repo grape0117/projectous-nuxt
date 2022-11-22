@@ -73,13 +73,15 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
     return newTask
   },
-  async createProjectTask({ commit, getters }: any, { title, project_id, sort_order, status, temp }: any) {
+  async createProjectTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, idList, assignedMembers }: any) {
     const task = {
       ...createDefaultTask(),
       title,
       project_id,
       sort_order,
-      status
+      status,
+      idList,
+      users: assignedMembers
     }
     let newTask
     if (temp) {
@@ -153,6 +155,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }*/
   },
   async updateTask({ commit }: any, task: any) {
+    console.log('task', task)
     // @ts-ignore
     await this._vm.$http().post('/tasks/' + task.id, { task })
     // TODO @stephane send task to server

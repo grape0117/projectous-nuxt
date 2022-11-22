@@ -32,7 +32,7 @@
           </span>
         </span>
       </div>
-      <button @click="addTask" class="btn-primary rounded">Add task</button> <i class="icon-close ml-2" @click="cancelAdd"></i>
+      <button @click="addTask" class="btn-primary rounded">Add task</button> <i class="icon-close ml-2" @click="completeAddTask"></i>
     </div>
   </div>
 </template>
@@ -49,11 +49,9 @@ export default {
       new_task_title: ''
     }
   },
-  props: {
-    task: {
-      type: Object,
-      default: () => ({})
-    }
+  props: ['task', 'idList'],
+  mounted() {
+    this.task.assignedMembers = this.$store.getters['task_users/getByTaskId'](this.task.id).map(user => user.company_user_id)
   },
   methods: {
     dueDate(date) {
@@ -123,17 +121,21 @@ export default {
       }
       return mappings[label] || mappings.default
     },
-    showEditMoal() {
+    showEditMoal(e) {
+      console.log(e)
+      if (e.target.className == 'icon-edit') {
+        return
+      }
       this.$emit('showEditModal')
     },
     addTask() {
       if (!this.new_task_title) {
         return
       }
-      console.log('add new task')
       this.task['title'] = this.new_task_title
+      this.task['idList'] = this.idList
       this.task['type'] = ''
-      this.$emit('cancelAdd', '')
+      this.$emit('completeAddTask', this.task)
     },
     addTaskWithEnter() {
       console.log('new task title', this.new_task_title)
@@ -184,10 +186,12 @@ export default {
       }
       this.task['title'] = this.new_task_title
       this.task['type'] = ''
+      this.task['idList'] = this.idList
+      this.$emit('completeAddTask', this.task)
       this.$emit('addTask', '')
     },
-    cancelAdd() {
-      this.$emit('cancelAdd', '')
+    completeAddTask() {
+      this.$emit('completeAddTask', '')
     },
     changeTitle: _.debounce(function(e) {
       this.task['title'] = this.new_task_title

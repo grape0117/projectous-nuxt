@@ -31,11 +31,15 @@ export const mutations: MutationTree<IModuleState> = {
       //task.sort_order = index
       //} //Project?
     })
-  } /*,
-  uuid_to_id(state: IModuleState, { uuid, id }) {
+  },
+  /*uuid_to_id(state: IModuleState, { uuid, id }) {
     state.tasks[state.lookup[uuid]].id = id
     state.lookup[id] = state.lookup[uuid]
 
     //TODO: do we need to delete from lookup? Doesn't seem to matter
   }*/
+  updateTask(state: IModuleState, task) {
+    console.log('here', task)
+    // this.commit('UPDATE_ATTRIBUTE', task)
+  }
 }

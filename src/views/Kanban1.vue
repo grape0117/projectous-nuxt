@@ -119,7 +119,7 @@ const Tasks = namespace('tasks')
 const Lists = namespace('lists')
 const Projects = namespace('projects')
 
-const taskStatuses = ['open', 'in-progress', 'turned-in', 'completed', 'closed']
+const taskStatuses = ['backlog', 'in-progress', 'turned-in', 'completed', 'closed']
 
 interface ITaskTimerToggle {
   taskId: number | string
@@ -282,20 +282,68 @@ export default class Custom extends Vue {
   }
   get selectedProjectTasksForStatusesColumns() {
     const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
-    console.log('projectTasks', projectTasks)
+    if (this.$store.state.lists.lists.length > 0) {
+      const lists = this.$store.state.lists.lists
+      let columns = new Array(lists.length)
+      for (let i = 0; i < lists.length; i++) {
+        const list = lists[i]
+        let tasks = projectTasks.filter(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => idList === list.id).sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+        if (i === 0) {
+          let unassigned_tasks = projectTasks.filter(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => idList === null).sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+          tasks = [...tasks, ...unassigned_tasks]
+        }
+        columns[i] = {
+          title: list.name,
+          idList: list.id,
+          tasks: tasks
+        }
+      }
+      return columns
+    } else {
+      let tasks = projectTasks
+        .map(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => ({
+          id,
+          title,
+          status,
+          listId: status,
+          sort_order,
+          temp,
+          idList: idList || 'backlog',
+          labels,
+          detail,
+          due_date,
+          assignedMembers
+        }))
+        .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+
+      let columns = [
+        {
+          title: 'Backlog',
+          tasks: tasks
+        }
+      ]
+
+      return columns
+    }
     return projectTasks
-      .map(({ id, title, status, sort_order, temp }: ITask) => ({
+      .map(({ id, title, status, sort_order, temp, idList, labels }: ITask) => ({
         id,
         title,
         status,
         listId: status,
         sort_order,
-        temp
+        temp,
+        idList: idList || 'backlog',
+        labels
       }))
       .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
   }
 
   get taskPerStatusLists() {
+    if (this.$store.state.lists.lists.length > 0) {
+      return this.$store.state.lists.lists
+    }
+
     return taskStatuses.map(status => ({
       title: status,
       id: status,
@@ -394,15 +442,18 @@ export default class Custom extends Vue {
     return project ? project.name : ''
   }
 
-  public async createTask({ item, ids_of_items_to_shift_up }: any) {
+  public async createTask({ title, idList, assignedMembers }: any) {
     console.log('CREATE TASK CUSTOM')
 
     this.createProjectTaskVuex({
-      title: item.title,
+      title: title,
       project_id: this.selectedProjectId,
-      sort_order: item.sort_order,
-      status: item.status,
-      temp: false
+      // sort_order: item.sort_order,
+      // status: item.status,
+      status: 'open',
+      temp: false,
+      idList: idList,
+      assignedMembers: assignedMembers
     })
   }
 

@@ -10,6 +10,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     const response = await this._vm.$http().get('/tasks?project_id=' + id)
     this.commit('ADD_MANY', { module: 'tasks', entities: response.tasks }, { root: true })
     this.commit('ADD_MANY', { module: 'task_users', entities: response.task_users }, { root: true })
+    this.commit('UPDATE', { module: 'lists', entity: response.lists }, { root: true })
   },
   async pinProject({ commit, state }, { id, userId }) {
     const { projects, lookup } = state

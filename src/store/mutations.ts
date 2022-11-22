@@ -153,6 +153,10 @@ export const mutations: MutationTree<IRootState> = {
       return
     }
     let modulestate = state[module]
+    if (modulestate && module == 'lists') {
+      state[module][module] = entity
+      return
+    }
     let key = modulestate.lookup[entity.id]
     if (!modulestate[module][key]) {
       console.log('UPDATE: entity not found in ' + module + ' lookup', entity.id, modulestate.lookup)
