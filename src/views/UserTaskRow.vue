@@ -200,7 +200,7 @@ export default {
     dueDate(due_date) {
       let formatted_date
       if (due_date) {
-        formatted_date = moment(new Date(due_date)).format('yyyy-MM-DD')
+        formatted_date = moment(due_date, 'yyyy-MM-DD').format('yyyy-MM-DD')
       } else {
         return ''
       }
