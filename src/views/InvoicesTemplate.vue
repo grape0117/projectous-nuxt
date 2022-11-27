@@ -62,12 +62,24 @@
               </div>
               <span class="checkbox-switch-title" @click="toggleShowAllStatus">All</span>
             </div>
-
             <div class="status-buttons">
               <b-button-group size="sm" style="height:30px">
-                <b-button @click="setStatusFilter('open')" :style="{ 'background-color': status_filter === 'open' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none' }">Open</b-button>
-                <b-button @click="setStatusFilter('paid')" :style="{ 'background-color': status_filter === 'paid' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none' }">Paid</b-button>
-                <b-button @click="setStatusFilter('voided')" :style="{ 'background-color': status_filter === 'voided' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none' }">Voided</b-button>
+                <b-button @click="setStatusFilter('open')" :style="{ 'background-color': status_filter === 'open' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
+                  Open
+                  <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">{{ open_count }}</b-badge>
+                </b-button>
+                <b-button @click="setStatusFilter('sent')" :style="{ 'background-color': status_filter === 'sent' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
+                  Sent
+                  <!-- <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">9</b-badge> -->
+                </b-button>
+                <b-button @click="setStatusFilter('paid')" :style="{ 'background-color': status_filter === 'paid' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
+                  Paid
+                  <!-- <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">9</b-badge> -->
+                </b-button>
+                <b-button @click="setStatusFilter('voided')" :style="{ 'background-color': status_filter === 'voided' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
+                  Voided
+                  <!-- <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">9</b-badge> -->
+                </b-button>
               </b-button-group>
             </div>
           </span>
@@ -78,13 +90,14 @@
             <b-form-checkbox name="selected-invoice" v-model="selected_invoice_id" :value="data.item.invoice_id"> </b-form-checkbox>
             <b-button-group size="sm" style="height:30px">
               <b-button @click="updateStatus(data.item.id, 'open')" :style="{ background: backgroundColor('open', data.item), border: 'none' }">Open</b-button>
+              <b-button @click="updateStatus(data.item.id, 'sent')" :style="{ background: backgroundColor('sent', data.item), border: 'none' }">Sent</b-button>
               <b-button @click="updateStatus(data.item.id, 'paid')" :style="{ background: backgroundColor('paid', data.item), border: 'none' }">Paid</b-button>
               <b-button @click="updateStatus(data.item.id, 'voided')" :style="{ background: backgroundColor('voided', data.item), border: 'none' }">Voided</b-button>
             </b-button-group>
           </span>
         </template>
         <template #cell(age)="data">
-          {{ invoice_age(data.item) }}
+          <span :style="{ color: invoice_age(data.item, true) }">{{ invoice_age(data.item) }}</span>
         </template>
         <template #cell(date_created)="data">
           {{ formatDate(data.item.created_at) }}
@@ -195,7 +208,8 @@ export default {
       ],
       items: [{ id: 'radio here', invoice_id: 1234, recipient: 'someone', amount: 222, note: 'test', age: '2 days', date_created: 'Aug 19', start_date: 'Aug 19', end_date: 'Aug 30', options: 'wqewwe' }],
       is_busy: false,
-      action: null
+      action: null,
+      open_count: 0
     }
   },
   created() {},
@@ -314,7 +328,6 @@ export default {
     },
     invoice_years_data() {
       let invoice = []
-
       let total_open_invoice_count = 0
       for (const { year } of this.invoice_years) {
         let open_year = this.open_invoice_count.find(function(year_count) {
@@ -362,6 +375,9 @@ export default {
       } else {
         this.selected_invoice_id = []
       }
+    },
+    invoice_filter() {
+      this.open_count = this.invoice_filter.filter(e => e.status === 'open').length
     }
   },
   methods: {
@@ -370,13 +386,26 @@ export default {
       this.invoice_years = counts.invoice_years
       this.open_invoice_count = counts.open_invoice_count
     },
-    invoice_age(invoice) {
+    invoice_age(invoice, return_color) {
       if (invoice.status === 'open') {
         const invoice_date = moment(invoice.created_at, 'YYYY-MM-DD')
         const today = moment().startOf('day')
 
         //Difference in number of days
-        return Math.floor(moment.duration(today.diff(invoice_date)).asDays()) + ' Days'
+        const days_diff = Math.floor(moment.duration(today.diff(invoice_date)).asDays())
+        let return_data
+        if (return_color) {
+          if (days_diff <= 30) {
+            return_data = 'white'
+          } else if (days_diff > 30 && days_diff <= 60) {
+            return_data = 'yellow'
+          } else if (days_diff > 60) {
+            return_data = 'red'
+          }
+        } else {
+          return_data = Math.floor(days_diff) + ' Days'
+        }
+        return return_data
       } else {
         return null
       }
@@ -488,7 +517,7 @@ export default {
       this.open_invoice_count = open_invoice_count
     },
     formatDate(date) {
-      return moment(date).format('MMM DD')
+      return moment(date).format('MMM DD YYYY')
     },
     applyAction() {
       let self = this
