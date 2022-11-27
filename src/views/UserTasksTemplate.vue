@@ -53,15 +53,15 @@
           <li @click="setTab('today_tasks')" :class="tabClass('today_tasks')" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >Today
-              <span v-if="others_count > 0 || for_today_tasks.length > 0" class="badge badge-secondary label-primary" v-html="others_count || for_today_tasks.length"></span>
-              <span v-if="others_high_count > 0" class="badge badge-danger label-primary" v-html="others_high_count"></span>
+              <span v-if="today_count > 0 || for_today_tasks.length > 0" class="badge badge-secondary label-primary" v-html="today_count || for_today_tasks.length"></span>
+              <span v-if="today_high_count > 0" class="badge badge-danger label-primary" v-html="today_high_count"></span>
             </a>
           </li>
           <li @click="setTab('past_due')" :class="tabClass('past_due')" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >Due
-              <span v-if="others_count > 0 || due_tasks.length > 0" class="badge badge-secondary label-primary" v-html="others_count || due_tasks.length"></span>
-              <span v-if="others_high_count > 0" class="badge badge-danger label-primary" v-html="others_high_count"></span>
+              <span v-if="past_due_count > 0 || due_tasks.length > 0" class="badge badge-secondary label-primary" v-html="past_due_count || due_tasks.length"></span>
+              <span v-if="past_due_high_count > 0" class="badge badge-danger label-primary" v-html="past_due_high_count"> </span>
             </a>
           </li>
         </ul>
@@ -120,14 +120,12 @@ export default {
   },
   mounted() {
     EventBus.$on('update', ({ company_user_id }) => {
-      console.log('company_user_id', company_user_id)
       this.setTab(company_user_id)
     })
   },
   computed: {
     current_company_user() {
       const me = this.$store.getters['company_users/getMe']
-      console.log('me', me)
       return me
     },
     isAdmin() {
@@ -159,7 +157,8 @@ export default {
       let user_id = null
       let tasks = []
       if (this.tab === 'all') {
-        tasks = this.$store.state.tasks.tasks
+        tasks = this.$store.state.tasks.all_tasks
+        // console.log("tasks==>", tasks);
         this.all_count = tasks.length
         this.all_high_count = tasks.filter(({ priority }) => priority == 'high').length
       } else if (this.tab === 'others') {
@@ -170,18 +169,20 @@ export default {
         user_id = self.current_company_user.id
         tasks = this.$store.state.tasks.my_tasks
         this.my_high_count = tasks.filter(task => task.priority == 'high').length
+      } else if (this.tab === 'today_tasks') {
+        user_id = self.current_company_user.id
+        tasks = this.$store.state.tasks.today_tasks
+        this.today_count = tasks.length
+        this.today_high_count = tasks.filter(task => task.priority == 'high').length
+      } else if (this.tab === 'past_due') {
+        user_id = self.current_company_user.id
+        tasks = this.$store.state.tasks.past_due_tasks
+        this.past_due_count = tasks.length
+        this.past_due_high_count = tasks.filter(task => task.priority == 'high').length
       } else if (this.tab === 'managing') {
       } else if (isFinite(this.tab)) {
         user_id = this.tab
         tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
-      } else if (this.tab === 'today_tasks') {
-        user_id = self.current_company_user.id
-        tasks = this.$store.state.tasks.today_tasks
-        this.my_high_count = tasks.filter(task => task.priority == 'high').length
-      } else if (this.tab === 'past_due') {
-        user_id = self.current_company_user.id
-        tasks = this.$store.state.tasks.past_due_tasks
-        this.my_high_count = tasks.filter(task => task.priority == 'high').length
       }
 
       tasks = tasks
@@ -233,7 +234,6 @@ export default {
           tmp_priority = task.priority
         }
       })
-      console.log(tasks)
       return tasks
     },
 
@@ -278,12 +278,15 @@ export default {
       all_count: 0,
       all_high_count: 0,
       others_count: 0,
-      others_high_count: 0
+      others_high_count: 0,
+      today_count: 0,
+      today_high_count: 0,
+      past_due_count: 0,
+      past_due_high_count: 0
     }
   },
   watch: {
     current_project_id() {
-      console.log('watching current_project_id')
       this.storeChanges()
     },
     task_filter() {
@@ -310,7 +313,6 @@ export default {
   },
   beforeCreate() {
     if (this.$store.state.settings.current_company.id) {
-      console.log('current_company_id')
       if (sessionStorage.getItem('tasks')) {
         this.$router.push({ path: sessionStorage.getItem('tasks') })
       }
@@ -415,8 +417,10 @@ export default {
       this.project_list = []
       this.project_filter = []
       this.tab = tab
-      this.current_company_user_id = tab
-      this.getData()
+      if (isFinite(this.tab)) {
+        this.current_company_user_id = tab
+        this.getData()
+      }
     },
     tabClass(tab) {
       if (this.tab === tab) {
@@ -432,7 +436,6 @@ export default {
         path += 'current_project_id=' + this.current_project_id + '&'
       }
       if (this.current_task) {
-        console.log(this.current_task)
         path += 'current_task_id=' + this.current_task.id + '&'
       }
 
@@ -509,7 +512,6 @@ export default {
     async getData() {
       if (this.current_company_user_id) {
         const response = await this.$http().get('/company_users/' + this.current_company_user_id + '/tasks')
-        console.log(response)
         let count_of_heigh = response.tasks.filter(task => task.priority == 'high').length
         if (this.high_count_of_users.filter(({ user_id }) => user_id == this.current_company_user_id).length == 0) {
           this.high_count_of_users.push({

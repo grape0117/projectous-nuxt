@@ -13,8 +13,13 @@
                 <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
                   {{ getProjectDetails(task.project_id) }}
                 </b-badge>
-                <b-badge v-else :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2">
+
+                <b-badge v-else-if="task.project_id" :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2">
                   {{ getProject(task.project_id).name }}
+                </b-badge>
+
+                <b-badge v-else :style="{ 'background-color': 'transparent' }" variant="primary" class="mr-2 ml-2">
+                  --
                 </b-badge>
 
                 {{ task.title ? task.title : '---' }}
