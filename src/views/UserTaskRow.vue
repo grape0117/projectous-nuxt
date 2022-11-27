@@ -183,6 +183,7 @@ export default {
       this.$emit('showUpdateModal', user)
     },
     updatePriority(priority) {
+      this.task.priority = priority
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: priority })
     },
     capitalizeFirstLetter(string) {
