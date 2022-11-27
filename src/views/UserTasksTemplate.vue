@@ -50,6 +50,20 @@
               <span v-if="filter_task_high_count(user.id).length > 0 && filter_task_high_count(user.id)[0]['count'] > 0" class="badge badge-danger label-primary" v-html="filter_task_high_count(user.id)[0]['count']"></span>
             </a>
           </li>
+          <li @click="setTab('today_tasks')" :class="tabClass('today_tasks')" role="presentation">
+            <a aria-controls="closed" role="tab" data-toggle="tab"
+              >Today
+              <span v-if="others_count > 0 || for_today_tasks.length > 0" class="badge badge-secondary label-primary" v-html="others_count || for_today_tasks.length"></span>
+              <span v-if="others_high_count > 0" class="badge badge-danger label-primary" v-html="others_high_count"></span>
+            </a>
+          </li>
+          <li @click="setTab('past_due')" :class="tabClass('past_due')" role="presentation">
+            <a aria-controls="closed" role="tab" data-toggle="tab"
+              >Due
+              <span v-if="others_count > 0 || due_tasks.length > 0" class="badge badge-secondary label-primary" v-html="others_count || due_tasks.length"></span>
+              <span v-if="others_high_count > 0" class="badge badge-danger label-primary" v-html="others_high_count"></span>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -131,6 +145,14 @@ export default {
       this.others_high_count = this.$store.state.tasks.others_tasks.filter(({ priority }) => priority == 'high').length
       return this.$store.state.tasks.others_tasks
     },
+    for_today_tasks() {
+      this.others_high_count = this.$store.state.tasks.today_tasks.filter(({ priority }) => priority == 'high').length
+      return this.$store.state.tasks.today_tasks
+    },
+    due_tasks() {
+      this.others_high_count = this.$store.state.tasks.past_due_tasks.filter(({ priority }) => priority == 'high').length
+      return this.$store.state.tasks.past_due_tasks
+    },
     getUserProjects(user_tasks) {},
     filtered_tasks() {
       let self = this
@@ -152,6 +174,14 @@ export default {
       } else if (isFinite(this.tab)) {
         user_id = this.tab
         tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
+      } else if (this.tab === 'today_tasks') {
+        user_id = self.current_company_user.id
+        tasks = this.$store.state.tasks.today_tasks
+        this.my_high_count = tasks.filter(task => task.priority == 'high').length
+      } else if (this.tab === 'past_due') {
+        user_id = self.current_company_user.id
+        tasks = this.$store.state.tasks.past_due_tasks
+        this.my_high_count = tasks.filter(task => task.priority == 'high').length
       }
 
       tasks = tasks
