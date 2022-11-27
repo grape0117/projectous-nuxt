@@ -417,10 +417,8 @@ export default {
       this.project_list = []
       this.project_filter = []
       this.tab = tab
-      if (isFinite(this.tab)) {
-        this.current_company_user_id = tab
-        this.getData()
-      }
+      this.current_company_user_id = tab
+      this.getData()
     },
     tabClass(tab) {
       if (this.tab === tab) {
