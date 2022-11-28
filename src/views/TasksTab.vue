@@ -453,7 +453,7 @@ export default {
 .modal-body {
   overflow: hidden;
 }
-.modal-dialog {
+#snooze-modal .modal-dialog {
   max-width: 325px !important;
 }
 .modal-header {
