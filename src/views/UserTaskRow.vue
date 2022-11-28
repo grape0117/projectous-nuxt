@@ -5,7 +5,7 @@
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
             <h6 class="card-text">
-              <b-icon v-if="isToday" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 0)"></b-icon>
+              <b-icon v-if="task['isToday']" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 0)"></b-icon>
               <b-icon v-else :icon="is_mouse_enter ? 'star-fill' : 'star'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 1)"></b-icon>
               <i class="icon-play_arrow" @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" style="color:green;cursor:pointer;"></i>
               <i class="icon-stop" @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" style="color:red;cursor:pointer;"></i>
@@ -87,11 +87,6 @@ export default {
     }
   },
   watch: {},
-  computed: {
-    isToday() {
-      return moment(this.task['next_work_day']).format('yyyy-MM-DD') <= moment().format('yyyy-MM-DD')
-    }
-  },
   methods: {
     priorityColor(priority) {
       let color = 'primary'

@@ -174,11 +174,18 @@ export default {
     customNextWorkDate(e) {
       this.is_custom_next_work_day = false
       const index = this.task_list.map(task => task.id).indexOf(this.selected_task)
-      this.task_list[index].next_work_day = this.next_work_day
-      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.selected_task, attribute: 'next_work_day', value: this.next_work_day })
-      this.show_snooze = false
-      this.next_work_day = null
-      this.shown_date_picker = false
+      const isToday = moment(this.next_work_day).format('yyyy-MM-DD') <= moment().format('yyyy-MM-DD')
+      this.task_list[index]['isToday'] = isToday
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.selected_task, company_user_id: current_user_id })[0]
+      if (task_user) {
+        this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: this.next_work_day })
+        this.show_snooze = false
+        this.next_work_day = null
+        this.shown_date_picker = false
+      } else {
+        this.makeToast('danger', 'You are not assigned to this task')
+      }
     },
     addUser(user_id) {
       const user_index = this.assigned_users.indexOf(user_id)
@@ -352,15 +359,21 @@ export default {
     },
     showSnoozeModal({ task_id, star }) {
       this.selected_task = task_id
-      this.selected_user = null
-      this.selected_step = null
-      this.task_notes = null
-      this.user_rate = ''
+      const current_user_id = this.$store.state.settings.current_company_user_id
       if (star === 1) {
-        const index = this.task_list.map(task => task.id).indexOf(task_id)
-        this.task_list[index].next_work_day = moment().format('yyyy-MM-DD')
-        this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: task_id, attribute: 'next_work_day', value: moment().format('Y-M-D') })
+        const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: task_id, company_user_id: current_user_id })[0]
+        if (task_user) {
+          const index = this.task_list.map(task => task.id).indexOf(task_id)
+          this.task_list[index]['isToday'] = true
+          this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: moment().format('Y-M-D') })
+        } else {
+          this.makeToast('danger', 'You are not assigned to this task')
+        }
       } else {
+        const index = this.task_list.map(task => task.id).indexOf(task_id)
+        this.task_list[index]['isToday'] = false
+        const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: task_id, company_user_id: current_user_id })[0]
+        this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: null })
         this.$bvModal.show('snooze-modal')
       }
     },
@@ -373,10 +386,17 @@ export default {
         .add(1, 'week')
         .format('Y-M-D')
       let next_work_day = days == 1 ? tomorrow : next_monday
+      const current_user_id = this.$store.state.settings.current_company_user_id
       const index = this.task_list.map(task => task.id).indexOf(this.selected_task)
-      this.task_list[index].next_work_day = next_work_day
-      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.selected_task, attribute: 'next_work_day', value: next_work_day })
-      this.show_snooze = false
+      const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.selected_task, company_user_id: current_user_id })[0]
+      if (task_user) {
+        this.task_list[index]['isToday'] = false
+        this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: next_work_day })
+        this.show_snooze = false
+        this.$forceUpdate()
+      } else {
+        this.makeToast('danger', 'You are not assigned to this task')
+      }
     }
   }
 }

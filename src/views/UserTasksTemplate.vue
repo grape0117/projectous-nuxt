@@ -110,6 +110,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import { EventBus } from '@/components/event-bus'
 import TasksTab from './TasksTab'
 import TaskActionRow from './TaskActionRow.vue'
@@ -156,6 +157,8 @@ export default {
       let self = this
       let user_id = null
       let tasks = []
+      const current_user_id = this.$store.state.settings.current_company_user_id
+
       if (this.tab === 'all') {
         tasks = this.$store.state.tasks.all_tasks
         // console.log("tasks==>", tasks);
@@ -233,6 +236,8 @@ export default {
           task['hasMargin'] = true
           tmp_priority = task.priority
         }
+        const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: task.id, company_user_id: current_user_id })[0]
+        task['isToday'] = task_user && task_user['next_work_day'] && moment(task_user['next_work_day']).format('yyyy-MM-DD') <= moment().format('yyyy-MM-DD')
       })
       return tasks
     },
