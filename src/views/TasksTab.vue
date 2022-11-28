@@ -100,7 +100,7 @@
         </b-button>
       </div>
     </b-modal>
-    <b-modal id="snooze-modal" v-model="show_snooze" class="snooze-modal" style="min-height: 500px" :size="'sm'">
+    <b-modal id="snooze-modal" v-model="show_snooze" class="snooze-modal" :size="'sm'">
       <template #modal-header>
         <div class="header">
           <div class="d-flex justify-content-between">
@@ -114,8 +114,8 @@
             <b-button variant="warning" @click="changeNextWorkDay(1)">Tomorrow</b-button>
             <b-button variant="warning" @click="changeNextWorkDay(2)" style="border-top: 2px solid white; border-bottom: 2px solid white;">Next Monday</b-button>
             <b-button variant="warning" @click="is_custom_next_work_day = true">Custom</b-button>
-            <b-form-datepicker v-if="is_custom_next_work_day" id="example-datepicker" v-model="next_work_day" class="mb-2"></b-form-datepicker>
-            <!-- <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-3" :style="{ width: task.due_date ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" /> -->
+            <b-form-datepicker v-if="is_custom_next_work_day" id="datepicker" v-model="next_work_day" class="mb-2" @input="customNextWorkDate" @shown="shown_date_picker = true" @hidden="shown_date_picker = false"></b-form-datepicker>
+            <div v-if="shown_date_picker" style="height: 190px;"></div>
           </b-button-group>
         </div>
       </div>
@@ -160,21 +160,26 @@ export default {
       assigned_users: [],
       working_users: [],
       is_custom_next_work_day: false,
-      next_work_day: ''
+      next_work_day: '',
+      shown_date_picker: false
     }
   },
   watch: {
     tasks(newTasks, oldTasks) {
       this.task_list = this.tasks
-    },
-    next_work_day(new_work_day, old) {
-      this.is_custom_next_work_day = false
-      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.selected_task, attribute: 'next_work_day', value: new_work_day })
-      this.show_snooze = false
     }
   },
 
   methods: {
+    customNextWorkDate(e) {
+      this.is_custom_next_work_day = false
+      const index = this.task_list.map(task => task.id).indexOf(this.selected_task)
+      this.task_list[index].next_work_day = this.next_work_day
+      this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.selected_task, attribute: 'next_work_day', value: this.next_work_day })
+      this.show_snooze = false
+      this.next_work_day = null
+      this.shown_date_picker = false
+    },
     addUser(user_id) {
       const user_index = this.assigned_users.indexOf(user_id)
 
@@ -345,13 +350,19 @@ export default {
       const task_index = this.tasks.findIndex(task => task.id === task_id)
       this.working_users = this.task_list[task_index].users.map(user => user.company_user_id)
     },
-    showSnoozeModal(task_id) {
+    showSnoozeModal({ task_id, star }) {
       this.selected_task = task_id
       this.selected_user = null
       this.selected_step = null
       this.task_notes = null
       this.user_rate = ''
-      this.$bvModal.show('snooze-modal')
+      if (star === 1) {
+        const index = this.task_list.map(task => task.id).indexOf(task_id)
+        this.task_list[index].next_work_day = moment().format('yyyy-MM-DD')
+        this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: task_id, attribute: 'next_work_day', value: moment().format('Y-M-D') })
+      } else {
+        this.$bvModal.show('snooze-modal')
+      }
     },
     changeNextWorkDay(days) {
       const tomorrow = moment()
@@ -362,6 +373,8 @@ export default {
         .add(1, 'week')
         .format('Y-M-D')
       let next_work_day = days == 1 ? tomorrow : next_monday
+      const index = this.task_list.map(task => task.id).indexOf(this.selected_task)
+      this.task_list[index].next_work_day = next_work_day
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.selected_task, attribute: 'next_work_day', value: next_work_day })
       this.show_snooze = false
     }
@@ -419,6 +432,9 @@ export default {
 }
 .modal-body {
   overflow: hidden;
+}
+.modal-dialog {
+  max-width: 325px !important;
 }
 .modal-header {
   margin: auto;

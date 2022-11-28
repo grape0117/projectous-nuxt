@@ -5,8 +5,8 @@
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
             <h6 class="card-text">
-              <b-icon v-if="isToday" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id)"></b-icon>
-              <b-icon v-else :icon="is_mouse_enter ? 'star-fill' : 'star'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id)"></b-icon>
+              <b-icon v-if="isToday" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 0)"></b-icon>
+              <b-icon v-else :icon="is_mouse_enter ? 'star-fill' : 'star'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 1)"></b-icon>
               <i class="icon-play_arrow" @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" style="color:green;cursor:pointer;"></i>
               <i class="icon-stop" @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" style="color:red;cursor:pointer;"></i>
               <b>
@@ -89,7 +89,7 @@ export default {
   watch: {},
   computed: {
     isToday() {
-      return this.task['next_work_day'] == moment(new Date()).format('yyyy-MM-DD')
+      return moment(this.task['next_work_day']).format('yyyy-MM-DD') <= moment().format('yyyy-MM-DD')
     }
   },
   methods: {
@@ -258,8 +258,8 @@ export default {
       const due_date = e.target.value
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'due_date', value: due_date })
     },
-    changeNextWorkDay(task_id) {
-      this.$emit('showSnoozeModal', task_id)
+    changeNextWorkDay(task_id, star) {
+      this.$emit('showSnoozeModal', { task_id, star })
     },
     getTaskTimers(id, type) {
       let timers = this.$store.state.timers.timers
