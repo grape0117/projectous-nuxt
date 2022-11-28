@@ -5,21 +5,26 @@
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
             <h6 class="card-text">
+              <b-icon v-if="task['isToday']" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 0)"></b-icon>
+              <b-icon v-else :icon="is_mouse_enter ? 'star-fill' : 'star'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 1)"></b-icon>
               <i class="icon-play_arrow" @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" style="color:green;cursor:pointer;"></i>
               <i class="icon-stop" @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" style="color:red;cursor:pointer;"></i>
-              <!-- <b-badge @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer"> <i class="icon-stop" style="color:red;"></i>Stop </b-badge> -->
-              <!-- <b-badge variant="danger mr-2" style="cursor:pointer">{{ task.priority ? capitalizeFirstLetter(task.priority) : 'Priority' }}</b-badge> -->
               <b>
                 <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
                   {{ getProjectDetails(task.project_id) }}
                 </b-badge>
-                <b-badge v-else :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2">
+
+                <b-badge v-else-if="task.project_id" :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2">
                   {{ getProject(task.project_id).name }}
+                </b-badge>
+
+                <b-badge v-else :style="{ 'background-color': 'transparent' }" variant="primary" class="mr-2 ml-2">
+                  --
                 </b-badge>
 
                 {{ task.title ? task.title : '---' }}
                 <span v-for="user in task.users" v-if="isAdmin">
-                  <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step}:${user.notes}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+                  <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
                   </span>
                 </span>
@@ -70,6 +75,7 @@ export default {
   data() {
     return {
       // priorities: ['high', 'regular', 'low', 'hold'],
+      is_mouse_enter: false,
       priorities: [
         { value: 'high', text: 'High' },
         { value: 'regular', text: 'Regular' },
@@ -172,6 +178,7 @@ export default {
       this.$emit('showUpdateModal', user)
     },
     updatePriority(priority) {
+      this.task.priority = priority
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: priority })
     },
     capitalizeFirstLetter(string) {
@@ -200,7 +207,7 @@ export default {
     dueDate(due_date) {
       let formatted_date
       if (due_date) {
-        formatted_date = moment(new Date(due_date)).format('yyyy-MM-DD')
+        formatted_date = moment(due_date, 'yyyy-MM-DD').format('yyyy-MM-DD')
       } else {
         return ''
       }
@@ -245,6 +252,9 @@ export default {
     saveDueDate(e) {
       const due_date = e.target.value
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'due_date', value: due_date })
+    },
+    changeNextWorkDay(task_id, star) {
+      this.$emit('showSnoozeModal', { task_id, star })
     },
     getTaskTimers(id, type) {
       let timers = this.$store.state.timers.timers

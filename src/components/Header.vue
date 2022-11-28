@@ -43,13 +43,14 @@
                   <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
                 </b-dropdown>
                 <b>
-                  | {{ new_task_title }}
+                  &nbsp;{{ new_task_title }}
 
                   <span v-if="new_company_user_id">
                     <span :title="`${getCompanyUserDetails(new_company_user_id).name}   ${assignedUser.step}:${assignedUser.notes}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${assignedUser.status} ${assignedUser.step} ${assignedUser.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(new_company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                       {{ abbrName(getCompanyUserDetails(new_company_user_id).name) }}
                     </span>
                   </span>
+                  <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-3" :style="{ width: new_task_due_date ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(new_task_due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(new_task_due_date)" v-b-tooltip.hover :title="dueDateDetails(new_task_due_date)" />
                 </b>
               </h6>
               <!-- end result -->
@@ -123,6 +124,7 @@ import { getCookie } from '@/utils/util-functions'
 import TaskActionRow from '../views/TaskActionRow.vue'
 import { abbrName } from '@/utils/util-functions'
 import _ from 'lodash'
+import moment from 'moment'
 
 export default Vue.extend({
   extends: TaskActionRow,
@@ -141,6 +143,7 @@ export default Vue.extend({
       new_company_user_id: false,
       new_user_name: '',
       new_priority: 'active',
+      new_task_due_date: '',
       showMenu: false,
       timerEmptyFields: 0,
       timerRunning: false,
@@ -322,6 +325,54 @@ export default Vue.extend({
     })
   },
   methods: {
+    saveDueDate(e) {
+      this.new_task_due_date = e.target.value
+    },
+    dueDateDetails(due_date, return_color) {
+      if (!due_date && !return_color) {
+        return ''
+      }
+      const timezone = moment.tz.guess()
+      const timezone_date = moment()
+        .tz(timezone)
+        .format('YYYY-MM-DD')
+      const task_due_date = moment(due_date).format('YYYY-MM-DD')
+
+      const diff = moment.duration(moment(task_due_date).diff(moment(timezone_date)))
+      const days = diff.asDays()
+      const near_due_date = [1, 2, 3]
+      let return_value
+      let color
+      if (days < 0) {
+        return_value = 'Past due'
+        color = '#ffc107'
+      } else if (days === 0) {
+        return_value = 'Due today'
+        color = 'red'
+      } else if (near_due_date.includes(days)) {
+        return_value = `Due in ${days} ${days === 1 ? 'day' : 'days'}`
+        color = 'orange'
+      } else {
+        return_value = `Due on ${moment(due_date).format('MMMM DD')}`
+        color = '#17a2b8'
+      }
+      if (!due_date) {
+        color = '#28a745'
+      }
+      if (return_color) {
+        return_value = color
+      }
+      return return_value
+    },
+    dueDate(due_date) {
+      let formatted_date
+      if (due_date) {
+        formatted_date = moment(due_date, 'yyyy-MM-DD').format('yyyy-MM-DD')
+      } else {
+        return ''
+      }
+      return formatted_date
+    },
     reload() {
       alert('Non-functional')
       return
@@ -413,7 +464,8 @@ export default Vue.extend({
         temp: false,
         users: [this.new_company_user_id],
         owner: this.$store.state.settings.current_company_user_id,
-        priority: this.new_priority
+        priority: this.new_priority,
+        due_date: this.new_task_due_date
       })
       EventBus.$emit('update', { company_user_id: this.new_company_user_id })
       this.new_task_title = ''
@@ -871,6 +923,12 @@ export default Vue.extend({
   color: #fff;
   background-color: #ffa500;
   border-color: #fff;
+}
+.search_result .card-text {
+  width: fit-content;
+}
+#task-list-due-date {
+  margin-left: 20px;
 }
 /* paletteColors: ['red', 'green', 'blue', 'rgba($color: orange, $alpha: 0.6)', 'pink', 'violet', 'rgba(255, 165, 0, 0.6)' ] */
 </style>

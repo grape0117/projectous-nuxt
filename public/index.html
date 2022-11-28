@@ -8,7 +8,8 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <link href="/style.css" rel="stylesheet">
     <title>Projectous</title>
-    <script src="https://<%= VUE_APP_WEB_SOCKET_SERVER_URL %>:<%= VUE_APP_WEB_SOCKET_SERVER_PORT %>/socket.io/socket.io.js"></script>
+    <!-- remove async when this is working again -->
+    <script async src="https://<%= VUE_APP_WEB_SOCKET_SERVER_URL %>:<%= VUE_APP_WEB_SOCKET_SERVER_PORT %>/socket.io/socket.io.js"></script>
   </head>
   <body>
     <noscript>
