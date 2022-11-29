@@ -15,4 +15,6 @@ export interface ITaskUser {
   user_rate: string
   work_day_position: number | null
   temp?: boolean
+  step: string | null
+  notes: string | null
 }

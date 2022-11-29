@@ -241,6 +241,7 @@ export default {
       }
       const result = await this.$http().post('/tasks-progress', task_progress_info)
       if (result.status === 'success') {
+        this.$store.commit('ADD_MANY', { module: 'task_users', entities: result.users }, { root: true })
         this.makeToast('success', 'Assigned a user!')
         const task_index = this.tasks.findIndex(task => task.id === this.selected_task)
         this.task_list[task_index].users = result.users
@@ -366,6 +367,7 @@ export default {
           const index = this.task_list.map(task => task.id).indexOf(task_id)
           this.task_list[index]['isToday'] = true
           this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: moment().format('Y-M-D') })
+          this.$store.commit('tasks/addTodayTask', this.task_list[index])
         } else {
           this.makeToast('danger', 'You are not assigned to this task')
         }
@@ -374,6 +376,7 @@ export default {
         this.task_list[index]['isToday'] = false
         const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: task_id, company_user_id: current_user_id })[0]
         this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: null })
+        this.$store.commit('tasks/removeTodayTask', this.task_list[index].id)
         this.$bvModal.show('snooze-modal')
       }
     },
@@ -390,10 +393,12 @@ export default {
       const index = this.task_list.map(task => task.id).indexOf(this.selected_task)
       const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.selected_task, company_user_id: current_user_id })[0]
       if (task_user) {
-        this.task_list[index]['isToday'] = false
         this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: next_work_day })
         this.show_snooze = false
         this.$forceUpdate()
+        if (index >= 0) {
+          this.task_list[index]['isToday'] = false
+        }
       } else {
         this.makeToast('danger', 'You are not assigned to this task')
       }
