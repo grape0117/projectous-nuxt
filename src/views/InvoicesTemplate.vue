@@ -70,15 +70,15 @@
                 </b-button>
                 <b-button @click="setStatusFilter('sent')" :style="{ 'background-color': status_filter === 'sent' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
                   Sent
-                  <!-- <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">9</b-badge> -->
+                  <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">{{ sent_count }}</b-badge>
                 </b-button>
                 <b-button @click="setStatusFilter('paid')" :style="{ 'background-color': status_filter === 'paid' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
                   Paid
-                  <!-- <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">9</b-badge> -->
+                  <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">{{ paid_count }}</b-badge>
                 </b-button>
                 <b-button @click="setStatusFilter('voided')" :style="{ 'background-color': status_filter === 'voided' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
                   Voided
-                  <!-- <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">9</b-badge> -->
+                  <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">{{ voided_count }}</b-badge>
                 </b-button>
               </b-button-group>
             </div>
@@ -209,7 +209,10 @@ export default {
       items: [{ id: 'radio here', invoice_id: 1234, recipient: 'someone', amount: 222, note: 'test', age: '2 days', date_created: 'Aug 19', start_date: 'Aug 19', end_date: 'Aug 30', options: 'wqewwe' }],
       is_busy: false,
       action: null,
-      open_count: 0
+      open_count: 0,
+      sent_count: 0,
+      paid_count: 0,
+      voided_count: 0
     }
   },
   created() {},
@@ -375,9 +378,6 @@ export default {
       } else {
         this.selected_invoice_id = []
       }
-    },
-    invoice_filter() {
-      this.open_count = this.invoice_filter.filter(e => e.status === 'open').length
     }
   },
   methods: {
@@ -443,6 +443,7 @@ export default {
         this.show_all_status = false
       }
       this.status_filter = filter_value
+      this.getData()
     },
     sortClass(sortBy_colName) {
       const sortBy = this.sortBy
@@ -491,6 +492,10 @@ export default {
     //   return invoices.filter(i => i.status === status)
     // },
     async selectYear(year) {
+      this.open_count = 0
+      this.sent_count = 0
+      this.paid_count = 0
+      this.voided_count = 0
       this.is_busy = true
       if (this.selectedYear === year) return
 
@@ -501,6 +506,7 @@ export default {
       this.invoices = invoices
       this.invoice_years = invoice_years
       this.open_invoice_count = open_invoice_count
+      this.getCountPerStatus(year)
     },
     async getInvoicesByYear(year) {
       const { invoices, invoice_years, open_invoice_count } = await this.$http().get(`/invoices/${year}`)
@@ -508,13 +514,37 @@ export default {
       return { invoices, invoice_years, open_invoice_count }
     },
     async getData() {
-      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear('open') //new Date().getFullYear()
+      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear(this.status_filter) //new Date().getFullYear()
 
       console.log({ invoices })
 
       this.invoices = invoices
       this.invoice_years = invoice_years
       this.open_invoice_count = open_invoice_count
+      this.getCountPerStatus('all')
+    },
+    async getCountPerStatus(year) {
+      const { count } = await this.$http().get(`/invoices_count_per_status/${year}`)
+      const check_open_count = count.find(e => e.status === 'open')
+      const check_sent_count = count.find(e => e.status === 'sent')
+      const check_paid = count.find(e => e.status === 'paid')
+      const check_voided = count.find(e => e.status === 'voided')
+
+      if (check_open_count) {
+        this.open_count = check_open_count.count
+      }
+
+      if (check_sent_count) {
+        this.sent_count = check_sent_count.count
+      }
+
+      if (check_paid) {
+        this.paid_count = check_paid.count
+      }
+
+      if (check_voided) {
+        this.voided_count = check_voided.count
+      }
     },
     formatDate(date) {
       return moment(date).format('MMM DD YYYY')
