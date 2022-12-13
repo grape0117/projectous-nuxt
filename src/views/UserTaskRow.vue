@@ -1,5 +1,5 @@
 <template>
-  <div class="col-md-12">
+  <div class="col-md-12  user-task-row">
     <div class="card" :style="{ margin: task['hasMargin'] ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white' }">
       <div class="card-body" style="padding: 10px 20px 10px 25px">
         <div class="row" style="padding: 0px;">
@@ -423,14 +423,14 @@ span.avatar.notes:before {
   background-size: contain;
   position: absolute;
 }
-.icon-play_arrow,
-.icon-stop {
+.user-task-row .icon-play_arrow,
+.user-task-row .icon-stop {
   border: solid 2px white;
   border-radius: 50%;
   font-size: 17px;
 }
-.icon-play_arrow:hover,
-.icon-stop:hover {
+.user-task-row .icon-play_arrow:hover,
+.user-task-row .icon-stop:hover {
   background-color: #fff;
 }
 /* span.avatar.test:after {
