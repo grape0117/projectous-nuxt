@@ -41,10 +41,10 @@ export default {
 .project-favicon {
   vertical-align: middle;
 }
-.dragzone-project-acronym {
+.sidebar-timer .dragzone-project-acronym {
   padding: 1px 3px 1px 5px;
   color: white;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
 }
 </style>
