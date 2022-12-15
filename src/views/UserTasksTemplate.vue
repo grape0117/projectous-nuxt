@@ -1,24 +1,5 @@
 <template id="user-dashboard-template">
   <div class="container-fluid">
-    <div class="row-no-padding">
-      <div class="col-sm-12 form-group form-inline"></div>
-      <div class="col-sm-12 form-group form-inline">
-        <div class="input-group">
-          <select v-model="new_task_project_id" id="task-project-id" class="form-control select2-select" name="project_id" style="width: 30%;">
-            <option value="">No Project</option>
-            <option>Personal</option>
-            <option v-for="project in openprojects()" :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
-          </select>
-          <input type="text" id="task" v-model="new_task_title" class="form-control" placeholder="@assign" @keyup.enter="createTask()" style="width: 70%;" />
-          <span class="input-group-btn">
-            <button @click="createTask()" class="btn btn-primary" type="button">Add Task</button>
-          </span>
-          <span class="input-group-btn" style="margin-left: 5px;">
-            <button @click="createProject()" class="btn btn-success" type="button">Add Project</button>
-          </span>
-        </div>
-      </div>
-    </div>
     <div class="row-no-padding" v-if="isAdmin">
       <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist">
