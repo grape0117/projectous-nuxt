@@ -6,7 +6,7 @@ import moment from 'moment'
 
 function createDefaultTaskMessage(task_id: string): ITaskMessage {
   return {
-    id: uuid.v4(),
+    // id: uuid.v4(),
     task_id,
     company_user_id: null,
     message: null,

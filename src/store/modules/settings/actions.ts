@@ -2,7 +2,6 @@ import { ActionTree } from 'vuex'
 import { IModuleState } from './types'
 import { IRootState } from '@/store/types'
 import { ICompanyUser } from '@/store/modules/company_users/types.ts'
-import { app } from '@/main.ts'
 const company_user_id: number = 1
 
 const UUID = () => {

@@ -92,7 +92,7 @@ export default {
       }
     },
     async saveMessage() {
-      let task_id = this.task_id
+      let task_id = this.chat.chat_id
       let company_user_id = this.current_company_user_id
       let message = this.s_message
       let task
