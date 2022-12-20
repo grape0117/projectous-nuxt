@@ -15,7 +15,7 @@
                 </b-badge>
 
                 <b-badge v-else-if="task.project_id" :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2">
-                  {{ getProject(task.project_id).name }}
+                  {{ getProject(task.project_id) ? getProject(task.project_id).name : '--' }}
                 </b-badge>
 
                 <b-badge v-else :style="{ 'background-color': 'transparent' }" variant="primary" class="mr-2 ml-2">
@@ -88,6 +88,10 @@ export default {
   },
   watch: {},
   methods: {
+    getProject(project_id) {
+      const project = this.$store.getters['projects/getById'](project_id)
+      return project
+    },
     priorityColor(priority) {
       let color = 'primary'
       switch (priority) {
@@ -200,7 +204,7 @@ export default {
       let client_data = null
       if (is_color && project) {
         client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
-        return client_data.color
+        return client_data ? client_data.color : ''
       }
       return project ? project.acronym : false
     },
