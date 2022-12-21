@@ -23,7 +23,7 @@
                 </b-badge>
 
                 {{ task.title ? task.title : '---' }}
-                <span v-for="user in task.users" v-if="is_admin">
+                <span v-for="user in task.users" v-if="isAdmin()">
                   <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
                   </span>
@@ -32,7 +32,7 @@
                   <span title="Complete" class="add-dev-btn" v-if="!isCompletedTask()" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></span>
                   <span title="Cancel Complete" class="add-dev-btn" v-else variant="outline-success" @click="notCompleteMyTask(task.id)" pill><i class="icon-close"/></span>
                 </span>
-                <span title="Add developer" v-if="is_admin" class="add-dev-btn" @click="addDeveloper(task.id)" pill><i class="icon-add"/></span>
+                <span title="Add developer" v-if="isAdmin()" class="add-dev-btn" @click="addDeveloper(task.id)" pill><i class="icon-add"/></span>
 
                 <!-- <b-button v-if="isAdmin" variant="outline-light" @click="addDeveloper(task.id)" pill><i class="icon-person_add"/></b-button> -->
               </b>
@@ -66,7 +66,7 @@ import moment from 'moment'
 import { Datetime } from 'vue-datetime'
 import { abbrName } from '@/utils/util-functions'
 export default {
-  props: ['task', 'is_admin'],
+  props: ['task'],
   extends: TaskActionRow,
   components: {
     datetime: Datetime
