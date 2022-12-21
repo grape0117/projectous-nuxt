@@ -20,7 +20,7 @@
   </div> -->
 
   <div class="row">
-    <user-task-row v-for="task in task_list" v-bind:task="task" :isAdmin="isAdmin()" @showSnoozeModal="showSnoozeModal" @showModal="showModal" @updateStatus="updateStatus" @showUpdateModal="showUpdateModal"></user-task-row>
+    <user-task-row v-for="task in task_list" v-bind:task="task" :is_admin="isAdmin" @showSnoozeModal="showSnoozeModal" @showModal="showModal" @updateStatus="updateStatus" @showUpdateModal="showUpdateModal"></user-task-row>
     <b-modal v-model="show_udpate_status" id="update-status-modal" class="update-status-modal" style="min-height: 500px" :size="'lg'">
       <template #modal-header>
         <div class="header">
@@ -134,7 +134,7 @@ import UserTaskRow from './UserTaskRow'
 import { abbrName } from '@/utils/util-functions'
 import moment from 'moment'
 export default {
-  props: ['tasks', 'tab'],
+  props: ['tasks', 'tab', 'isAdmin'],
   name: 'tasks-tab',
   components: {
     'tasks-tab-row': TasksTabRow,
@@ -202,9 +202,6 @@ export default {
         variant: variant,
         solid: true
       })
-    },
-    isAdmin() {
-      return this.$store.getters['settings/isAdmin']
     },
     abbrName,
     getCompanyUserDetails(company_user_id) {

@@ -88,7 +88,7 @@
       </div>
     </div>
     <div v-if="!isAdmin">
-      <tasks-tab v-bind:tasks="my_tasks" @updateData="updateData"> </tasks-tab>
+      <tasks-tab v-bind:tasks="my_tasks" @updateData="updateData" :isAdmin="isAdmin"> </tasks-tab>
     </div>
   </div>
 </template>
