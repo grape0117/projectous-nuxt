@@ -1,5 +1,5 @@
 <template>
-  <div class="col-md-12">
+  <div class="col-md-12  user-task-row">
     <div class="card" :style="{ margin: task['hasMargin'] ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white' }">
       <div class="card-body" style="padding: 10px 20px 10px 25px">
         <div class="row" style="padding: 0px;">
@@ -15,7 +15,7 @@
                 </b-badge>
 
                 <b-badge v-else-if="task.project_id" :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2">
-                  {{ getProject(task.project_id).name }}
+                  {{ getProject(task.project_id) ? getProject(task.project_id).name : '--' }}
                 </b-badge>
 
                 <b-badge v-else :style="{ 'background-color': 'transparent' }" variant="primary" class="mr-2 ml-2">
@@ -23,7 +23,7 @@
                 </b-badge>
 
                 {{ task.title ? task.title : '---' }}
-                <span v-for="user in task.users" v-if="isAdmin">
+                <span v-for="user in task.users" v-if="isAdmin()">
                   <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
                   </span>
@@ -32,7 +32,7 @@
                   <span title="Complete" class="add-dev-btn" v-if="!isCompletedTask()" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></span>
                   <span title="Cancel Complete" class="add-dev-btn" v-else variant="outline-success" @click="notCompleteMyTask(task.id)" pill><i class="icon-close"/></span>
                 </span>
-                <span title="Add developer" v-if="isAdmin" class="add-dev-btn" @click="addDeveloper(task.id)" pill><i class="icon-add"/></span>
+                <span title="Add developer" v-if="isAdmin()" class="add-dev-btn" @click="addDeveloper(task.id)" pill><i class="icon-add"/></span>
 
                 <!-- <b-button v-if="isAdmin" variant="outline-light" @click="addDeveloper(task.id)" pill><i class="icon-person_add"/></b-button> -->
               </b>
@@ -66,7 +66,7 @@ import moment from 'moment'
 import { Datetime } from 'vue-datetime'
 import { abbrName } from '@/utils/util-functions'
 export default {
-  props: ['task', 'isAdmin'],
+  props: ['task'],
   extends: TaskActionRow,
   components: {
     datetime: Datetime
@@ -88,6 +88,10 @@ export default {
   },
   watch: {},
   methods: {
+    getProject(project_id) {
+      const project = this.$store.getters['projects/getById'](project_id)
+      return project
+    },
     priorityColor(priority) {
       let color = 'primary'
       switch (priority) {
@@ -200,7 +204,7 @@ export default {
       let client_data = null
       if (is_color && project) {
         client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
-        return client_data.color
+        return client_data ? client_data.color : ''
       }
       return project ? project.acronym : false
     },
@@ -423,14 +427,14 @@ span.avatar.notes:before {
   background-size: contain;
   position: absolute;
 }
-.icon-play_arrow,
-.icon-stop {
+.user-task-row .icon-play_arrow,
+.user-task-row .icon-stop {
   border: solid 2px white;
   border-radius: 50%;
   font-size: 17px;
 }
-.icon-play_arrow:hover,
-.icon-stop:hover {
+.user-task-row .icon-play_arrow:hover,
+.user-task-row .icon-stop:hover {
   background-color: #fff;
 }
 /* span.avatar.test:after {

@@ -52,6 +52,9 @@
       <div class="tab-content">
         <ul>
           <li>
+            <b-form-checkbox v-if="tab == 'my_tasks'" v-model="is_owner" name="check-button" switch variant="warning">
+              Owner
+            </b-form-checkbox>
             <span class="input-group" style="display: inline;">
               <input v-model="task_filter" :class="'form-control input-sm ' + taskFilterClass()" style="width: 200px; background: transparent;" /><button v-if="task_filter" class="btn btn-sm btn-default" @click="clearSearch()">&times;</button><button class="btn btn-sm btn-default"><i class="glyphicon glyphicon-search"></i></button>
             </span>
@@ -151,7 +154,11 @@ export default {
         this.others_high_count = tasks.filter(({ priority }) => priority == 'high').length
       } else if (this.tab === 'my_tasks') {
         user_id = self.current_company_user.id
-        tasks = this.$store.state.tasks.my_tasks
+        if (this.is_owner) {
+          tasks = this.$store.state.tasks.tasks.filter(({ owner }) => owner == current_user_id)
+        } else {
+          tasks = this.$store.state.tasks.my_tasks
+        }
         this.my_high_count = tasks.filter(task => task.priority == 'high').length
       } else if (this.tab === 'today_tasks') {
         user_id = self.current_company_user.id
@@ -268,7 +275,8 @@ export default {
       today_count: 0,
       today_high_count: 0,
       past_due_count: 0,
-      past_due_high_count: 0
+      past_due_high_count: 0,
+      is_owner: false
     }
   },
   watch: {

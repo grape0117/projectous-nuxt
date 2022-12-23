@@ -1,7 +1,7 @@
 <template>
-  <span v-if="project.acronym" class="project-icon" :style="{ 'background-color': client ? client.color : '' }">
+  <span v-if="project.acronym" class="project-icon">
     <span v-html="icon"></span>
-    <span v-if="project" class="dragzone-project-acronym"> {{ project.acronym }} </span>
+    <span v-if="project" class="dragzone-project-acronym" :style="{ 'background-color': client ? client.color : '' }" style="margin-right: 6px;"> {{ project.acronym }} </span>
   </span>
 </template>
 
@@ -40,5 +40,11 @@ export default {
 }
 .project-favicon {
   vertical-align: middle;
+}
+.sidebar-timer .dragzone-project-acronym {
+  padding: 1px 3px 1px 5px;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
 }
 </style>
