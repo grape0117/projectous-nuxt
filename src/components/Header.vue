@@ -29,27 +29,28 @@
                 <option v-for="project in openprojects()" :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
               </select> -->
               <vue-bootstrap-typeahead ref="projectsTypeahead" :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
-              <input type="text" id="task" ref="noteInput" v-model="new_task_title" class="form-control" placeholder="@assign" @keyup.enter="createTask()" @input="creatingTask" style="width: 70%;" />
+              <input type="text" id="task" ref="noteInput" class="form-control" placeholder="@assign" @keyup.enter="createTask" @input="creatingTask" style="width: 70%;" />
             </div>
             <div class="search_result" v-if="showResult">
               <h6 class="card-text">
                 <b-badge :style="{ 'background-color': getClientAcronymColor(new_task_project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(new_task_project_id)" v-b-tooltip.hover :title="taskProjectName(new_task_project_id)">
                   {{ getProjectDetails(new_task_project_id) }}
                 </b-badge>
-                <b-dropdown id="priorities-dropdown" :text="new_priority ? capitalizeFirstLetter(new_priority) : ''" variant="danger" style="border:none">
+                <b-dropdown id="priorities-dropdown" :text="new_priority ? capitalizeFirstLetter(new_priority) : ''" :variant="priorityColor(new_priority)" style="border:none">
                   <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
                   <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
                   <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
                   <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
                 </b-dropdown>
                 <b>
-                  | {{ new_task_title }}
+                  &nbsp;{{ new_task_title }}
 
                   <span v-if="new_company_user_id">
                     <span :title="`${getCompanyUserDetails(new_company_user_id).name}   ${assignedUser.step}:${assignedUser.notes}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${assignedUser.status} ${assignedUser.step} ${assignedUser.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(new_company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                       {{ abbrName(getCompanyUserDetails(new_company_user_id).name) }}
                     </span>
                   </span>
+                  <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-3" :style="{ width: new_task_due_date ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(new_task_due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(new_task_due_date)" v-b-tooltip.hover :title="dueDateDetails(new_task_due_date)" />
                 </b>
               </h6>
               <!-- end result -->
@@ -123,6 +124,7 @@ import { getCookie } from '@/utils/util-functions'
 import TaskActionRow from '../views/TaskActionRow.vue'
 import { abbrName } from '@/utils/util-functions'
 import _ from 'lodash'
+import moment from 'moment'
 
 export default Vue.extend({
   extends: TaskActionRow,
@@ -141,6 +143,7 @@ export default Vue.extend({
       new_company_user_id: false,
       new_user_name: '',
       new_priority: 'active',
+      new_task_due_date: '',
       showMenu: false,
       timerEmptyFields: 0,
       timerRunning: false,
@@ -322,10 +325,83 @@ export default Vue.extend({
     })
   },
   methods: {
+    saveDueDate(e) {
+      this.new_task_due_date = e.target.value
+    },
+    dueDateDetails(due_date, return_color) {
+      if (!due_date && !return_color) {
+        return ''
+      }
+      const timezone = moment.tz.guess()
+      const timezone_date = moment()
+        .tz(timezone)
+        .format('YYYY-MM-DD')
+      const task_due_date = moment(due_date).format('YYYY-MM-DD')
+
+      const diff = moment.duration(moment(task_due_date).diff(moment(timezone_date)))
+      const days = diff.asDays()
+      const near_due_date = [1, 2, 3]
+      let return_value
+      let color
+      if (days < 0) {
+        return_value = 'Past due'
+        color = '#ffc107'
+      } else if (days === 0) {
+        return_value = 'Due today'
+        color = 'red'
+      } else if (near_due_date.includes(days)) {
+        return_value = `Due in ${days} ${days === 1 ? 'day' : 'days'}`
+        color = 'orange'
+      } else {
+        return_value = `Due on ${moment(due_date).format('MMMM DD')}`
+        color = '#17a2b8'
+      }
+      if (!due_date) {
+        color = '#28a745'
+      }
+      if (return_color) {
+        return_value = color
+      }
+      return return_value
+    },
+    dueDate(due_date) {
+      let formatted_date
+      if (due_date) {
+        formatted_date = moment(due_date, 'yyyy-MM-DD').format('yyyy-MM-DD')
+      } else {
+        return ''
+      }
+      return formatted_date
+    },
     reload() {
       alert('Non-functional')
       return
       this.$emit('reload')
+    },
+    priorityColor(priority) {
+      let color = 'primary'
+      switch (priority) {
+        case 'high':
+          color = 'danger'
+          break
+        case 'active':
+          color = 'success'
+          break
+        case 'regular':
+          color = 'success'
+          break
+        case 'low':
+          color = 'warning'
+          break
+        case 'hold':
+          color = 'secondary'
+          break
+
+        default:
+          color = 'primary'
+          break
+      }
+      return color
     },
     closeNewTask() {
       this.projectSearch = ''
@@ -374,6 +450,12 @@ export default Vue.extend({
       return client ? client.name : ''
     },
     async createTask() {
+      if (!this.new_company_user_id) {
+        return
+      }
+      this.$refs.noteInput.value = ''
+      this.$refs.projectsTypeahead.inputValue = ''
+      this.showResult = false
       const newTask = await this.$store.dispatch('tasks/createTask', {
         title: this.new_task_title,
         project_id: this.new_task_project_id,
@@ -382,17 +464,17 @@ export default Vue.extend({
         temp: false,
         users: [this.new_company_user_id],
         owner: this.$store.state.settings.current_company_user_id,
-        priority: this.new_priority
+        priority: this.new_priority,
+        due_date: this.new_task_due_date
       })
       EventBus.$emit('update', { company_user_id: this.new_company_user_id })
       this.new_task_title = ''
       this.new_task_project_id = null
       this.new_company_user_id = null
-      this.showResult = false
     },
     creatingTask: _.debounce(function(e) {
-      let notesWithTaskTile = this.new_task_title
-      const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+))', 'g')
+      let notesWithTaskTile = e.target.value
+      const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+)|([a-z][A-Z]@+))', 'g')
 
       const acronym_matchs = notesWithTaskTile ? notesWithTaskTile.match(projectRegex) : null
       if (!acronym_matchs) {
@@ -833,5 +915,20 @@ export default Vue.extend({
   margin-top: 27px;
 }
 
+.btn-outline-primary {
+  color: #fff;
+  border-color: #fff;
+}
+.btn-outline-primary:hover {
+  color: #fff;
+  background-color: #ffa500;
+  border-color: #fff;
+}
+.search_result .card-text {
+  width: fit-content;
+}
+#task-list-due-date {
+  margin-left: 20px;
+}
 /* paletteColors: ['red', 'green', 'blue', 'rgba($color: orange, $alpha: 0.6)', 'pink', 'violet', 'rgba(255, 165, 0, 0.6)' ] */
 </style>

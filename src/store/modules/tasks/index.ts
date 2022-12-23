@@ -21,6 +21,9 @@ const state = {
   today_tasks: [],
   tasks: [],
   my_tasks: [],
+  past_due_tasks: [],
+  others_tasks: [],
+  all_tasks: [],
   tasks_by_project: [],
   lookup: {}
 }
