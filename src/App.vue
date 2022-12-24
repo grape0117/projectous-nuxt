@@ -325,6 +325,13 @@ export default {
             this.newMessage = e.data
           }
           break
+        case 'NEW_TASK':
+          title = e.data.title
+          body = JSON.stringify(e.data.message)
+          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0 && this.route_query_taskId === e.data.task_id) {
+            this.newMessage = e.data
+          }
+          break
       }
       if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) var notification = new Notification(title, { body: body, icon: 'img' })
 
