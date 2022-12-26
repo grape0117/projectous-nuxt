@@ -414,7 +414,7 @@ export default {
       return this.$store.getters['settings/isIHI']
     },
     openprojects: function() {
-      const result = this.$store.getters['projects/getOpenProjectsSortedByClient']
+      const result = this.$store.getters['projects/getOpenProjectsSortedByClient'] || []
       const projectsUniqueById = [...new Map(result.map(item => [item['id'], item])).values()]
       return projectsUniqueById
     },

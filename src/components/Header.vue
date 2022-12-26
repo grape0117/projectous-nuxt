@@ -317,7 +317,7 @@ export default Vue.extend({
       }
     })
     this.$root.$on('bv::dropdown::hide', bvEvent => {
-      if (!this.hideNewTask && bvEvent.componentId === 'new-task-menu') {
+      if (!this.hideNewTask && bvEvent.componentId === 'new-task-menu' && this.hideNewTask !== undefined) {
         bvEvent.preventDefault()
       } else {
         this.hideNewTask = false
@@ -443,7 +443,9 @@ export default Vue.extend({
       this.updateBackground(option)
     },
     openprojects() {
-      return this.$store.getters['projects/openprojects']()
+      const result = this.$store.getters['projects/getOpenProjectsSortedByClient'] || []
+      const projectsUniqueById = [...new Map(result.map(item => [item['id'], item])).values()]
+      return projectsUniqueById
     },
     client_name(client_company_id) {
       let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
