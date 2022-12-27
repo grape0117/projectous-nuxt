@@ -257,6 +257,9 @@ export default {
     },
     timer_watch() {
       return this.$store.state.settings.timer_watch
+    },
+    is_admin() {
+      return this.$store.getters['settings/isAdmin']
     }
   },
   watch: {
@@ -313,6 +316,11 @@ export default {
     },
     received_check_id: function() {
       this.getData('received_check_id')
+    },
+    is_admin(newValue, oldValue) {
+      if (newValue) {
+        this.getData()
+      }
     }
   },
   beforeCreate: function() {
@@ -322,7 +330,6 @@ export default {
   },
   mounted() {
     console.log('reports mounted', this.$route.query, this.$route, this.chosen_clients, this.total_time, 'test')
-    this.getData()
   },
   methods: {
     timeToDecimal,
