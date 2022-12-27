@@ -946,9 +946,6 @@ div:hover > .hover-action {
     box-shadow: none !important;
 }
 
-#new-task-menu {
-    background-color: rgb(255, 165, 0);
-}
 #new-task-menu .dropdown-menu:not(#priorities-dropdown .dropdown-menu) {
     background-color: rgb(78, 55, 10);
     width: 777px;
