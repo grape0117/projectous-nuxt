@@ -1,6 +1,6 @@
 <template>
-  <b-list-group-item class="message-panel_inner-message">
-    <b-avatar class="mr-1 mb-4" :text="user_name" v-b-tooltip.hover :title="message.user.name" size="25px" />
+  <b-list-group-item class="message-panel_inner-message" :style="is_me ? 'float: right;' : ''">
+    <b-avatar v-if="!is_me" class="mr-1 mb-4" :text="user_name" v-b-tooltip.hover :title="message.user.name" size="25px" />
     <div>
       <div class="message-wrapper">
         <pre class="msg-content" style="color: white;">{{ message.text }}</pre>
@@ -28,7 +28,7 @@ export default {
       open_actions: false
     }
   },
-  props: ['message'],
+  props: ['message', 'is_me'],
   computed: {
     user_name() {
       return abbrName(this.message.user.name)

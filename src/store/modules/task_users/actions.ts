@@ -96,6 +96,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       taskUsers.push(task_user)
     }
 
+    // @ts-ignore
     task_users = await this._vm.$http().post('/tasks-progress', { task_id: task_id, assigned_users: company_user_ids, step: step, notes: notes })
     commit('ADD_MANY', { module: 'task_users', entities: task_users.users }, { root: true })
     return task_users.users

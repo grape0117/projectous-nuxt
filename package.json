@@ -29,6 +29,7 @@
     "moment-timezone": "^0.5.33",
     "normalizr": "^3.6.0",
     "pretty-quick": "^2.0.2",
+    "socket.io-client": "^4.5.4",
     "vue": "^2.6.12",
     "vue-bootstrap-typeahead": "^0.2.6",
     "vue-chartjs": "^3.5.1",
