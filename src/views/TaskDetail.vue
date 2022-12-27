@@ -204,6 +204,11 @@ export default Vue.extend({
       type: Object,
       required: false,
       default: () => {}
+    },
+    newMessage: {
+      type: Object,
+      required: false,
+      default: false
     }
   },
   data() {
@@ -254,6 +259,9 @@ export default Vue.extend({
           this.showTab = 1
         }
       }
+    },
+    newMessage(newMessage, oldMessage) {
+      this.chat.messages = [...this.chat.messages, newMessage]
     }
   },
   methods: {

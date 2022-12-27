@@ -5,7 +5,7 @@
         <div class="date" v-if="isShowDate(index, message, chat.messages)">
           {{ date(message.createdAt) }}
         </div>
-        <task-message-item :message="message" @edit-message="editMessage" @delete-message="deleteMessage" />
+        <task-message-item :message="message" @edit-message="editMessage" @delete-message="deleteMessage" :is_me="message.company_user_id == current_company_user_id" />
       </div>
     </b-list-group>
     <div>
@@ -92,7 +92,7 @@ export default {
       }
     },
     async saveMessage() {
-      let task_id = this.task_id
+      let task_id = this.chat.chat_id
       let company_user_id = this.current_company_user_id
       let message = this.s_message
       let task
