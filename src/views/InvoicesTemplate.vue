@@ -539,7 +539,7 @@ export default {
       const invoice = `invoice/${invoice_id}`
       const csv = `export/csv/invoice/${invoice_id}`
 
-      if (to === 'invoice') return window.open(`${path}${invoice}`, '_blank')
+      if (to === 'invoice') return window.open(`/${invoice}`, '_blank')
       if (to === 'csv') return window.open(`${path}${csv}`, '_blank')
     },
     applyPayment(selected_invoice) {
