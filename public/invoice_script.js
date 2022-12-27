@@ -79,7 +79,10 @@ function generateTableRow() {
 }
 
 function parseFloatHTML(element) {
-	return parseFloat(element.innerHTML.replace(/[^\d\.\-]+/g, '')) || 0;
+	console.log('parse float', element.innerHTML);
+	console.log(element);
+	console.log(element.innerHTML.replace(/[^\d\.\-]+/g, ''));
+	return parseFloat(element.innerHTML.replace(/[^\d\.\-]+/g, ''));// || 0;
 }
 
 function parsePrice(number) {
@@ -121,9 +124,14 @@ function updateInvoice() {
 	for (var a = document.querySelectorAll('table.inventory tbody tr'), i = 0; a[i]; ++i) {
 		// get inventory row cells
 		cells = a[i].querySelectorAll('span:last-child');
-
+		amount = a[i].querySelector('.timer-amount');
+		quantity = a[i].querySelector('.timer-quantity');
+		timertotal = a[i].querySelector('.timer-total');
 		// set price as cell[2] * cell[3]
-		price = parseFloatHTML(cells[3]) * parseFloatHTML(cells[4]);
+		console.log('amount', cells[3], 'quantity', cells[4]);
+		console.log('cell 3', parseFloatHTML(cells[3]));
+		console.log('cell 4', parseFloatHTML(cells[4]));
+		price = parseFloatHTML(amount) * parseFloatHTML(quantity);
 
 		// add price to total
 		if($(a[i]).hasClass('not-billable')){
@@ -136,7 +144,8 @@ function updateInvoice() {
 		//unbilled = 4698.75;//0;//4406.85;
 
 		// set row total
-		cells[5].innerHTML = price;
+		//console.log(cells[5])
+		timertotal.innerHTML = price;
 	}
 
 	// update balance cells
@@ -150,7 +159,7 @@ function updateInvoice() {
 	cells[1].innerHTML = total;
 
 	// set balance and meta balance
-	console.log(parseFloatHTML(cells[1]));
+	//console.log('total?',cells[1],parseFloatHTML(cells[1]));
 	cells[3].innerHTML = document.querySelector('table.meta tr:last-child td:last-child span:last-child').innerHTML = parsePrice(total);
 
 	// update prefix formatting
@@ -161,8 +170,12 @@ function updateInvoice() {
 
 	// update price formatting
 	// =======================
-
-	for (a = document.querySelectorAll('span[data-prefix] + span'), i = 0; a[i]; ++i) if (document.activeElement != a[i]) a[i].innerHTML = parsePrice(parseFloatHTML(a[i]));
+	console.log('activeElement', document.activeElement);
+	for (a = document.querySelectorAll('span[data-prefix] + span'), i = 0; a[i]; ++i) {
+		if (document.activeElement != a[i]) {
+			a[i].innerHTML = parsePrice(parseFloatHTML(a[i]));
+		}	
+	}
 }
 
 /* On Content Load
@@ -170,6 +183,23 @@ function updateInvoice() {
 
 function onContentLoad() {
 	if (window.location.href.indexOf(/invoice/)<0) {
+		return;
+	}
+	var authorization = $('[name="authorization"]').val();
+	var instanceid = $('[name="instanceid"]').val();
+	$.ajaxSetup({
+		headers: {
+			'authorization': authorization,
+			'instanceid': instanceid,
+			'Referrer-Policy': 'strict-origin-when-cross-origin'
+		}
+	});
+
+	if (authorization&&instanceid) {
+		setTimeout(function(){
+			saveInvoiceTotal();
+		}, 500);
+	} else {
 		return;
 	}
 	updateInvoice();
@@ -190,6 +220,8 @@ function onContentLoad() {
 			row = e.target.ancestorQuerySelector('tr');
 
 			row.parentNode.removeChild(row);
+			alert('Removing this entry from this invoice. This entry is not deleted. It will just be removed from this invoice.')
+			removeFromInvoice(e.target.dataset.id);
 		}
 
 		updateInvoice();
@@ -229,7 +261,7 @@ function onContentLoad() {
 	if (window.addEventListener) {
 		document.addEventListener('click', onClick);
 
-		//document.addEventListener('mousewheel', updateNumber);
+		document.addEventListener('mousewheel', updateNumber);
 		document.addEventListener('keydown', updateNumber);
 
 		document.addEventListener('keydown', updateInvoice);
@@ -240,13 +272,53 @@ function onContentLoad() {
 		input.addEventListener('dragover', onEnterCancel);
 		input.addEventListener('dragenter', onEnterCancel);
 
-		input.addEventListener('blur', onLeaveCancel);
+		input.addEventListener('blur', updateInvoice);
 		input.addEventListener('dragleave', onLeaveCancel);
 		input.addEventListener('mouseout', onLeaveCancel);
 
 		input.addEventListener('drop', onFileInput);
 		input.addEventListener('change', onFileInput);
 	}
+}
+
+
+
+function addTimer(id, data){
+	$.post('https://api.projectous.com/api/api/invoice-timer/'+id+'/save', data);//TODO: onerror
+} 
+
+
+
+function setInvoiceNotes(id, invoice_notes){
+	
+	$.post('https://api.projectous.com/api/invoice-timer/'+id+'/save', {invoice_notes: invoice_notes});
+}
+
+function setClientRate(id, client_rate){
+	$.post('https://api.projectous.com/api/invoice-timer/'+id+'/save', 		
+	 	{client_rate: client_rate}, function(){
+			saveInvoiceTotal()
+		});
+}
+
+function setQuantity(id, quantity){
+	const invoice_duration = quantity * 3600;
+	$.post('https://api.projectous.com/api/invoice-timer/'+id+'/save', {invoice_duration: invoice_duration}, function(){
+			saveInvoiceTotal()
+		});
+}
+
+function removeFromInvoice(id){
+	$.post('https://api.projectous.com/api/invoice-timer/'+id+'/save', {invoice_id: null});
+}
+
+function saveInvoiceTotal(){
+	var invoice_id = $('body > article > table.meta > tbody > tr:nth-child(1) > td > span')[0].innerText
+	console.log({invoice_id})
+	var total = $('body > article > table.meta > tbody > tr:nth-child(4) > td > span:nth-child(2)')[0].innerText
+	console.log({total})
+	$.post('https://api.projectous.com/api/invoice/'+invoice_id+'/save-total', { total});
+
 }
 
 window.addEventListener && document.addEventListener('DOMContentLoaded', onContentLoad);
