@@ -114,6 +114,7 @@ function updateNumber(e) {
 /* ========================================================================== */
 
 function updateInvoice() {
+	document.title = $('[name="title"]').val();
 	var total = 0;
 	var unbilled = 0;
 	var cells, price, total, a, i;
