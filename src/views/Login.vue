@@ -16,7 +16,8 @@
 
           <div class="d-flex justify-content-end">
             <b-button type="submit" variant="primary" class="mr-2">Submit</b-button>
-            <b-button @click="forgotpassword" variant="danger">Forgot Password</b-button>
+            <b-button @click="forgotpassword" variant="danger" class="mr-2">Forgot Password</b-button>
+            <b-button @click="register" variant="primary">Register</b-button>
           </div>
         </b-form>
       </div>
@@ -139,6 +140,9 @@ export default class Login extends Vue {
     } else {
       alert('Invalid email')
     }
+  }
+  private async register(e: any) {
+    window.location.href = '/register'
   }
 }
 </script>
