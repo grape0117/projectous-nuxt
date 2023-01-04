@@ -445,6 +445,8 @@ export default {
       timers = {
         timers: timer_ids
       }
+      const form_data = new FormData()
+      form_data.append('timers', timer_ids)
       if (this.invoice_action == 'create_invoice') {
         //TODO: $invoice_id = Invoice::max('invoice_id') + 1
         this.$http()
@@ -470,7 +472,8 @@ export default {
           alert('Try again.')
           return
         }
-        this.$http().post('/timers/adjust-client-rate', timers + '&client_rate=' + new_client_rate, function() {
+        form_data.append('client_rate', new_client_rate)
+        this.$http().post('/timers/adjust-client-rate', form_data, function() {
           alert('Done, reload page.')
         })
         return
@@ -480,7 +483,8 @@ export default {
           alert('Try again.')
           return
         }
-        this.$http().post('/timers/adjust-user-rate', timers + '&user_rate=' + new_user_rate, function() {
+        form_data.append('user_rate', new_user_rate)
+        this.$http().post('/timers/adjust-user-rate', form_data, function() {
           alert('Done, reload page.')
         })
         return
@@ -490,7 +494,8 @@ export default {
           alert('Try again.')
           return
         }
-        this.$http().post('/timers/' + action, timers + '&task_id=' + task_id, function() {
+        form_data.append('task_id', task_id)
+        this.$http().post('/timers/' + action, form_data, function() {
           alert('Done, reload page.')
         })
         return
