@@ -148,6 +148,25 @@ function updateInvoice() {
 		//console.log(cells[5])
 		timertotal.innerHTML = price;
 	}
+	
+	for (var sub_total_rows = document.querySelectorAll('table.inventory thead.sub-total-row'), i = 0; sub_total_rows[i]; ++i) {
+		sub_total = 0;
+		for (var a = document.querySelectorAll('table.inventory thead.sub-total-row')[i].nextElementSibling.querySelectorAll('tr'), ii = 0; a[ii]; ++ii) {
+			cells = a[ii].querySelectorAll('span:last-child');
+			amount = a[ii].querySelector('.timer-amount');
+			quantity = a[ii].querySelector('.timer-quantity');
+			timertotal = a[ii].querySelector('.timer-total');
+			price = parseFloatHTML(amount) * parseFloatHTML(quantity);
+			if($(a[ii]).hasClass('not-billable')){
+				unbilled += price;
+
+			} else {
+				sub_total += price;
+			}
+		}
+		timertotal = sub_total_rows[i].querySelector('.sub-total-price');
+		timertotal.innerHTML = parsePrice(sub_total);
+	}
 
 	// update balance cells
 	// ====================
