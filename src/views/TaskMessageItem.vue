@@ -64,6 +64,7 @@ export default {
   border-radius: 4px;
   margin-top: 5px;
   margin-bottom: 0;
+  white-space: pre-wrap;
 }
 
 .message-panel_inner-message {
@@ -72,6 +73,10 @@ export default {
   background-color: rgba($color: #000000, $alpha: 0) !important;
   border: 0 !important;
   padding: 0px 10px 5px 10px;
+  max-width: 90%;
+  .b-avatar-text {
+    width: 25px !important;
+  }
 
   .message-dateTime {
     font-size: 12px;

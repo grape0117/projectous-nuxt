@@ -1,6 +1,6 @@
 <template>
-  <div class="message-panel">
-    <b-list-group class="message-panel_inner" v-if="chat && Object.keys(chat).length > 0">
+  <div class="message-panel" id="message-container">
+    <b-list-group class="message-panel_inner" v-if="chat && Object.keys(chat).length > 0" @dragover="dragOver" @drop="dropFile">
       <div v-for="(message, index) in chatMessages" :key="message.id">
         <div class="date" v-if="isShowDate(index, message, chat.messages)">
           {{ date(message.createdAt) }}
@@ -8,6 +8,12 @@
         <task-message-item :message="message" @edit-message="editMessage" @delete-message="deleteMessage" :is_me="message.company_user_id == current_company_user_id" />
       </div>
     </b-list-group>
+    <vue-dropzone @vdropzone-drag-leave="dragLeave" ref="chatDropzone" id="dropzone" :options="dropzoneOptions" @vdropzone-complete="afterComplete" @vdropzone-sending="sendingFiles" v-if="showDropzone" :useCustomSlot="true" @vdropzone-file-added="fileAdded" @vdropzone-files-added="filesAdded" @vdropzone-canceled="cancelUpload" @vdropzone-removed-file="removedFile">
+      <div class="dropzone-custom-content">
+        <h3 class="dropzone-custom-title">Drag and drop to upload content!</h3>
+        <div class="subtitle">...or click to select a file from your computer</div>
+      </div>
+    </vue-dropzone>
     <div>
       <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3"> </b-form-textarea>
       <b-button pill variant="primary" @click="saveMessage()" style="float: right; margin-top: 10px">Save</b-button>
@@ -18,17 +24,41 @@
 <script>
 import uuid from 'uuid'
 import moment from 'moment'
+import vue2Dropzone from 'vue2-dropzone'
+import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import { chain, groupBy } from 'lodash'
+import { getCookie } from '@/utils/util-functions'
 
 export default {
   data() {
     return {
+      showDropzone: false,
+      fileExist: false,
       s_message: '',
-      selected_message: null
+      selected_message: null,
+      dropzoneOptions: {
+        // url: `${process.env.VUE_APP_API_URL}/store-file`,
+        url: `http://testing.projectous.com/upload`,
+        thumbnailWidth: 150,
+        maxFilesize: 500,
+        autoProcessQueue: false,
+        addRemoveLinks: true,
+        headers: {
+          InstanceID: this.$store.state.settings.instance_id,
+          Authorization: 'Bearer ' + getCookie('auth_token'),
+          'Cache-Control': '',
+          'X-Requested-With': '',
+          'Access-Control-Allow-Origin': '*'
+        }
+        // paramName: function(n) {
+        //   return "files[]";
+        // },
+      }
     }
   },
   components: {
-    'task-message-item': () => import('./TaskMessageItem.vue')
+    'task-message-item': () => import('./TaskMessageItem.vue'),
+    vueDropzone: vue2Dropzone
   },
   props: {
     chat: {
@@ -58,6 +88,41 @@ export default {
   },
   mounted() {},
   methods: {
+    dragLeave(event) {
+      if (!this.fileExist) {
+        this.showDropzone = false
+      }
+    },
+    dropFile(event) {},
+    dragOver(event) {
+      this.showDropzone = true
+      event.preventDefault()
+    },
+    fileAdded(file) {
+      this.showDropzone = true
+      this.fileExist = true
+    },
+    filesAdded(file) {
+      this.showDropzone = true
+      this.fileExist = true
+    },
+    sendingFiles(file, xhr, formData) {},
+    afterComplete(response) {
+      console.log('complete')
+      this.showDropzone = false
+      this.$refs.chatDropzone.removeAllFiles()
+    },
+    cancelUpload(file) {
+      console.log('cancel')
+      console.log(file)
+    },
+    removedFile(file, error, xhr) {
+      console.log('remove')
+      console.log(file)
+      if (this.$refs.chatDropzone.getActiveFiles().length == 0) {
+        this.showDropzone = false
+      }
+    },
     isShowDate(index, message, messages) {
       if (index === 0) return true
       return messages && messages.length > 0 && this.date(message.createdAt) !== this.date(messages[index > 0 ? index - 1 : index].createdAt)
@@ -92,6 +157,7 @@ export default {
       }
     },
     async saveMessage() {
+      this.$refs.chatDropzone.processQueue()
       let task_id = this.chat.chat_id
       let company_user_id = this.current_company_user_id
       let message = this.s_message
@@ -150,11 +216,28 @@ export default {
 }
 .message-panel {
   width: 100%;
-  // height: 100%;
-  // border: 1px solid red;
-
   display: flex;
   flex-direction: column;
+}
+.dropzone {
+  position: absolute;
+  width: 100%;
+  bottom: 130px;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: none;
+}
+
+.dropzone .dz-message {
+  height: 600px;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropzone-custom-title,
+.subtitle {
+  color: white;
 }
 
 .message-panel_inner {
