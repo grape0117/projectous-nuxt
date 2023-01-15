@@ -304,18 +304,18 @@ function onContentLoad() {
 
 
 function addTimer(id, data){
-	$.post('https://api.projectous.com/api/api/invoice-timer/'+id+'/save', data);//TODO: onerror
+	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save', data);//TODO: onerror
 } 
 
 
 
 function setInvoiceNotes(id, invoice_notes){
 	
-	$.post('https://api.projectous.com/api/invoice-timer/'+id+'/save', {invoice_notes: invoice_notes});
+	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save', {invoice_notes: invoice_notes});
 }
 
 function setClientRate(id, client_rate){
-	$.post('https://api.projectous.com/api/invoice-timer/'+id+'/save', 		
+	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save',
 	 	{client_rate: client_rate}, function(){
 			saveInvoiceTotal()
 		});
@@ -323,13 +323,13 @@ function setClientRate(id, client_rate){
 
 function setQuantity(id, quantity){
 	const invoice_duration = quantity * 3600;
-	$.post('https://api.projectous.com/api/invoice-timer/'+id+'/save', {invoice_duration: invoice_duration}, function(){
+	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save', {invoice_duration: invoice_duration}, function(){
 			saveInvoiceTotal()
 		});
 }
 
 function removeFromInvoice(id){
-	$.post('https://api.projectous.com/api/invoice-timer/'+id+'/save', {invoice_id: null});
+	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save', {invoice_id: null});
 }
 
 function saveInvoiceTotal(){
@@ -337,7 +337,7 @@ function saveInvoiceTotal(){
 	console.log({invoice_id})
 	var total = $('body > article > table.meta > tbody > tr:nth-child(4) > td > span:nth-child(2)')[0].innerText
 	console.log({total})
-	$.post('https://api.projectous.com/api/invoice/'+invoice_id+'/save-total', { total});
+	$.post('https://app2.projectous.com/api/invoice/'+invoice_id+'/save-total', { total});
 
 }
 
