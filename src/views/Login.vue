@@ -117,28 +117,7 @@ export default class Login extends Vue {
     }
   }
   private async forgotpassword(e: any) {
-    //send the request to get the reset password link.
-    // @ts-ignore
-    let email = document.getElementById('email')['value']
-    if (!email) {
-      alert('please enter the email')
-      return
-    }
-    this.$store.state.loading = true
-    // @ts-ignore
-    const res = await this.$http().post('/forgotpassword', {
-      // @ts-ignore
-      email: document.getElementById('email')['value']
-    })
-    this.$store.state.loading = false
-    let sent = res ? res.flag : null
-
-    if (sent) {
-      alert('We have just sent the reset link to your email. Please check your email!')
-      //this.$router.push('/reset-password/'+res.api_token)
-    } else {
-      alert('Invalid email')
-    }
+    window.location.href = '/forgot-password'
   }
 }
 </script>
