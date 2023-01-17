@@ -4,6 +4,7 @@ import store from '@/store'
 
 export class BaseHttp implements IHttp {
   protected baseUrl: any = process.env.VUE_APP_API_URL
+  protected baseUrl2: any = 'http://testing.projectous.com'
   protected headers: any = {
     InstanceID: store.state.settings.instance_id,
     Authorization: 'Bearer ' + getCookie('auth_token'),
@@ -21,6 +22,9 @@ export class BaseHttp implements IHttp {
     this.throwError()
   }
   public async post(url: string, data: any): Promise<any> {
+    this.throwError()
+  }
+  public async post2(url: string, data: any): Promise<any> {
     this.throwError()
   }
   public async put(url: string, id: number | string, data: any): Promise<any> {

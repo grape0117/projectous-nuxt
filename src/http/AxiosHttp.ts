@@ -61,6 +61,25 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       return (Store.state.popAlert = true)
     }
   }
+  public async post2(url: string, data: any) {
+    Store.state.totalActiveRequests++
+    if (this.offlineMode) {
+      this.notifyUser(this.offlineNotifyUserMessage)
+      Store.state.totalActiveRequests--
+      return
+    }
+    try {
+      const { data: response } = await axios.post(`${this.baseUrl2}${url}`, data, {
+        headers: this.headers,
+        responseType: 'blob'
+      })
+      Store.state.totalActiveRequests--
+      return response
+    } catch (e) {
+      Store.state.totalActiveRequests--
+      return (Store.state.popAlert = true)
+    }
+  }
   public async put(url: string, id: number | string, data: any) {
     Store.state.totalActiveRequests++
     console.log('put', data)

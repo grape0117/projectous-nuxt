@@ -9,6 +9,7 @@
           <div class="message-actions-options" v-if="open_actions">
             <i class="icon-edit" @click="editMessage(message)" />
             <i class="icon-delete" @click="deleteMessage(message)" />
+            <i v-if="message.isFile" class="icon-download" @click="downloadFile(message)" />
           </div>
         </div>
       </div>
@@ -20,6 +21,7 @@
 <script>
 import moment from 'moment'
 import { abbrName } from '@/utils/util-functions'
+import { writeFileSync } from 'fs'
 
 export default {
   name: 'task-message-item',
@@ -38,6 +40,21 @@ export default {
     }
   },
   methods: {
+    forceFileDownload(response, title) {
+      const url = window.URL.createObjectURL(new Blob([response]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', title)
+      document.body.appendChild(link)
+      link.click()
+    },
+    downloadFile(message) {
+      this.$http()
+        .post2('/download', { file_key: message.filePath })
+        .then(response => {
+          this.forceFileDownload(response, message.text)
+        })
+    },
     getUserNameWithCompanyUserId(company_user_id) {
       let company_user = this.$store.state.company_users.company_users[this.$store.state.company_users.lookup[company_user_id]]
       if (company_user) return company_user.name

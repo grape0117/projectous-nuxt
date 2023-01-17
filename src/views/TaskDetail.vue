@@ -135,7 +135,7 @@
           <!-- <pre style="color: black;">
             {{ task }}
           </pre> -->
-          <task-message class="task-cloud_task-message" :chat="chat"> </task-message>
+          <task-message class="task-cloud_task-message" :chat="chat" :showChat="showTab == 1"> </task-message>
         </b-tab>
       </b-tabs>
     </div>
