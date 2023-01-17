@@ -11,6 +11,8 @@ export interface ITaskMessage {
   company_user_id: number | null
   message: string | null
   created_at: string | null
+  is_file: Boolean | null
+  file_path: string | null
   //  save(): any
 }
 
@@ -20,6 +22,8 @@ export class TaskMessage implements ITaskMessage {
   public company_user_id: number | null = null
   public message: string | null = ''
   public created_at: string | null = ''
+  public is_file: Boolean | null = false
+  public file_path: string | null = ''
   // save() {
   //   //window._actions[module + '/CASCADE_DELETE']
   // }
