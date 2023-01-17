@@ -10,8 +10,8 @@ export interface ITaskMessage {
   task_id: string
   company_user_id: number | null
   message: string | null
-  created_at: string | null,
-  is_file: Boolean | null,
+  created_at: string | null
+  is_file: Boolean | null
   file_path: string | null
   //  save(): any
 }

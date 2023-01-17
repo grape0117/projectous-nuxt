@@ -15,9 +15,9 @@
       </div>
     </vue-dropzone>
     <div class="send-message">
-      <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3"> </b-form-textarea>
+      <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3" @keyup.enter.exact="changeText" @keydown.enter="handleEnter"> </b-form-textarea>
       <i class="icon-attach_file" @click="attachFile()" />
-      <i class="icon-send" :style="s_message == '' ? 'color: gray;' : 'color: darkorange;'" @click="saveMessage()" />
+      <i class="icon-send" :style="s_message == '' || s_message == '\n' ? 'color: gray;' : 'color: darkorange;'" @click="saveMessage()" />
     </div>
   </div>
 </template>
@@ -103,7 +103,25 @@ export default {
       return this.$store.state.settings.current_company_user_id
     }
   },
+  mounted() {
+    setTimeout(() => {
+      let container = this.$refs.msgContainer
+      container.scrollTop = container.scrollHeight + 120
+    }, 500)
+  },
   methods: {
+    handleEnter(e) {
+      if (e.ctrlKey) {
+        this.s_message = this.s_message + '\n'
+      } else {
+        this.saveMessage()
+      }
+    },
+    changeText(e) {
+      if (this.s_message == '\n' || this.s_message == '') {
+        this.s_message = ''
+      }
+    },
     dragLeave(event) {
       if (!this.fileExist) {
         this.showDropzone = false
@@ -191,11 +209,12 @@ export default {
       }
     },
     async saveMessage() {
-      if (!this.s_message) {
-        return
-      }
       if (this.$refs.chatDropzone && this.$refs.chatDropzone.getActiveFiles().length > 0) {
         this.$refs.chatDropzone.processQueue()
+      }
+      if (this.s_message == '\n' || this.s_message == '') {
+        this.s_message = ''
+        return
       }
       let task_id = this.chat.chat_id
       let company_user_id = this.current_company_user_id
