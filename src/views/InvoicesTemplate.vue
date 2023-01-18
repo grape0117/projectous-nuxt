@@ -15,7 +15,7 @@
             <span class="total-open" :style="{ 'background-color': default_theme_color }">{{ total }}</span>
           </div>
         </div>
-        <div>
+        <!-- <div>
           <div style="float:right">
             <div class="year-buttons">
               <div class="year-button">
@@ -28,13 +28,13 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="mb-2">
-        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Unsent: $ {{ unsent_total }}</b-badge>
-        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Unpaid: $ {{ unpaid_total }}</b-badge>
-        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Paid: $ {{ paid_total }}</b-badge>
-        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Voided: $ {{ voided_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Unsent: ${{ unsent_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Unpaid: ${{ unpaid_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Paid: ${{ paid_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Voided: ${{ voided_total }}</b-badge>
       </div>
       <b-table responsive :items="invoice_filter" :fields="fields" thead-class="table-header-background" tbody-class="table-header-background" :busy="is_busy" style="max-height: 86vh; overflow: auto;">
         <template #thead-top="data">
@@ -500,23 +500,27 @@ export default {
     },
     processBreakdownPerStatus(total_per_status) {
       this.unsent_total = total_per_status
-        .filter(e => e.status === 'open' || e.status === '')
+        .filter(e => e.status === 'open')
         .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
       this.unpaid_total = total_per_status
         .filter(e => e.status === 'open' || e.status === 'sent')
         .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
       this.paid_total = total_per_status
         .filter(e => e.status === 'paid')
         .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
       this.voided_total = total_per_status
         .filter(e => e.status === 'voided')
         .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     },
@@ -551,6 +555,7 @@ export default {
       console.log({ invoices })
 
       this.invoices = invoices
+      this.processBreakdownPerStatus(invoices)
       this.invoice_years = invoice_years
       this.open_invoice_count = open_invoice_count
       this.getCountPerStatus('all')
@@ -561,7 +566,6 @@ export default {
       const check_sent_count = count.find(e => e.status === 'sent')
       const check_paid = count.find(e => e.status === 'paid')
       const check_voided = count.find(e => e.status === 'voided')
-      this.processBreakdownPerStatus(total_per_status)
       if (check_open_count) {
         this.open_count = check_open_count.count
       }
