@@ -9,7 +9,7 @@
         <div class="row">
           <div class="col-sm-12">
             <div>
-              <b-tabs content-class="mt-3">
+              <b-tabs content-class="mt-3 scrollable">
                 <b-tab title="Details" active>
                   <form id="editTimerForm" class="form-horizontal">
                     <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
@@ -637,5 +637,9 @@ export default {
   margin-left: 14px;
   border-radius: 50px;
   color: white;
+}
+.scrollable {
+  height: 600px;
+  overflow-y: auto;
 }
 </style>
