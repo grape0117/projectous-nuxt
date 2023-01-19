@@ -20,7 +20,7 @@
           </div>
           <div class="d-flex">
             <task-tray v-show="showTaskSection" />
-            <task-side-bar v-show="has_route_query_showChatSection || showChatSection" :show="has_route_query_showChatSection || showChatSection" />
+            <task-side-bar :updated_at="updated_at" :new_message="newMessage1" v-show="has_route_query_showChatSection || showChatSection" :show="has_route_query_showChatSection || showChatSection" />
             <timer-tab v-show="showTimerSection" />
           </div>
         </div>
@@ -106,7 +106,9 @@ export default {
       bgStyle: '',
       bgTheme: '',
       showTaskDetail: false,
-      newMessage: null
+      newMessage: null,
+      newMessage1: null,
+      updated_at: 0
     }
   },
   computed: {
@@ -302,7 +304,7 @@ export default {
 
     //listener
     let user_id = getCookie('user_id')
-    let that = this
+    var that = this
 
     SocketioService.setupSocketConnection()
     SocketioService.socketListener('chat-message', e => {
@@ -321,15 +323,20 @@ export default {
         case 'TASK_MESSAGE':
           title = e.data.title
           body = JSON.stringify(e.data.sender + ' : ' + e.data.message)
-          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0 && this.route_query_taskId === e.data.task_id) {
-            this.newMessage = e.data
+          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
+            that.newMessage1 = e.data
+            that.updated_at = new Date().getTime()
+            if (this.route_query_taskId === e.data.task_id) {
+              that.newMessage = e.data
+            }
           }
+
           break
         case 'NEW_TASK':
           title = e.data.title
           body = JSON.stringify(e.data.message)
           if (e.data.users_list.indexOf(parseInt(user_id)) >= 0 && this.route_query_taskId === e.data.task_id) {
-            this.newMessage = e.data
+            that.newMessage = e.data
           }
           break
       }

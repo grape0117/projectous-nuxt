@@ -262,9 +262,10 @@ export default {
     },
     attachFile() {
       this.showDropzone = true
+      var that = this
       setTimeout(() => {
-        $('#dropzone').click()
-      }, 100)
+        that.$refs.chatDropzone.$el.click()
+      }, 500)
     }
   }
 }
