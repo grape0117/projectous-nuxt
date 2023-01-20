@@ -62,12 +62,13 @@ export default {
     'timer.status'(status) {
       EventBus.$emit('timerStatus', status)
     },
-    // 'timer.notes'(notes) {
-    //   if (notes === null) return
-    //   if ((notes.includes('&#8203;') && notes.length === 7) || notes === '') {
-    //     this.timer.notes = ''
-    //   }
-    // },
+    'timer.notes'(notes) {
+      if (notes === null) return
+      if ((notes.includes('&#8203;') && notes.length === 7) || notes === '') {
+        this.timer.notes = ''
+      }
+      this.$refs.noteInput.value = notes
+    },
     $route(to, from) {
       this.checkPathTimerId()
     }
@@ -159,6 +160,9 @@ export default {
     // }
   },
   mounted: function() {
+    if (this.timer.notes == '&#8203;') {
+      this.timer.notes = ''
+    }
     this.$refs.noteInput.value = this.timer.notes
     if (this.index === 0 && this.timer.notes === null) {
       this.$refs['noteInput'].focus()

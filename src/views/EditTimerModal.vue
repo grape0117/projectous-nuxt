@@ -267,6 +267,7 @@ export default {
   computed: {
     title() {
       if (this.editTimerStatus === 'add') {
+        this.timer_data.notes = ''
         return 'Add Timer'
       }
       return 'Edit Timer'
@@ -562,6 +563,14 @@ export default {
       }
 
       this.$store.dispatch('timers/saveTimer', this.timer_data).then(function(response) {
+        if (self.timer_data.notes != self.timer.notes) {
+          self.$store.dispatch('UPDATE_ATTRIBUTE', {
+            module: 'timers',
+            id: self.timer.id,
+            attribute: 'notes',
+            value: self.timer_data.notes
+          })
+        }
         if (self.timer_data.duration != self.timer.duration) {
           self.$store.dispatch('UPDATE_ATTRIBUTE', {
             module: 'timers',
