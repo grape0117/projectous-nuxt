@@ -107,7 +107,7 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   UPSERT(state: IRootState, { module, entity }: any) {
-    console.log('UPSERT', module, entity)
+    console.log('UPSERT Mutation', module, entity)
     if (!state[module]) return
     //console.log('module exists')
     // @ts-ignore
