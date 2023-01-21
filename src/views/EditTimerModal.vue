@@ -9,7 +9,7 @@
         <div class="row">
           <div class="col-sm-12">
             <div>
-              <b-tabs content-class="mt-3">
+              <b-tabs content-class="mt-3 scrollable">
                 <b-tab title="Details" active>
                   <form id="editTimerForm" class="form-horizontal">
                     <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
@@ -267,6 +267,7 @@ export default {
   computed: {
     title() {
       if (this.editTimerStatus === 'add') {
+        this.timer_data.notes = ''
         return 'Add Timer'
       }
       return 'Edit Timer'
@@ -562,6 +563,14 @@ export default {
       }
 
       this.$store.dispatch('timers/saveTimer', this.timer_data).then(function(response) {
+        if (self.timer_data.notes != self.timer.notes) {
+          self.$store.dispatch('UPDATE_ATTRIBUTE', {
+            module: 'timers',
+            id: self.timer.id,
+            attribute: 'notes',
+            value: self.timer_data.notes
+          })
+        }
         if (self.timer_data.duration != self.timer.duration) {
           self.$store.dispatch('UPDATE_ATTRIBUTE', {
             module: 'timers',
@@ -637,5 +646,9 @@ export default {
   margin-left: 14px;
   border-radius: 50px;
   color: white;
+}
+.scrollable {
+  height: 600px;
+  overflow-y: auto;
 }
 </style>
