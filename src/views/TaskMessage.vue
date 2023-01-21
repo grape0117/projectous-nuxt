@@ -1,5 +1,6 @@
 <template>
   <div class="message-panel" id="message-container">
+    <b-button v-if="!isNotificationEnabled && !enabledNotification" @click="enableNotification">Enable Notification</b-button>
     <b-list-group class="message-panel_inner" ref="msgContainer" v-if="chat && Object.keys(chat).length > 0" @dragover="dragOver" @drop="dropFile">
       <div v-for="(message, index) in chatMessages" :key="message.id">
         <div class="date" v-if="isShowDate(index, message, chat.messages)">
@@ -37,6 +38,7 @@ export default {
       fileExist: false,
       s_message: '',
       selected_message: null,
+      enabledNotification: false,
       dropzoneOptions: {
         // url: `${process.env.VUE_APP_API_URL}/store-file`,
         url: `http://testing.projectous.com/upload`,
@@ -80,6 +82,9 @@ export default {
   },
 
   computed: {
+    isNotificationEnabled() {
+      return Notification.permission === 'granted'
+    },
     chatMessages() {
       let messages = this.chat.messages.sort(function(a, b) {
         return new Date(b.createdAt) - new Date(a.createdAt)
@@ -110,6 +115,13 @@ export default {
     }, 500)
   },
   methods: {
+    async enableNotification() {
+      const notificationPermission = await Notification.requestPermission()
+      if (notificationPermission == 'granted') {
+        this.enabledNotification = true
+      }
+      console.log(notificationPermission)
+    },
     handleEnter(e) {
       if (e.ctrlKey) {
         this.s_message = this.s_message + '\n'
