@@ -207,6 +207,8 @@ html {
 .task-sidebar-title {
   font-size: 17px;
   font-weight: bold;
+  margin-bottom: 0px;
+  line-height: 18px;
 }
 /* .task-side-bar .message-sidebar .list-group {
   border: 5px solid red;

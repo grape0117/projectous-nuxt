@@ -7,20 +7,20 @@
         <span class="task-sidebar-item_project-name">{{ chat.task }}</span>
       </p>
       <div class="d-flex align-items-center" style="margin-bottom: 8px !important">
-        <div class="message-avatar" style="margin-right: 10px">
-          <span class="rounded-circle task-sidebar-item_badge" v-if="chat.last_message.company_user_id" :style="{ backgroundColor: chat.last_message.user.color }">
-            {{ chat.last_message.user.name | abbrName }}
-          </span>
-        </div>
         <div>
-          <span class="task-sidebar-title">{{ chat.last_message.text }}</span>
+          <p class="task-sidebar-title">{{ chat.last_message.text | messageContent }}</p>
         </div>
       </div>
     </div>
 
-    <div class="task-sidebar-last-message-wrapper">
+    <div class="task-sidebar-last-message-wrapper d-flex">
+      <div class="message-avatar" style="margin-right: 10px">
+        <span class="rounded-circle task-sidebar-item_badge" v-if="chat.last_message.company_user_id" :style="{ backgroundColor: chat.last_message.user.color }">
+          {{ chat.last_message.user.name | abbrName }}
+        </span>
+      </div>
       <div class="task-sidebar-last-message" style="margin-top: 0 !important; padding-top: 5px !important" @click="showTaskDetail">
-        <span class="task-sidebar-date">{{ chat.last_message.createdAt | moment('MMMM Do YYYY') }}</span>
+        <span class="task-sidebar-date">{{ chat.last_message.createdAt | showDate }}</span>
       </div>
       <!-- <span class="task-sidebar_go-to-task" @click="showTaskDetail">[ Go to task]</span> -->
     </div>
@@ -86,6 +86,18 @@ export default {
         let acronym = matches.join('') // JSON
         return acronym.toUpperCase()
       }
+    },
+    showDate(createdAt) {
+      if (moment(createdAt).isSame(moment(), 'day')) {
+        return moment(createdAt).format('hh:mm A')
+      }
+      return moment(createdAt).format('MMMM Do YYYY')
+    },
+    messageContent(text) {
+      if (text.length > 110) {
+        return text.substring(0, 110) + '...'
+      }
+      return text
     }
   }
 }
@@ -119,12 +131,13 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 25px;
-  height: 25px;
+  width: 20px;
+  height: 20px;
   color: black;
   box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 5px;
   margin-left: 0px;
   font-size: 10px;
+  margin-top: 5px;
 }
 .task-sidebar-last-message {
   font-size: 15px;
@@ -146,5 +159,10 @@ export default {
 }
 .task-sidebar_go-to-task:hover {
   color: #007fff;
+}
+.task-sidebar-title {
+  font-size: 14px;
+  margin-bottom: 0px;
+  line-height: 18px;
 }
 </style>
