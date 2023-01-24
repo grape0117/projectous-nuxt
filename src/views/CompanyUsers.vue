@@ -12,19 +12,32 @@
             Inactive
             <span class="userCount">{{ inactiveUsers.length }}</span>
           </span>
+          <span class="filterUsers" :class="selectedFilter === 'pending' ? 'selected' : null" @click="selectedFilter = 'pending'">
+            Pending Invites
+            <span class="userCount">{{ pendingInvites.length }}</span>
+          </span>
         </div>
         <div @click="inviteUser()" class="btn btn-primary">Invite User</div>
       </div>
     </div>
     <div class="row table-responsive">
       <table class="table timer-table">
-        <tbody>
+        <tbody v-if="!isPending">
           <tr class="row-date">
             <td>Client</td>
             <td>Role</td>
             <td>Address</td>
           </tr>
           <div v-for="user in selectedFilter === 'active' ? activeUsers : inactiveUsers" :key="user.id" :user="user" is="company-users-row" />
+        </tbody>
+        <tbody v-if="isPending">
+          <tr class="row-date">
+            <td>Name</td>
+            <td>Email</td>
+            <td>Role</td>
+            <td>Action</td>
+          </tr>
+          <div v-for="invite in pendingInvites" :key="invite.id" :invite="invite" is="pending-invites-row" />
         </tbody>
       </table>
     </div>
@@ -33,6 +46,8 @@
 
 <script>
 import CompanyUsersRow from './CompanyUsersRow.vue'
+import PendingInvitesRow from './PendingInvitesRow.vue'
+
 export default {
   name: 'users-template',
   data() {
@@ -41,12 +56,16 @@ export default {
     }
   },
   components: {
-    CompanyUsersRow
+    CompanyUsersRow,
+    PendingInvitesRow
   },
   computed: {
     isAdmin: function() {
       return true
       return this.$store.getters['settings/isAdmin']
+    },
+    isPending: function() {
+      return this.selectedFilter == 'pending'
     },
     company_users: function() {
       return this.$store.state.company_users.company_users
@@ -56,6 +75,9 @@ export default {
     },
     inactiveUsers() {
       return this.$store.getters['company_users/getInactive']
+    },
+    pendingInvites: function() {
+      return this.$store.getters['pending_invites/getAllInvites']
     }
   },
   methods: {
