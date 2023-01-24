@@ -110,6 +110,12 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoiceTemplate.vue')
     },
     {
+      path: '/task_invoice/:invoice_id',
+      name: 'TaskInvoice',
+      meta: { adminOnly: true },
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/TaskInvoiceTemplate.vue')
+    },
+    {
       path: '/days',
       name: 'Days',
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/DaysTemplate.vue')
