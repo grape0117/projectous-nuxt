@@ -129,7 +129,7 @@
         <template #cell(options)="data">
           <span class="status d-flex">
             <b-button-group size="sm" style="height:30px">
-              <b-button :style="{ background: default_theme_color }" @click="redirect('task_invoice', data.item.invoice_id)"><i class="icon-open_in_new"/></b-button>
+              <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('task_invoice', data.item.invoice_id)"><i class="icon-open_in_new"/></b-button>
               <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('invoice', data.item.invoice_id)"><i class="icon-open_in_new"/></b-button>
               <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('csv', data.item.invoice_id)">CSV</b-button>
               <b-button style="border:none" variant="danger" @click="deleteInvoice(data.item)"><i class="icon-delete_outline"/></b-button>
@@ -604,7 +604,7 @@ export default {
       const csv = `export/csv/invoice/${invoice_id}`
 
       if (to === 'invoice') return window.open(`/${invoice}`, '_blank')
-      if (to === 'task_invoice') return window.open(`/${invoice}`, '_blank')
+      if (to === 'task_invoice') return window.open(`/${task_invoice}`, '_blank')
       if (to === 'csv') return window.open(`${path}${csv}`, '_blank')
     },
     applyPayment(selected_invoice) {
