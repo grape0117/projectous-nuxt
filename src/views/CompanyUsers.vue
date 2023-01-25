@@ -17,7 +17,10 @@
             <span class="userCount">{{ pendingInvites.length }}</span>
           </span>
         </div>
-        <div @click="inviteUser()" class="btn btn-primary">Invite User</div>
+        <div>
+          <div @click="inviteUser()" class="btn btn-primary">Invite User</div>
+          <div @click="addWorker()" class="btn btn-primary ml-3">Add Worker</div>
+        </div>
       </div>
     </div>
     <div class="row table-responsive">
@@ -83,6 +86,9 @@ export default {
   methods: {
     inviteUser: function() {
       this.$store.dispatch('company_users/inviteUser')
+    },
+    addWorker: function() {
+      this.$store.dispatch('company_users/addWorker')
     }
   }
 }

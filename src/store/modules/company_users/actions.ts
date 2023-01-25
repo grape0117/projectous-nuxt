@@ -10,5 +10,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   editUser(context, user) {
     context.commit('settings/setCurrentEditCompanyUser', user, { root: true })
     context.dispatch('settings/openModal', 'user', { root: true })
+  },
+  addWorker(context) {
+    context.dispatch('settings/openModal', 'add-worker', { root: true })
   }
 }
