@@ -94,6 +94,9 @@ export const mutations: MutationTree<IModuleState> = {
     // @ts-ignore
     state[setting] = value
   },
+  increaseWatchTimer(state) {
+    state.timer_watch = state.timer_watch + 1
+  },
   popActionStack(state) {
     let modal_stack = state.modal_stack
     let popped = modal_stack.pop()

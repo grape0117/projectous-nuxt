@@ -173,7 +173,6 @@ export default {
       }
     },
     setSetting(key, value) {
-      console.log(value)
       this.task['settings']['task_type'] = value
     },
     deleteTask() {
