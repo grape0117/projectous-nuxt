@@ -78,29 +78,28 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('ADD_ONE', { module: 'task_users', entity: task_user }, { root: true })
     return task_user
   },
-  async createManyTaskUser({ commit }, { task_id, next_work_day, company_user_ids, user_task_list_id, sort_order, temp, step, notes }: any) {
-    let taskUsers = []
-    let task_users
-    for (let i = 0; i < company_user_ids.length; i++) {
-      const company_user_id = company_user_ids[i]
-      let task_user = {}
-      task_user = {
-        ...creteDefaultTaskUser(task_id),
-        next_work_day,
-        company_user_id,
-        user_task_list_id,
-        sort_order,
-        step,
-        notes
-      }
-      taskUsers.push(task_user)
-    }
+  // async createManyTaskUser({ commit }, { task_id, next_work_day, company_user_ids, user_task_list_id, sort_order, temp, step, notes }: any) {
+  //   let taskUsers = []
+  //   let task_users
+  //   for (let i = 0; i < company_user_ids.length; i++) {
+  //     const company_user_id = company_user_ids[i]
+  //     let task_user = {}
+  //     task_user = {
+  //       ...creteDefaultTaskUser(task_id),
+  //       next_work_day,
+  //       company_user_id,
+  //       user_task_list_id,
+  //       sort_order,
+  //       step,
+  //       notes
+  //     }
+  //     taskUsers.push(task_user)
+  //   }
 
-    // @ts-ignore
-    task_users = await this._vm.$http().post('/tasks-progress', { task_id: task_id, assigned_users: company_user_ids, step: step, notes: notes })
-    commit('ADD_MANY', { module: 'task_users', entities: task_users.users }, { root: true })
-    return task_users.users
-  },
+  //   task_users = await this._vm.$http().post('/tasks-progress', { task_id: task_id, assigned_users: company_user_ids, step: step, notes: notes })
+  //   commit('ADD_MANY', { module: 'task_users', entities: task_users.users }, { root: true })
+  //   return task_users.users
+  // },
   async updateTaskUser({ commit }: any, taskUser: ITaskUser) {
     commit('UPDATE', { module: 'task_users', entity: taskUser }, { root: true })
     // @ts-ignore

@@ -5,13 +5,20 @@
         <span>Reset Password</span>
       </div>
       <div class="login-page__block-form">
-        <form @submit="resetpassword">
-          <label class="control-label">New Password</label>
-          <input type="password" id="password" class="form-control" />
-          <label class="control-label">Confirm Password</label>
-          <input type="password" id="password_confirm" class="form-control" />
-          <button type="submit">Submit</button>
-        </form>
+        <b-form @submit="resetpassword">
+          <b-form-group id="input-group-1" label="Email address:" label-for="email">
+            <b-form-input id="email" v-model="email" type="email" placeholder="Enter email" required></b-form-input>
+          </b-form-group>
+          <b-form-group id="input-group-2" label="New Password" label-for="password">
+            <b-form-input id="password" v-model="password" type="password" required></b-form-input>
+          </b-form-group>
+          <b-form-group id="input-group-3" label="Confirm Password" label-for="password_confirm">
+            <b-form-input id="password" v-model="password_confirm" type="password" required></b-form-input>
+          </b-form-group>
+          <div class="d-flex justify-content-end">
+            <b-button type="submit" variant="primary">Reset Password</b-button>
+          </div>
+        </b-form>
       </div>
     </div>
   </div>
@@ -21,23 +28,22 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class ResetPassword extends Vue {
+  private email = '' as string
+  private password = '' as string
+  private password_confirm = '' as string
+
   private async resetpassword(e: any) {
     e.preventDefault()
-    //validation.
-    // @ts-ignore
-    let password = document.getElementById('password')['value']
-    // @ts-ignore
-    let password_confirm = document.getElementById('password_confirm')['value']
 
-    if (password == '') {
+    if (this.password == '') {
       alert('Please enter password!')
       return
     }
-    if (password.length < 6) {
+    if (this.password.length < 8) {
       alert('Passowrd must be greater than 6 characters!')
       return
     }
-    if (password != password_confirm) {
+    if (this.password != this.password_confirm) {
       alert('Password does not match!')
       return
     }
@@ -46,20 +52,22 @@ export default class ResetPassword extends Vue {
     // @ts-ignore
     const res = await this.$http().post('/resetpassword', {
       // @ts-ignore
-      api_token: api_token,
+      token: api_token,
       // @ts-ignore
-      password: password,
+      email: this.email,
       // @ts-ignore
-      password_confirm: password_confirm
+      password: this.password,
+      // @ts-ignore
+      password_confirmation: this.password_confirm
     })
 
-    let flag = res ? res.flag : null
+    let success = res ? res.success : null
 
-    if (flag) {
+    if (success == 'success') {
       alert('Password has been reset successfully! Please try to login.')
       this.$router.push('/login')
     } else {
-      alert('Error')
+      alert(res.message)
     }
   }
 }

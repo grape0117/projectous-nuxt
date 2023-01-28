@@ -347,6 +347,9 @@ export default {
     'timer.project_id': function() {
       const all_projects = this.openprojects()
       const project_id = this.timer.project_id
+      if (!project_id) {
+        return
+      }
       const client_company_id = all_projects.filter(e => e.id == project_id)[0].client_company_id
       this.client = this.clients.filter(e => e.client_company_id == client_company_id)[0]
 
@@ -412,7 +415,9 @@ export default {
       return this.$store.getters['settings/isIHI']
     },
     openprojects: function() {
-      return this.$store.getters['projects/getOpenProjectsSortedByClient']
+      const result = this.$store.getters['projects/getOpenProjectsSortedByClient'] || []
+      const projectsUniqueById = [...new Map(result.map(item => [item['id'], item])).values()]
+      return projectsUniqueById
     },
     calculateDuration: function() {
       this.timer.duration = this.endSeconds - this.startSeconds

@@ -31,6 +31,7 @@
     <edit-client-modal id="edit-client-modal" />
     <edit-user-modal id="edit-user-modal" />
     <invite-user-modal id="invite-user-modal" />
+    <add-worker-modal id="add-worker-modal" />
     <edit-timer-modal id="edit-timer-modal" />
     <edit-project-modal id="edit-project-modal" />
 
@@ -59,6 +60,7 @@ import Header from '@/components/Header.vue'
 import EditClientModal from './views/EditClientModal.vue'
 import EditUserModal from './views/EditUserModal'
 import InviteUserModal from './views/InviteUserModal'
+import AddWorkerModal from './views/AddWorkerModal'
 import EditTaskModal from './views/EditTaskModal'
 import EditTimerModal from './views/EditTimerModal'
 import EditProjectModal from './views/EditProjectModal'
@@ -91,6 +93,7 @@ export default {
     EditClientModal,
     EditUserModal,
     InviteUserModal,
+    AddWorkerModal,
     EditTaskModal,
     EditTimerModal,
     EditProjectModal,
