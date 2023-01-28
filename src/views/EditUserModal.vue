@@ -27,6 +27,7 @@
               <div class="col-sm-8">
                 <select class="form-control" id="userRole" name="role" v-model="user.user_role">
                   <option value="user">User</option>
+                  <option value="worker">Worker</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>
