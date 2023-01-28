@@ -31,6 +31,11 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "graph" */ '@/views/Graph.vue')
     },
     {
+      path: '/forgot-password',
+      name: 'Forgot Password',
+      component: () => import(/* webpackChunkName: "forgot-password" */ '@/views/ForgotPassword.vue')
+    },
+    {
       path: '/reset-password/:api_token',
       name: 'Reset Password',
       component: () => import(/* webpackChunkName: "reset-password" */ '@/views/ResetPassword.vue')
@@ -132,7 +137,7 @@ const router = new Router({
   ]
 })
 
-const unGuardedRoutes = ['Login', 'AcceptInvite', 'Register']
+const unGuardedRoutes = ['Login', 'AcceptInvite', 'Register', 'Forgot Password', 'Reset Password']
 
 router.beforeEach((to, from, next) => {
   const guardedRoute = !unGuardedRoutes.find(route => route === to.name)
