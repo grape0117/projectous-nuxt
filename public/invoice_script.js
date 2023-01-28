@@ -79,9 +79,6 @@ function generateTableRow() {
 }
 
 function parseFloatHTML(element) {
-	console.log('parse float', element.innerHTML);
-	console.log(element);
-	console.log(element.innerHTML.replace(/[^\d\.\-]+/g, ''));
 	return parseFloat(element.innerHTML.replace(/[^\d\.\-]+/g, ''));// || 0;
 }
 
@@ -93,10 +90,10 @@ function parsePrice(number) {
 /* ========================================================================== */
 
 function updateNumber(e) {
-	var
-	activeElement = document.activeElement,
-	value = parseFloat(activeElement.innerHTML),
-	wasPrice = activeElement.innerHTML == parsePrice(parseFloatHTML(activeElement));
+	// var
+	// activeElement = document.activeElement,
+	// value = parseFloat(activeElement.innerHTML),
+	// wasPrice = activeElement.innerHTML == parsePrice(parseFloatHTML(activeElement));
 
 	/*if (!isNaN(value) && (e.keyCode == 38 || e.keyCode == 40 || e.wheelDeltaY)) {
 		e.preventDefault();
@@ -122,21 +119,19 @@ function updateInvoice() {
 	// update inventory cells
 	// ======================
 
+	console.log("================== start ========================");
 	for (var a = document.querySelectorAll('table.inventory tbody tr'), i = 0; a[i]; ++i) {
 		// get inventory row cells
 		cells = a[i].querySelectorAll('span:last-child');
 		amount = a[i].querySelector('.timer-amount');
 		quantity = a[i].querySelector('.timer-quantity');
 		timertotal = a[i].querySelector('.timer-total');
-		// set price as cell[2] * cell[3]
-		console.log('amount', cells[3], 'quantity', cells[4]);
-		console.log('cell 3', parseFloatHTML(cells[3]));
-		console.log('cell 4', parseFloatHTML(cells[4]));
 		price = parseFloatHTML(amount) * parseFloatHTML(quantity);
 
 		// add price to total
 		if($(a[i]).hasClass('not-billable')){
 			unbilled += price;
+			console.log("unbilled item: ", "" , price);
 			//console.log(a[i]);
 		} else {
 			total += price;
@@ -148,6 +143,8 @@ function updateInvoice() {
 		//console.log(cells[5])
 		timertotal.innerHTML = price;
 	}
+	console.log("unbilled", unbilled);
+	console.log("==========================================");
 	
 	for (var sub_total_rows = document.querySelectorAll('table.inventory thead.sub-total-row'), i = 0; sub_total_rows[i]; ++i) {
 		sub_total = 0;
@@ -158,7 +155,8 @@ function updateInvoice() {
 			timertotal = a[ii].querySelector('.timer-total');
 			price = parseFloatHTML(amount) * parseFloatHTML(quantity);
 			if($(a[ii]).hasClass('not-billable')){
-				unbilled += price;
+				// unbilled += price;
+				console.log("unbilled item: ", "" , price);
 
 			} else {
 				sub_total += price;
@@ -167,6 +165,9 @@ function updateInvoice() {
 		timertotal = sub_total_rows[i].querySelector('.sub-total-price');
 		timertotal.innerHTML = parsePrice(sub_total);
 	}
+	console.log("total unbilled", unbilled);
+
+	console.log("================== end ========================");
 
 	// update balance cells
 	// ====================
@@ -190,7 +191,7 @@ function updateInvoice() {
 
 	// update price formatting
 	// =======================
-	console.log('activeElement', document.activeElement);
+	// console.log('activeElement', document.activeElement);
 	for (a = document.querySelectorAll('span[data-prefix] + span'), i = 0; a[i]; ++i) {
 		if (document.activeElement != a[i]) {
 			a[i].innerHTML = parsePrice(parseFloatHTML(a[i]));
@@ -202,7 +203,7 @@ function updateInvoice() {
 /* ========================================================================== */
 
 function onContentLoad() {
-	if (window.location.href.indexOf(/invoice/)<0) {
+	if (window.location.href.indexOf(/invoice/)<0&&window.location.href.indexOf(/task_invoice/)<0) {
 		return;
 	}
 	var authorization = $('[name="authorization"]').val();
@@ -328,15 +329,26 @@ function setQuantity(id, quantity){
 		});
 }
 
+function setTaskClientRate(id, client_rate){
+	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save',
+	 	{client_rate: client_rate, is_task: true}, function(){
+			saveInvoiceTotal()
+		});
+}
+
+function setTaskQuantity(id, quantity){
+	const invoice_duration = quantity * 3600;
+	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save', {invoice_duration: invoice_duration, is_task: true}, function(){
+			saveInvoiceTotal()
+		});
+}
 function removeFromInvoice(id){
 	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save', {invoice_id: null});
 }
 
 function saveInvoiceTotal(){
-	var invoice_id = $('body > article > table.meta > tbody > tr:nth-child(1) > td > span')[0].innerText
-	console.log({invoice_id})
-	var total = $('body > article > table.meta > tbody > tr:nth-child(4) > td > span:nth-child(2)')[0].innerText
-	console.log({total})
+	var invoice_id = $('body article table.meta tbody tr:nth-child(1) td span')[0].innerText
+	var total = $('body article table.meta tbody tr:nth-child(4) td span:nth-child(2)')[0].innerText
 	$.post('https://app2.projectous.com/api/invoice/'+invoice_id+'/save-total', { total});
 
 }
