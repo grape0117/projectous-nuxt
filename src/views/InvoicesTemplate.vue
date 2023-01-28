@@ -15,7 +15,7 @@
             <span class="total-open" :style="{ 'background-color': default_theme_color }">{{ total }}</span>
           </div>
         </div>
-        <div>
+        <!-- <div>
           <div style="float:right">
             <div class="year-buttons">
               <div class="year-button">
@@ -28,13 +28,13 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="mb-2">
-        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Unsent: $ {{ unsent_total }}</b-badge>
-        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Unpaid: $ {{ unpaid_total }}</b-badge>
-        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Paid: $ {{ paid_total }}</b-badge>
-        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Voided: $ {{ voided_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Unsent: ${{ unsent_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Unpaid: ${{ unpaid_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Paid: ${{ paid_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Voided: ${{ voided_total }}</b-badge>
       </div>
       <b-table responsive :items="invoice_filter" :fields="fields" thead-class="table-header-background" tbody-class="table-header-background" :busy="is_busy" style="max-height: 86vh; overflow: auto;">
         <template #thead-top="data">
@@ -222,7 +222,8 @@ export default {
       unsent_total: 0,
       unpaid_total: 0,
       paid_total: 0,
-      voided_total: 0
+      voided_total: 0,
+      invoice_count_per_year: []
     }
   },
   created() {},
@@ -342,16 +343,22 @@ export default {
     invoice_years_data() {
       let invoice = []
       let total_open_invoice_count = 0
+      console.log(this.invoice_count_per_year)
       for (const { year } of this.invoice_years) {
         let open_year = this.open_invoice_count.find(function(year_count) {
           // console.log(year_count.year, ' === ', year)
+          return year_count.year === year
+        })
+
+        let count_per_year = this.invoice_count_per_year.find(function(year_count) {
+          console.log(year_count.year, ' === ', year)
           return year_count.year === year
         })
         if (open_year) {
           total_open_invoice_count += open_year['count(id)']
         }
 
-        invoice.push({ year: year.toString(), total: open_year && open_year['count(id)'] ? open_year['count(id)'] : '' })
+        invoice.push({ year: year.toString(), total: count_per_year && count_per_year['status_count'] ? count_per_year['status_count'] : '' })
       }
 
       this.total_open_invoice_count = total_open_invoice_count
@@ -500,23 +507,27 @@ export default {
     },
     processBreakdownPerStatus(total_per_status) {
       this.unsent_total = total_per_status
-        .filter(e => e.status === 'open' || e.status === '')
+        .filter(e => e.status === 'open')
         .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
       this.unpaid_total = total_per_status
         .filter(e => e.status === 'open' || e.status === 'sent')
         .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
       this.paid_total = total_per_status
         .filter(e => e.status === 'paid')
         .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
       this.voided_total = total_per_status
         .filter(e => e.status === 'voided')
         .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     },
@@ -541,18 +552,20 @@ export default {
       this.getCountPerStatus(year)
     },
     async getInvoicesByYear(year) {
-      const { invoices, invoice_years, open_invoice_count } = await this.$http().get(`/invoices/${year}`)
+      const { invoices, invoice_years, open_invoice_count, invoice_count_per_year } = await this.$http().get(`/invoices/${year}`)
 
-      return { invoices, invoice_years, open_invoice_count }
+      return { invoices, invoice_years, open_invoice_count, invoice_count_per_year }
     },
     async getData() {
-      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear(this.status_filter) //new Date().getFullYear()
+      const { invoices, invoice_years, open_invoice_count, invoice_count_per_year } = await this.getInvoicesByYear(this.status_filter) //new Date().getFullYear()
 
       console.log({ invoices })
 
       this.invoices = invoices
+      this.processBreakdownPerStatus(invoices)
       this.invoice_years = invoice_years
       this.open_invoice_count = open_invoice_count
+      this.invoice_count_per_year = invoice_count_per_year
       this.getCountPerStatus('all')
     },
     async getCountPerStatus(year) {
@@ -561,7 +574,6 @@ export default {
       const check_sent_count = count.find(e => e.status === 'sent')
       const check_paid = count.find(e => e.status === 'paid')
       const check_voided = count.find(e => e.status === 'voided')
-      this.processBreakdownPerStatus(total_per_status)
       if (check_open_count) {
         this.open_count = check_open_count.count
       }
