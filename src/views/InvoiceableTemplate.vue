@@ -430,7 +430,7 @@ export default {
         variant: variant
       })
     },
-    applyAction() {
+    async applyAction() {
       let self = this
       const view_invoice_container = document.getElementById('actionLink')
       view_invoice_container.innerHTML = ''
@@ -445,6 +445,8 @@ export default {
       timers = {
         timers: timer_ids
       }
+      const form_data = new FormData()
+      form_data.append('timers', timer_ids)
       if (this.invoice_action == 'create_invoice') {
         //TODO: $invoice_id = Invoice::max('invoice_id') + 1
         this.$http()
@@ -470,9 +472,11 @@ export default {
           alert('Try again.')
           return
         }
-        this.$http().post('/timers/adjust-client-rate', timers + '&client_rate=' + new_client_rate, function() {
-          alert('Done, reload page.')
-        })
+        form_data.append('client_rate', new_client_rate)
+        const result = await this.$http().post('/timers/adjust-client-rate', form_data)
+        if (result.status === 'success') {
+          self.getData()
+        }
         return
       } else if (this.invoice_action == 'adjust-user-rate') {
         let new_user_rate = prompt('What rate?', '')
@@ -480,9 +484,11 @@ export default {
           alert('Try again.')
           return
         }
-        this.$http().post('/timers/adjust-user-rate', timers + '&user_rate=' + new_user_rate, function() {
-          alert('Done, reload page.')
-        })
+        form_data.append('user_rate', new_user_rate)
+        const result = await this.$http().post('/timers/adjust-user-rate', form_data)
+        if (result.status === 'success') {
+          self.getData()
+        }
         return
       } else if (this.invoice_action == 'assigntotask') {
         let task_id = prompt('What task ID?', '')
@@ -490,7 +496,8 @@ export default {
           alert('Try again.')
           return
         }
-        this.$http().post('/timers/' + action, timers + '&task_id=' + task_id, function() {
+        form_data.append('task_id', task_id)
+        this.$http().post('/timers/' + action, form_data, function() {
           alert('Done, reload page.')
         })
         return
@@ -506,12 +513,10 @@ export default {
         return
       }
 
-      this.$http()
-        .post('/timers/' + this.invoice_action, timers)
-        .then(function() {
-          // Do something with the response
-          self.getData()
-        })
+      const result = await this.$http().post('/timers/' + this.invoice_action, timers)
+      if (result.status === 'success') {
+        self.getData()
+      }
     },
     isTecharound: function() {
       return this.$store.getters['settings/isTecharound']
@@ -665,6 +670,9 @@ export default {
       console.log(this.total_time)
       // }
       this.loading_data = false
+      for (const timer of document.querySelectorAll('.timer-action:checked')) {
+        timer.checked = false
+      }
     }
   }
 }

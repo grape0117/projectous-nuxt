@@ -15,11 +15,47 @@
         </router-link>
         <div>
           <b-dropdown id="dropdown-divider" class="transparent-button" text="Reports">
-            <b-dropdown-item-button><router-link id="report-menu-link" to="/days">Days</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link id="report-menu-link" to="/invoiceable">Invoiceable</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link id="report-menu-link" to="/payable">Payable</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link id="report-menu-link" to="/profit">Profit</router-link></b-dropdown-item-button>
-            <b-dropdown-item-button><router-link id="report-menu-link" to="/user_report">My Report</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button @click="$router.push('/days')"><router-link id="report-menu-link" to="/days">Days</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button @click="$router.push('/invoiceable')"><router-link id="report-menu-link" to="/invoiceable">Invoiceable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button @click="$router.push('/payable')"><router-link id="report-menu-link" to="/payable">Payable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button @click="$router.push('/profit')"><router-link id="report-menu-link" to="/profit">Profit</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button @click="$router.push('/user_report')"><router-link id="report-menu-link" to="/user_report">My Report</router-link></b-dropdown-item-button>
+          </b-dropdown>
+          <b-dropdown id="new-task-menu" class="transparent-button" text="New Task" ref="newtask_dropdown">
+            <div class="new-task-container">
+              <!-- <select v-model="new_task_project_id" id="task-project-id2" class="form-control select2-select" name="project_id" style="width: 30%;">
+                <option value="">No Project</option>
+                <option>Personal</option>
+                <option v-for="project in openprojects()" :value="project.id"> {{ client_name(project.client_company_id) }} - {{ project.name }} </option>
+              </select> -->
+              <vue-bootstrap-typeahead ref="projectsTypeahead" :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
+              <input type="text" id="task" ref="noteInput" class="form-control" placeholder="@assign" @keyup.enter="createTask" @input="creatingTask" style="width: 70%;" />
+            </div>
+            <div class="search_result" v-if="showResult">
+              <h6 class="card-text">
+                <b-badge :style="{ 'background-color': getClientAcronymColor(new_task_project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(new_task_project_id)" v-b-tooltip.hover :title="taskProjectName(new_task_project_id)">
+                  {{ getProjectDetails(new_task_project_id) }}
+                </b-badge>
+                <b-dropdown id="priorities-dropdown" :text="new_priority ? capitalizeFirstLetter(new_priority) : ''" :variant="priorityColor(new_priority)" style="border:none">
+                  <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
+                  <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
+                  <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
+                  <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
+                </b-dropdown>
+                <b>
+                  &nbsp;{{ new_task_title }}
+
+                  <span v-if="new_company_user_id">
+                    <span :title="`${getCompanyUserDetails(new_company_user_id).name}   ${assignedUser.step}:${assignedUser.notes}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${assignedUser.status} ${assignedUser.step} ${assignedUser.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(new_company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+                      {{ abbrName(getCompanyUserDetails(new_company_user_id).name) }}
+                    </span>
+                  </span>
+                  <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-3" :style="{ width: new_task_due_date ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(new_task_due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(new_task_due_date)" v-b-tooltip.hover :title="dueDateDetails(new_task_due_date)" />
+                </b>
+              </h6>
+              <!-- end result -->
+            </div>
+            <b-button class="float-right" variant="outline-primary" @click="closeNewTask">Close</b-button>
           </b-dropdown>
         </div>
       </div>
@@ -85,10 +121,29 @@ import Vue from 'vue'
 import { EventBus } from '@/components/event-bus'
 import { idbKeyval } from '@/plugins/idb.ts'
 import { getCookie } from '@/utils/util-functions'
+import TaskActionRow from '../views/TaskActionRow.vue'
+import { abbrName } from '@/utils/util-functions'
+import _ from 'lodash'
+import moment from 'moment'
 
 export default Vue.extend({
+  extends: TaskActionRow,
+  watch: {
+    projectSearch: _.debounce(function(project_name) {
+      let projects = this.openprojects()
+      projects = projects.filter(project => project.name.toLowerCase().indexOf(project_name.toLowerCase()) >= 0)
+      return projects
+    }, 500)
+  },
   data() {
     return {
+      projectSearch: '',
+      new_task_title: '',
+      task_content: '',
+      new_company_user_id: false,
+      new_user_name: '',
+      new_priority: 'active',
+      new_task_due_date: '',
       showMenu: false,
       timerEmptyFields: 0,
       timerRunning: false,
@@ -209,7 +264,11 @@ export default Vue.extend({
         }
       ],
       isShowReload: false,
-      bgStyle: ''
+      bgStyle: '',
+      new_task_project_id: null,
+      showResult: false,
+      assignedUser: {},
+      hideNewTask: false
     }
   },
   computed: {
@@ -248,12 +307,119 @@ export default Vue.extend({
     })
 
     this.updateBackground()
+    this.$root.$on('bv::dropdown::show', bvEvent => {
+      if (bvEvent.componentId === 'new-task-menu') {
+        setTimeout(() => {
+          if (this.$refs.noteInput) {
+            this.$refs.noteInput.focus()
+          }
+        }, 400)
+      }
+    })
+    this.$root.$on('bv::dropdown::hide', bvEvent => {
+      if (!this.hideNewTask && bvEvent.componentId === 'new-task-menu' && this.hideNewTask !== undefined) {
+        bvEvent.preventDefault()
+      } else {
+        this.hideNewTask = false
+      }
+    })
   },
   methods: {
+    saveDueDate(e) {
+      this.new_task_due_date = e.target.value
+    },
+    dueDateDetails(due_date, return_color) {
+      if (!due_date && !return_color) {
+        return ''
+      }
+      const timezone = moment.tz.guess()
+      const timezone_date = moment()
+        .tz(timezone)
+        .format('YYYY-MM-DD')
+      const task_due_date = moment(due_date).format('YYYY-MM-DD')
+
+      const diff = moment.duration(moment(task_due_date).diff(moment(timezone_date)))
+      const days = diff.asDays()
+      const near_due_date = [1, 2, 3]
+      let return_value
+      let color
+      if (days < 0) {
+        return_value = 'Past due'
+        color = '#ffc107'
+      } else if (days === 0) {
+        return_value = 'Due today'
+        color = 'red'
+      } else if (near_due_date.includes(days)) {
+        return_value = `Due in ${days} ${days === 1 ? 'day' : 'days'}`
+        color = 'orange'
+      } else {
+        return_value = `Due on ${moment(due_date).format('MMMM DD')}`
+        color = '#17a2b8'
+      }
+      if (!due_date) {
+        color = '#28a745'
+      }
+      if (return_color) {
+        return_value = color
+      }
+      return return_value
+    },
+    dueDate(due_date) {
+      let formatted_date
+      if (due_date) {
+        formatted_date = moment(due_date, 'yyyy-MM-DD').format('yyyy-MM-DD')
+      } else {
+        return ''
+      }
+      return formatted_date
+    },
     reload() {
       alert('Non-functional')
       return
       this.$emit('reload')
+    },
+    priorityColor(priority) {
+      let color = 'primary'
+      switch (priority) {
+        case 'high':
+          color = 'danger'
+          break
+        case 'active':
+          color = 'success'
+          break
+        case 'regular':
+          color = 'success'
+          break
+        case 'low':
+          color = 'warning'
+          break
+        case 'hold':
+          color = 'secondary'
+          break
+
+        default:
+          color = 'primary'
+          break
+      }
+      return color
+    },
+    closeNewTask() {
+      this.projectSearch = ''
+      this.new_task_title = ''
+      this.new_company_user_id = false
+      this.new_user_name = ''
+      this.new_task_project_id = null
+      this.showResult = false
+      this.hideNewTask = true
+      setTimeout(() => {
+        this.$refs.newtask_dropdown.hide()
+      }, 100)
+    },
+    selectProject($event) {
+      this.showResult = true
+      setTimeout(() => {
+        this.new_task_project_id = $event.id
+      }, 100)
     },
     closeModal() {
       this.toggles.paint = false
@@ -262,12 +428,6 @@ export default Vue.extend({
       console.log(state)
       this.isShowReload = state
     },
-    // goTo(path) {
-    //   this.showMenu = false
-    //   if (this.$route.path === `/${path}`) return
-
-    //   this.$router.push({ path: `/${path}` })
-    // },
     logout() {
       document.cookie = 'auth_token=' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
       window.location.reload()
@@ -282,6 +442,95 @@ export default Vue.extend({
       EventBus.$emit('changeBackground', { option, theme })
       this.updateBackground(option)
     },
+    openprojects() {
+      const result = this.$store.getters['projects/getOpenProjectsSortedByClient'] || []
+      const projectsUniqueById = [...new Map(result.map(item => [item['id'], item])).values()]
+      return projectsUniqueById
+    },
+    client_name(client_company_id) {
+      let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
+      return client ? client.name : ''
+    },
+    async createTask() {
+      if (!this.new_company_user_id) {
+        return
+      }
+      this.$refs.noteInput.value = ''
+      this.$refs.projectsTypeahead.inputValue = ''
+      this.showResult = false
+      const newTask = await this.$store.dispatch('tasks/createTask', {
+        title: this.new_task_title,
+        project_id: this.new_task_project_id,
+        sort_order: 0,
+        status: 'open',
+        temp: false,
+        users: [this.new_company_user_id],
+        owner: this.$store.state.settings.current_company_user_id,
+        priority: this.new_priority,
+        due_date: this.new_task_due_date
+      })
+      EventBus.$emit('update', { company_user_id: this.new_company_user_id })
+      this.new_task_title = ''
+      this.new_task_project_id = null
+      this.new_company_user_id = null
+    },
+    creatingTask: _.debounce(function(e) {
+      let notesWithTaskTile = e.target.value
+      const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+)|([a-z][A-Z]@+))', 'g')
+
+      const acronym_matchs = notesWithTaskTile ? notesWithTaskTile.match(projectRegex) : null
+      if (!acronym_matchs) {
+        return
+      }
+      let project_captured = false
+      let user_name_captured = false
+      let title_captured = false
+      let user_name = null
+      let task_title = null
+      let project_title = null
+      console.log('acronym_matchs', acronym_matchs)
+      for (let i = 0; i < acronym_matchs.length; i++) {
+        const acronym_match = acronym_matchs[i]
+
+        user_name = acronym_match.indexOf('@') >= 0 ? acronym_match.split('@')[1] : user_name
+        project_title = acronym_match.indexOf(':') > 0 ? acronym_match.split(':')[0] : project_title
+        task_title = acronym_match.indexOf(':') < 0 && acronym_match.indexOf('@') < 0 ? acronym_match : task_title
+      }
+
+      if (project_title) {
+        console.log('project_title', project_title)
+        project_captured = true
+        const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === project_title)
+        if (projects_by_acronym.length === 1) {
+          this.new_task_project_id = projects_by_acronym[0].id
+          this.new_task_title = task_title
+          const project_full_title = this.client_name(projects_by_acronym[0].client_company_id) + '-' + projects_by_acronym[0].name
+          this.$refs.projectsTypeahead.inputValue = project_full_title
+        }
+      }
+
+      if (user_name) {
+        user_name_captured = true
+        console.log('user_name', user_name)
+        this.new_user_name = user_name
+        let new_company_user = this.$store.getters['company_users/getByAlias'](user_name)
+        if (new_company_user) {
+          this.new_company_user_id = new_company_user['id']
+          this.assignedUser = new_company_user
+          this.new_task_title = task_title
+        }
+      }
+      if (task_title) {
+        title_captured = true
+        console.log('title', task_title)
+      }
+      if (project_captured || title_captured || user_name_captured) {
+        this.showResult = true
+      } else {
+        this.showResult = false
+      }
+    }, 700),
+
     async toggle(iconName) {
       if (iconName === 'reload') {
         this.$emit('reload')
@@ -297,6 +546,32 @@ export default Vue.extend({
         this.toggles[iconName] = !this.toggles[iconName]
         EventBus.$emit(`toggle_${iconName}`, this.toggles[iconName])
       }
+    },
+    abbrName,
+    getCompanyUserDetails(company_user_id) {
+      const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
+
+      return user_details
+    },
+    getClientAcronymColor(project_id) {
+      return this.getProjectDetails(project_id, true)
+    },
+    getProjectDetails(project_id, is_color) {
+      const project = this.getProject(project_id)
+      let client_data = null
+      if (is_color && project) {
+        client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
+        return client_data.color
+      }
+      return project ? project.acronym : false
+    },
+    capitalizeFirstLetter(string) {
+      const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1)
+
+      return capitalize(string)
+    },
+    updatePriority(priority) {
+      this.new_priority = priority
     }
   },
   created() {
@@ -637,6 +912,25 @@ export default Vue.extend({
   background-size: cover !important;
   cursor: pointer;
 }
+.search_result {
+  color: white;
+  margin-top: 27px;
+}
 
+.btn-outline-primary {
+  color: #fff;
+  border-color: #fff;
+}
+.btn-outline-primary:hover {
+  color: #fff;
+  background-color: #ffa500;
+  border-color: #fff;
+}
+.search_result .card-text {
+  width: fit-content;
+}
+#task-list-due-date {
+  margin-left: 20px;
+}
 /* paletteColors: ['red', 'green', 'blue', 'rgba($color: orange, $alpha: 0.6)', 'pink', 'violet', 'rgba(255, 165, 0, 0.6)' ] */
 </style>

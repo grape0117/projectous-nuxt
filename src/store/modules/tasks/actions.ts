@@ -49,13 +49,17 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
     state.tasks_by_project = tasks.filter((task: ITask) => (task.project_id = project_id))
   },
-  async createTask({ commit, getters }: any, { title, project_id, sort_order, status, temp }: any) {
+  async createTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, users = [], owner, priority = 'active', due_date }: any) {
     const task = {
       ...createDefaultTask(),
       title,
       project_id,
       sort_order,
-      status
+      status,
+      users,
+      owner,
+      priority,
+      due_date
     }
     let newTask
     if (temp) {
@@ -67,8 +71,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     } else {
       //TODO: should we do this? task.id = uuid.v4();
       // @ts-ignore
-      newTask = (await this._vm.$http().post('/tasks', { task })).task
-      commit('removeTempTasks')
+      newTask = (await this._vm.$http().post('/tasks', { task }))[0]
+      // commit('removeTempTasks')
     }
     commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
     return newTask

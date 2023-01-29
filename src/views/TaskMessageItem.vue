@@ -1,6 +1,6 @@
 <template>
-  <b-list-group-item class="message-panel_inner-message">
-    <b-avatar class="mr-1 mb-4" :text="user_name" v-b-tooltip.hover :title="message.user.name" size="25px" />
+  <b-list-group-item class="message-panel_inner-message" :style="is_me ? 'float: right;' : ''">
+    <b-avatar v-if="!is_me" class="mr-1 mb-4" :text="user_name" v-b-tooltip.hover :title="message.user.name" size="25px" />
     <div>
       <div class="message-wrapper">
         <pre class="msg-content" style="color: white;">{{ message.text }}</pre>
@@ -9,6 +9,7 @@
           <div class="message-actions-options" v-if="open_actions">
             <i class="icon-edit" @click="editMessage(message)" />
             <i class="icon-delete" @click="deleteMessage(message)" />
+            <i v-if="message.isFile" class="icon-download" @click="downloadFile(message)" />
           </div>
         </div>
       </div>
@@ -20,6 +21,7 @@
 <script>
 import moment from 'moment'
 import { abbrName } from '@/utils/util-functions'
+import { writeFileSync } from 'fs'
 
 export default {
   name: 'task-message-item',
@@ -28,7 +30,7 @@ export default {
       open_actions: false
     }
   },
-  props: ['message'],
+  props: ['message', 'is_me'],
   computed: {
     user_name() {
       return abbrName(this.message.user.name)
@@ -38,6 +40,21 @@ export default {
     }
   },
   methods: {
+    forceFileDownload(response, title) {
+      const url = window.URL.createObjectURL(new Blob([response]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', title)
+      document.body.appendChild(link)
+      link.click()
+    },
+    downloadFile(message) {
+      this.$http()
+        .post2('/download', { file_key: message.filePath })
+        .then(response => {
+          this.forceFileDownload(response, message.text)
+        })
+    },
     getUserNameWithCompanyUserId(company_user_id) {
       let company_user = this.$store.state.company_users.company_users[this.$store.state.company_users.lookup[company_user_id]]
       if (company_user) return company_user.name
@@ -64,6 +81,7 @@ export default {
   border-radius: 4px;
   margin-top: 5px;
   margin-bottom: 0;
+  white-space: pre-wrap;
 }
 
 .message-panel_inner-message {
@@ -72,6 +90,10 @@ export default {
   background-color: rgba($color: #000000, $alpha: 0) !important;
   border: 0 !important;
   padding: 0px 10px 5px 10px;
+  max-width: 90%;
+  .b-avatar-text {
+    width: 25px !important;
+  }
 
   .message-dateTime {
     font-size: 12px;

@@ -28,7 +28,7 @@
     <div class="sidebar-timer-report-at">{{ restartedAt() }}</div>
 
     <div class="sidebar-timer-notes">
-      <b-form-textarea ref="noteInput" style="overflow-y: hidden; color: white; font-size: smaller; min-width: 100px; background: none; border-left: white solid 1px; border-radius: 0px;" v-on:blur="saveNotes" class="sidebar-timer-timer-task" rows="2" max-rows="30" cols="300" v-model="timer.notes"></b-form-textarea>
+      <textarea @keyup="resize" @focus="resize" ref="noteInput" style="overflow-y: hidden; color: white; font-size: smaller; min-width: 100px; background: none; border-left: white solid 1px; border-radius: 0px;" v-on:blur="saveNotes" class="sidebar-timer-timer-task" rows="2" max-rows="30" cols="300"></textarea>
     </div>
     <div v-if="isNotCurrentUser()">{{ user.name }}</div>
     <span class="sidebar-timer-timer-id">{{ timer.id }}</span>
@@ -67,6 +67,7 @@ export default {
       if ((notes.includes('&#8203;') && notes.length === 7) || notes === '') {
         this.timer.notes = ''
       }
+      this.$refs.noteInput.value = notes
     },
     $route(to, from) {
       this.checkPathTimerId()
@@ -159,9 +160,14 @@ export default {
     // }
   },
   mounted: function() {
+    if (this.timer.notes == '&#8203;') {
+      this.timer.notes = ''
+    }
+    this.$refs.noteInput.value = this.timer.notes
     if (this.index === 0 && this.timer.notes === null) {
       this.$refs['noteInput'].focus()
     }
+    this.resize()
     /**
      * load in current running project if one exists
      */
@@ -177,6 +183,10 @@ export default {
     this.checkPathTimerId()
   },
   methods: {
+    resize() {
+      const { noteInput } = this.$refs
+      noteInput.style.height = noteInput.scrollHeight + 'px'
+    },
     applyTheme,
     async bumpItUp() {
       const timer = await _.cloneDeep(this.timer)
@@ -345,6 +355,7 @@ export default {
       await this.$store.dispatch('timers/saveTimer', this.timer)
     },
     saveNotes: async function(event) {
+      this.timer.notes = event.target.value
       let notesWithAcronym = this.timer.notes
       console.log('notesWithAcronym', notesWithAcronym)
       // Check for ABC: //TODO: move somewhere else to common area?
@@ -371,6 +382,7 @@ export default {
       }
       console.log('NOTES', notes)
       this.timer.notes = notes
+      event.target.value = notes
       // event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
 
       // await this.$store.dispatch('timers/saveTimer', this.timer)

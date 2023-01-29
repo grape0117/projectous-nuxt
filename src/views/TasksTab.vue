@@ -20,7 +20,7 @@
   </div> -->
 
   <div class="row">
-    <user-task-row v-for="task in task_list" v-bind:task="task" :isAdmin="isAdmin()" is="user-task-row" @showModal="showModal" @updateStatus="updateStatus" @showUpdateModal="showUpdateModal"></user-task-row>
+    <user-task-row v-for="task in task_list" v-bind:task="task" @showSnoozeModal="showSnoozeModal" @showModal="showModal" @updateStatus="updateStatus" @showUpdateModal="showUpdateModal"></user-task-row>
     <b-modal v-model="show_udpate_status" id="update-status-modal" class="update-status-modal" style="min-height: 500px" :size="'lg'">
       <template #modal-header>
         <div class="header">
@@ -100,6 +100,31 @@
         </b-button>
       </div>
     </b-modal>
+    <b-modal id="snooze-modal" v-model="show_snooze" class="snooze-modal" :size="'sm'">
+      <template #modal-header>
+        <div class="header">
+          <div class="d-flex justify-content-between">
+            <h4>Select Next Work Day</h4>
+          </div>
+        </div>
+      </template>
+      <div>
+        <div class="form">
+          <b-button-group vertical style="width:100%;">
+            <b-button variant="warning" @click="changeNextWorkDay(1)">Tomorrow</b-button>
+            <b-button variant="warning" @click="changeNextWorkDay(2)" style="border-top: 2px solid white; border-bottom: 2px solid white;">Next Monday</b-button>
+            <b-button variant="warning" @click="is_custom_next_work_day = true">Custom</b-button>
+            <b-form-datepicker v-if="is_custom_next_work_day" id="datepicker" v-model="next_work_day" class="mb-2" @input="customNextWorkDate" @shown="shown_date_picker = true" @hidden="shown_date_picker = false"></b-form-datepicker>
+            <div v-if="shown_date_picker" style="height: 190px;"></div>
+          </b-button-group>
+        </div>
+      </div>
+      <div slot="modal-footer" class="w-100">
+        <b-button variant="secondary" size="md" class="float-right ml-2" @click="show_snooze = false">
+          Cancel
+        </b-button>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -107,6 +132,7 @@
 import TasksTabRow from './TasksTabRow'
 import UserTaskRow from './UserTaskRow'
 import { abbrName } from '@/utils/util-functions'
+import moment from 'moment'
 export default {
   props: ['tasks', 'tab'],
   name: 'tasks-tab',
@@ -130,8 +156,12 @@ export default {
       task_list: this.tasks,
       show_add_user: false,
       show_udpate_status: false,
+      show_snooze: false,
       assigned_users: [],
-      working_users: []
+      working_users: [],
+      is_custom_next_work_day: false,
+      next_work_day: '',
+      shown_date_picker: false
     }
   },
   watch: {
@@ -141,6 +171,22 @@ export default {
   },
 
   methods: {
+    customNextWorkDate(e) {
+      this.is_custom_next_work_day = false
+      const index = this.task_list.map(task => task.id).indexOf(this.selected_task)
+      const isToday = moment(this.next_work_day).format('yyyy-MM-DD') <= moment().format('yyyy-MM-DD')
+      this.task_list[index]['isToday'] = isToday
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.selected_task, company_user_id: current_user_id })[0]
+      if (task_user) {
+        this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: this.next_work_day })
+        this.show_snooze = false
+        this.next_work_day = null
+        this.shown_date_picker = false
+      } else {
+        this.makeToast('danger', 'You are not assigned to this task')
+      }
+    },
     addUser(user_id) {
       const user_index = this.assigned_users.indexOf(user_id)
 
@@ -157,9 +203,6 @@ export default {
         solid: true
       })
     },
-    isAdmin() {
-      return this.$store.getters['settings/isAdmin']
-    },
     abbrName,
     getCompanyUserDetails(company_user_id) {
       const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
@@ -171,7 +214,6 @@ export default {
       const task_index = this.tasks.findIndex(task => task.id === statusInfo.task_id)
       const user_index = this.task_list[task_index].users.findIndex(user => user.company_user_id === current_user_id)
       this.task_list[task_index].users[user_index].status = statusInfo.status
-      this.makeToast('success', 'Status changed!')
     },
     updateNotes(e) {
       this.notes = e.target.value
@@ -196,6 +238,7 @@ export default {
       }
       const result = await this.$http().post('/tasks-progress', task_progress_info)
       if (result.status === 'success') {
+        this.$store.commit('ADD_MANY', { module: 'task_users', entities: result.users }, { root: true })
         this.makeToast('success', 'Assigned a user!')
         const task_index = this.tasks.findIndex(task => task.id === this.selected_task)
         this.task_list[task_index].users = result.users
@@ -243,7 +286,6 @@ export default {
       }
       const result = await this.$http().post(`/tasks-progress/${this.selected_task}`, task_progress_info)
       if (result.status === 'success') {
-        this.makeToast('success', `Status changed to ${status}`)
         const task_index = this.tasks.findIndex(task => task.id === this.selected_task)
         const user_index = this.tasks[task_index].users.findIndex(user => user.company_user_id === result.user.company_user_id)
         let users = [...this.tasks[task_index].users]
@@ -312,6 +354,51 @@ export default {
       this.$bvModal.show('add-user-modal')
       const task_index = this.tasks.findIndex(task => task.id === task_id)
       this.working_users = this.task_list[task_index].users.map(user => user.company_user_id)
+    },
+    showSnoozeModal({ task_id, star }) {
+      this.selected_task = task_id
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      if (star === 1) {
+        const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: task_id, company_user_id: current_user_id })[0]
+        if (task_user) {
+          const index = this.task_list.map(task => task.id).indexOf(task_id)
+          this.task_list[index]['isToday'] = true
+          this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: moment().format('Y-M-D') })
+          this.$store.commit('tasks/addTodayTask', this.task_list[index])
+        } else {
+          this.makeToast('danger', 'You are not assigned to this task')
+        }
+      } else {
+        const index = this.task_list.map(task => task.id).indexOf(task_id)
+        this.task_list[index]['isToday'] = false
+        const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: task_id, company_user_id: current_user_id })[0]
+        this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: null })
+        this.$store.commit('tasks/removeTodayTask', this.task_list[index].id)
+        this.$bvModal.show('snooze-modal')
+      }
+    },
+    changeNextWorkDay(days) {
+      const tomorrow = moment()
+        .add(1, 'days')
+        .format('Y-M-D')
+      const next_monday = moment()
+        .startOf('isoWeek')
+        .add(1, 'week')
+        .format('Y-M-D')
+      let next_work_day = days == 1 ? tomorrow : next_monday
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      const index = this.task_list.map(task => task.id).indexOf(this.selected_task)
+      const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.selected_task, company_user_id: current_user_id })[0]
+      if (task_user) {
+        this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'task_users', id: task_user.id, attribute: 'next_work_day', value: next_work_day })
+        this.show_snooze = false
+        this.$forceUpdate()
+        if (index >= 0) {
+          this.task_list[index]['isToday'] = false
+        }
+      } else {
+        this.makeToast('danger', 'You are not assigned to this task')
+      }
     }
   }
 }
@@ -364,5 +451,14 @@ export default {
   left: 24px;
   position: absolute;
   z-index: 9;
+}
+.modal-body {
+  overflow: hidden;
+}
+#snooze-modal .modal-dialog {
+  max-width: 325px !important;
+}
+.modal-header {
+  margin: auto;
 }
 </style>

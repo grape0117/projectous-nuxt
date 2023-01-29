@@ -16,7 +16,8 @@
 
           <div class="d-flex justify-content-end">
             <b-button type="submit" variant="primary" class="mr-2">Submit</b-button>
-            <b-button @click="forgotpassword" variant="danger">Forgot Password</b-button>
+            <b-button @click="forgotpassword" variant="danger" class="mr-2">Forgot Password</b-button>
+            <b-button @click="register" variant="primary">Register</b-button>
           </div>
         </b-form>
       </div>
@@ -117,28 +118,10 @@ export default class Login extends Vue {
     }
   }
   private async forgotpassword(e: any) {
-    //send the request to get the reset password link.
-    // @ts-ignore
-    let email = document.getElementById('email')['value']
-    if (!email) {
-      alert('please enter the email')
-      return
-    }
-    this.$store.state.loading = true
-    // @ts-ignore
-    const res = await this.$http().post('/forgotpassword', {
-      // @ts-ignore
-      email: document.getElementById('email')['value']
-    })
-    this.$store.state.loading = false
-    let sent = res ? res.flag : null
-
-    if (sent) {
-      alert('We have just sent the reset link to your email. Please check your email!')
-      //this.$router.push('/reset-password/'+res.api_token)
-    } else {
-      alert('Invalid email')
-    }
+    window.location.href = '/forgot-password'
+  }
+  private async register(e: any) {
+    window.location.href = '/register'
   }
 }
 </script>

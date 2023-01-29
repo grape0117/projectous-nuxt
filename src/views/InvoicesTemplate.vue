@@ -15,7 +15,7 @@
             <span class="total-open" :style="{ 'background-color': default_theme_color }">{{ total }}</span>
           </div>
         </div>
-        <div>
+        <!-- <div>
           <div style="float:right">
             <div class="year-buttons">
               <div class="year-button">
@@ -28,7 +28,13 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
+      </div>
+      <div class="mb-2">
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Unsent: ${{ unsent_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Unpaid: ${{ unpaid_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Paid: ${{ paid_total }}</b-badge>
+        <b-badge variant="secondary" class="mr-1 invoice-breakdown-badge">Voided: ${{ voided_total }}</b-badge>
       </div>
       <b-table responsive :items="invoice_filter" :fields="fields" thead-class="table-header-background" tbody-class="table-header-background" :busy="is_busy" style="max-height: 86vh; overflow: auto;">
         <template #thead-top="data">
@@ -62,12 +68,24 @@
               </div>
               <span class="checkbox-switch-title" @click="toggleShowAllStatus">All</span>
             </div>
-
             <div class="status-buttons">
               <b-button-group size="sm" style="height:30px">
-                <b-button @click="setStatusFilter('open')" :style="{ 'background-color': status_filter === 'open' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none' }">Open</b-button>
-                <b-button @click="setStatusFilter('paid')" :style="{ 'background-color': status_filter === 'paid' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none' }">Paid</b-button>
-                <b-button @click="setStatusFilter('voided')" :style="{ 'background-color': status_filter === 'voided' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none' }">Voided</b-button>
+                <b-button @click="setStatusFilter('open')" :style="{ 'background-color': status_filter === 'open' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
+                  Open
+                  <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">{{ open_count }}</b-badge>
+                </b-button>
+                <b-button @click="setStatusFilter('sent')" :style="{ 'background-color': status_filter === 'sent' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
+                  Sent
+                  <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">{{ sent_count }}</b-badge>
+                </b-button>
+                <b-button @click="setStatusFilter('paid')" :style="{ 'background-color': status_filter === 'paid' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
+                  Paid
+                  <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">{{ paid_count }}</b-badge>
+                </b-button>
+                <b-button @click="setStatusFilter('voided')" :style="{ 'background-color': status_filter === 'voided' ? (is_theme_colors ? background_colors : toRGB(background_colors[0])) : 'transparent', border: 'none', display: 'flex' }">
+                  Voided
+                  <b-badge variant="light" style="margin-top: 4px; margin-left: 4px;">{{ voided_count }}</b-badge>
+                </b-button>
               </b-button-group>
             </div>
           </span>
@@ -78,13 +96,14 @@
             <b-form-checkbox name="selected-invoice" v-model="selected_invoice_id" :value="data.item.invoice_id"> </b-form-checkbox>
             <b-button-group size="sm" style="height:30px">
               <b-button @click="updateStatus(data.item.id, 'open')" :style="{ background: backgroundColor('open', data.item), border: 'none' }">Open</b-button>
+              <b-button @click="updateStatus(data.item.id, 'sent')" :style="{ background: backgroundColor('sent', data.item), border: 'none' }">Sent</b-button>
               <b-button @click="updateStatus(data.item.id, 'paid')" :style="{ background: backgroundColor('paid', data.item), border: 'none' }">Paid</b-button>
               <b-button @click="updateStatus(data.item.id, 'voided')" :style="{ background: backgroundColor('voided', data.item), border: 'none' }">Voided</b-button>
             </b-button-group>
           </span>
         </template>
         <template #cell(age)="data">
-          {{ invoice_age(data.item) }}
+          <span :style="{ color: invoice_age(data.item, true) }">{{ invoice_age(data.item) }}</span>
         </template>
         <template #cell(date_created)="data">
           {{ formatDate(data.item.created_at) }}
@@ -110,6 +129,7 @@
         <template #cell(options)="data">
           <span class="status d-flex">
             <b-button-group size="sm" style="height:30px">
+              <b-button :style="{ background: 'rgb(68 64 55)', border: 'none' }" @click="redirect('task_invoice', data.item.invoice_id)"><i class="icon-open_in_new"/></b-button>
               <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('invoice', data.item.invoice_id)"><i class="icon-open_in_new"/></b-button>
               <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('csv', data.item.invoice_id)">CSV</b-button>
               <b-button style="border:none" variant="danger" @click="deleteInvoice(data.item)"><i class="icon-delete_outline"/></b-button>
@@ -195,7 +215,16 @@ export default {
       ],
       items: [{ id: 'radio here', invoice_id: 1234, recipient: 'someone', amount: 222, note: 'test', age: '2 days', date_created: 'Aug 19', start_date: 'Aug 19', end_date: 'Aug 30', options: 'wqewwe' }],
       is_busy: false,
-      action: null
+      action: null,
+      open_count: 0,
+      sent_count: 0,
+      paid_count: 0,
+      voided_count: 0,
+      unsent_total: 0,
+      unpaid_total: 0,
+      paid_total: 0,
+      voided_total: 0,
+      invoice_count_per_year: []
     }
   },
   created() {},
@@ -314,18 +343,23 @@ export default {
     },
     invoice_years_data() {
       let invoice = []
-
       let total_open_invoice_count = 0
+      console.log(this.invoice_count_per_year)
       for (const { year } of this.invoice_years) {
         let open_year = this.open_invoice_count.find(function(year_count) {
           // console.log(year_count.year, ' === ', year)
+          return year_count.year === year
+        })
+
+        let count_per_year = this.invoice_count_per_year.find(function(year_count) {
+          console.log(year_count.year, ' === ', year)
           return year_count.year === year
         })
         if (open_year) {
           total_open_invoice_count += open_year['count(id)']
         }
 
-        invoice.push({ year: year.toString(), total: open_year && open_year['count(id)'] ? open_year['count(id)'] : '' })
+        invoice.push({ year: year.toString(), total: count_per_year && count_per_year['status_count'] ? count_per_year['status_count'] : '' })
       }
 
       this.total_open_invoice_count = total_open_invoice_count
@@ -370,13 +404,26 @@ export default {
       this.invoice_years = counts.invoice_years
       this.open_invoice_count = counts.open_invoice_count
     },
-    invoice_age(invoice) {
+    invoice_age(invoice, return_color) {
       if (invoice.status === 'open') {
         const invoice_date = moment(invoice.created_at, 'YYYY-MM-DD')
         const today = moment().startOf('day')
 
         //Difference in number of days
-        return Math.floor(moment.duration(today.diff(invoice_date)).asDays()) + ' Days'
+        const days_diff = Math.floor(moment.duration(today.diff(invoice_date)).asDays())
+        let return_data
+        if (return_color) {
+          if (days_diff <= 30) {
+            return_data = 'white'
+          } else if (days_diff > 30 && days_diff <= 60) {
+            return_data = 'yellow'
+          } else if (days_diff > 60) {
+            return_data = 'red'
+          }
+        } else {
+          return_data = Math.floor(days_diff) + ' Days'
+        }
+        return return_data
       } else {
         return null
       }
@@ -414,6 +461,7 @@ export default {
         this.show_all_status = false
       }
       this.status_filter = filter_value
+      this.getData()
     },
     sortClass(sortBy_colName) {
       const sortBy = this.sortBy
@@ -458,10 +506,40 @@ export default {
       console.log({ status })
       this.get_count()
     },
+    processBreakdownPerStatus(total_per_status) {
+      this.unsent_total = total_per_status
+        .filter(e => e.status === 'open')
+        .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      this.unpaid_total = total_per_status
+        .filter(e => e.status === 'open' || e.status === 'sent')
+        .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      this.paid_total = total_per_status
+        .filter(e => e.status === 'paid')
+        .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      this.voided_total = total_per_status
+        .filter(e => e.status === 'voided')
+        .reduce((total, obj) => total + parseFloat(obj.total), 0)
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    },
     // getStatus(invoices, status) {
     //   return invoices.filter(i => i.status === status)
     // },
     async selectYear(year) {
+      this.open_count = 0
+      this.sent_count = 0
+      this.paid_count = 0
+      this.voided_count = 0
       this.is_busy = true
       if (this.selectedYear === year) return
 
@@ -472,23 +550,49 @@ export default {
       this.invoices = invoices
       this.invoice_years = invoice_years
       this.open_invoice_count = open_invoice_count
+      this.getCountPerStatus(year)
     },
     async getInvoicesByYear(year) {
-      const { invoices, invoice_years, open_invoice_count } = await this.$http().get(`/invoices/${year}`)
+      const { invoices, invoice_years, open_invoice_count, invoice_count_per_year } = await this.$http().get(`/invoices/${year}`)
 
-      return { invoices, invoice_years, open_invoice_count }
+      return { invoices, invoice_years, open_invoice_count, invoice_count_per_year }
     },
     async getData() {
-      const { invoices, invoice_years, open_invoice_count } = await this.getInvoicesByYear('open') //new Date().getFullYear()
+      const { invoices, invoice_years, open_invoice_count, invoice_count_per_year } = await this.getInvoicesByYear(this.status_filter) //new Date().getFullYear()
 
       console.log({ invoices })
 
       this.invoices = invoices
+      this.processBreakdownPerStatus(invoices)
       this.invoice_years = invoice_years
       this.open_invoice_count = open_invoice_count
+      this.invoice_count_per_year = invoice_count_per_year
+      this.getCountPerStatus('all')
+    },
+    async getCountPerStatus(year) {
+      const { count, total_per_status } = await this.$http().get(`/invoices_count_per_status/${year}`)
+      const check_open_count = count.find(e => e.status === 'open')
+      const check_sent_count = count.find(e => e.status === 'sent')
+      const check_paid = count.find(e => e.status === 'paid')
+      const check_voided = count.find(e => e.status === 'voided')
+      if (check_open_count) {
+        this.open_count = check_open_count.count
+      }
+
+      if (check_sent_count) {
+        this.sent_count = check_sent_count.count
+      }
+
+      if (check_paid) {
+        this.paid_count = check_paid.count
+      }
+
+      if (check_voided) {
+        this.voided_count = check_voided.count
+      }
     },
     formatDate(date) {
-      return moment(date).format('MMM DD')
+      return moment(date).format('MMM DD YYYY')
     },
     applyAction() {
       let self = this
@@ -508,9 +612,11 @@ export default {
     redirect(to, invoice_id) {
       const path = 'http://old.projectous.com/'
       const invoice = `invoice/${invoice_id}`
+      const task_invoice = `task_invoice/${invoice_id}`
       const csv = `export/csv/invoice/${invoice_id}`
 
-      if (to === 'invoice') return window.open(`${path}${invoice}`, '_blank')
+      if (to === 'invoice') return window.open(`/${invoice}`, '_blank')
+      if (to === 'task_invoice') return window.open(`/${task_invoice}`, '_blank')
       if (to === 'csv') return window.open(`${path}${csv}`, '_blank')
     },
     applyPayment(selected_invoice) {
@@ -650,6 +756,10 @@ export default {
   max-height: calc(100vh - 50px);
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.invoice-breakdown-badge {
+  background: rgba(0, 0, 0, 0.4) !important;
 }
 
 .invoices-table {

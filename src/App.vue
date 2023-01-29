@@ -14,13 +14,13 @@
       <div class="row-no-padding">
         <Header v-on:reload="reload" />
         <div class="d-flex justify-content-between">
-          <div class="router-view-class" style="width: 1px">
-            <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" />
+          <div class="router-view-class" style="width: 100px">
+            <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" :newMessage="newMessage" />
             <router-view style="width: 100%; height: 100%" />
           </div>
           <div class="d-flex">
             <task-tray v-show="showTaskSection" />
-            <task-side-bar v-show="has_route_query_showChatSection || showChatSection" :show="has_route_query_showChatSection || showChatSection" />
+            <task-side-bar :updated_at="updated_at" :new_message="newMessage1" v-show="has_route_query_showChatSection || showChatSection" :show="has_route_query_showChatSection || showChatSection" />
             <timer-tab v-show="showTimerSection" />
           </div>
         </div>
@@ -31,6 +31,7 @@
     <edit-client-modal id="edit-client-modal" />
     <edit-user-modal id="edit-user-modal" />
     <invite-user-modal id="invite-user-modal" />
+    <add-worker-modal id="add-worker-modal" />
     <edit-timer-modal id="edit-timer-modal" />
     <edit-project-modal id="edit-project-modal" />
 
@@ -59,10 +60,12 @@ import Header from '@/components/Header.vue'
 import EditClientModal from './views/EditClientModal.vue'
 import EditUserModal from './views/EditUserModal'
 import InviteUserModal from './views/InviteUserModal'
+import AddWorkerModal from './views/AddWorkerModal'
 import EditTaskModal from './views/EditTaskModal'
 import EditTimerModal from './views/EditTimerModal'
 import EditProjectModal from './views/EditProjectModal'
 import { createListsByDays, createUserLists, getCookie } from '@/utils/util-functions'
+import SocketioService from '@/utils/socketio.service.js'
 import Vue from 'vue'
 import { idbKeyval, idbGetAll } from '@/plugins/idb.ts'
 import { modulesNames, modulesNamesList } from './store/modules-names'
@@ -90,6 +93,7 @@ export default {
     EditClientModal,
     EditUserModal,
     InviteUserModal,
+    AddWorkerModal,
     EditTaskModal,
     EditTimerModal,
     EditProjectModal,
@@ -104,7 +108,10 @@ export default {
       bgDefault: 'rgba(255, 165, 0, 0.6)', // default style
       bgStyle: '',
       bgTheme: '',
-      showTaskDetail: false
+      showTaskDetail: false,
+      newMessage: null,
+      newMessage1: null,
+      updated_at: 0
     }
   },
   computed: {
@@ -200,6 +207,7 @@ export default {
      * We want every modal hide to check to see if another modal should be displayed.
      */
     //Make bvModal available in vuex store -- complaint department is =>
+    const notificationPermission = await Notification.requestPermission()
     window.$_app = this
     //Add trigger on modal hidden
     this.$root.$on('bv::modal::hidden', () => {
@@ -299,54 +307,50 @@ export default {
 
     //listener
     let user_id = getCookie('user_id')
-    let that = this
+    var that = this
 
+    SocketioService.setupSocketConnection()
+    SocketioService.socketListener('chat-message', e => {
+      console.log('-----Called getNewData!----' + e.data.item_type, e.data)
+      let body = ''
+      let title = ''
+      switch (e.data.item_type) {
+        case 'timelog':
+          title = ''
+          body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
+          break
+        case 'tasks':
+          title = ''
+          body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
+          break
+        case 'TASK_MESSAGE':
+          title = e.data.title
+          body = JSON.stringify(e.data.sender + ' : ' + e.data.message)
+          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
+            that.newMessage1 = e.data
+            that.updated_at = new Date().getTime()
+            if (this.route_query_taskId === e.data.task_id) {
+              that.newMessage = e.data
+            }
+          }
+
+          break
+        case 'NEW_TASK':
+          title = e.data.title
+          body = JSON.stringify(e.data.message)
+          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0 && this.route_query_taskId === e.data.task_id) {
+            that.newMessage = e.data
+          }
+          break
+      }
+      if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) var notification = new Notification(title, { body: body, icon: 'img' })
+
+      // that.$store.dispatch('GET_NEW_DATA')
+    })
     if (user_id) {
       this.$store.state.settings.logged_in = true
       try {
-        window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', function(e) {
-          console.log('-----Called getNewData!----' + e.data.data.item_type, e.data.data)
-          let body = ''
-          let title = ''
-          let data = e.data
-          switch (data.data.item_type) {
-            case 'timelog':
-              title = ''
-              body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
-              break
-            case 'tasks':
-              title = ''
-              body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
-              break
-            case 'task_messages':
-              title = data.data.value.taskname
-              body = JSON.stringify(data.data.value.sender + ' : ' + data.data.value.message)
-              break
-          }
-          if (body)
-            // @ts-ignore
-            that.$notification.show(
-              title,
-              {
-                body: body
-              },
-              {
-                onerror: function() {
-                  console.log('Custom error event was called')
-                },
-                onclick: function() {
-                  console.log('Custom click event was called')
-                },
-                onclose: function() {
-                  console.log('Custom close event was called')
-                },
-                onshow: function() {
-                  console.log('Custom show event was called')
-                }
-              }
-            )
-          that.$store.dispatch('GET_NEW_DATA')
-        })
+        that.$store.dispatch('GET_NEW_DATA')
       } catch (e) {
         console.error('Websockets not running?')
       }
@@ -359,6 +363,7 @@ export default {
     EventBus.$off('toggle_timers')
     EventBus.$off('toggle_chat')
     EventBus.$off('changeBackground')
+    SocketioService.disconnect()
   },
   methods: {
     // getNewData() {

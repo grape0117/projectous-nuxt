@@ -135,7 +135,7 @@
           <!-- <pre style="color: black;">
             {{ task }}
           </pre> -->
-          <task-message class="task-cloud_task-message" :chat="chat"> </task-message>
+          <task-message class="task-cloud_task-message" :chat="chat" :showChat="showTab == 1"> </task-message>
         </b-tab>
       </b-tabs>
     </div>
@@ -204,6 +204,11 @@ export default Vue.extend({
       type: Object,
       required: false,
       default: () => {}
+    },
+    newMessage: {
+      type: Object,
+      required: false,
+      default: false
     }
   },
   data() {
@@ -254,6 +259,9 @@ export default Vue.extend({
           this.showTab = 1
         }
       }
+    },
+    newMessage(newMessage, oldMessage) {
+      this.chat.messages = [...this.chat.messages, newMessage]
     }
   },
   methods: {
@@ -554,7 +562,6 @@ export default Vue.extend({
 }
 
 .left-section {
-  max-width: 300px;
   width: 100%;
   padding: 0 10px;
   height: calc(100vh - 50px);

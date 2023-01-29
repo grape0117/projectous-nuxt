@@ -9,7 +9,7 @@
         <div class="row">
           <div class="col-sm-12">
             <div>
-              <b-tabs content-class="mt-3">
+              <b-tabs content-class="mt-3 scrollable">
                 <b-tab title="Details" active>
                   <form id="editTimerForm" class="form-horizontal">
                     <input id="modalTimerId" type="hidden" name="id" v-model="timer.id" />
@@ -267,6 +267,7 @@ export default {
   computed: {
     title() {
       if (this.editTimerStatus === 'add') {
+        this.timer_data.notes = ''
         return 'Add Timer'
       }
       return 'Edit Timer'
@@ -346,6 +347,9 @@ export default {
     'timer.project_id': function() {
       const all_projects = this.openprojects()
       const project_id = this.timer.project_id
+      if (!project_id) {
+        return
+      }
       const client_company_id = all_projects.filter(e => e.id == project_id)[0].client_company_id
       this.client = this.clients.filter(e => e.client_company_id == client_company_id)[0]
 
@@ -411,7 +415,9 @@ export default {
       return this.$store.getters['settings/isIHI']
     },
     openprojects: function() {
-      return this.$store.getters['projects/getOpenProjectsSortedByClient']
+      const result = this.$store.getters['projects/getOpenProjectsSortedByClient'] || []
+      const projectsUniqueById = [...new Map(result.map(item => [item['id'], item])).values()]
+      return projectsUniqueById
     },
     calculateDuration: function() {
       this.timer.duration = this.endSeconds - this.startSeconds
@@ -562,6 +568,14 @@ export default {
       }
 
       this.$store.dispatch('timers/saveTimer', this.timer_data).then(function(response) {
+        if (self.timer_data.notes != self.timer.notes) {
+          self.$store.dispatch('UPDATE_ATTRIBUTE', {
+            module: 'timers',
+            id: self.timer.id,
+            attribute: 'notes',
+            value: self.timer_data.notes
+          })
+        }
         if (self.timer_data.duration != self.timer.duration) {
           self.$store.dispatch('UPDATE_ATTRIBUTE', {
             module: 'timers',
@@ -637,5 +651,9 @@ export default {
   margin-left: 14px;
   border-radius: 50px;
   color: white;
+}
+.scrollable {
+  height: 600px;
+  overflow-y: auto;
 }
 </style>

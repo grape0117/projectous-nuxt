@@ -20,7 +20,7 @@ import uuid from 'uuid'
 import moment from 'moment'
 
 export default {
-  props: ['show'],
+  props: ['show', 'updated_at', 'new_message'],
   data() {
     return {
       active_task: {},
@@ -34,6 +34,21 @@ export default {
       handler(val) {
         if (this.is_loggedIn && val) {
           this.getChats()
+        }
+      }
+    },
+    updated_at: {
+      immediate: true,
+      handler(val) {
+        if (this.is_loggedIn && val) {
+          let update_chat_index = this.chats.findIndex(({ chat_id }) => chat_id == this.new_message.task_id)
+          let newMessage = this.chats[update_chat_index]
+          newMessage.last_message.text = this.new_message.message
+          newMessage.last_message.createdAt = this.new_message.createdAt
+          newMessage.last_message.id = this.new_message.id
+          newMessage.last_message.user = { name: this.new_message.user.name, color: this.new_message.user.color, role: this.new_message.user.user_role, _id: this.new_message.user.id }
+          this.chats.splice(update_chat_index, 1)
+          this.chats = [newMessage, ...this.chats]
         }
       }
     }
@@ -192,6 +207,8 @@ html {
 .task-sidebar-title {
   font-size: 17px;
   font-weight: bold;
+  margin-bottom: 0px;
+  line-height: 18px;
 }
 /* .task-side-bar .message-sidebar .list-group {
   border: 5px solid red;

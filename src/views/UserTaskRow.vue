@@ -1,26 +1,30 @@
 <template>
-  <div class="col-md-12">
-    <div class="card" style="margin:5px 15px;background-color: rgba(0,0,0,.4); color:white;">
+  <div class="col-md-12  user-task-row">
+    <div class="card" :style="{ margin: task['hasMargin'] ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white' }">
       <div class="card-body" style="padding: 10px 20px 10px 25px">
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
             <h6 class="card-text">
-              <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
-                {{ getProjectDetails(task.project_id) }}
-              </b-badge>
-              <b-badge @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer"> <i class="icon-play_arrow" style="color:green;"></i>Play </b-badge>
-              <b-badge @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" variant="light mr-2" style="cursor:pointer"> <i class="icon-stop" style="color:red;"></i>Stop </b-badge>
-              <!-- <b-badge variant="danger mr-2" style="cursor:pointer">{{ task.priority ? capitalizeFirstLetter(task.priority) : 'Priority' }}</b-badge> -->
-              <b-dropdown id="priorities-dropdown" :text="task.priority ? capitalizeFirstLetter(task.priority) : ''" variant="danger" style="border:none">
-                <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
-                <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
-                <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
-                <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
-              </b-dropdown>
+              <b-icon v-if="task['isToday']" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 0)"></b-icon>
+              <b-icon v-else :icon="is_mouse_enter ? 'star-fill' : 'star'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 1)"></b-icon>
+              <i class="icon-play_arrow" @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" style="color:green;cursor:pointer;"></i>
+              <i class="icon-stop" @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" style="color:red;cursor:pointer;"></i>
               <b>
-                | {{ task.title ? task.title : '---' }}
-                <span v-for="user in task.users" v-if="isAdmin">
-                  <span :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step}:${user.notes}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+                <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
+                  {{ getProjectDetails(task.project_id) }}
+                </b-badge>
+
+                <b-badge v-else-if="task.project_id" :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2">
+                  {{ getProject(task.project_id) ? getProject(task.project_id).name : '--' }}
+                </b-badge>
+
+                <b-badge v-else :style="{ 'background-color': 'transparent' }" variant="primary" class="mr-2 ml-2">
+                  --
+                </b-badge>
+
+                {{ task.title ? task.title : '---' }}
+                <span v-for="user in task.users" v-if="isAdmin()">
+                  <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
                   </span>
                 </span>
@@ -28,7 +32,7 @@
                   <span title="Complete" class="add-dev-btn" v-if="!isCompletedTask()" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></span>
                   <span title="Cancel Complete" class="add-dev-btn" v-else variant="outline-success" @click="notCompleteMyTask(task.id)" pill><i class="icon-close"/></span>
                 </span>
-                <span title="Add developer" v-if="isAdmin" class="add-dev-btn" @click="addDeveloper(task.id)" pill><i class="icon-add"/></span>
+                <span title="Add developer" v-if="isAdmin()" class="add-dev-btn" @click="addDeveloper(task.id)" pill><i class="icon-add"/></span>
 
                 <!-- <b-button v-if="isAdmin" variant="outline-light" @click="addDeveloper(task.id)" pill><i class="icon-person_add"/></b-button> -->
               </b>
@@ -40,7 +44,13 @@
           <div class="col-md-3" style="align-self:center">
             <div>
               <b-badge variant="primary mr-2" style="cursor:pointer; float:right" @click="showTaskDetail"><i class="icon-open_in_new"></i>Open task</b-badge>
-              <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-2" :style="{ float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
+              <b-dropdown class="mr-3" id="priorities-dropdown" :text="task.priority ? capitalizeFirstLetter(task.priority) : ''" :variant="priorityColor(task.priority)" style="border:none; float: right;">
+                <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
+                <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
+                <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
+                <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
+              </b-dropdown>
+              <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-3" :style="{ width: task.due_date ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
             </div>
           </div>
         </div>
@@ -56,7 +66,7 @@ import moment from 'moment'
 import { Datetime } from 'vue-datetime'
 import { abbrName } from '@/utils/util-functions'
 export default {
-  props: ['task', 'isAdmin'],
+  props: ['task'],
   extends: TaskActionRow,
   components: {
     datetime: Datetime
@@ -65,6 +75,7 @@ export default {
   data() {
     return {
       // priorities: ['high', 'regular', 'low', 'hold'],
+      is_mouse_enter: false,
       priorities: [
         { value: 'high', text: 'High' },
         { value: 'regular', text: 'Regular' },
@@ -77,6 +88,38 @@ export default {
   },
   watch: {},
   methods: {
+    getProject(project_id) {
+      const project = this.$store.getters['projects/getById'](project_id)
+      return project
+    },
+    priorityColor(priority) {
+      let color = 'primary'
+      switch (priority) {
+        case 'high':
+          color = 'danger'
+          break
+        case 'active':
+          color = 'primary'
+          break
+        case 'regular':
+          color = 'success'
+          break
+        case 'low':
+          color = 'warning'
+          break
+        case 'hold':
+          color = 'secondary'
+          break
+
+        default:
+          color = 'primary'
+          break
+      }
+      return color
+    },
+    date_pick() {
+      document.getElementById('task-list-due-date').click()
+    },
     makeToast(variant = null, content = '') {
       this.$bvToast.toast(content, {
         title: `${variant === 'success' ? 'Success' : 'Error'}`,
@@ -92,7 +135,15 @@ export default {
     myStepAndNotes() {
       const current_user_id = this.$store.state.settings.current_company_user_id
       this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
-      return this.user_info && `${this.user_info.step}: ${this.user_info.notes}`
+      if (this.user_info.step && this.user_info.notes) {
+        return `${this.user_info.step}: ${this.user_info.notes}`
+      } else if (this.user_info.step) {
+        return `${this.user_info.step}: --`
+      } else if (this.user_info.notes) {
+        return `--: ${this.user_info.notes}`
+      } else {
+        return ''
+      }
     },
     isMyTask() {
       const current_user_id = this.$store.state.settings.current_company_user_id
@@ -131,6 +182,7 @@ export default {
       this.$emit('showUpdateModal', user)
     },
     updatePriority(priority) {
+      this.task.priority = priority
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: priority })
     },
     capitalizeFirstLetter(string) {
@@ -152,18 +204,23 @@ export default {
       let client_data = null
       if (is_color && project) {
         client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
-        return client_data.color
+        return client_data ? client_data.color : ''
       }
       return project ? project.acronym : false
     },
     dueDate(due_date) {
       let formatted_date
       if (due_date) {
-        formatted_date = moment(new Date(due_date)).format('yyyy-MM-DD')
+        formatted_date = moment(due_date, 'yyyy-MM-DD').format('yyyy-MM-DD')
+      } else {
+        return ''
       }
       return formatted_date
     },
     dueDateDetails(due_date, return_color) {
+      if (!due_date && !return_color) {
+        return ''
+      }
       const timezone = moment.tz.guess()
       const timezone_date = moment()
         .tz(timezone)
@@ -188,6 +245,9 @@ export default {
         return_value = `Due on ${moment(due_date).format('MMMM DD')}`
         color = '#17a2b8'
       }
+      if (!due_date) {
+        color = '#28a745'
+      }
       if (return_color) {
         return_value = color
       }
@@ -196,6 +256,9 @@ export default {
     saveDueDate(e) {
       const due_date = e.target.value
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'due_date', value: due_date })
+    },
+    changeNextWorkDay(task_id, star) {
+      this.$emit('showSnoozeModal', { task_id, star })
     },
     getTaskTimers(id, type) {
       let timers = this.$store.state.timers.timers
@@ -363,6 +426,16 @@ span.avatar.notes:before {
   margin-top: -17px;
   background-size: contain;
   position: absolute;
+}
+.user-task-row .icon-play_arrow,
+.user-task-row .icon-stop {
+  border: solid 2px white;
+  border-radius: 50%;
+  font-size: 17px;
+}
+.user-task-row .icon-play_arrow:hover,
+.user-task-row .icon-stop:hover {
+  background-color: #fff;
 }
 /* span.avatar.test:after {
   background: url(../assets/icons/test.png) no-repeat;

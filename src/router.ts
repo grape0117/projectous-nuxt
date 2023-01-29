@@ -21,9 +21,19 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
     },
     {
+      path: '/register',
+      name: 'Register',
+      component: () => import(/* webpackChunkName: "login" */ '@/views/Register.vue')
+    },
+    {
       path: '/graph',
       name: 'Graph',
       component: () => import(/* webpackChunkName: "graph" */ '@/views/Graph.vue')
+    },
+    {
+      path: '/forgot-password',
+      name: 'Forgot Password',
+      component: () => import(/* webpackChunkName: "forgot-password" */ '@/views/ForgotPassword.vue')
     },
     {
       path: '/reset-password/:api_token',
@@ -109,6 +119,18 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoicesTemplate.vue')
     },
     {
+      path: '/invoice/:invoice_id',
+      name: 'Invoice',
+      meta: { adminOnly: true },
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoiceTemplate.vue')
+    },
+    {
+      path: '/task_invoice/:invoice_id',
+      name: 'TaskInvoice',
+      meta: { adminOnly: true },
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/TaskInvoiceTemplate.vue')
+    },
+    {
       path: '/days',
       name: 'Days',
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/DaysTemplate.vue')
@@ -126,7 +148,7 @@ const router = new Router({
   ]
 })
 
-const unGuardedRoutes = ['Login', 'AcceptInvite', 'Register']
+const unGuardedRoutes = ['Login', 'AcceptInvite', 'Register', 'Forgot Password', 'Reset Password']
 
 router.beforeEach((to, from, next) => {
   const guardedRoute = !unGuardedRoutes.find(route => route === to.name)
