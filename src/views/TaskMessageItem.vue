@@ -13,7 +13,7 @@
           </div>
         </div>
       </div>
-      <span class="message-dateTime">{{ formatTime(message.createdAt) }}</span>
+      <span class="message-dateTime">{{ formatTime(message.senderLocalTime) }}</span>
     </div>
   </b-list-group-item>
 </template>
