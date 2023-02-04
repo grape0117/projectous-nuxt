@@ -13,6 +13,7 @@ export interface ITaskMessage {
   created_at: string | null
   is_file: Boolean | null
   file_path: string | null
+  thumbnail: string | null
   //  save(): any
 }
 
@@ -24,6 +25,7 @@ export class TaskMessage implements ITaskMessage {
   public created_at: string | null = ''
   public is_file: Boolean | null = false
   public file_path: string | null = ''
+  public thumbnail: string | null = ''
   // save() {
   //   //window._actions[module + '/CASCADE_DELETE']
   // }

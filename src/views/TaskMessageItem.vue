@@ -3,7 +3,10 @@
     <b-avatar v-if="!is_me" class="mr-1 mb-4" :text="user_name" v-b-tooltip.hover :title="message.user.name" size="25px" />
     <div>
       <div class="message-wrapper">
-        <pre class="msg-content" style="color: white;">{{ message.text }}</pre>
+        <div class="message-container">
+          <img v-if="message.thumbnail" :src="'https://projectous-chat-bucket.sfo3.digitaloceanspaces.com/' + message.thumbnail" width="100" height="100" alt="thumbnail" />
+          <pre class="msg-content" style="color: white;">{{ message.text }}</pre>
+        </div>
         <div class="message-actions" v-if="current_company_user_id == message.company_user_id">
           <i class="icon-more_vert" @click="open_actions = !open_actions" />
           <div class="message-actions-options" v-if="open_actions">

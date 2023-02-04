@@ -167,7 +167,8 @@ export default {
           company_user_id,
           file_path: response.file_path,
           message: response.name,
-          is_file: true
+          is_file: true,
+          thumbnail: response.thumbnail_path
         })
         this.s_message = ''
         return
