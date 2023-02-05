@@ -4,8 +4,13 @@
     <div>
       <div class="message-wrapper">
         <div class="message-container">
-          <img v-if="message.thumbnail" :src="'https://projectous-chat-bucket.sfo3.digitaloceanspaces.com/' + message.thumbnail" width="100" height="100" alt="thumbnail" />
-          <pre class="msg-content" style="color: white;">{{ message.text }}</pre>
+          <button v-if="message.thumbnail" @click="openImage" role="button" title="Open image" aria-label="Open image" aria-disabled="false" tabindex="-1" style="position: relative; display: flex; flex-direction: column; flex-grow: 0; flex-shrink: 0; overflow: hidden; align-items: center; justify-content: center; app-region: no-drag; background-color: transparent; border-color: transparent; text-align: left; border-width: 0px; width: 299.995px; height: 259.938px; border-radius: 0px 10px 10px; padding: 0px; cursor: pointer; border-style: solid;">
+            <div role="none" style="position: relative; display: flex; flex-direction: column; flex-grow: 0; flex-shrink: 0; overflow: hidden; align-items: stretch; justify-content: center; border-radius: 0px 10px 10px; width: 299.995px; height: 259.938px;">
+              <img v-if="!image_loaded" src="@/assets/img/no-image.png" width="300" height="260" alt="thumbnail" style="position: absolute;" />
+              <img :src="'https://projectous-chat-bucket.sfo3.digitaloceanspaces.com/' + message.thumbnail" width="300" height="260" alt="thumbnail" @load="imgLoaded" />
+            </div>
+          </button>
+          <pre v-if="!message.thumbnail" class="msg-content" style="color: white;">{{ message.text }}</pre>
         </div>
         <div class="message-actions" v-if="current_company_user_id == message.company_user_id">
           <i class="icon-more_vert" @click="open_actions = !open_actions" />
@@ -30,10 +35,18 @@ export default {
   name: 'task-message-item',
   data() {
     return {
-      open_actions: false
+      open_actions: false,
+      image_loaded: false
     }
   },
   props: ['message', 'is_me'],
+  // watch(() => props.image, (image) => {
+  //       isLoaded.value = false;
+
+  //       const img = new Image();
+  //       img.onload = () => isLoaded.value = true;
+  //       img.src = message.thumbnail;
+  //   }, { immediate: true })
   computed: {
     user_name() {
       return abbrName(this.message.user.name)
@@ -43,6 +56,12 @@ export default {
     }
   },
   methods: {
+    openImage() {
+      window.open('https://projectous-chat-bucket.sfo3.digitaloceanspaces.com/' + this.message.filePath, '_blank')
+    },
+    imgLoaded() {
+      this.image_loaded = true
+    },
     forceFileDownload(response, title) {
       const url = window.URL.createObjectURL(new Blob([response]))
       const link = document.createElement('a')
