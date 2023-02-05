@@ -10,6 +10,7 @@
               <img :src="'https://projectous-chat-bucket.sfo3.digitaloceanspaces.com/' + message.thumbnail" width="300" height="260" alt="thumbnail" @load="imgLoaded" />
             </div>
           </button>
+          <img v-if="!message.thumbnail && message.isFile" src="@/assets/img/attach-file.png" width="200" height="220" alt="thumbnail" />
           <pre v-if="!message.thumbnail" class="msg-content" style="color: white;">{{ message.text }}</pre>
         </div>
         <div class="message-actions" v-if="current_company_user_id == message.company_user_id">
