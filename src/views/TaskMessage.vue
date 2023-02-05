@@ -41,7 +41,7 @@ export default {
       enabledNotification: false,
       dropzoneOptions: {
         // url: `${process.env.VUE_APP_API_URL}/store-file`,
-        url: `http://testing.projectous.com/upload`,
+        url: `https://testing.projectous.com/upload`,
         thumbnailWidth: 150,
         maxFilesize: 500,
         autoProcessQueue: false,
