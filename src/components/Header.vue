@@ -452,6 +452,12 @@ export default Vue.extend({
       return client ? client.name : ''
     },
     async createTask() {
+      if (this.$refs.noteInput.value == '') {
+        this.showResult = false
+        this.new_task_title = ''
+        this.new_task_project_id = null
+        this.new_company_user_id = null
+      }
       if (!this.new_company_user_id) {
         return
       }
@@ -476,6 +482,9 @@ export default Vue.extend({
     },
     creatingTask: _.debounce(function(e) {
       let notesWithTaskTile = e.target.value
+      if (notesWithTaskTile == '') {
+        this.showResult = false
+      }
       const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+)|([a-z][A-Z]@+))', 'g')
 
       const acronym_matchs = notesWithTaskTile ? notesWithTaskTile.match(projectRegex) : null
@@ -529,7 +538,7 @@ export default Vue.extend({
       } else {
         this.showResult = false
       }
-    }, 700),
+    }, 200),
 
     async toggle(iconName) {
       if (iconName === 'reload') {
