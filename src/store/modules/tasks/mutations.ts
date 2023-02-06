@@ -10,6 +10,7 @@ export const mutations: MutationTree<IModuleState> = {
     this.commit('task_users/deleteByTaskId', entity.id) //TODO: handle here?
   },
   DELETE(state: IModuleState, entity) {
+    console.log('Task Delete', entity)
     if (state.completed_tasks.length > 0) {
       // @ts-ignore
       state.completed_tasks = state.completed_tasks.filter(({ id }) => id !== entity.id)
@@ -49,6 +50,49 @@ export const mutations: MutationTree<IModuleState> = {
     if (state.all_tasks.length > 0) {
       // @ts-ignore
       state.all_tasks = state.all_tasks.filter(({ id }) => id !== entity.id)
+    }
+  },
+  UPDATE(state: IModuleState, entity) {
+    console.log('Task Update', entity)
+    if (state.completed_tasks.length > 0) {
+      // @ts-ignore
+      state.completed_tasks = state.completed_tasks.map(task => (task.id == entity.id ? entity : task))
+    }
+    if (state.hold_tasks.length > 0) {
+      // @ts-ignore
+      state.hold_tasks = state.hold_tasks.map(task => (task.id == entity.id ? entity : task))
+    }
+    if (state.active_tasks.length > 0) {
+      // @ts-ignore
+      state.active_tasks = state.active_tasks.map(task => (task.id == entity.id ? entity : task))
+    }
+    if (state.when_possible_tasks.length > 0) {
+      // @ts-ignore
+      state.when_possible_tasks = state.when_possible_tasks.map(task => (task.id == entity.id ? entity : task))
+    }
+    if (state.this_week_tasks.length > 0) {
+      // @ts-ignore
+      state.this_week_tasks = state.this_week_tasks.map(task => (task.id == entity.id ? entity : task))
+    }
+    if (state.today_tasks.length > 0) {
+      // @ts-ignore
+      state.today_tasks = state.today_tasks.map(task => (task.id == entity.id ? entity : task))
+    }
+    if (state.my_tasks.length > 0) {
+      // @ts-ignore
+      state.my_tasks = state.my_tasks.map(task => (task.id == entity.id ? entity : task))
+    }
+    if (state.past_due_tasks.length > 0) {
+      // @ts-ignore
+      state.past_due_tasks = state.past_due_tasks.map(task => (task.id == entity.id ? entity : task))
+    }
+    if (state.others_tasks.length > 0) {
+      // @ts-ignore
+      state.others_tasks = state.others_tasks.map(task => (task.id == entity.id ? entity : task))
+    }
+    if (state.all_tasks.length > 0) {
+      // @ts-ignore
+      state.all_tasks = state.all_tasks.map(task => (task.id == entity.id ? entity : task))
     }
   },
   deleteByProjectId(state: IModuleState, project_id) {

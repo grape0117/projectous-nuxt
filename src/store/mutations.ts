@@ -182,7 +182,7 @@ export const mutations: MutationTree<IRootState> = {
     // @ts-ignore
     if (this._mutations[module + '/UPDATE']) {
       // @ts-ignore
-      this.commit(module + '/UPDATE', entities)
+      this.commit(module + '/UPDATE', entity)
     }
   },
   UPDATE_ATTRIBUTE(state: IRootState, { module, id, attribute, value }) {
