@@ -411,8 +411,9 @@ export default Vue.extend({
       this.new_task_project_id = null
       this.showResult = false
       this.hideNewTask = true
+      const that = this
       setTimeout(() => {
-        this.$refs.newtask_dropdown.hide()
+        that.$refs.newtask_dropdown.hide()
       }, 100)
     },
     selectProject($event) {
