@@ -325,6 +325,9 @@ export default Vue.extend({
     })
   },
   methods: {
+    goTo(path) {
+      this.$router.push(path)
+    },
     saveDueDate(e) {
       this.new_task_due_date = e.target.value
     },
