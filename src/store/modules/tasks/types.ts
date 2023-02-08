@@ -14,10 +14,10 @@ export interface IModuleState {
   when_possible_tasks: ITask[]
   this_week_tasks: ITask[]
   today_tasks: ITask[]
-  my_tasks: []
-  past_due_tasks: []
-  others_tasks: []
-  all_tasks: []
+  my_tasks: ITask[]
+  past_due_tasks: ITask[]
+  others_tasks: ITask[]
+  all_tasks: ITask[]
   tasks_by_project: ITask[]
 }
 
