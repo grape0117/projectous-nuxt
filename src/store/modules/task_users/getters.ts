@@ -9,7 +9,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     return state.task_users[state.lookup[id]]
   },
   getByCompanyUserId: (state: IModuleState) => (id: any) => {
-    return state.task_users.filter(({ company_user_id }) => company_user_id === id)
+    let tasks = state.task_users.filter(({ company_user_id }) => company_user_id === id)
+    tasks = [...new Map(tasks.map(item => [item['task_id'], item])).values()]
+    return tasks
   },
   getByTaskId: (state: IModuleState) => (task_id: any) => {
     return state.task_users.filter(task_user => task_user.task_id === task_id)
