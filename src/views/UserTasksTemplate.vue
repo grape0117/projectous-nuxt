@@ -88,6 +88,9 @@
       </div>
     </div>
     <div v-if="!isAdmin">
+      <b-form-checkbox v-model="is_owner" name="check-button" switch variant="warning">
+        Owner
+      </b-form-checkbox>
       <tasks-tab v-bind:tasks="my_tasks" @updateData="updateData"> </tasks-tab>
     </div>
   </div>
@@ -118,6 +121,10 @@ export default {
     },
     my_tasks() {
       this.my_high_count = this.$store.state.tasks.my_tasks.filter(({ priority }) => priority == 'high').length
+      if (this.is_owner) {
+        const current_user_id = this.$store.state.settings.current_company_user_id
+        return this.$store.state.tasks.tasks.filter(({ owner }) => owner == current_user_id)
+      }
       return this.$store.state.tasks.my_tasks
     },
     all_tasks() {
