@@ -219,7 +219,7 @@ export default Vue.extend({
       selectedFile: [],
       selected_tab: '',
       chat: {},
-      showTab: 0,
+      showTab: 1,
       newResource: false,
       user_filter: false
     }
