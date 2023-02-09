@@ -118,7 +118,26 @@ export default {
     },
     my_tasks() {
       this.my_high_count = this.$store.state.tasks.my_tasks.filter(({ priority }) => priority == 'high').length
-      return this.$store.state.tasks.my_tasks
+      let my_tasks = this.$store.state.tasks.my_tasks
+      let self = this
+      my_tasks = my_tasks.sort((a, b) => {
+        if (a.priority !== b.priority) {
+          return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
+        } else {
+          const distantFuture = new Date(8640000000000000)
+          let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
+          let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
+          return dateA.getTime() - dateB.getTime()
+        }
+      })
+      let tmp_priority = my_tasks.length > 0 ? my_tasks[0].priority : ''
+      my_tasks.forEach((task, i) => {
+        if (task.priority !== tmp_priority) {
+          task['hasMargin'] = true
+          tmp_priority = task.priority
+        }
+      })
+      return my_tasks
     },
     all_tasks() {
       this.all_high_count = this.$store.state.tasks.all_tasks.filter(({ priority }) => priority == 'high').length
