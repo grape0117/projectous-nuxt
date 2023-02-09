@@ -12,18 +12,20 @@ function createDefaultTaskMessage(task_id: string): ITaskMessage {
     message: null,
     created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
     file_path: null,
-    is_file: false
+    is_file: false,
+    thumbnail: null
   }
 }
 
 export const actions: ActionTree<IModuleState, IRootState> = {
-  async createTaskMessage({ commit }, { task_id, company_user_id, message, is_file, file_path }: ITaskMessage) {
+  async createTaskMessage({ commit }, { task_id, company_user_id, message, is_file, file_path, thumbnail }: ITaskMessage) {
     const taskMessage = {
       ...createDefaultTaskMessage(task_id),
       company_user_id: company_user_id,
       message: message,
       is_file: is_file,
-      file_path: file_path
+      file_path: file_path,
+      thumbnail: thumbnail
     }
 
     // @ts-ignore
