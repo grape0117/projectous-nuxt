@@ -273,7 +273,11 @@ export default Vue.extend({
   },
   computed: {
     unread_messages_num() {
-      return this.$store.state.settings.unread_messages_num
+      let total_unread_num = 0
+      this.$store.state.tasks.chats.map(({ num_unread }) => {
+        total_unread_num = total_unread_num + num_unread
+      })
+      return total_unread_num
     },
     is_loggedIn() {
       return this.$store.state.settings.logged_in

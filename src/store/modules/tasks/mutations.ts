@@ -123,7 +123,11 @@ export const mutations: MutationTree<IModuleState> = {
       //task.sort_order = index
       //} //Project?
     })
-  } /*,
+  },
+  updateChats(state: IModuleState, chats) {
+    state.chats = chats
+  }
+  /*,
   uuid_to_id(state: IModuleState, { uuid, id }) {
     state.tasks[state.lookup[uuid]].id = id
     state.lookup[id] = state.lookup[uuid]

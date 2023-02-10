@@ -25,7 +25,8 @@ const state = {
   others_tasks: [],
   all_tasks: [],
   tasks_by_project: [],
-  lookup: {}
+  lookup: {},
+  chats: []
 }
 
 export const tasks: Module<IModuleState, IRootState> = {

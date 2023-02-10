@@ -19,6 +19,7 @@ export interface IModuleState {
   others_tasks: ITask[]
   all_tasks: ITask[]
   tasks_by_project: ITask[]
+  chats: any[]
 }
 
 export interface ITask {
