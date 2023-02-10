@@ -163,6 +163,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
   },
   async updateChats({ commit }: any) {
+    // @ts-ignore
     let { chats } = await this._vm.$http().get('/chats')
     commit('updateChats', chats)
   },
