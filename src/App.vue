@@ -318,6 +318,7 @@ export default {
         case 'timelog':
           title = ''
           body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
+          that.$store.dispatch('timers/updateTimer', JSON.parse(e.data.value))
           if (e.data.user_id != user_id) {
             that.$store.commit('settings/increaseWatchTimer')
           }
