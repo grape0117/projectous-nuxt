@@ -162,6 +162,10 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // TODO @stephane send task to server
     commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
   },
+  async updateChats({ commit }: any) {
+    let { chats } = await this._vm.$http().get('/chats')
+    commit('updateChats', chats)
+  },
   async CASCADE_DELETE({ rootState, commit }, task) {
     rootState.task_users.task_users.forEach((task_user: ITaskUser) => {
       if (task_user.task_id === task.id) {

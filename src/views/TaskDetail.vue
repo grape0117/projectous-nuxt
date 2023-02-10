@@ -295,6 +295,7 @@ export default Vue.extend({
 
       const { chat } = await this.$http().get(`/chat/${task_id}`)
       this.chat = chat
+      this.$store.dispatch('tasks/updateChats')
     },
     async addResource() {
       // add or update action
