@@ -37,6 +37,14 @@ export default {
         }
       }
     },
+    new_message: {
+      immediate: true,
+      handler(val) {
+        if (this.is_loggedIn && val) {
+          this.getChats()
+        }
+      }
+    },
     updated_at: {
       immediate: true,
       handler(val) {

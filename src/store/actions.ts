@@ -116,6 +116,9 @@ export const actions: ActionTree<IRootState, IRootState> = {
       } else {
         switch (module) {
           //TODO: store in IndexedDB
+          case 'unread_messages_num':
+            rootState.settings.unread_messages_num = data[module]
+            break
           case 'current_company_id':
             rootState.settings.current_company_id = data[module]
             break

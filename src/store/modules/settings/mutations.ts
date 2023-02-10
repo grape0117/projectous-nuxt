@@ -31,6 +31,12 @@ export const mutations: MutationTree<IModuleState> = {
   setCurrentEditCompanyUser(state, company_user) {
     state.current_edit_company_user = JSON.parse(JSON.stringify(company_user))
   },
+  setUnreadMessageNum(state, unread_messages_num) {
+    state.unread_messages_num = unread_messages_num
+  },
+  increaseUnreadMessageNum(state) {
+    state.unread_messages_num = state.unread_messages_num + 1
+  },
   setCurrentEditCompanyClient(state, client) {
     console.log('open client modal', client)
     state.current_edit_client = client

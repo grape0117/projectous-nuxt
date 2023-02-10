@@ -1,5 +1,8 @@
 <template>
   <b-list-group-item class="task-sidebar-item">
+    <div class="unread-message-num" v-if="chat.num_unread > 0">
+      <span class="rounded-circle task-sidebar-item_badge">{{ chat.num_unread }}</span>
+    </div>
     <div class="" @click="showTaskDetail">
       <p class="task-sidebar-item_header-part" style="margin-bottom: 8px !important">
         <span v-if="chat && chat.acronym" class="task-sidebar-item_project-badge" :style="{ 'background-color': chat.color ? chat.color : null }">{{ chat.acronym }}</span>
@@ -164,5 +167,17 @@ export default {
   font-size: 12px;
   margin-bottom: 0px;
   line-height: 18px;
+}
+.unread-message-num span {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  border: 1px solid red;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  font-size: 18px;
+  width: 25px;
+  height: 25px;
 }
 </style>
