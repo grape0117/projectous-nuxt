@@ -161,5 +161,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   setCurrentProject: (context, project) => {
     context.commit('setCurrentProject', project)
+  },
+  setUnreadMessageNum: (context, unread_messages_num) => {
+    context.commit('setUnreadMessageNum', unread_messages_num)
+  },
+  increaseUnreadMessageNum: context => {
+    context.commit('increaseUnreadMessageNum')
   }
 }

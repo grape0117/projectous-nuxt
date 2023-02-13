@@ -219,7 +219,7 @@ export default Vue.extend({
       selectedFile: [],
       selected_tab: '',
       chat: {},
-      showTab: 0,
+      showTab: 1,
       newResource: false,
       user_filter: false
     }
@@ -295,6 +295,7 @@ export default Vue.extend({
 
       const { chat } = await this.$http().get(`/chat/${task_id}`)
       this.chat = chat
+      this.$store.dispatch('tasks/updateChats')
     },
     async addResource() {
       // add or update action

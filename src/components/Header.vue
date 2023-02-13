@@ -74,7 +74,7 @@
               <span class="chat-right-icon-text">0</span>
             </div>
             <div class="chat-right-icon" style="background-color: red">
-              <span class="chat-right-icon-text">0</span>
+              <span class="chat-right-icon-text">{{ unread_messages_num }}</span>
             </div>
           </div>
           <div class="timers-right-icons" v-if="icon.name === 'timers' && (timerRunning || timerEmptyFields > 0)">
@@ -272,6 +272,13 @@ export default Vue.extend({
     }
   },
   computed: {
+    unread_messages_num() {
+      let total_unread_num = 0
+      this.$store.state.tasks.chats.map(({ num_unread }) => {
+        total_unread_num = total_unread_num + num_unread
+      })
+      return total_unread_num
+    },
     is_loggedIn() {
       return this.$store.state.settings.logged_in
     },
@@ -325,6 +332,9 @@ export default Vue.extend({
     })
   },
   methods: {
+    goTo(path) {
+      this.$router.push(path)
+    },
     saveDueDate(e) {
       this.new_task_due_date = e.target.value
     },

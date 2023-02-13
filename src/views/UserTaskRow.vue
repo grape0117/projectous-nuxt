@@ -1,6 +1,6 @@
 <template>
   <div class="col-md-12  user-task-row">
-    <div class="card" :style="{ margin: task['hasMargin'] ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white' }">
+    <div class="card" :style="{ margin: task['hasMargin'] ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white', opacity: isCompletedTask() ? 0.5 : 1 }">
       <div class="card-body" style="padding: 10px 20px 10px 25px">
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
@@ -22,7 +22,7 @@
                   --
                 </b-badge>
 
-                {{ task.title ? task.title : '---' }}
+                <span @click="showTaskDetail" style="cursor: pointer;">{{ task.title ? task.title : '---' }}</span>
                 <span v-for="user in task.users" v-if="isAdmin() || is_owner">
                   <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
@@ -158,7 +158,23 @@ export default {
     addDeveloper(task_id) {
       this.$emit('showModal', task_id)
     },
-    async deleteTask(task_id) {},
+    async deleteTask() {
+      let to_delete = await this.$bvModal.msgBoxConfirm('Are you sure you want to delete?', {
+        title: 'Please Confirm',
+        size: 'md',
+        buttonSize: 'sm',
+        okVariant: 'danger',
+        okTitle: 'YES',
+        cancelTitle: 'NO',
+        footerClass: 'p-2',
+        hideHeaderClose: false,
+        centered: true
+      })
+
+      if (to_delete) {
+        this.$store.dispatch('DELETE', { module: 'tasks', entity: this.task })
+      }
+    },
     async completeMyTask(task_id) {
       const task_progress_info = {
         company_user_id: 'me',

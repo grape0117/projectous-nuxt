@@ -118,5 +118,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     const response = await this._vm.$http().post('/timer/delete/' + timer.id, {})
     context.commit('DELETE', { module: 'timers', entity: timer }, { root: true })
     //$('#timer-modal').modal('hide');
+  },
+  async updateTimer(context, timer) {
+    context.commit('updateTimer', timer)
   }
 }

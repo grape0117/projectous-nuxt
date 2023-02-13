@@ -318,6 +318,10 @@ export default {
         case 'timelog':
           title = ''
           body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
+          that.$store.dispatch('timers/updateTimer', JSON.parse(e.data.value))
+          if (e.data.user_id != user_id) {
+            that.$store.commit('settings/increaseWatchTimer')
+          }
           break
         case 'tasks':
           title = ''
@@ -328,18 +332,19 @@ export default {
           body = JSON.stringify(e.data.sender + ' : ' + e.data.message)
           if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
             that.newMessage1 = e.data
-            that.updated_at = new Date().getTime()
+            // that.updated_at = new Date().getTime()
             if (this.route_query_taskId === e.data.task_id) {
               that.newMessage = e.data
             }
+            that.$store.dispatch('tasks/updateChats')
           }
 
           break
         case 'NEW_TASK':
           title = e.data.title
           body = JSON.stringify(e.data.message)
-          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0 && this.route_query_taskId === e.data.task_id) {
-            that.newMessage = e.data
+          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
+            that.$store.dispatch('tasks/updateTask')
           }
           break
       }

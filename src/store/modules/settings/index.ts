@@ -29,7 +29,8 @@ export const settings = {
     notes: '',
     timer_watch: 1,
     logged_in: false,
-    invoices_status: 'open'
+    invoices_status: 'open',
+    unread_messages_num: 0
   },
   mutations,
   actions,
@@ -68,6 +69,9 @@ export const settings = {
       return state.current_company.modules.slice().sort((a: any, b: any) => {
         return a.pivot.sort_order - b.pivot.sort_order
       })
+    },
+    getUnreadMessagesNum: (state: any) => {
+      return state.unread_messages_num
     },
     isCurrentUserOrAdmin: (state: any, getters: any) => (user_id: any) => {
       // TODO: user company_user_id

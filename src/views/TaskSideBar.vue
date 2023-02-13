@@ -24,8 +24,7 @@ export default {
   data() {
     return {
       active_task: {},
-      openedChatId: null,
-      chats: []
+      openedChatId: null
     }
   },
   watch: {
@@ -59,6 +58,9 @@ export default {
     },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
+    },
+    chats() {
+      return this.$store.state.tasks.chats
     }
   },
   mounted() {
@@ -66,8 +68,7 @@ export default {
   },
   methods: {
     async getChats() {
-      let { chats } = await this.$http().get('/chats')
-      this.chats = chats
+      this.$store.dispatch('tasks/updateChats')
     },
     async createTask() {
       let newTask = { id: uuid.v4() }

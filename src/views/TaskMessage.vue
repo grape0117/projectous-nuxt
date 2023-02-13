@@ -149,6 +149,7 @@ export default {
       this.fileExist = true
     },
     filesAdded(file) {
+      $('#dropzone').addClass('dropzone-file-contentainer')
       this.showDropzone = true
       this.fileExist = true
     },
@@ -167,7 +168,8 @@ export default {
           company_user_id,
           file_path: response.file_path,
           message: response.name,
-          is_file: true
+          is_file: true,
+          thumbnail: response.thumbnail_path
         })
         this.s_message = ''
         return
@@ -284,6 +286,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#dropzone {
+  height: calc(100% - 238px);
+
+  .dropzone-custom-content {
+    margin-top: 40% !important;
+  }
+}
+.dropzone-file-contentainer {
+  display: flex;
+  align-items: end;
+}
+.dropzone .dz-message {
+  margin-top: 40% !important;
+}
 .date {
   display: flex;
   justify-content: center;
@@ -299,17 +315,10 @@ export default {
 .dropzone {
   position: absolute;
   width: 100%;
-  bottom: 130px;
+  bottom: 126px;
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.2);
   border: none;
-}
-
-.dropzone .dz-message {
-  height: 600px;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
 }
 
 .dropzone-custom-title,

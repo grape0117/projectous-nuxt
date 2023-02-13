@@ -568,6 +568,7 @@ export default {
       }
 
       this.$store.dispatch('timers/saveTimer', this.timer_data).then(function(response) {
+        self.$store.commit('settings/increaseWatchTimer')
         if (self.timer_data.notes != self.timer.notes) {
           self.$store.dispatch('UPDATE_ATTRIBUTE', {
             module: 'timers',
