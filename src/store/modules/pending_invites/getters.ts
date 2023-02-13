@@ -9,10 +9,6 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     return state.pending_invites[state.lookup[id]]
   },
   getAllInvites: (state: IModuleState) => {
-    return (
-      state.pending_invites
-        // @ts-ignore
-        .sort(Vue.nameSort)
-    )
+    return state.pending_invites
   }
 }

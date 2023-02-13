@@ -33,17 +33,26 @@ const router = new Router({
     {
       path: '/forgot-password',
       name: 'Forgot Password',
-      component: () => import(/* webpackChunkName: "forgot-password" */ '@/views/ForgotPassword.vue')
+      component: () => import(/* webpackChunkName: "forgot-password" */ '@/views/ForgotPassword.vue'),
+      meta: {
+        hideNavbar: true
+      }
     },
     {
       path: '/reset-password/:api_token',
       name: 'Reset Password',
-      component: () => import(/* webpackChunkName: "reset-password" */ '@/views/ResetPassword.vue')
+      component: () => import(/* webpackChunkName: "reset-password" */ '@/views/ResetPassword.vue'),
+      meta: {
+        hideNavbar: true
+      }
     },
     {
       path: '/accept-invite',
       name: 'AcceptInvite',
-      component: () => import(/* webpackChunkName: "accept-invite" */ '@/views/AcceptInvite.vue')
+      component: () => import(/* webpackChunkName: "accept-invite" */ '@/views/AcceptInvite.vue'),
+      meta: {
+        hideNavbar: true
+      }
     },
     {
       path: '/tasks',
