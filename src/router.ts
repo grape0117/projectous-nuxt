@@ -18,12 +18,18 @@ const router = new Router({
     {
       path: '/login',
       name: 'Login',
-      component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
+      component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue'),
+      meta: {
+        hideNavbar: true
+      }
     },
     {
       path: '/register',
       name: 'Register',
-      component: () => import(/* webpackChunkName: "login" */ '@/views/Register.vue')
+      component: () => import(/* webpackChunkName: "login" */ '@/views/Register.vue'),
+      meta: {
+        hideNavbar: true
+      }
     },
     {
       path: '/graph',
