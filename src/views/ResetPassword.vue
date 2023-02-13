@@ -1,10 +1,10 @@
 <template>
-  <div class="login-page">
-    <div class="login-page__block">
-      <div class="login-page__block-title">
+  <div class="reset-password-page">
+    <div class="reset-password-page__block">
+      <div class="reset-password-page__block-title">
         <span>Reset Password</span>
       </div>
-      <div class="login-page__block-form">
+      <div class="reset-password-page__block-form">
         <b-form @submit="resetpassword">
           <b-form-group id="input-group-1" label="Email address:" label-for="email">
             <b-form-input id="email" v-model="email" type="email" placeholder="Enter email" required></b-form-input>
@@ -40,7 +40,7 @@ export default class ResetPassword extends Vue {
       return
     }
     if (this.password.length < 8) {
-      alert('Passowrd must be greater than 6 characters!')
+      alert('Passowrd must be greater than 8 characters!')
       return
     }
     if (this.password != this.password_confirm) {
@@ -61,9 +61,9 @@ export default class ResetPassword extends Vue {
       password_confirmation: this.password_confirm
     })
 
-    let success = res ? res.success : null
+    let status = res ? res.status : null
 
-    if (success == 'success') {
+    if (status == 'success') {
       alert('Password has been reset successfully! Please try to login.')
       this.$router.push('/login')
     } else {
@@ -73,7 +73,7 @@ export default class ResetPassword extends Vue {
 }
 </script>
 <style>
-.login-page {
+.reset-password-page {
   width: 100%;
   height: 100vh;
   padding: 1rem;
@@ -82,7 +82,7 @@ export default class ResetPassword extends Vue {
   justify-content: center;
   background-color: #cccccc;
 }
-.login-page__block {
+.reset-password-page__block {
   display: block;
   width: 100%;
   max-width: 400px;
@@ -93,7 +93,7 @@ export default class ResetPassword extends Vue {
   border-radius: 4px;
   box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
-.login-page__block-title {
+.reset-password-page__block-title {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -102,7 +102,7 @@ export default class ResetPassword extends Vue {
   line-height: 2rem;
   word-break: break-all;
 }
-.login-page__block-title span {
+.reset-password-page__block-title span {
   font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: 0.0125em;
