@@ -3,7 +3,10 @@
     <td>{{ invite.name }}</td>
     <td>{{ invite.email }}</td>
     <td>{{ invite.user_role }}</td>
-    <td><input type="button" @click="resendInvite" class="btn btn-primary" value="Resend Invitation" /></td>
+    <td>
+      <input type="button" @click="resendInvite" class="btn btn-primary" value="Resend Invitation" />
+      <input type="button" @click="deleteInvite" class="btn btn-danger ml-3" value="Delete Invitation" />
+    </td>
   </tr>
 </template>
 
@@ -19,9 +22,9 @@ export default {
         this.$http()
           .post('/re-invite', {
             token: uuid.v4(),
-            invite_id: invite.id,
-            name: invite.name,
-            email: invite.email
+            invite_id: this.invite.id,
+            name: this.invite.name,
+            email: this.invite.email
           })
           .then(response => {
             if (response.success) {
@@ -30,6 +33,16 @@ export default {
               alert('Error while re-sending an invitation to the user. Please contact admin')
             }
           })
+        this.$store.state.loading = false
+      }
+    },
+    async deleteInvite() {
+      console.log('INVITE', this.invite)
+      if (window.confirm('Are you going to delete an invitation?')) {
+        this.$store.state.loading = true
+
+        await this.$store.dispatch('DELETE', { module: 'pending_invites', entity: this.invite })
+        // alert('Deleted Selected Invitation!')
         this.$store.state.loading = false
       }
     }
