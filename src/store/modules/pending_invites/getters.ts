@@ -9,6 +9,10 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     return state.pending_invites[state.lookup[id]]
   },
   getAllInvites: (state: IModuleState) => {
-    return state.pending_invites
+    return state.pending_invites.sort((a, b) => {
+      if (a.updated_at < b.updated_at) return 1
+      if (a.updated_at > b.updated_at) return -1
+      return 0
+    })
   }
 }
