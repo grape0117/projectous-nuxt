@@ -90,6 +90,7 @@ export default {
     },
     addWorker: function() {
       this.$store.dispatch('company_users/addWorker')
+      this.selectedFilter = 'active'
     }
   }
 }
