@@ -62,6 +62,7 @@ export default {
         .post('/invite', { token, name: this.name, user_role: this.user_role, email: this.email })
         .then(response => {
           //TODO: add to invites?
+          this.$store.dispatch('ADD_MANY', { module: 'pending_invites', entities: [response.invite] }, { root: true })
           this.$store.dispatch('settings/closeModal', {
             modal: 'invite',
             object: null,
