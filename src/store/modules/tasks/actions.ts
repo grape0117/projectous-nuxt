@@ -39,7 +39,8 @@ function createDefaultTask(): ITask {
     workflowy_id: null,
     settings: {},
     last_task_message_id: null,
-    last_task_message_created_at: null
+    last_task_message_created_at: null,
+    total_time_spent: 0
   }
 }
 
