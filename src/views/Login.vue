@@ -111,7 +111,7 @@ export default class Login extends Vue {
       if (next) {
         this.$router.push(next)
       } else {
-        this.$router.push('/tasks')
+        this.$router.push('/user-tasks')
       }
     } else {
       alert('Invalid email or password')
