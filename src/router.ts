@@ -117,6 +117,12 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoiceableTemplate.vue')
     },
     {
+      path: '/daily-report',
+      name: 'DailyReport',
+      meta: { adminOnly: true },
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/DailyReportTemplate.vue')
+    },
+    {
       path: '/payable',
       name: 'Payable',
       meta: { adminOnly: true },

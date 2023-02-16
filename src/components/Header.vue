@@ -17,6 +17,7 @@
           <b-dropdown id="dropdown-divider" class="transparent-button" text="Reports">
             <b-dropdown-item-button @click="$router.push('/days')"><router-link id="report-menu-link" to="/days">Days</router-link></b-dropdown-item-button>
             <b-dropdown-item-button @click="$router.push('/invoiceable')"><router-link id="report-menu-link" to="/invoiceable">Invoiceable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button @click="$router.push('/daily-report')"><router-link id="report-menu-link" to="/daily-report">Daily Report</router-link></b-dropdown-item-button>
             <b-dropdown-item-button @click="$router.push('/payable')"><router-link id="report-menu-link" to="/payable">Payable</router-link></b-dropdown-item-button>
             <b-dropdown-item-button @click="$router.push('/profit')"><router-link id="report-menu-link" to="/profit">Profit</router-link></b-dropdown-item-button>
             <b-dropdown-item-button @click="$router.push('/user_report')"><router-link id="report-menu-link" to="/user_report">My Report</router-link></b-dropdown-item-button>
