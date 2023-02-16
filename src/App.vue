@@ -12,7 +12,7 @@
       </template>
 
       <div class="row-no-padding">
-        <Header v-on:reload="reload" v-if="!$route.meta.hideNavbar" />
+        <Header v-on:reload="reload" :showItems="!$route.meta.hideNavbar" />
         <div class="d-flex justify-content-between">
           <div class="router-view-class" style="width: 100px">
             <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" :newMessage="newMessage" />

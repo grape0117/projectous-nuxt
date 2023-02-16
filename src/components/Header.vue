@@ -9,7 +9,7 @@
           <span class="reload-text">RELOAD</span>
         </div>
       </div>
-      <div class="nav-buttons" style="align-items: center;">
+      <div class="nav-buttons" style="align-items: center;" v-if="showItems">
         <router-link class="nav-buttons__button" :to="button.path" v-for="(button, index) in navLinks" :style="{ 'text-decoration': $route.path === button.path ? 'underline' : '' }" :key="index">
           {{ button.name | toUpperCase }}
         </router-link>
@@ -17,6 +17,7 @@
           <b-dropdown id="dropdown-divider" class="transparent-button" text="Reports">
             <b-dropdown-item-button @click="$router.push('/days')"><router-link id="report-menu-link" to="/days">Days</router-link></b-dropdown-item-button>
             <b-dropdown-item-button @click="$router.push('/invoiceable')"><router-link id="report-menu-link" to="/invoiceable">Invoiceable</router-link></b-dropdown-item-button>
+            <b-dropdown-item-button @click="$router.push('/daily-report')"><router-link id="report-menu-link" to="/daily-report">Daily Report</router-link></b-dropdown-item-button>
             <b-dropdown-item-button @click="$router.push('/payable')"><router-link id="report-menu-link" to="/payable">Payable</router-link></b-dropdown-item-button>
             <b-dropdown-item-button @click="$router.push('/profit')"><router-link id="report-menu-link" to="/profit">Profit</router-link></b-dropdown-item-button>
             <b-dropdown-item-button @click="$router.push('/user_report')"><router-link id="report-menu-link" to="/user_report">My Report</router-link></b-dropdown-item-button>
@@ -61,7 +62,7 @@
       </div>
     </div>
     <div class="header-bottom">
-      <div class="nav-icons">
+      <div class="nav-icons" v-if="showItems">
         <div class="d-flex" :class="(has_route_query_showChatSection && icon.name === 'chat') || toggles[icon.name] ? 'nav-icons-active' : ''" v-for="(icon, index) in icons" :key="index">
           <div class="nav-icon" @click="toggle(icon.name)">
             <i class="nav-icon__icon" :class="icon.icon" />
@@ -127,6 +128,7 @@ import _ from 'lodash'
 import moment from 'moment'
 
 export default Vue.extend({
+  props: ['showItems'],
   extends: TaskActionRow,
   watch: {
     projectSearch: _.debounce(function(project_name) {
