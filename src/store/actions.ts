@@ -131,6 +131,15 @@ export const actions: ActionTree<IRootState, IRootState> = {
           case 'my_tasks':
             rootState.tasks.my_tasks = data[module]
             break
+          case 'new_task':
+            rootState.tasks.my_tasks = [data[module], ...rootState.tasks.my_tasks]
+            break
+          case 'updated_task':
+            const task_index = rootState.tasks.my_tasks.findIndex((task: any) => task.id === data[module].id)
+            const new_my_task_list = [...rootState.tasks.my_tasks]
+            new_my_task_list[task_index] = data[module]
+            rootState.tasks.my_tasks = new_my_task_list
+            break
           case 'today_tasks':
             rootState.tasks.today_tasks = data[module]
             break

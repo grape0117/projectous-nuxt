@@ -344,7 +344,14 @@ export default {
           title = e.data.title
           body = JSON.stringify(e.data.message)
           if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
-            that.$store.dispatch('tasks/updateTask')
+            this.$store.dispatch('PROCESS_INCOMING_DATA', { new_task: JSON.parse(e.data.new_task) })
+          }
+          break
+        case 'UPDATE_TASK':
+          title = e.data.title
+          body = JSON.stringify(e.data.message)
+          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
+            this.$store.dispatch('PROCESS_INCOMING_DATA', { updated_task: JSON.parse(e.data.updated_task) })
           }
           break
       }

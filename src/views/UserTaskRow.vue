@@ -3,7 +3,7 @@
     <div class="card" :style="{ margin: task['hasMargin'] ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white', opacity: isCompletedTask() ? 0.5 : 1 }">
       <div class="card-body" style="padding: 10px 20px 10px 25px">
         <div class="row" style="padding: 0px;">
-          <div class="col-md-8" style="align-self:center">
+          <div class="col-md-9" style="align-self:center">
             <h6 class="card-text">
               <b-icon v-if="task['isToday']" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 0)"></b-icon>
               <b-icon v-else :icon="is_mouse_enter ? 'star-fill' : 'star'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 1)"></b-icon>
@@ -41,7 +41,7 @@
               {{ myStepAndNotes() }}
             </h5>
           </div>
-          <div class="col-md-4" style="align-self:center">
+          <div class="col-md-3" style="align-self:center">
             <div>
               <span>{{ durationDisplay }}</span>
               <b-badge variant="primary mr-2" style="cursor:pointer; float:right" @click="showTaskDetail"><i class="icon-open_in_new"></i>Open task</b-badge>
