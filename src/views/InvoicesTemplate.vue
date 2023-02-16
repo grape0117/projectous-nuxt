@@ -347,12 +347,10 @@ export default {
       console.log(this.invoice_count_per_year)
       for (const { year } of this.invoice_years) {
         let open_year = this.open_invoice_count.find(function(year_count) {
-          // console.log(year_count.year, ' === ', year)
           return year_count.year === year
         })
 
         let count_per_year = this.invoice_count_per_year.find(function(year_count) {
-          console.log(year_count.year, ' === ', year)
           return year_count.year === year
         })
         if (open_year) {
@@ -548,6 +546,7 @@ export default {
       const { invoices, invoice_years, open_invoice_count } = await this.$http().get(`/invoices/${year}`)
 
       this.invoices = invoices
+      this.processBreakdownPerStatus(invoices)
       this.invoice_years = invoice_years
       this.open_invoice_count = open_invoice_count
       this.getCountPerStatus(year)
