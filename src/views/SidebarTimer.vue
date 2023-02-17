@@ -272,7 +272,7 @@ export default {
           start_time = Math.round(datetimeToJS(self.timer.created_at).getTime() / 1000)
         }
         self.running_timers[self.timer.id] = window.setInterval(function() {
-          const duration = Math.round(new Date().getTime() / 1000) - start_time + Number(self.timer.duration)
+          const duration = Math.round(new Date().getTime() / 1000) - start_time + Number(self.timer.duration ? self.timer.duration : 0)
           self.totalDuration = duration
         }, 500)
       } else if (self.running_timers[self.timer.id] && self.timer.status != 'running') {

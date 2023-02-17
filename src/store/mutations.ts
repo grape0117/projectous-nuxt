@@ -123,8 +123,10 @@ export const mutations: MutationTree<IRootState> = {
         }
       }
     } else {
-      // @ts-ignore
-      this.commit('ADD_ONE', { entity: entity, module: module })
+      if (module === 'timers' && state[module][module].findIndex((timer: any) => timer.id == entity.id) < 0) {
+        // @ts-ignore
+        this.commit('ADD_ONE', { entity: entity, module: module })
+      }
     }
     console.log('done')
     console.log(state[module][module])

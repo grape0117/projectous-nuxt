@@ -7,9 +7,12 @@ export const mutations: MutationTree<IModuleState> = {
   updateTimer(state: IModuleState, timer: ITimer) {
     let oldTimers = [...state.timers]
     let updatedTimerIndex = oldTimers.findIndex(({ id }) => id == timer.id)
-    oldTimers[updatedTimerIndex] = timer
-
-    console.log('updated timers', oldTimers)
-    state.timers = oldTimers
+    if (updatedTimerIndex >= 0) {
+      oldTimers[updatedTimerIndex] = timer
+      state.timers = oldTimers
+    } else {
+      let newTimers = [timer, ...oldTimers]
+      state.timers = newTimers
+    }
   }
 }
