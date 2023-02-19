@@ -163,7 +163,7 @@ export default {
     if (this.timer.notes == '&#8203;') {
       this.timer.notes = ''
     }
-    this.$refs.noteInput.value = this.timer.notes
+    this.$refs.noteInput.value = this.timer.notes || ''
     if (this.index === 0 && this.timer.notes === null) {
       this.$refs['noteInput'].focus()
     }
