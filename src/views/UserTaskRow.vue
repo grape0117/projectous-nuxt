@@ -83,8 +83,7 @@ export default {
         { value: 'low', text: 'Low' },
         { value: 'hold', text: 'Hold' }
       ],
-      users_in_task: this.task.users,
-      user_info: {}
+      users_in_task: this.task.users
     }
   },
   watch: {},
@@ -103,29 +102,32 @@ export default {
     },
     isCompletedTask() {
       const current_user_id = this.$store.state.settings.current_company_user_id
-      this.user_info = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.task.id, company_user_id: current_user_id })[0]
-      return this.user_info && this.user_info.status === 'completed'
+      const user_info = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.task.id, company_user_id: current_user_id })[0]
+      return user_info && user_info.status === 'completed'
     },
     myStepAndNotes() {
       const current_user_id = this.$store.state.settings.current_company_user_id
-      this.user_info = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.task.id, company_user_id: current_user_id })[0]
-      if (this.user_info.step && this.user_info.notes) {
-        return `${this.user_info.step}: ${this.user_info.notes}`
-      } else if (this.user_info.step) {
-        return `${this.user_info.step}: --`
-      } else if (this.user_info.notes) {
-        return `--: ${this.user_info.notes}`
+      const user_info = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.task.id, company_user_id: current_user_id })[0]
+      if (user_info.step && user_info.notes) {
+        return `${user_info.step}: ${user_info.notes}`
+      } else if (user_info.step) {
+        return `${user_info.step}: --`
+      } else if (user_info.notes) {
+        return `--: ${user_info.notes}`
       } else {
         return ''
       }
     },
     isMyTask() {
       const current_user_id = this.$store.state.settings.current_company_user_id
-      this.user_info = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.task.id, company_user_id: current_user_id })
-      return this.user_info.length > 0
+      const user_info = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.task.id, company_user_id: current_user_id })
+      return user_info.length > 0
     },
-    task_users() {
-      return this.$store.getters['task_users/getByTaskId'](this.task.id)
+    task_users: {
+      get: function() {
+        return this.$store.getters['task_users/getByTaskId'](this.task.id)
+      },
+      set: function(newValue) {}
     }
   },
   methods: {
