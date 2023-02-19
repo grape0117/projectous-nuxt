@@ -1,6 +1,6 @@
 <template>
   <div class="col-md-12  user-task-row">
-    <div class="card" :style="{ margin: task['hasMargin'] ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white', opacity: isCompletedTask() ? 0.5 : 1 }">
+    <div class="card" :style="{ margin: task['hasMargin'] ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white', opacity: isCompletedTask ? 0.5 : 1 }">
       <div class="card-body" style="padding: 10px 20px 10px 25px">
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
@@ -23,13 +23,13 @@
                 </b-badge>
 
                 <span @click="showTaskDetail" style="cursor: pointer;">{{ task.title ? task.title : '---' }}</span>
-                <span v-for="user in task.users" v-if="isAdmin() || is_owner">
+                <span v-for="user in task_users" v-if="isAdmin() || is_owner">
                   <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
                     {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
                   </span>
                 </span>
-                <span v-if="isMyTask()">
-                  <span title="Complete" class="add-dev-btn" v-if="!isCompletedTask()" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></span>
+                <span v-if="isMyTask">
+                  <span title="Complete" class="add-dev-btn" v-if="!isCompletedTask" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></span>
                   <span title="Cancel Complete" class="add-dev-btn" v-else variant="outline-success" @click="notCompleteMyTask(task.id)" pill><i class="icon-close"/></span>
                 </span>
                 <span title="Add developer" v-if="isAdmin()" class="add-dev-btn" @click="addDeveloper(task.id)" pill><i class="icon-add"/></span>
@@ -37,8 +37,8 @@
                 <!-- <b-button v-if="isAdmin" variant="outline-light" @click="addDeveloper(task.id)" pill><i class="icon-person_add"/></b-button> -->
               </b>
             </h6>
-            <h5 v-if="isMyTask()">
-              {{ myStepAndNotes() }}
+            <h5 v-if="isMyTask">
+              {{ myStepAndNotes }}
             </h5>
           </div>
           <div class="col-md-3" style="align-self:center">
@@ -100,6 +100,32 @@ export default {
       let durationSeconds = totalDuration ? ('00' + Math.floor(totalDuration % 60)).slice(-2) : '00'
 
       return durationHours + ':' + durationMinutes + ':' + durationSeconds
+    },
+    isCompletedTask() {
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      this.user_info = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.task.id, company_user_id: current_user_id })[0]
+      return this.user_info && this.user_info.status === 'completed'
+    },
+    myStepAndNotes() {
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      this.user_info = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.task.id, company_user_id: current_user_id })[0]
+      if (this.user_info.step && this.user_info.notes) {
+        return `${this.user_info.step}: ${this.user_info.notes}`
+      } else if (this.user_info.step) {
+        return `${this.user_info.step}: --`
+      } else if (this.user_info.notes) {
+        return `--: ${this.user_info.notes}`
+      } else {
+        return ''
+      }
+    },
+    isMyTask() {
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      this.user_info = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.task.id, company_user_id: current_user_id })
+      return this.user_info.length > 0
+    },
+    task_users() {
+      return this.$store.getters['task_users/getByTaskId'](this.task.id)
     }
   },
   methods: {
@@ -141,28 +167,6 @@ export default {
         variant: variant,
         solid: true
       })
-    },
-    isCompletedTask() {
-      const current_user_id = this.$store.state.settings.current_company_user_id
-      this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
-      return this.user_info && this.user_info.status === 'completed'
-    },
-    myStepAndNotes() {
-      const current_user_id = this.$store.state.settings.current_company_user_id
-      this.user_info = this.task.users.filter(user => user.company_user_id === current_user_id)[0]
-      if (this.user_info.step && this.user_info.notes) {
-        return `${this.user_info.step}: ${this.user_info.notes}`
-      } else if (this.user_info.step) {
-        return `${this.user_info.step}: --`
-      } else if (this.user_info.notes) {
-        return `--: ${this.user_info.notes}`
-      } else {
-        return ''
-      }
-    },
-    isMyTask() {
-      const current_user_id = this.$store.state.settings.current_company_user_id
-      return this.task.users.findIndex(user => user.company_user_id === current_user_id) > -1
     },
     addDeveloper(task_id) {
       this.$emit('showModal', task_id)
@@ -369,9 +373,6 @@ export default {
     },
     async showTaskDetail() {
       await this.$router.push({ query: { task: this.task.id, showChatSection: 'true' } })
-    },
-    task_users() {
-      return this.$store.getters['task_users/getByTaskId'](this.task.id)
     },
     getNeed() {
       const need = prompt('What is blocking this task?', this.task.settings ? (this.task.settings.needs ? this.task.settings.needs : '') : '')

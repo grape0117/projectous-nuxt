@@ -32,5 +32,11 @@ export const mutations: MutationTree<IModuleState> = {
       // @ts-ignore
       this.commit('UPDATE_ATTRIBUTE', { module: 'task_users', id, attribute: 'sort_order', value: index })
     })
+  },
+  update(state: IModuleState, taskUser: ITaskUser) {
+    let updated_task_users = [...state.task_users]
+    const task_user_index = updated_task_users.findIndex(({ id }) => id === taskUser.id)
+    updated_task_users[task_user_index] = { ...taskUser }
+    state.task_users = updated_task_users
   }
 }

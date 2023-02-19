@@ -105,6 +105,10 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // @ts-ignore
     const task_user = await this._vm.$http().put('/task-users/', taskUser.id, { task_user: taskUser })
   },
+  async update({ commit }: any, taskUser: ITaskUser) {
+    commit('update', taskUser)
+    // @ts-ignore
+  },
   /*  async deleteTaskUser({ commit }, taskUser: ITaskUser) {
     commit('DELETE', { module: 'task_users', entity: taskUser }, { root: true })
   },*/

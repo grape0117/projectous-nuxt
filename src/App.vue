@@ -357,6 +357,11 @@ export default {
             this.$store.dispatch('PROCESS_INCOMING_DATA', { updated_task: JSON.parse(e.data.updated_task) })
           }
           break
+        case 'TASK_USER':
+          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
+            this.$store.dispatch('task_users/update', JSON.parse(e.data.task_user))
+          }
+          break
       }
       if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) var notification = new Notification(title, { body: body, icon: 'img' })
 
