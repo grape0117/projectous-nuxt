@@ -103,6 +103,8 @@ export default {
       } else if (isFinite(this.tab)) {
         const user_id = this.tab
         tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
+      } else {
+        tasks = this.$store.state.tasks.my_tasks
       }
       const task = tasks.filter(task => task.id == this.task.id)[0]
       return task && task.hasMargin
