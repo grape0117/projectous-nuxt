@@ -1,6 +1,6 @@
 <template>
   <div class="col-md-12  user-task-row">
-    <div class="card" :style="{ margin: task['hasMargin'] ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white', opacity: isCompletedTask ? 0.5 : 1 }">
+    <div class="card" :style="{ margin: hasMargin ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white', opacity: isCompletedTask ? 0.5 : 1 }">
       <div class="card-body" style="padding: 10px 20px 10px 25px">
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
@@ -67,7 +67,7 @@ import moment from 'moment'
 import { Datetime } from 'vue-datetime'
 import { abbrName } from '@/utils/util-functions'
 export default {
-  props: ['task'],
+  props: ['task', 'tab'],
   extends: TaskActionRow,
   components: {
     datetime: Datetime
@@ -82,12 +82,31 @@ export default {
         { value: 'regular', text: 'Regular' },
         { value: 'low', text: 'Low' },
         { value: 'hold', text: 'Hold' }
-      ],
-      users_in_task: this.task.users
+      ]
     }
   },
   watch: {},
   computed: {
+    hasMargin() {
+      let tasks = []
+      if (this.tab === 'all') {
+        tasks = this.$store.state.tasks.all_tasks
+      } else if (this.tab === 'others') {
+        tasks = this.$store.state.tasks.others_tasks
+      } else if (this.tab === 'my_tasks') {
+        tasks = this.$store.state.tasks.my_tasks
+      } else if (this.tab === 'today_tasks') {
+        tasks = this.$store.state.tasks.today_tasks
+      } else if (this.tab === 'past_due') {
+        tasks = this.$store.state.tasks.past_due_tasks
+      } else if (this.tab === 'managing') {
+      } else if (isFinite(this.tab)) {
+        const user_id = this.tab
+        tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
+      }
+      const task = tasks.filter(task => task.id == this.task.id)[0]
+      return task && task.hasMargin
+    },
     is_owner() {
       const current_user_id = this.$store.state.settings.current_company_user_id
       return current_user_id == this.task.owner

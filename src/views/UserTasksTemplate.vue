@@ -142,6 +142,8 @@ export default {
         if (task.priority !== tmp_priority) {
           task['hasMargin'] = true
           tmp_priority = task.priority
+        } else {
+          task['hasMargin'] = false
         }
       })
       return my_tasks
@@ -249,6 +251,8 @@ export default {
         if (task.priority !== tmp_priority) {
           task['hasMargin'] = true
           tmp_priority = task.priority
+        } else {
+          task['hasMargin'] = false
         }
         const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: task.id, company_user_id: current_user_id })[0]
         task['isToday'] = task_user && task_user['next_work_day'] && moment(task_user['next_work_day']).format('yyyy-MM-DD') <= moment().format('yyyy-MM-DD')

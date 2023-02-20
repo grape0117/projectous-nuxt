@@ -20,7 +20,7 @@
   </div> -->
 
   <div class="row">
-    <user-task-row v-for="task in task_list" v-bind:task="task" @showSnoozeModal="showSnoozeModal" @showModal="showModal" @updateStatus="updateStatus" @showUpdateModal="showUpdateModal"></user-task-row>
+    <user-task-row v-for="(task, index) in task_list" v-bind:task="task" v-bind:index="index" v-bind:key="index" v-bind:tab="tab" @showSnoozeModal="showSnoozeModal" @showModal="showModal" @updateStatus="updateStatus" @showUpdateModal="showUpdateModal"></user-task-row>
     <b-modal v-model="show_udpate_status" id="update-status-modal" class="update-status-modal" style="min-height: 500px" :size="'lg'">
       <template #modal-header>
         <div class="header">
