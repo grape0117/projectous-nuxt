@@ -191,7 +191,9 @@ export const mutations: MutationTree<IRootState> = {
     if (!state[module]) return
     console.log('lookup', id, state[module].lookup[id])
     // @ts-ignore
-    state[module][module][state[module].lookup[id]][attribute] = value
+    let lookup_id = state[module][module].findIndex(item => item.id == id)
+    state[module][module][lookup_id][attribute] = value
+    // state[module][module][state[module].lookup[id]][attribute] = value
 
     // @ts-ignore
     this.commit('updateCreateIndexDBEntity', { module, entity: state[module][module][state[module].lookup[id]] })

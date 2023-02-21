@@ -128,7 +128,7 @@
                     <div v-if="isAdmin" class="form-group">
                       <label class="control-label col-sm-4" for="client_rate">Client Rate: </label>
                       <div class="col-sm-8">
-                        <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value()" />
+                        <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value" />
                       </div>
                     </div>
                     <!-- <div class="form-group">
@@ -315,6 +315,13 @@ export default {
     clients: function() {
       const clients = this.$store.getters['clients/getActiveCompanyClients']
       return clients
+    },
+    client_rate_value: function() {
+      let timerInfo = this.$store.state.timers.timers.filter(({ id }) => id == this.timer.id)[0]
+      if (timerInfo.invoice_id) {
+        return timerInfo.client_rate
+      }
+      return timerInfo.default_client_rate != timerInfo.client_rate ? timerInfo.client_rate : ''
     }
   },
   mounted: function() {
@@ -386,12 +393,12 @@ export default {
     client_rate_placeholder: function() {
       return this.timer_data.default_client_rate
     },
-    client_rate_value: function() {
-      if (this.timer_data.invoice_id) {
-        return this.timer_data.client_rate
-      }
-      return this.timer_data.default_client_rate != this.timer_data.client_rate ? this.timer_data.client_rate : ''
-    },
+    // client_rate_value: function() {
+    //   if (this.timer_data.invoice_id) {
+    //     return this.timer_data.client_rate
+    //   }
+    //   return this.timer_data.default_client_rate != this.timer_data.client_rate ? this.timer_data.client_rate : ''
+    // },
     user_rate_placeholder: function() {
       return this.timer_data.default_user_rate
     },
