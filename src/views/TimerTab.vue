@@ -51,16 +51,9 @@ export default {
       let timers = this.$store.state.timers.timers.filter(function(timer) {
         if (timer.company_user_id === self.$store.state.settings.current_company_user_id) {
           let timertime = new Date(timer.report_at)
-          //console.log(timertime)
-          //console.log(midnight)
-          /*if(timertime > midnight){
-            console.log('greater')
-          } else {
-            console.log('less than')
-          }*/
 
           if (new Date(timer.report_at) > midnight) {
-            total_time_today += timer.duration
+            total_time_today += timer.duration || 0
           }
         }
       })
