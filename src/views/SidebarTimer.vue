@@ -344,6 +344,7 @@ export default {
     },
     restartTimer: function() {
       this.$store.dispatch('timers/restartTimer', this.timer)
+      this.$refs['noteInput'].focus()
     },
     stopTimer: function() {
       this.$store.dispatch('timers/stopTimer', this.timer)
