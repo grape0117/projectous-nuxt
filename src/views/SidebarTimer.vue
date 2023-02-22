@@ -164,7 +164,7 @@ export default {
       this.timer.notes = ''
     }
     this.$refs.noteInput.value = this.timer.notes || ''
-    if (this.index === 0 && this.timer.notes === null) {
+    if (this.index === 0) {
       this.$refs['noteInput'].focus()
     }
     this.resize()
