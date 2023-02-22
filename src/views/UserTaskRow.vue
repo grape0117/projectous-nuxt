@@ -146,7 +146,7 @@ export default {
     },
     task_users: {
       get: function() {
-        return this.$store.getters['task_users/getByTaskId'](this.task.id)
+        return this.$store.getters['task_users/getByTaskId'](this.task.id).filter(task_user => task_user.role != 'owner')
       },
       set: function(newValue) {}
     }
