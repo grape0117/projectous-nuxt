@@ -319,7 +319,7 @@ export default {
           title = ''
           body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
           let timerInfo = JSON.parse(e.data.value)
-          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             that.$store.dispatch('timers/updateTimer', timerInfo)
           }
           if (e.data.user_id != user_id) {
@@ -333,7 +333,7 @@ export default {
         case 'TASK_MESSAGE':
           title = e.data.title
           body = JSON.stringify(e.data.sender + ' : ' + e.data.message)
-          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             that.newMessage1 = e.data
             // that.updated_at = new Date().getTime()
             if (this.route_query_taskId === e.data.task_id) {
@@ -346,19 +346,19 @@ export default {
         case 'NEW_TASK':
           title = e.data.title
           body = JSON.stringify(e.data.message)
-          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             this.$store.dispatch('PROCESS_INCOMING_DATA', { new_task: JSON.parse(e.data.new_task) })
           }
           break
         case 'UPDATE_TASK':
           title = e.data.title
           body = JSON.stringify(e.data.message)
-          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             this.$store.dispatch('PROCESS_INCOMING_DATA', { updated_task: JSON.parse(e.data.updated_task) })
           }
           break
         case 'TASK_USER':
-          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             this.$store.dispatch('task_users/update', JSON.parse(e.data.task_user))
           }
           break
