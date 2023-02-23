@@ -345,20 +345,24 @@ export default {
           title = e.data.title
           body = JSON.stringify(e.data.message)
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
-            this.$store.dispatch('PROCESS_INCOMING_DATA', { new_task: JSON.parse(e.data.new_task) })
+            that.$store.dispatch('PROCESS_INCOMING_DATA', { new_task: JSON.parse(e.data.new_task) })
           }
           break
         case 'UPDATE_TASK':
           title = e.data.title
           body = JSON.stringify(e.data.message)
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
-            this.$store.dispatch('PROCESS_INCOMING_DATA', { updated_task: JSON.parse(e.data.updated_task) })
+            that.$store.dispatch('PROCESS_INCOMING_DATA', { updated_task: JSON.parse(e.data.updated_task) })
           }
           break
         case 'TASK_USER':
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
-            this.$store.dispatch('task_users/update', JSON.parse(e.data.task_user))
+            that.$store.dispatch('task_users/update', JSON.parse(e.data.task_user))
           }
+          break
+        case 'clients':
+          let clientInfo = JSON.parse(e.data.value)
+          that.$store.commit('clients/updateClient', clientInfo)
           break
       }
       if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) var notification = new Notification(title, { body: body, icon: 'img' })
@@ -368,7 +372,7 @@ export default {
     if (user_id) {
       this.$store.state.settings.logged_in = true
       try {
-        that.$store.dispatch('GET_NEW_DATA')
+        // that.$store.dispatch('GET_NEW_DATA')
       } catch (e) {
         console.error('Websockets not running?')
       }

@@ -17,5 +17,17 @@ export const mutations: MutationTree<IModuleState> = {
       //@ts-ignore
       Vue.set(state.lookup_by_client_company_id, client.client_company_id, key) //TODO: risk of having more than one client with the same company id?
     })
+  },
+  updateClient(state: IModuleState, client: any) {
+    //@ts-ignore
+    let prevClients = [...state.clients]
+    let updatedClientIndex = prevClients.findIndex(({ id }) => id == client.id)
+    if (updatedClientIndex >= 0) {
+      prevClients[updatedClientIndex] = client
+      state.clients = prevClients
+    } else {
+      let newClients = [...prevClients, client]
+      state.clients = newClients
+    }
   }
 }
