@@ -37,7 +37,6 @@ export default {
       }
     },
     async deleteInvite() {
-      console.log('INVITE', this.invite)
       if (window.confirm('Are you going to delete an invitation?')) {
         this.$store.state.loading = true
 

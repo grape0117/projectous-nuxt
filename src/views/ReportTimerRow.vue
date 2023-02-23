@@ -77,7 +77,6 @@ export default {
       if (!this.checkbox_toggled) return this.checkbox_all_checked === true ? 1 : 0
 
       // if toggled toggled
-      console.log(!this.checkbox_all_checked)
       return !this.checkbox_all_checked === true ? 1 : 0
     },
     users() {
@@ -87,9 +86,7 @@ export default {
       return this.$store.state.settings.current_company
     }
   },
-  created: function() {
-    console.log(this.is_user_report)
-  },
+  created: function() {},
   methods: {
     abbrName,
     formatTime,
@@ -131,7 +128,6 @@ export default {
       }
     },
     editTimer() {
-      // console.log(this.timer)
       this.$store.dispatch('timers/editTimer', this.timer)
     }
   }

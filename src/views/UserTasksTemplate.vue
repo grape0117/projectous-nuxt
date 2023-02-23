@@ -173,7 +173,6 @@ export default {
 
       if (this.tab === 'all') {
         tasks = this.$store.state.tasks.all_tasks
-        // console.log("tasks==>", tasks);
         this.all_count = tasks.length
         this.all_high_count = tasks.filter(({ priority }) => priority == 'high').length
       } else if (this.tab === 'others') {

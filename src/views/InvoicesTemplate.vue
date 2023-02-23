@@ -344,7 +344,6 @@ export default {
     invoice_years_data() {
       let invoice = []
       let total_open_invoice_count = 0
-      console.log(this.invoice_count_per_year)
       for (const { year } of this.invoice_years) {
         let open_year = this.open_invoice_count.find(function(year_count) {
           return year_count.year === year
@@ -385,9 +384,7 @@ export default {
     current_company() {
       // this.getData()
     },
-    selected_invoice_id() {
-      console.log(this.selected_invoice_id)
-    },
+    selected_invoice_id() {},
     check_all() {
       if (this.check_all) {
         this.selected_invoice_id = this.invoice_filter.filter(e => e.invoice_id).map(({ invoice_id }) => invoice_id)
@@ -500,8 +497,6 @@ export default {
 
       this.invoices[index].status = status
 
-      console.log({ id })
-      console.log({ status })
       this.get_count()
     },
     processBreakdownPerStatus(total_per_status) {
@@ -559,8 +554,6 @@ export default {
     async getData() {
       const { invoices, invoice_years, open_invoice_count, invoice_count_per_year } = await this.getInvoicesByYear(this.status_filter) //new Date().getFullYear()
 
-      console.log({ invoices })
-
       this.invoices = invoices
       this.processBreakdownPerStatus(invoices)
       this.invoice_years = invoice_years
@@ -595,7 +588,6 @@ export default {
     },
     applyAction() {
       let self = this
-      console.log(this.action)
       if (this.action === 'export') {
         this.$http()
           .post('/invoices/quickbooks', this.selected_invoice_id)

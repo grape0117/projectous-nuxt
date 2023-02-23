@@ -136,7 +136,6 @@ export default {
     },
     project_class(project) {
       let ratio = project.monthly_target / project.invoicable_projected
-      console.log(ratio + '...' + project.invoicable_projected + ' ' + project.monthly_target)
       if (ratio > 1.5) {
         return 'over_alert'
       } else if (ratio > 1.1) {

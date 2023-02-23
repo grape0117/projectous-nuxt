@@ -10,7 +10,6 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   editClient(context, client_id) {
     const client = context.getters['getById'](client_id)
-    console.log('client', client)
     context.rootState.settings.current_edit_client = client
     context.dispatch('settings/openModal', 'client', { root: true })
   },

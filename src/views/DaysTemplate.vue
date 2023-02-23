@@ -85,7 +85,6 @@ export default {
   },
   methods: {
     userName(company_user_id) {
-      console.log('userName', company_user_id)
       const company_user = this.$store.getters['company_users/getById'](company_user_id)
       return company_user ? company_user.name : ''
     },

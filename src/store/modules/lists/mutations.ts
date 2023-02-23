@@ -43,6 +43,5 @@ export const mutations: MutationTree<IListsState> = {
       group: 'Unsorted'
     })
     state.generalLists = lists
-    console.log('****** DAY LISTS SET ******')
   }
 }

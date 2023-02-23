@@ -41,7 +41,6 @@ export class BaseHttp implements IHttp {
   }
   protected notifyUser(message: string) {
     // @stephane later we can add notification for user
-    console.log(message)
   }
   private throwError() {
     throw Error('Method is not implemented')

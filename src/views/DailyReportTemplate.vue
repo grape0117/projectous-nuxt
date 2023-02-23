@@ -326,7 +326,6 @@ export default {
     this.buttonStyle = this.applyTheme()
   },
   mounted() {
-    console.log('reports mounted', this.$route.query, this.$route, this.chosen_clients, this.total_time, 'test')
     this.getData()
 
     // background
@@ -344,7 +343,6 @@ export default {
       yesterday.setDate(yesterday.getDate() - 1)
       const start_date = this.$route.query.start ? decodeURI(this.$route.query.start) : yesterday.getFullYear() + '-' + (yesterday.getMonth() + 1) + '-' + yesterday.getDate()
       // this.start = start_date
-      console.log('Start Date', start_date)
 
       return start_date
     },
@@ -354,7 +352,6 @@ export default {
       yesterday.setDate(yesterday.getDate() - 1)
       const end_date = this.$route.query.end ? decodeURI(this.$route.query.end) : yesterday.getFullYear() + '-' + (yesterday.getMonth() + 1) + '-' + yesterday.getDate()
       // this.end = end_date
-      console.log('End Date', end_date)
 
       return end_date
     },
@@ -373,7 +370,6 @@ export default {
       this.isShowInvoiceableItems = false
     },
     generateInvoiceButton(timers, invoice_id) {
-      console.log(this.$store)
       const client = document.getElementById('client').value
       const params = {
         timers,
@@ -391,7 +387,6 @@ export default {
           const create_invoice_button = document.getElementById('createInvoiceButton')
           create_invoice_button.classList.add('btn')
           create_invoice_button.classList.add('btn-primary')
-          console.log('Response', response)
           // this.$store.dispatch('invoices/clearInvoiceableItems', response[0])
         })
     },
@@ -542,7 +537,6 @@ export default {
       } else {
         //this.chosen_clients.push(e.target.value*1)
       }
-      //console.log(this.chosen_clients)
     },
     async getData(where) {
       this.loading_data = true
@@ -618,7 +612,6 @@ export default {
           this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
         }
       }
-      console.log(this.total_time)
       // }
       this.loading_data = false
       for (const timer of document.querySelectorAll('.timer-action:checked')) {

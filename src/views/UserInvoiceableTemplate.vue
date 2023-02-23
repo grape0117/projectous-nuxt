@@ -328,9 +328,7 @@ export default {
       this.$router.push({ path: '/user_report?' + new URLSearchParams(sessionStorage.getItem('user_report')).toString() }).catch(() => {})
     }
   },
-  mounted() {
-    console.log('reports mounted', this.$route.query, this.$route, this.chosen_clients, this.total_time, 'test')
-  },
+  mounted() {},
   methods: {
     timeToDecimal,
     totalToDecimal,

@@ -57,7 +57,6 @@ export default class Login extends Vue {
           // @ts-ignore
           window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', evnt => {
             // @ts-ignore
-            console.log('-----Called getNewData!----' + evnt.data.data.item_type, evnt.data.data)
             let body = ''
             let title = ''
             let data = evnt.data
@@ -84,18 +83,10 @@ export default class Login extends Vue {
                 },
 
                 {
-                  onerror: function() {
-                    console.log('Custom error event was called')
-                  },
-                  onclick: function() {
-                    console.log('Custom click event was called')
-                  },
-                  onclose: function() {
-                    console.log('Custom close event was called')
-                  },
-                  onshow: function() {
-                    console.log('Custom show event was called')
-                  }
+                  onerror: function() {},
+                  onclick: function() {},
+                  onclose: function() {},
+                  onshow: function() {}
                 }
               )
 

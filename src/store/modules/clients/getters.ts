@@ -8,7 +8,6 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   },
   getByClientCompanyId: (state: IModuleState) => (client_company_id: any) => {
     const client = state.clients[state.lookup_by_client_company_id[client_company_id]]
-    //console.log('client', client, 'client_company_id', client_company_id, 'key', state.lookup_by_client_company_id[client_company_id])
     return client
   },
   getActiveCompanyClients: (state: IModuleState) => {

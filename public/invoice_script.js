@@ -119,7 +119,6 @@ function updateInvoice() {
 	// update inventory cells
 	// ======================
 
-	console.log("================== start ========================");
 	for (var a = document.querySelectorAll('table.inventory tbody tr'), i = 0; a[i]; ++i) {
 		// get inventory row cells
 		cells = a[i].querySelectorAll('span:last-child');
@@ -131,8 +130,7 @@ function updateInvoice() {
 		// add price to total
 		if($(a[i]).hasClass('not-billable')){
 			unbilled += price;
-			console.log("unbilled item: ", "" , price);
-			//console.log(a[i]);
+		
 		} else {
 			total += price;
 		}
@@ -140,11 +138,9 @@ function updateInvoice() {
 		//unbilled = 4698.75;//0;//4406.85;
 
 		// set row total
-		//console.log(cells[5])
+	
 		timertotal.innerHTML = price;
 	}
-	console.log("unbilled", unbilled);
-	console.log("==========================================");
 	
 	for (var sub_total_rows = document.querySelectorAll('table.inventory thead.sub-total-row'), i = 0; sub_total_rows[i]; ++i) {
 		sub_total = 0;
@@ -156,7 +152,6 @@ function updateInvoice() {
 			price = parseFloatHTML(amount) * parseFloatHTML(quantity);
 			if($(a[ii]).hasClass('not-billable')){
 				// unbilled += price;
-				console.log("unbilled item: ", "" , price);
 
 			} else {
 				sub_total += price;
@@ -165,9 +160,7 @@ function updateInvoice() {
 		timertotal = sub_total_rows[i].querySelector('.sub-total-price');
 		timertotal.innerHTML = parsePrice(sub_total);
 	}
-	console.log("total unbilled", unbilled);
 
-	console.log("================== end ========================");
 
 	// update balance cells
 	// ====================
@@ -180,7 +173,7 @@ function updateInvoice() {
 	cells[1].innerHTML = total;
 
 	// set balance and meta balance
-	//console.log('total?',cells[1],parseFloatHTML(cells[1]));
+
 	cells[3].innerHTML = document.querySelector('table.meta tr:last-child td:last-child span:last-child').innerHTML = parsePrice(total);
 
 	// update prefix formatting
@@ -191,7 +184,7 @@ function updateInvoice() {
 
 	// update price formatting
 	// =======================
-	// console.log('activeElement', document.activeElement);
+
 	for (a = document.querySelectorAll('span[data-prefix] + span'), i = 0; a[i]; ++i) {
 		if (document.activeElement != a[i]) {
 			a[i].innerHTML = parsePrice(parseFloatHTML(a[i]));

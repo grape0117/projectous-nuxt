@@ -348,16 +348,13 @@ export default {
   beforeCreate: function() {
     //labeledConsole('beforeCreate', $('#project').val())
     if (sessionStorage.getItem('invoiceable')) {
-      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() }).catch(() => {
-        console.log('catching redundant navigation link')
-      })
+      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() }).catch(() => {})
     }
   },
   created() {
     this.buttonStyle = this.applyTheme()
   },
   mounted() {
-    console.log('reports mounted', this.$route.query, this.$route, this.chosen_clients, this.total_time, 'test')
     this.getData()
 
     // background
@@ -402,7 +399,6 @@ export default {
       this.isShowInvoiceableItems = false
     },
     generateInvoiceButton(timers, invoice_id) {
-      console.log(this.$store)
       const client = document.getElementById('client').value
       const params = {
         timers,
@@ -420,7 +416,6 @@ export default {
           const create_invoice_button = document.getElementById('createInvoiceButton')
           create_invoice_button.classList.add('btn')
           create_invoice_button.classList.add('btn-primary')
-          console.log('Response', response)
           // this.$store.dispatch('invoices/clearInvoiceableItems', response[0])
         })
     },
@@ -547,7 +542,7 @@ export default {
     //     Vue.set(this.settings, 'search', event.target.value)
     //   },
     //   toggleUsers(event) {
-    //     //console.log('toggle users'+ event.target.checked)
+
     //     Vue.set(this.settings, 'show_inactive_users', event.target.checked)
     //   },
     filteredusers() {
@@ -584,7 +579,6 @@ export default {
       } else {
         //this.chosen_clients.push(e.target.value*1)
       }
-      //console.log(this.chosen_clients)
     },
     async getData(where) {
       this.loading_data = true
@@ -639,9 +633,7 @@ export default {
 
       const queryString = new URLSearchParams(data).toString()
 
-      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {
-        console.log('catching redundant navigation link')
-      })
+      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {})
       sessionStorage.setItem('invoiceable', queryString)
 
       // if (this.isAdmin()) {
@@ -667,7 +659,6 @@ export default {
           this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
         }
       }
-      console.log(this.total_time)
       // }
       this.loading_data = false
       for (const timer of document.querySelectorAll('.timer-action:checked')) {

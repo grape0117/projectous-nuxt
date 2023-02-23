@@ -10,7 +10,6 @@ export const mutations: MutationTree<IModuleState> = {
     this.commit('task_users/deleteByTaskId', entity.id) //TODO: handle here?
   },
   DELETE(state: IModuleState, entity) {
-    console.log('Task Delete', entity)
     if (state.completed_tasks.length > 0) {
       // @ts-ignore
       state.completed_tasks = state.completed_tasks.filter(({ id }) => id !== entity.id)
@@ -53,7 +52,6 @@ export const mutations: MutationTree<IModuleState> = {
     }
   },
   UPDATE(state: IModuleState, entity) {
-    console.log('Task Update', entity)
     if (state.completed_tasks.length > 0) {
       // @ts-ignore
       state.completed_tasks = state.completed_tasks.map(task => (task.id == entity.id ? entity : task))
@@ -116,7 +114,6 @@ export const mutations: MutationTree<IModuleState> = {
     ids.forEach((id, index) => {
       //TODO: clear out all but UPDATE_ATTRIBUTE
       //const task = state.tasks[state.lookup[id]]
-      console.log(index + ' updateTasksSortOrders: updating sort order for task')
       //if (task) {
       // @ts-ignore
       this.commit('UPDATE_ATTRIBUTE', { module: 'tasks', id, attribute: 'sort_order', value: index })

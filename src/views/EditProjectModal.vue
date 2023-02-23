@@ -154,9 +154,7 @@ export default {
   },
   methods: {
     applyTheme,
-    checkProject() {
-      console.log(this.project)
-    },
+    checkProject() {},
     reset_project() {
       this.project = {}
     },

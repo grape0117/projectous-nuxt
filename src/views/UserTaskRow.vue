@@ -333,7 +333,6 @@ export default {
         case 'restart_timer':
           const latest_task_timer = timers.filter(e => e.task_id === id)
           const latest_timer = latest_task_timer[latest_task_timer.length - 1]
-          console.log(latest_timer)
           //guess timezone
           const timezone = moment.tz.guess()
           const tz_date = moment(new Date()).tz(timezone)
@@ -341,7 +340,6 @@ export default {
           const gmt_date = tz_date.clone().tz('GMT')
 
           const is_same_day = latest_timer ? moment(moment(gmt_date).format('YYYY-MM-DD')).isSame(moment(latest_timer.report_at).format('YYYY-MM-DD'), 'day') : false
-          console.log(is_same_day)
 
           return_data = { is_same_day, latest_timer }
           break
@@ -367,7 +365,6 @@ export default {
       }
 
       const { is_same_day, latest_timer } = this.getTaskTimers(this.task.id, 'restart_timer')
-      console.log(latest_timer)
       if (is_same_day) {
         this.restartTimer(latest_timer)
       } else {

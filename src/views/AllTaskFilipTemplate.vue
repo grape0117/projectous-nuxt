@@ -72,7 +72,7 @@ export default Vue.extend({
   computed: {
     // task: function() {
     //   let task = this.$store.state.settings.current_edit_task
-    //   // console.log('modal task', task)
+
     //   return task
     // },
     active_users: function() {
@@ -80,7 +80,7 @@ export default Vue.extend({
     },
     clients() {
       let clients = this.$store.getters['clients/getActiveCompanyClients']
-      //console.log('clients', clients)
+
       return clients.sort((a, b) => {
         return Vue.simpleSort(a.name.toLowerCase(), b.name.toLowerCase())
       })
@@ -183,7 +183,6 @@ export default Vue.extend({
     }
   },
   mounted() {
-    console.log('moment', moment('2010-10-20'))
     // addEventListener('keyup', ev => {
     //   if (ev.keyCode === 27) {
     //     //* Note keyCode 27 is ESC
@@ -197,17 +196,15 @@ export default Vue.extend({
     }
     // this.$nextTick(() => {
     // this.$watch('$route', (val) => {
-    //   console.log('WATCH ON CREATED');
+
     // })
     // })
     // if(this.$route.params.task_id) {
-    //   console.log('THERE IS DATA!!!')
-    //   console.log(this.$route.params);
+
     // }
     if (this.$route.params && Object.keys(this.$route.params).length) {
       this.$watch('active_client_tasks', async data => {
         if (data) {
-          console.log('DATA RESULT')
           this.show_task = await data.find(({ id }) => id === this.$route.params.task_id)
         }
       })
@@ -215,7 +212,6 @@ export default Vue.extend({
   },
   methods: {
     Images_onFileChanged(event) {
-      console.log('adding file')
       this.selectedFile = event.target.files[0]
     },
     Images_onUpload() {
@@ -280,7 +276,6 @@ export default Vue.extend({
       let tablinks = document.getElementsByClassName('tablinks')
       for (i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(' active', '')
-        console.log(tablinks[i].innerHTML.trim(), resourceName)
         if (tablinks[i].innerHTML.trim() == resourceName) {
           tablinks[i].className += ' active'
         }
@@ -308,11 +303,9 @@ export default Vue.extend({
       return client ? client.name : ''
     },
     openprojects: function(client) {
-      //console.log('client', client)
       return this.$store.getters['projects/getOpenCompanyProjects'](client.client_company_id)
     },
     async saveTask(isRedirect = true) {
-      console.log(this.show_task)
       await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.show_task })
       if (isRedirect) {
         this.show_task = false
@@ -322,7 +315,6 @@ export default Vue.extend({
     },
     addResource() {
       // add or update action
-      console.log(this.show_task)
       if (!this.show_task.settings.resources) {
         Vue.set(this.show_task.settings, 'resources', [])
       }
@@ -347,7 +339,6 @@ export default Vue.extend({
             href: document.getElementById('add-resource-href').value
           }
       }
-      console.log(this.show_task)
     },
     addTask() {
       this.show_task = { id: uuid.v4() }
@@ -366,7 +357,6 @@ export default Vue.extend({
       this.$bvModal.show('client-modal')
     },
     async showTask(task) {
-      console.log('show task!', task)
       this.scrollTop = document.documentElement.scrollTop
       //pop modal
       // this.show_task = task
@@ -440,7 +430,6 @@ export default Vue.extend({
       // if (document.getElementById(resourceName)) {
       //   document.getElementById(resourceName).style.display = 'block'
       // }
-      // console.log(document.getElementById(resourceName))
     }
   },
   watch: {
@@ -457,7 +446,6 @@ export default Vue.extend({
         let task = list.filter(item => {
           return (item.id = me.task_id)
         })
-        console.log('filter task', task)
         if (task) {
           this.show_task = task
           this.t_update()
@@ -465,10 +453,6 @@ export default Vue.extend({
       }
     },
     async $route(to, from) {
-      console.log(to)
-
-      // console.log('ROUTE IS CHANGING')
-
       if (to.name == 'Task_Detail' && from.name == 'Tasks') {
         document.documentElement.scrollTop = 0
       } else if (to.name == 'Tasks' && from.name == 'Task_Detail') {

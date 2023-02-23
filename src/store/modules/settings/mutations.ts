@@ -5,7 +5,6 @@ import Vue from 'vue'
 export const mutations: MutationTree<IModuleState> = {
   registerModals(state, bvModal) {
     //@ts-ignore
-    console.log(window.$_app.$bvModal)
   },
   setCurrentEditTimerProject(state, project) {
     state.current_edit_timer.project_id = project.id
@@ -38,7 +37,6 @@ export const mutations: MutationTree<IModuleState> = {
     state.unread_messages_num = state.unread_messages_num + 1
   },
   setCurrentEditCompanyClient(state, client) {
-    console.log('open client modal', client)
     state.current_edit_client = client
     if (client.id) {
       // @ts-ignore
@@ -49,7 +47,6 @@ export const mutations: MutationTree<IModuleState> = {
     }
   },
   setCurrentEditProject(state, project) {
-    console.log('open project modal')
     state.current_edit_project = project
     if (project.id) {
       // @ts-ignore
@@ -60,7 +57,6 @@ export const mutations: MutationTree<IModuleState> = {
     }
   },
   setCurrentEditProjectStatus(state, status) {
-    console.log('open project modal')
     state.current_edit_project_status = status
   },
   setCurrentEditTask(state, task) {
@@ -113,8 +109,6 @@ export const mutations: MutationTree<IModuleState> = {
     state.modal_stack.push(action)
   },
   setCurrentRunningTimer(state, timer) {
-    //console.log('setCurreRunTim')
-    //console.log(timer);
     state.current_running_timer = timer
   }
 }

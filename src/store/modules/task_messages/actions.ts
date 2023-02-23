@@ -34,11 +34,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       .post('/task_messages', { task_message: taskMessage })
       // @ts-ignore
       .then(res => {
-        // console.log(res.task_messages)
         commit('ADD_ONE', { module: 'task_messages', entity: res.task_messages }, { root: true })
         // return res.task_messages
       }).task_messages
-    console.log(task_message)
     return task_message
     // commit(REMOVE_TEMP_TASKS_MESSAGE)
     //return task_message

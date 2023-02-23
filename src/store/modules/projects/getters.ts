@@ -15,7 +15,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   },
   getOpenProjectsSortedByClient: function(state: IModuleState, _getters, rootState, rootGetters) {
     let self = this
-    //console.log('openprojects')
+
     let active_clients = rootGetters['clients/getActiveCompanyClients']
     // @ts-ignore
     let new_projects = state.projects.filter(e => e.projects)
@@ -26,30 +26,23 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     }
     // @ts-ignore
     let client_projects = []
-    //console.log('active_clients', active_clients)
-    //console.log('lookup_by_client_company_id', state.lookup_by_client_company_id)
-    //console.log(state.lookup_by_client_company_id)
+
     // @ts-ignore
     active_clients.forEach(function(client) {
-      //console.log(client)
       client_projects = []
       // @ts-ignore
       // @ts-ignore
       let client_project_keys = state.lookup_by_client_company_id[client.client_company_id]
       if (!client_project_keys) {
-        // console.log('project not found', client)
         return
       }
       // @ts-ignore
       client_project_keys.forEach(function(key) {
-        //console.log(project_id)
-        /*console.log(self.$store.state.projects.lookup[project_id])
-                console.log(self.$store.state.projects.projects[self.$store.state.projects.lookup[project_id]])*/
         if (!state.projects[key]) {
           return
         }
         let project = state.projects[key]
-        //console.log(project.status)
+
         if (project.status === 'open') {
           client_projects.push(project)
         }
@@ -65,7 +58,6 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       )
     })
 
-    // console.log("PROJECTS", projects)
     if (new_projects.length > 0) {
       new_projects.forEach(function(proj) {
         // @ts-ignore
@@ -210,27 +202,24 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   },
   openprojects: (state, _getters, rootState, rootGetters) => (search: any, sort: any) => {
     let isAdmin = rootGetters['settings/isAdmin']
-    console.log('isAdmin', isAdmin)
+
     let projects = state.projects.filter(function(project) {
-      //console.log('openprojects')
       if (project.status != 'open') {
         return false
       }
-      //console.log('project', project)
+
       let client = rootGetters['clients/getByClientCompanyId'](project.client_company_id)
       if (client && client.status != 'active') {
         return false
       }
 
-      //console.log('project', rootGetters['settings/isAdmin'], project.owner_company_id, rootState.settings.current_company.id, project.users);
       //If !admin && !project_user return false
       if (
         !rootGetters['settings/isAdmin'] &&
         !project.users.find(function(company_user) {
           if (company_user.id == rootState.settings.current_company_user_id) {
-            //console.log(project.name);
           }
-          //console.log(company_user.id, rootState.settings.current_company_user.id)
+
           return company_user.id == rootState.settings.current_company_user_id
         })
       ) {
@@ -256,7 +245,6 @@ export const getters: GetterTree<IModuleState, IRootState> = {
           }
         } else {
           //TODO uncomment to find projects without a client
-          //console.log(project.name, project.client_company_id, rootState.clients.lookup_by_client_id[project.client_company_id])
           //return false;
         }
       }
@@ -266,9 +254,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   },
   openprojects2: (state, _getters, rootState, rootGetters) => (search: any, sort: any) => {
     let isAdmin = rootGetters['settings/isAdmin']
-    console.log('isAdmin', isAdmin)
+
     let projects = state.projects.filter(function(project) {
-      //console.log('openprojects')
       if (project.status != 'open') {
         return false
       }
@@ -277,15 +264,13 @@ export const getters: GetterTree<IModuleState, IRootState> = {
         return false
       }
 
-      //console.log('project', rootGetters['settings/isAdmin'], project.owner_company_id, rootState.settings.current_company.id, project.users);
       //If !admin && !project_user return false
       if (
         !rootGetters['settings/isAdmin'] &&
         !project.users.find(function(company_user) {
           if (company_user.id == rootState.settings.current_company_user_id) {
-            //console.log(project.name);
           }
-          //console.log(company_user.id, rootState.settings.current_company_user.id)
+
           return company_user.id == rootState.settings.current_company_user_id
         })
       ) {
@@ -311,14 +296,12 @@ export const getters: GetterTree<IModuleState, IRootState> = {
           }
         } else {
           //TODO uncomment to find projects without a client
-          //console.log(project.name, project.client_company_id, rootState.clients.lookup_by_client_id[project.client_company_id])
           //return false;
         }
       }
       return true
     }) //.sort(Vue.projectSort)
 
-    //console.log('projects', projects)
     return projects
   }
 }

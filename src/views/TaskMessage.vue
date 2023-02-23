@@ -94,7 +94,6 @@ export default {
         container.scrollTop = container.scrollHeight + 120
       }, 100)
 
-      console.log('computed')
       return messages.reverse()
     },
     // getMessages() {
@@ -120,7 +119,6 @@ export default {
       if (notificationPermission == 'granted') {
         this.enabledNotification = true
       }
-      console.log(notificationPermission)
     },
     handleEnter(e) {
       if (e.ctrlKey) {
@@ -176,15 +174,11 @@ export default {
       }
     },
     afterComplete(response) {
-      console.log('complete')
       this.showDropzone = false
       this.$refs.chatDropzone.removeAllFiles()
     },
-    cancelUpload(file) {
-      console.log('cancel')
-    },
+    cancelUpload(file) {},
     removedFile(file, error, xhr) {
-      console.log('remove')
       if (this.$refs.chatDropzone.getActiveFiles().length == 0) {
         this.showDropzone = false
       }
@@ -252,7 +246,6 @@ export default {
         // .then(res => {
 
         // })
-        console.log(task_message.task_messages)
         this.s_message = ''
         return
         task = this.$store.getters['tasks/getById'](task_id)

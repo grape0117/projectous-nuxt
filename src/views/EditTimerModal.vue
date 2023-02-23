@@ -318,10 +318,14 @@ export default {
     },
     client_rate_value: function() {
       let timerInfo = this.$store.state.timers.timers.filter(({ id }) => id == this.timer.id)[0]
-      if (timerInfo.invoice_id) {
-        return timerInfo.client_rate
+      if (timerInfo) {
+        if (timerInfo.invoice_id) {
+          return timerInfo.client_rate
+        }
+        return timerInfo.default_client_rate != timerInfo.client_rate ? timerInfo.client_rate : ''
+      } else {
+        return 0
       }
-      return timerInfo.default_client_rate != timerInfo.client_rate ? timerInfo.client_rate : ''
     }
   },
   mounted: function() {
@@ -345,7 +349,6 @@ export default {
       const timer_url = `${window.location.origin}?timer_id=${this.timer.id}`
       this.timer_link = timer_url
       const resp = await this.$http().get('/timer/' + this.timer.id + '/history')
-      console.log(resp.history)
       resp.history.sort(function(a, b) {
         return b.id - a.id
       })
@@ -482,7 +485,7 @@ export default {
       //   pop: false,
       //   push: true
       // })
-      // console.log(timer_project.id)
+
       const timer_project = this.timerProject()
       this.$store.commit('settings/setCurrentEditProject', cloneDeep(timer_project))
       this.$store.commit('settings/setCurrentEditProjectStatus', 'edit')
@@ -495,7 +498,6 @@ export default {
       //   push: true
       // })
       const timer_client = this.timerClient()
-      console.log(timer_client)
       this.$store.dispatch('clients/editClient', timer_client.id)
       this.$store.commit('settings/setCheckModalStack', true)
     },
@@ -510,7 +512,6 @@ export default {
       return this.timer.project_id === project_id
     },
     isTimerUser: function(user_id) {
-      console.log(this.timer.user_id, user_id)
       return this.timer.user_id === user_id
     },
     checkInputValue: function(input) {

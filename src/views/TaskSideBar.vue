@@ -63,9 +63,7 @@ export default {
       return this.$store.state.tasks.chats
     }
   },
-  mounted() {
-    console.log('mounted')
-  },
+  mounted() {},
   methods: {
     async getChats() {
       this.$store.dispatch('tasks/updateChats')

@@ -62,7 +62,6 @@ export default {
       }
     },
     doStuff: function(type, hour, minute) {
-      console.log('doing stuff ' + type + ' ' + hour + ' - ' + minute)
       if (type == 'start') {
         this.$emit('setstarttime', { hour: hour, minute: minute })
         //this.doStartStuff(hour * 60 + minute);
@@ -77,13 +76,11 @@ export default {
       //this.report_at = moment(date + time);
     },
     isAvailable: function(hour, minute) {
-      //console.log(this.type+' availability check')
       return true //TODO: right now having this in place breaks the slider if you choose a start time past an end time for example
       if (this.type === 'start') {
         //Block out times later than compareto
-        //console.log(this.compareto);
+
         if (this.compareto) {
-          //console.log(hour + ' * 60 + ' + minute + ' >= ' + this.compareto);
           if (hour * 3600 + minute * 60 >= this.compareto) {
             return false
           }
@@ -91,7 +88,7 @@ export default {
       } else {
         //type == 'end'
         //Block out times earlier than compareto
-        //console.log(this.compareto);
+
         if (hour * 3600 + minute * 60 <= this.compareto) {
           return false
         }

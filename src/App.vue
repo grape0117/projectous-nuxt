@@ -147,14 +147,12 @@ export default {
       if (typeof this.bgStyle === 'object') {
         return `url(${this.bgStyle.image})`
       }
-      console.log('HERE')
       return this.bgStyle
     },
     current_edit_task: function() {
       return this.$store.getters['settings/get_current_edit_task']
     },
     current_edit_project: function() {
-      console.log('cureent edit projec')
       return this.$store.getters['settings/get_current_edit_project']
     }
     // getBackground() {
@@ -311,9 +309,9 @@ export default {
 
     SocketioService.setupSocketConnection()
     SocketioService.socketListener('chat-message', e => {
-      console.log('-----Called getNewData!----' + e.data.item_type, e.data)
       let body = ''
       let title = ''
+      console.log('socket data', e.data)
       switch (e.data.item_type) {
         case 'timelog':
           title = ''
@@ -387,7 +385,7 @@ export default {
   },
   methods: {
     // getNewData() {
-    //   console.log('-getNewData--app.vue---')
+
     //   this.$http()
     //     .get('/get-new-data/' + window.sessionStorage.last_poll_timestamp)
     //     .then(response => {
@@ -400,9 +398,7 @@ export default {
     async getAppDataFromApi(updated_at) {
       try {
         return await this.$http().get('/test-tasks/' + updated_at)
-      } catch (e) {
-        console.log(e)
-      }
+      } catch (e) {}
     },
     async getAppData() {
       this.$store.state.loading = false //Right now it's just blocking everything
@@ -418,7 +414,6 @@ export default {
       let data = {}
       //TODO: find out why adding a table breaks
       if (false && indexDBExists && dataValidation) {
-        console.log('----------------loading from IDB!------------------')
         for (let propertyName of modulesNamesList) {
           const allEntities = await idbGetAll(propertyName)
           if (propertyName === 'properties') {
@@ -430,7 +425,6 @@ export default {
           }
         }
       } else {
-        console.log('----------------loading from API (/test-tasks) !------------------')
         data = await this.storeDataInIndexedDb()
       }
       this.$store.dispatch('PROCESS_INCOMING_DATA', data)
@@ -447,7 +441,6 @@ export default {
       setInterval(this.dateInterval, 1800000)
     },
     async fetchData() {
-      console.log(window.sessionStorage.last_poll_timestamp, 'poll')
       if (!window.sessionStorage.last_poll_timestamp) return
       const appData = await this.getAppDataFromApi(window.sessionStorage.last_poll_timestamp)
       this.$store.dispatch('PROCESS_INCOMING_DATA', appData)
@@ -467,7 +460,6 @@ export default {
     },
     async storeDataInIndexedDb() {
       const appData = await this.getAppDataFromApi(0)
-      console.log('appData', appData)
       if (appData) {
         document.cookie = `company_user_id=${appData.current_company_user_id}`
       }
@@ -480,10 +472,10 @@ export default {
               }
               await idbKeyval.set(entity.id, entity, key)
             } catch (e) {
-              console.error('---------------------')
-              console.error(e)
-              console.error(entity)
-              console.error('---------------------')
+              // console.error('---------------------')
+              // console.error(e)
+              // console.error(entity)
+              // console.error('---------------------')
             }
           })
         } else {
@@ -495,10 +487,8 @@ export default {
     async clear_idb() {
       let oRequest = indexedDB.open('projectous-data')
       oRequest.onsuccess = function() {
-        console.log('clearing', modulesNamesList)
         let db = oRequest.result
         for (module of modulesNamesList) {
-          console.log(module)
           let tx = db.transaction(module, 'readwrite')
           let st = tx.objectStore(module)
           st.clear(module)
@@ -506,7 +496,6 @@ export default {
       }
     },
     async reload() {
-      // console.log('reloading')
       // this.$store.state.loading = true
       // this.clear_idb()
       // let data = {}
@@ -523,7 +512,6 @@ export default {
         return
       }
       this.scrolling = true
-      console.log(this.scrolling, this.$refs['wrapper1'].scrollLeft)
       this.$refs['wrapper2'].scrollLeft = this.$refs['wrapper1'].scrollLeft
     },
     handleScroll2: function() {
@@ -532,7 +520,6 @@ export default {
         return
       }
       this.scrolling = true
-      console.log(this.scrolling, this.$refs['wrapper2'].scrollLeft)
       this.$refs['wrapper1'].scrollLeft = this.$refs['wrapper2'].scrollLeft
     }
   }

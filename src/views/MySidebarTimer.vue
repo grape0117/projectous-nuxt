@@ -37,7 +37,6 @@ export default {
       return totalCount
     },
     timers: function() {
-      console.log('trigger!')
       return this.$store.state.timers.timers
     },
     projects: function() {

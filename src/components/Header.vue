@@ -438,7 +438,6 @@ export default Vue.extend({
       this.toggles.paint = false
     },
     setReload(state) {
-      console.log(state)
       this.isShowReload = state
     },
     logout() {
@@ -510,7 +509,6 @@ export default Vue.extend({
       let user_name = null
       let task_title = null
       let project_title = null
-      console.log('acronym_matchs', acronym_matchs)
       for (let i = 0; i < acronym_matchs.length; i++) {
         const acronym_match = acronym_matchs[i]
 
@@ -520,7 +518,6 @@ export default Vue.extend({
       }
 
       if (project_title) {
-        console.log('project_title', project_title)
         project_captured = true
         const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === project_title)
         if (projects_by_acronym.length === 1) {
@@ -533,7 +530,6 @@ export default Vue.extend({
 
       if (user_name) {
         user_name_captured = true
-        console.log('user_name', user_name)
         this.new_user_name = user_name
         let new_company_user = this.$store.getters['company_users/getByAlias'](user_name)
         if (new_company_user) {
@@ -544,7 +540,6 @@ export default Vue.extend({
       }
       if (task_title) {
         title_captured = true
-        console.log('title', task_title)
       }
       if (project_captured || title_captured || user_name_captured) {
         this.showResult = true

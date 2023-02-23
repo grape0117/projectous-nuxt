@@ -39,7 +39,6 @@ export class AxiosHttp extends BaseHttp implements IHttp {
       return data
     } catch (e) {
       Store.state.totalActiveRequests--
-      console.log(e)
       return
     }
   }
@@ -82,7 +81,6 @@ export class AxiosHttp extends BaseHttp implements IHttp {
   }
   public async put(url: string, id: number | string, data: any) {
     Store.state.totalActiveRequests++
-    console.log('put', data)
     if (this.offlineMode) {
       this.notifyUser(this.offlineNotifyUserMessage)
       Store.state.totalActiveRequests--

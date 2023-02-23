@@ -12,7 +12,6 @@ export const getters: GetterTree<IListsState, IRootState> = {
         list.group = list.title
         return list
       })
-    console.log('LISTS@@@', userLists, state.lists, company_user_id, state.generalLists, undraggableListsNames)
     return [...generalLists, ...userLists].map(list => {
       if (undraggableListsNames.includes(list.group)) {
         list.group = 'undraggable'

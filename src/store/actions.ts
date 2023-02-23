@@ -28,8 +28,6 @@ export const actions: ActionTree<IRootState, IRootState> = {
     return result
   },
   UPSERT({ dispatch, commit, state }, { module, entity }: any) {
-    console.log('UPSERT ACTION', module, entity)
-
     if (!state[module]) {
       console.error('Module ' + module + ' not found.')
       return
@@ -37,7 +35,6 @@ export const actions: ActionTree<IRootState, IRootState> = {
 
     // @ts-ignore
     let key = state[module].lookup[entity.id]
-    console.log('key', key, state[module][module][key])
 
     if (state[module][module][key]) {
       dispatch('UPDATE', { module, entity })
@@ -46,7 +43,6 @@ export const actions: ActionTree<IRootState, IRootState> = {
     }
   },
   UPDATE({ commit, dispatch }, { module, entity }) {
-    console.log('update entity', entity)
     commit('UPDATE', { module, entity })
     // @ts-ignore
     this._vm
@@ -87,7 +83,6 @@ export const actions: ActionTree<IRootState, IRootState> = {
    * Dispatch cascade deletes, commit delete then send delete to backend
    */
   DELETE({ dispatch, commit }, { module, entity }) {
-    console.log('delete')
     // @ts-ignore
     if (this._actions[module + '/CASCADE_DELETE']) {
       // @ts-ignore
@@ -100,7 +95,6 @@ export const actions: ActionTree<IRootState, IRootState> = {
     this._vm.$http().delete('/' + module + '/', entity.id)
   },
   PROCESS_INCOMING_DATA({ commit, rootState }, data) {
-    // console.log('PROCESS_INCOMING_DATA', data)
     // @ts-ignore
     for (const module in data) {
       if (rootState[module]) {

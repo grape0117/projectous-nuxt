@@ -23,8 +23,6 @@ function creteDefaultTaskUser(task_id: number): ITaskUser {
 
 export const actions: ActionTree<IModuleState, IRootState> = {
   async createUserTask({ commit }, { taskUser, task, ids_of_taskUsers_to_shift_up }: any) {
-    console.log('********** ACTION *********')
-    console.log(ids_of_taskUsers_to_shift_up)
     //TODO: Vue.nextTick
     //commit taskUser
     commit('ADD_ONE', { module: 'task_users', entity: taskUser }, { root: true })

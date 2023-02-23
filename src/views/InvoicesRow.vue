@@ -100,7 +100,6 @@ export default {
     },
     applyPayment() {
       EventBus.$emit('apply-payment', this.invoice)
-      console.log(this.invoice)
     },
     async deleteInvoice() {
       if (confirm('Are you sure you want to delete invoice ' + this.invoice.invoice_id + '?')) {

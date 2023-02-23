@@ -96,10 +96,8 @@ export const settings = {
       return state.current_company.id === 1
     },
     isAdmin(state: any, getters: any, rootState: any, rootGetters: any) {
-      console.log('isadmin')
       const current_company_user = rootGetters['company_users/getById'](state.current_company_user_id)
       if (!current_company_user) {
-        console.log('no current company user', state.current_company_user_id)
         return false
       }
       return current_company_user.user_role === 'admin' // TODO: add more roles

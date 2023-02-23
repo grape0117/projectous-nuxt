@@ -61,7 +61,6 @@ export default {
   },
   mounted() {
     //if(this.task.users){
-    //console.log(this.task.users);
     //}
   },
   computed: {
@@ -71,8 +70,6 @@ export default {
   },
   methods: {
     moveStatusForward() {
-      console.log(this.task.status)
-      console.log(this.task)
       switch (this.task.status) {
         case 'open':
           if (this.isAdmin()) {
@@ -126,17 +123,14 @@ export default {
       })
       return task_users
     },
-    checkUser(user) {
-      //console.log(user);
-    },
+    checkUser(user) {},
     toggle_notes() {
       this.show_notes = this.show_notes ? false : true
     },
     due_date() {
       if (!this.task.due_date) return
       let date = new Date(this.task.due_date)
-      //console.log(date);
-      //console.log(this.task.due_date);
+
       if (date.getSeconds() + date.getMinutes() + date.getHours()) {
       } else {
         return date.getMonth() + 1 + '/' + date.getDate() + '/' + date.getFullYear()
@@ -197,10 +191,7 @@ export default {
       })
 
       ev.preventDefault()
-      console.log('scripts/drop()')
       let data = ev.dataTransfer.getData('text')
-      console.log('dataTransfer.getData("text")')
-      console.log(data)
       /**
        * Figure out position of drop. Compare to current position. Call ajax. Update store.
        */
@@ -225,19 +216,19 @@ export default {
 
                         if(project)
                         if(project.owner_company_id != self.current_company.id){
-                            //console.log('not matching company')
-                            //console.log(self.task.title)
-                            //console.log(project.owner_company_id+' != '+self.current_company.id)
+                          
+                          
+                          
                             var company_users = self.$store.state.company_users.company_users.filter(function(company_user){
                                 //if company_user.user_type == 'company && company_user.user_id == self.current_company.id
                                 //if company_user.user_type == 'user' && company_user.company_id == self.current_company.id
                                 return company_user.user_id == self.current_company.id;
                             });
                             //Go through task.task_users to see if assigned to anyone
-                            //console.log(self.task.users);
+                          
                             if(!self.task.users.filter(function(task_user){
                                 return company_users.find(function(company_user){
-                                    //console.log(company_user.id+' == '+task_user.company_user_id)
+                                  
                                     return company_user.id == task_user.company_user_id;
                                 })
                             })){
@@ -295,7 +286,6 @@ export default {
       this.$store.dispatch('tasks/markNotToday', task_id)
     },
     saveTaskTitletask_id() {
-      console.log('save task title')
       this.$store.dispatch('tasks/saveTaskTitle', { id: task_id, title: $('.task-' + task_id).html() })
     },
     taskProjectName(project_id) {
@@ -310,11 +300,7 @@ export default {
     },
     createAfter(e) {
       e.preventDefault()
-      console.log(e)
-      console.log(e.target)
-      console.log(e.target.dataset)
       labeledConsole('dataset.order', e.target.dataset.order)
-      console.log('createAfter')
 
       /*
         Get current order

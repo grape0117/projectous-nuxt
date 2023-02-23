@@ -30,19 +30,6 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.config.productionTip = false
 
-import Echo from 'laravel-echo'
-// @ts-ignore
-if (typeof io !== 'undefined') {
-  // @ts-ignore
-  window.Echo = new Echo({
-    broadcaster: 'socket.io',
-    host: process.env.VUE_APP_WEB_SOCKET_SERVER_URL + ':' + process.env.VUE_APP_WEB_SOCKET_SERVER_PORT
-  })
-} else {
-  // alert('Socket.io not started')
-  console.error('Socket.io not started?')
-}
-
 export let app = new Vue({
   router,
   store,

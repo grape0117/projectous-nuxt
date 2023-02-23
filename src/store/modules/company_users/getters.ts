@@ -42,7 +42,6 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   getByAlias: state => (alias: string) => {
     //TODO: @me
     return state.company_users.find((user: ICompanyUser) => {
-      console.log(user.aliases, '==', alias, user.aliases && user.aliases.trim() == alias.trim())
       return user.aliases && user.aliases.trim() == alias.trim() //TODO: trim and split by comma?
     })
   }
