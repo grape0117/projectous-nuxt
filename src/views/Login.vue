@@ -45,54 +45,10 @@ export default class Login extends Vue {
 
     if (auth_token) {
       document.cookie = 'auth_token=' + auth_token
-
       try {
         if (user_id) {
           this.$store.state.settings.logged_in = true
-
           document.cookie = 'user_id=' + user_id
-          // @ts-ignore
-          window.Echo.leave('addentryevent_channel_' + user_id)
-          let that = this
-          // @ts-ignore
-          window.Echo.channel('addentryevent_channel_' + user_id).listen('.AddEntryEvent', evnt => {
-            // @ts-ignore
-            let body = ''
-            let title = ''
-            let data = evnt.data
-            switch (data.data.item_type) {
-              case 'timelog':
-                title = ''
-                body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
-                break
-              case 'tasks':
-                title = ''
-                body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
-                break
-              case 'task_messages':
-                title = data.data.value.taskname
-                body = JSON.stringify(data.data.value.sender + ' : ' + data.data.value.message)
-                break
-            }
-            if (body)
-              // @ts-ignore
-              that.$notification.show(
-                title,
-                {
-                  body: body
-                },
-
-                {
-                  onerror: function() {},
-                  onclick: function() {},
-                  onclose: function() {},
-                  onshow: function() {}
-                }
-              )
-
-            //'item_id = ' + e.item_id + ' & from_user_id = ' + e.from_user_id + ' & to_user_id = ' + e.to_user_id + ' & item_type = ' + e.item_type
-            that.$store.dispatch('GET_NEW_DATA')
-          })
         }
       } catch (e) {
         console.error(e, 'Unable to create socket')

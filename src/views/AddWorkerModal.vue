@@ -59,7 +59,7 @@ export default {
         .post('/add-worker', { name: this.name, user_role: this.user_role, email: this.email })
         .then(response => {
           //TODO: add to workers?
-          this.$store.dispatch('ADD_MANY', { module: 'company_users', entities: [response.company_user] }, { root: true })
+          this.$store.commit('company_users/updateUser', response.company_user)
           this.$store.dispatch('settings/closeModal', {
             modal: 'add-worker',
             object: null,

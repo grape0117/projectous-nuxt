@@ -364,6 +364,10 @@ export default {
           let clientInfo = JSON.parse(e.data.value)
           that.$store.commit('clients/updateClient', clientInfo)
           break
+        case 'COMPANY_USER':
+          let userInfo = JSON.parse(e.data.value)
+          that.$store.commit('company_users/updateUser', userInfo)
+          break
       }
       if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) var notification = new Notification(title, { body: body, icon: 'img' })
 
