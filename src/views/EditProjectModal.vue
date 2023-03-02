@@ -82,7 +82,8 @@ export default {
     return {
       changed_project_users: [],
       project: {},
-      buttonStyle: ''
+      buttonStyle: '',
+      default_client_rate: 0
     }
   },
   created() {
@@ -97,14 +98,6 @@ export default {
     },
     edit_project() {
       return this.$store.state.settings.current_edit_project
-    },
-    default_client_rate() {
-      if (this.project.client_company_id) {
-        let client = this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
-        return client.default_client_rate
-      } else {
-        return 0
-      }
     },
     current_edit_project_status() {
       return this.$store.state.settings.current_edit_project_status
@@ -161,6 +154,14 @@ export default {
           push: true
         })
         this.$store.dispatch('clients/createClient')
+      }
+    },
+    'project.client_company_id': function() {
+      if (this.project.client_company_id) {
+        let client = this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
+        this.default_client_rate = client.default_client_rate
+      } else {
+        this.default_client_rate = 0
       }
     }
   },
