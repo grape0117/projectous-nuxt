@@ -16,7 +16,7 @@
         </div>
         <div class="form-group col-sm-12">
           <label class="control-label white-text" for="projectAcronymEdit">Url: </label>
-          <input id="projectAcronymEdit" class="form-control" type="text" name="url" placeholder="Project Acronym" v-model="project.url" />
+          <input id="projectAcronymEdit" class="form-control" type="text" name="url" placeholder="Url" v-model="project.url" />
         </div>
         <div class="form-group col-sm-6">
           <label class="control-label white-text" for="companyClientSelect">Status: </label>
