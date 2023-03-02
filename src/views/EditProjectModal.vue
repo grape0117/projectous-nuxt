@@ -42,6 +42,10 @@
           <b-badge variant="light" class="mr-1 mt-2" style="cursor: pointer;" @click="editClient()">Edit Client</b-badge>
           <b-badge variant="light" class="mr-1 mt-2" style="cursor: pointer;" @click="createClient()">Add Client</b-badge>
         </div>
+        <div class="form-group col-sm-12">
+          <label class="control-label white-text" for="clientRate">Client Rate: </label>
+          <input id="clientRate" class="form-control" name="client_rate" placeholder="Client Rate" v-model="default_client_rate" />
+        </div>
         <div class="form-group col-sm-6">
           <label class="control-label white-text" for="projectDueDate">Due Date: </label>
           <input id="projectDueDate" class="form-control" type="date" name="due_at" placeholder="Due Date" v-model="due_date" />
@@ -93,6 +97,14 @@ export default {
     },
     edit_project() {
       return this.$store.state.settings.current_edit_project
+    },
+    default_client_rate() {
+      if (this.project.client_company_id) {
+        let client = this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
+        return client.default_client_rate
+      } else {
+        return 0
+      }
     },
     current_edit_project_status() {
       return this.$store.state.settings.current_edit_project_status
