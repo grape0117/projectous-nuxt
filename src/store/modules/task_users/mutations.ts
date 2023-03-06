@@ -27,6 +27,14 @@ export const mutations: MutationTree<IModuleState> = {
       }
     })
   },
+
+  deleteByTaskIdAndCompanyUserId(state: IModuleState, entity) {
+    let task_user = state.task_users.filter(user => user.company_user_id == entity.company_user_id && user.task_id == entity.task_id)
+    if (task_user.length > 0) {
+      // @ts-ignore
+      this.commit('DELETE', { module: 'task_users', entity: task_user[0] }, { root: true })
+    }
+  },
   updateTaskUsersSortOrders(state: IModuleState, ids: number[]) {
     ids.forEach((id, index) => {
       // @ts-ignore

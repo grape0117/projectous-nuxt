@@ -360,6 +360,16 @@ export default {
             that.$store.dispatch('task_users/update', JSON.parse(e.data.task_user))
           }
           break
+        case 'DELETE_TASK_USER':
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            let taskUserInfo = JSON.parse(e.data.task_user)
+            const task_progress_info = {
+              task_id: taskUserInfo.task_id,
+              company_user_id: taskUserInfo.company_user_id
+            }
+            that.$store.commit('task_users/deleteByTaskIdAndCompanyUserId', task_progress_info)
+          }
+          break
         case 'clients':
           let clientInfo = JSON.parse(e.data.value)
           that.$store.commit('clients/updateClient', clientInfo)

@@ -121,11 +121,12 @@ export default {
     },
     my_tasks() {
       this.my_high_count = this.$store.state.tasks.my_tasks.filter(({ priority }) => priority == 'high').length
+      const current_user_id = this.$store.state.settings.current_company_user_id
       if (this.is_owner) {
-        const current_user_id = this.$store.state.settings.current_company_user_id
         return this.$store.state.tasks.tasks.filter(({ owner }) => owner == current_user_id)
       }
       let my_tasks = this.$store.state.tasks.my_tasks
+      // let my_tasks = this.$store.getters['tasks/getByCompanyUserId'](current_user_id)
       let self = this
       my_tasks = my_tasks.sort((a, b) => {
         if (a.priority !== b.priority) {

@@ -319,16 +319,8 @@ export default {
       }
       const result = await this.$http().post(`/tasks-progress/del/${this.selected_task}`, task_progress_info)
       if (result.status === 'success') {
-        const task_index = this.tasks.findIndex(task => task.id === this.selected_task)
-        const users = this.tasks[task_index].users.filter(user => user.company_user_id !== this.selected_user.id)
-        this.tasks[task_index].users = users
-        this.task_list = this.tasks
+        this.$store.commit('task_users/deleteByTaskIdAndCompanyUserId', task_progress_info)
         this.$bvModal.hide('update-status-modal')
-        this.selected_task = null
-        this.selected_user = null
-        this.selected_step = null
-        this.task_notes = null
-        this.user_rate = ''
       }
     },
 
