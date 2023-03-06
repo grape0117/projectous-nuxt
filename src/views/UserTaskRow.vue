@@ -1,7 +1,7 @@
 <template>
   <div class="col-md-12  user-task-row">
     <div class="card" :style="{ margin: hasMargin ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white', opacity: isCompletedTask ? 0.5 : 1 }">
-      <div class="card-body" style="padding: 10px 20px 10px 25px">
+      <div class="card-body" :style="{ padding: '10px 20px 10px 25px', border: isNewTask ? 'white dashed 3px' : 'none' }">
         <div class="row" style="padding: 0px;">
           <div class="col-md-9" style="align-self:center">
             <h6 class="card-text">
@@ -108,6 +108,16 @@ export default {
       }
       const task = tasks.filter(task => task.id == this.task.id)[0]
       return task && task.hasMargin
+    },
+    isNewTask() {
+      const timezone = moment.tz.guess()
+      const timezone_date = moment()
+        .tz(timezone)
+        .format('YYYY-MM-DD')
+      const diff = moment.duration(moment(this.task.created_at).diff(moment(timezone_date)))
+      const days = diff.asDays()
+
+      return Math.abs(days) < 2
     },
     is_owner() {
       const current_user_id = this.$store.state.settings.current_company_user_id
