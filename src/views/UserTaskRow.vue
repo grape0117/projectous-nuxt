@@ -142,7 +142,7 @@ export default {
     isMyTask() {
       const current_user_id = this.$store.state.settings.current_company_user_id
       const user_info = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: this.task.id, company_user_id: current_user_id })
-      return user_info.length > 0
+      return user_info.length > 0 && user_info[0].role === 'assigned'
     },
     task_users: {
       get: function() {
