@@ -487,10 +487,12 @@ export default Vue.extend({
         priority: this.new_priority,
         due_date: this.new_task_due_date
       })
-      EventBus.$emit('update', { company_user_id: this.new_company_user_id })
+      EventBus.$emit('update', { company_user_id: this.new_company_user_id, task_id: newTask.id })
       this.new_task_title = ''
       this.new_task_project_id = null
-      this.new_company_user_id = null
+      setTimeout(() => {
+        this.new_company_user_id = null
+      }, 100)
     },
     creatingTask: _.debounce(function(e) {
       let notesWithTaskTile = e.target.value

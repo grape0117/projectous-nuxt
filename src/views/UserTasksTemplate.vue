@@ -107,8 +107,9 @@ export default {
     'tasks-tab': TasksTab
   },
   mounted() {
-    EventBus.$on('update', ({ company_user_id }) => {
-      this.setTab(company_user_id)
+    EventBus.$on('update', async ({ company_user_id, task_id }) => {
+      await this.setTab(company_user_id)
+      document.getElementById(`task_${task_id}`).scrollIntoView()
     })
   },
   computed: {
@@ -437,12 +438,12 @@ export default {
       this.current_company_user_id = company_user_id
       this.setTab(company_user_id)
     },
-    setTab(tab) {
+    async setTab(tab) {
       this.project_list = []
       this.project_filter = []
       this.tab = tab
       this.current_company_user_id = tab
-      this.getData()
+      const data = await this.getData()
     },
     tabClass(tab) {
       if (this.tab === tab) {
@@ -541,9 +542,8 @@ export default {
             count: count_of_heigh
           })
         }
-        this.$store.dispatch('PROCESS_INCOMING_DATA', response)
+        const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', response)
       }
-      return
     },
     async updateData() {
       // const result = await this.getData();
