@@ -368,6 +368,9 @@ export default {
               company_user_id: taskUserInfo.company_user_id
             }
             that.$store.commit('task_users/deleteByTaskIdAndCompanyUserId', task_progress_info)
+            if (taskUserInfo.user.id == user_id) {
+              that.$store.commit('tasks/removeMyTask', taskUserInfo.task_id) // for regular users
+            }
           }
           break
         case 'clients':

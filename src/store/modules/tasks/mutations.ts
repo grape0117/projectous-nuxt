@@ -110,6 +110,9 @@ export const mutations: MutationTree<IModuleState> = {
   removeTodayTask(state: IModuleState, task_id) {
     state.today_tasks = state.today_tasks.filter(({ id }) => id !== task_id)
   },
+  removeMyTask(state: IModuleState, task_id) {
+    state.my_tasks = state.my_tasks.filter(({ id }) => id !== task_id)
+  },
   updateTasksSortOrders(state: IModuleState, ids: number[]) {
     ids.forEach((id, index) => {
       //TODO: clear out all but UPDATE_ATTRIBUTE
