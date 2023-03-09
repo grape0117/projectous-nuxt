@@ -146,6 +146,9 @@ export const actions: ActionTree<IRootState, IRootState> = {
           case 'all_tasks':
             rootState.tasks.all_tasks = data[module]
             break
+          case 'other_timers':
+            rootState.timers.other_timers = data[module]
+            break
           case 'last_poll_timestamp':
             window.sessionStorage.last_poll_timestamp = data[module]
             break

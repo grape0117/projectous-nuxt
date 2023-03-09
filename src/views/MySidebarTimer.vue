@@ -21,6 +21,7 @@ export default {
   components: {
     SidebarTimer: () => import('./SidebarTimer.vue')
   },
+  props: ['timer_filter'],
   created() {
     this.$watch('timerEmptyFields', async count => {
       await EventBus.$emit('timerEmptyFields', this.timerEmptyFields)
@@ -38,6 +39,9 @@ export default {
     },
     timers: function() {
       return this.$store.state.timers.timers
+    },
+    other_timers: function() {
+      return this.$store.state.timers.other_timers
     },
     projects: function() {
       return this.$store.state.projects.projects
@@ -104,41 +108,25 @@ export default {
             }
           })
       }
-      let timers = this.timers
-        .filter(timer => timer.company_user_id === this.$store.state.settings.current_company_user_id)
+      let timers = []
+      if (this.timer_filter == 'my_timer') {
+        timers = this.timers.filter(timer => timer.company_user_id === this.$store.state.settings.current_company_user_id)
+      } else {
+        timers = this.other_timers.filter(timer => timer.company_user_id !== this.$store.state.settings.current_company_user_id)
+      }
 
-        // .filter(timer => {
-        //   let getToday = moment().format('YYYY-MM-DD HH:mm:ss')
-        //   let getYesterday = moment()
-        //     .subtract(1, 'day')
-        //     .format('YYYY-MM-DD HH:mm:ss')
+      timers = timers.sort(function(a, b) {
+        if (a.status === 'running') {
+          return -1
+        }
+        let aDate = new Date(a.status_changed_at)
+        let bDate = new Date(b.status_changed_at)
 
-        //   let date = datetimeToJS(timer.status_changed_at)
-        //     .toString()
-        //     .split(' ')
-        //   let today = datetimeToJS(getToday)
-        //     .toString()
-        //     .split(' ')
-        //   let yesterday = datetimeToJS(getYesterday)
-        //     .toString()
-        //     .split(' ')
+        if (aDate > bDate) return -1
+        if (aDate < bDate) return 1
 
-        //   if ((date[0] === yesterday[0] && date[1] === yesterday[1] && date[2] === yesterday[2] && date[3] === yesterday[3]) || (date[0] === today[0] && date[1] === today[1] && date[2] === today[2] && date[3] === today[3])) {
-        //     return true
-        //   }
-        // })
-        .sort(function(a, b) {
-          if (a.status === 'running') {
-            return -1
-          }
-          let aDate = new Date(a.status_changed_at)
-          let bDate = new Date(b.status_changed_at)
-
-          if (aDate > bDate) return -1
-          if (aDate < bDate) return 1
-
-          return 0
-        })
+        return 0
+      })
       return timers
     }
   }

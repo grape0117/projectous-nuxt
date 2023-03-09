@@ -1,5 +1,5 @@
 <template>
-  <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" :style="{ 'background-color': status_running ? default_theme_color : null }" v-bind:data-restarted="timer.restart_at">
+  <li v-if="isCurrentUser() || isAdmin" class="timer-row-template sidebar-timer" :style="{ 'background-color': status_running ? default_theme_color : null }" v-bind:data-restarted="timer.restart_at">
     <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
@@ -74,6 +74,11 @@ export default {
     }
   },
   computed: {
+    isAdmin() {
+      const temp_is_admin = this.$store.getters['settings/isAdmin']
+      this.is_admin = temp_is_admin
+      return temp_is_admin
+    },
     status_running() {
       return this.timer.status === 'running'
     },

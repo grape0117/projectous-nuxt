@@ -13,8 +13,17 @@
         <span class="makeBtn" @click="startTimer()">Start New</span>
         <span>{{ total_time_today }}</span>
       </div>
+      <div class="timer-tab">
+        <ul class="nav nav-tabs">
+          <li :class="tabClass('my_timer')" @click="setTab('my_timer')">
+            <a class="nav-link" href="#">My</a>
+          </li>
+          <li :class="tabClass('other_timer')" @click="setTab('other_timer')">
+            <a class="nav-link" href="#">Other</a>
+          </li>
+        </ul>
+      </div>
     </div>
-
     <div class="timer-tray-timer-card">
       <my-sidebar-timer :class="getSidebarClass()" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
     </div>
@@ -37,10 +46,9 @@ export default {
   data: function() {
     return {
       tray_expanded: true,
-      timer_filter: '',
+      timer_filter: 'my_timer',
       keys: [],
       month_stats: 0
-      // profit
     }
   },
   computed: {
@@ -105,6 +113,14 @@ export default {
         return
       }
       start()
+    },
+    async setTab(tab) {
+      this.timer_filter = tab
+    },
+    tabClass(tab) {
+      if (this.timer_filter === tab) {
+        return 'active'
+      }
     }
   },
   mounted() {
@@ -167,5 +183,24 @@ export default {
 }
 .makeBtn:hover {
   background-color: rgba(0, 0, 0, 0.7);
+}
+.timer-tab ul > li {
+  cursor: pointer;
+  font-weight: bold;
+  margin-right: 5px;
+  border-radius: 5px;
+}
+.timer-tab ul > li a {
+  color: white;
+}
+.timer-tab ul > li.active {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+  border-color: rgba(0, 0, 0, 0.7);
+}
+.nav-tabs {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
 }
 </style>
