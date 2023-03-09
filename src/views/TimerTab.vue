@@ -13,7 +13,7 @@
         <span class="makeBtn" @click="startTimer()">Start New</span>
         <span>{{ total_time_today }}</span>
       </div>
-      <div class="timer-tab">
+      <div class="timer-tab" v-if="isAdmin">
         <ul class="nav nav-tabs">
           <li :class="tabClass('my_timer')" @click="setTab('my_timer')">
             <a class="nav-link" href="#">My</a>
@@ -52,6 +52,9 @@ export default {
     }
   },
   computed: {
+    isAdmin() {
+      return this.$store.getters['settings/isAdmin']
+    },
     total_time_today: function() {
       let self = this
       let total_time_today = 0

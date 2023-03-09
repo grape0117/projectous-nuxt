@@ -75,9 +75,7 @@ export default {
   },
   computed: {
     isAdmin() {
-      const temp_is_admin = this.$store.getters['settings/isAdmin']
-      this.is_admin = temp_is_admin
-      return temp_is_admin
+      return this.$store.getters['settings/isAdmin']
     },
     status_running() {
       return this.timer.status === 'running'
