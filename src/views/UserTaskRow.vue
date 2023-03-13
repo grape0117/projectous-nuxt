@@ -1,5 +1,5 @@
 <template>
-  <div class="col-md-12  user-task-row">
+  <div class="col-md-12  user-task-row" v-show="showTimer">
     <div class="card" :id="'task_' + task.id" :style="{ margin: hasMargin ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white', opacity: isCompletedTask ? 0.5 : 1 }">
       <div class="card-body" :style="{ padding: '10px 20px 10px 25px', border: isNewTask ? 'white dashed 3px' : 'none' }">
         <div class="row" style="padding: 0px;">
@@ -159,6 +159,15 @@ export default {
         return this.$store.getters['task_users/getByTaskId'](this.task.id).filter(task_user => task_user.role != 'owner')
       },
       set: function(newValue) {}
+    },
+    showTimer() {
+      const running_timers = this.$store.getters['timers/runningTimers']
+      if (running_timers.length > 0 && running_timers[0].task_id == this.task.id) {
+        return true
+      } else if (running_timers.length > 0 && (!running_timers[0].task_id || running_timers[0].task_id != this.task.id)) {
+        return false
+      }
+      return true
     }
   },
   methods: {
