@@ -108,7 +108,7 @@
         <div class="header_menu" v-if="showMenu">
           <div class="header_menu-item-list">
             <span class="header_menu-item" @click="goTo('profile')">Profile</span>
-            <span class="header_menu-item">Change company</span>
+            <span class="header_menu-item" @click="goTo('change-company')">Change company</span>
             <span class="header_menu-item" @click="logout">Log Out</span>
           </div>
         </div>

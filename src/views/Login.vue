@@ -42,6 +42,7 @@ export default class Login extends Vue {
 
     const auth_token = res ? res.auth_token : null
     const user_id = res ? res.user_id : null
+    const company_id = res ? res.company_id : null
 
     if (auth_token) {
       document.cookie = 'auth_token=' + auth_token
@@ -54,11 +55,16 @@ export default class Login extends Vue {
         console.error(e, 'Unable to create socket')
       }
 
-      const next = sessionStorage.getItem('afterLoginRoute')
-      if (next) {
-        this.$router.push(next)
+      if (company_id) {
+        this.$store.dispatch('settings/setCurrentCompanyId', company_id)
+        const next = sessionStorage.getItem('afterLoginRoute')
+        if (next) {
+          this.$router.push(next)
+        } else {
+          this.$router.push('/user-tasks')
+        }
       } else {
-        this.$router.push('/user-tasks')
+        this.$router.push('/change-company')
       }
     } else {
       alert('Invalid email or password')

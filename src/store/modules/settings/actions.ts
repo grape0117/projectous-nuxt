@@ -137,9 +137,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     let company_user = context.rootState.company_users.company_users.find(({ company_id: companyId, user_id: userId }: ICompanyUser) => companyId == company_id && userId == user_id)
     context.commit('setCurrentCompanyUser', company_user)
   },
-  setCurrentCompany({ commit, dispatch, rootState }, company_id) {
+  async setCurrentCompany({ commit, dispatch, rootState }, company_id) {
     // @ts-ignore
-    const company = this._vm.$http().put('/set-current-company/' + company_id, {}, function() {
+    const company = await this._vm.$http().post('/set-current-company/' + company_id, {}, function() {
       rootState.companies.companies.find((c: any) => {
         if (company_id == c.id) {
           commit('setCurrentCompany', company)
@@ -148,6 +148,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
         }
       })
     })
+  },
+  setCurrentCompanyId(context, company_id) {
+    context.commit('setCurrentCompanyId', company_id)
   },
   setCurrentProject: (context, project) => {
     context.commit('setCurrentProject', project)
