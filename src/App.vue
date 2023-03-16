@@ -15,7 +15,7 @@
         <Header v-on:reload="reload" :showItems="!$route.meta.hideNavbar" />
         <div class="d-flex justify-content-between">
           <div class="router-view-class" style="width: 100px">
-            <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" :newMessage="newMessage" />
+            <new-task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" :newMessage="newMessage" />
             <router-view style="width: 100%; height: 100%" />
           </div>
           <div class="d-flex">
@@ -90,6 +90,7 @@ export default {
     TaskTray: () => import('./views/TaskTray.vue'),
     TaskSideBar: () => import('./views/TaskSideBar.vue'),
     TaskDetail: () => import('./views/TaskDetail.vue'),
+    NewTaskDetail: () => import('./views/NewTaskDetail.vue'),
     EditClientModal,
     EditUserModal,
     InviteUserModal,

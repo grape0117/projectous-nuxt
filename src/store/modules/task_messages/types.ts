@@ -14,6 +14,9 @@ export interface ITaskMessage {
   is_file: Boolean | null
   file_path: string | null
   thumbnail: string | null
+  user: object | null
+  thread_id: number | null
+  timestamp: number | null
   //  save(): any
 }
 
@@ -26,6 +29,9 @@ export class TaskMessage implements ITaskMessage {
   public is_file: Boolean | null = false
   public file_path: string | null = ''
   public thumbnail: string | null = ''
+  public user: object | null = {}
+  public thread_id: number | null = 0
+  public timestamp: number | null = 0
   // save() {
   //   //window._actions[module + '/CASCADE_DELETE']
   // }
