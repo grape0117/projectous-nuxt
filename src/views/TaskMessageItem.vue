@@ -14,10 +14,17 @@
           <pre v-if="!message.thumbnail" class="msg-content" style="color: white;">{{ message.message }}</pre>
         </div>
         <div class="message-actions" v-if="current_company_user_id == message.company_user_id">
-          <i class="icon-more_vert" @click="open_actions = !open_actions" />
+          <!-- <i class="icon-more_vert" @click="open_actions = !open_actions" /> -->
           <div class="message-actions-options">
             <i class="icon-edit" @click="editMessage(message)" />
             <i class="icon-delete" @click="deleteMessage(message)" />
+            <i class="icon-message" @click="showThread(message)" />
+            <i v-if="message.isFile" class="icon-download" @click="downloadFile(message)" />
+          </div>
+        </div>
+        <div class="message-actions" v-else>
+          <!-- <i class="icon-more_vert" @click="open_actions = !open_actions" /> -->
+          <div class="message-actions-options">
             <i class="icon-message" @click="showThread(message)" />
             <i v-if="message.isFile" class="icon-download" @click="downloadFile(message)" />
           </div>

@@ -4,7 +4,7 @@
     <b-list-group class="message-panel_inner" ref="msgContainer" v-if="chat && Object.keys(chat).length > 0" @dragover="dragOver" @drop="dropFile">
       <div v-for="(message, index) in chatMessages" :key="message.id">
         <div class="date" v-if="isShowDate(index, message, chat.messages)">
-          {{ date(message.createdAt) }}
+          {{ date(message.created_at) }}
         </div>
         <task-message-item :message="message" @edit-message="editMessage" @delete-message="deleteMessage" :is_me="message.company_user_id == current_company_user_id" />
       </div>
@@ -86,8 +86,10 @@ export default {
       return Notification.permission === 'granted'
     },
     chatMessages() {
-      let messages = this.chat.messages.sort(function(a, b) {
-        return new Date(b.createdAt) - new Date(a.createdAt)
+      const task_id = this.chat.chat_id
+      let messages = this.$store.getters['task_messages/getByTaskId'](task_id)
+      messages = messages.sort(function(a, b) {
+        return new Date(b.created_at) - new Date(a.created_at)
       })
       setTimeout(() => {
         let container = this.$refs.msgContainer
@@ -105,6 +107,10 @@ export default {
     // },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
+    },
+    current_company_user() {
+      const me = this.$store.getters['company_users/getMe']
+      return me
     }
   },
   mounted() {
@@ -160,6 +166,7 @@ export default {
       let company_user_id = this.current_company_user_id
       let message = this.s_message
       let task
+      let me = this.current_company_user
       if (this.selected_message == null) {
         let task_message = this.$store.dispatch('task_messages/createTaskMessage', {
           task_id,
@@ -167,7 +174,8 @@ export default {
           file_path: response.file_path,
           message: response.name,
           is_file: true,
-          thumbnail: response.thumbnail_path
+          thumbnail: response.thumbnail_path,
+          user: me
         })
         this.s_message = ''
         return
@@ -185,7 +193,7 @@ export default {
     },
     isShowDate(index, message, messages) {
       if (index === 0) return true
-      return messages && messages.length > 0 && this.date(message.createdAt) !== this.date(messages[index > 0 ? index - 1 : index].createdAt)
+      return messages && messages.length > 0 && this.date(message.created_at) !== this.date(messages[index > 0 ? index - 1 : index].created_at)
     },
     date(date) {
       return moment(date).format('MMM DD, YYYY | ddd')
@@ -238,10 +246,12 @@ export default {
         //   created_at: moment().format('YYYY-MM-DD HH:mm:ss')
         // }
         // this.$store.dispatch('ADD_ONE', { module: 'task_messages', entity: [message] }, { root: true })
+        let me = this.current_company_user
         let task_message = this.$store.dispatch('task_messages/createTaskMessage', {
           task_id,
           company_user_id,
-          message
+          message,
+          user: me
         })
         // .then(res => {
 

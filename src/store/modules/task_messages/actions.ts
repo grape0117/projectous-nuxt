@@ -39,15 +39,15 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       }).task_messages
     return task_message
   },
-  async createThreadMessage({ commit }, { task_id, company_user_id, message, is_file, file_path, thumbnail, user, timestamp }: ITaskMessage) {
+  async createThreadMessage({ commit }, { thread_id, task_id, company_user_id, message, is_file, file_path, thumbnail, user }: ITaskMessage) {
     const threadMessage = {
       ...createDefaultTaskMessage(task_id),
+      thread_id: thread_id,
       company_user_id: company_user_id,
       message: message,
       is_file: is_file,
       file_path: file_path,
-      thumbnail: thumbnail,
-      timestamp: timestamp
+      thumbnail: thumbnail
     }
 
     // @ts-ignore

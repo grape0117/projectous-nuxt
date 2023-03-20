@@ -6,6 +6,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   getById: (state: IModuleState) => (id: any) => {
     return state.task_messages[state.lookup[id]]
   },
+  getByMessageId: (state: IModuleState) => (id: any) => {
+    return state.task_messages.filter(message => message.id === id)
+  },
   getByCompanyUserId: (state: IModuleState) => (id: any) => {
     return state.task_messages.filter(({ company_user_id }) => company_user_id === id)
   },

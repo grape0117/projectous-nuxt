@@ -475,7 +475,7 @@ export default Vue.extend({
 }
 .task-cloud_task-message {
   height: 100%;
-  height: calc(100vh - 170px) !important;
+  height: calc(100vh - 194px) !important;
 }
 .task-cloud_task-message .message-panel_inner {
   min-height: calc(100vh - 305px);

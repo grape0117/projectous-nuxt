@@ -1,5 +1,5 @@
 <template>
-  <div id="new-task-detail">
+  <div id="new-task-detail" v-if="task">
     <div class="left-section">
       <div class="task-detail-top-buttons">
         <button @click="saveTask">Close (ESC)</button>
@@ -97,12 +97,12 @@
           </div>
         </b-tab>
         <b-tab title="Chat">
-          <splitpanes class="default-theme" style="height: 100%">
-            <pane min-size="30">
-              <task-message class="task-cloud_task-message" :chat="chat" :showChat="showTab == 1"> </task-message>
+          <splitpanes class="default-theme " style="height: 100%">
+            <pane min-size="30" max-size="50">
+              <task-thread class="task-cloud_task-message" :chat="chat" :showChat="showTab == 1" :task="task"> </task-thread>
             </pane>
             <pane min-size="30" v-if="showThread">
-              <thread-message class="task-cloud_task-message" :chat="threadChat" :showChat="showTab == 1" :messageId="thread_message_id" :task_id="task.id"> </thread-message>
+              <thread-message class="task-cloud_task-message" :chat="threadChat" :showChat="showTab == 1" :messageId="thread_message_id" :task_id="task.id" :thread_id="thread_id"> </thread-message>
             </pane>
           </splitpanes>
         </b-tab>
@@ -126,6 +126,7 @@ export default Vue.extend({
     'task-card': () => import('@/components/ui/TaskCard.vue'),
     'edit-task-modal-user': () => import('@/views/EditTaskModalUser.vue'),
     'thread-message': () => import('@/views/ThreadMessage.vue'),
+    'task-thread': () => import('@/views/TaskThread.vue'),
     'task-message': () => import('@/views/TaskMessage.vue'),
     multipane: () => MultiPane,
     'multipane-resizer': () => MultiPaneResizer,
@@ -159,6 +160,7 @@ export default Vue.extend({
       showThread: false,
       threadChat: {},
       thread_message_id: null,
+      thread_id: null,
       task_id: null
     }
   },
@@ -408,6 +410,14 @@ export default Vue.extend({
     EventBus.$on('show-thread', message => {
       this.thread_message_id = message.id
       this.showThread = true
+    })
+    EventBus.$on('open-thread', thread => {
+      this.thread_id = thread.id
+      this.showThread = true
+    })
+    EventBus.$on('close-thread', () => {
+      this.showThread = false
+      this.thread_id = null
     })
   },
   mounted() {

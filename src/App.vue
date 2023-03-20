@@ -333,11 +333,8 @@ export default {
           title = e.data.title
           body = JSON.stringify(e.data.sender + ' : ' + e.data.message)
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
-            that.newMessage1 = e.data
-            // that.updated_at = new Date().getTime()
-            if (this.route_query_taskId === e.data.task_id) {
-              that.newMessage = e.data
-            }
+            that.$store.commit('ADD_ONE', { module: 'task_messages', entity: e.data }, { root: true })
+
             that.$store.dispatch('tasks/updateChats')
           }
 

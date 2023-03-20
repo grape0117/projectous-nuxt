@@ -1,7 +1,6 @@
 <template>
   <div class="message-panel" id="message-container">
-    <task-message-item :message="thread_message" v-if="thread_message" />
-    <b-button v-if="!isNotificationEnabled && !enabledNotification" @click="enableNotification">Enable Notification</b-button>
+    <thread-title :thread="thread" />
     <b-list-group class="thread-message-panel_inner" ref="msgContainer" @dragover="dragOver" @drop="dropFile">
       <div v-for="(message, index) in chatMessages" :key="message.id">
         <div class="date" v-if="isShowDate(index, message, chat.messages)">
@@ -21,6 +20,10 @@
       <i class="icon-attach_file" @click="attachFile()" />
       <i class="icon-send" :style="s_message == '' || s_message == '\n' ? 'color: gray;' : 'color: darkorange;'" @click="saveMessage()" />
     </div>
+    <div class="thread-btns">
+      <b-button @click="closeThread">CLOSE THREAD</b-button>
+      <b-button @click="closeThread">SUBMIT</b-button>
+    </div>
   </div>
 </template>
 
@@ -31,6 +34,7 @@ import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import { chain, groupBy } from 'lodash'
 import { getCookie } from '@/utils/util-functions'
+import { EventBus } from '@/components/event-bus'
 
 export default {
   data() {
@@ -60,11 +64,12 @@ export default {
       },
       thread_title: '',
       thread_message: null,
-      thread_id: null
+      thread: null
     }
   },
   components: {
     'task-message-item': () => import('./TaskMessageItem.vue'),
+    'thread-title': () => import('./ThreadTitle.vue'),
     vueDropzone: vue2Dropzone
   },
   props: {
@@ -74,7 +79,8 @@ export default {
     },
     showChat: false,
     messageId: null,
-    task_id: null
+    task_id: null,
+    thread_id: null
   },
   /* Load surveys and questionnaired on page load. */
   created() {},
@@ -85,14 +91,23 @@ export default {
         container.scrollTop = container.scrollHeight + 120
       }
     },
-    messageId: function(messageid) {
-      if (messageid) {
-        let message_content = this.$store.getters['task_messages/getById'](messageid)
-        this.thread_title = message_content ? message_content.message : ''
-        this.thread_message = message_content ? message_content : null
-        this.thread_id = message_content.task_id + '-' + message_content.timestamp
+    thread_id: function(thread_id) {
+      if (thread_id) {
+        let thread = this.$store.getters['threads/getById'](this.thread_id)[0]
+        if (thread) {
+          this.thread_title = thread.title
+          this.thread = thread
+        }
       }
     }
+    // messageId: function(messageid) {
+    //   if (messageid) {
+    //     let message_content = this.$store.getters['task_messages/getById'](messageid)
+    //     this.thread_title = message_content ? message_content.message : ''
+    //     this.thread_message = message_content ? message_content : null
+    //     this.thread_id = message_content.task_id + '-' + message_content.timestamp
+    //   }
+    // }
   },
 
   computed: {
@@ -104,9 +119,12 @@ export default {
       messages = messages.sort(function(a, b) {
         return new Date(b.created_at) - new Date(a.created_at)
       })
+      setTimeout(() => {
+        let container = this.$refs.msgContainer
+        container.scrollTop = container.scrollHeight + 120
+      }, 100)
       return messages.reverse()
     },
-
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
     }
@@ -114,16 +132,24 @@ export default {
   mounted() {
     setTimeout(() => {
       let container = this.$refs.msgContainer
-      // container.scrollTop = container.scrollHeight + 120
+      container.scrollTop = container.scrollHeight + 120
     }, 500)
-    if (this.messageId) {
-      let message_content = this.$store.getters['task_messages/getById'](this.messageId)
-      this.thread_title = message_content ? message_content.message : ''
-      this.thread_message = message_content ? message_content : null
-      this.thread_id = message_content.task_id + '-' + message_content.timestamp
+    if (this.thread_id) {
+      let thread = this.$store.getters['threads/getById'](this.thread_id)[0]
+      this.thread = thread
     }
+    // if (this.messageId) {
+    //   let message_content = this.$store.getters['task_messages/getById'](this.messageId)
+    //   this.thread_title = message_content ? message_content.message : ''
+    //   this.thread_message = message_content ? message_content : null
+    //   this.thread_id = message_content.task_id + '-' + message_content.timestamp
+    // }
   },
   methods: {
+    async closeThread() {
+      const thread = await this.$store.dispatch('threads/closeThread', { thread_id: this.thread_id })
+      EventBus.$emit('close-thread')
+    },
     async enableNotification() {
       const notificationPermission = await Notification.requestPermission()
       if (notificationPermission == 'granted') {
@@ -250,16 +276,15 @@ export default {
         // }
         // this.$store.dispatch('ADD_ONE', { module: 'task_messages', entity: [message] }, { root: true })
         let task_message = await this.$store.dispatch('task_messages/createThreadMessage', {
+          thread_id: this.thread_id,
           task_id,
           company_user_id,
-          message,
+          message
           // task_message_id: this.messageId,
-          timestamp: this.thread_message.timestamp
+          // timestamp: this.thread_message.timestamp
         })
         console.log('task_message', task_message)
-        // .then(res => {
 
-        // })
         this.s_message = ''
         return
         task = this.$store.getters['tasks/getById'](task_id)
@@ -356,6 +381,11 @@ export default {
 .send-message {
   border: gray solid 1px;
   border-radius: 7px;
+}
+.thread-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
 }
 
 ::-webkit-scrollbar {
