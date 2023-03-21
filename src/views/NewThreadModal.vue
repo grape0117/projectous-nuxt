@@ -4,13 +4,10 @@
       <h5 class="white-text">New Thread</h5>
     </template>
     <slot name="content">
-      <form id="newThreadForm" class="form-horizontal row ml-1 mr-1">
-        <input id="taskID" class="form-control" type="hidden" name="id" v-model="task_id" />
-        <div class="form-group col-sm-12">
-          <label class="control-label white-text" for="thread-title">Thread title: </label>
-          <input id="thread-title" class="form-control" type="text" name="title" placeholder="Thread Title" v-model="thread_title" />
-        </div>
-      </form>
+      <div class="form-group col-sm-12">
+        <label class="control-label white-text" for="thread-title">Thread title: </label>
+        <input id="thread-title" class="form-control" type="text" name="title" placeholder="Thread Title" v-model="thread_title" v-on:keyup.enter="saveThread" />
+      </div>
     </slot>
   </b-modal>
 </template>
@@ -50,13 +47,19 @@ export default {
     applyTheme,
     async saveThread(callback) {
       let me = this.current_company_user
+      if (this.thread_title == '') {
+        this.makeToast('danger', 'Title is required!')
+        return
+      }
       let thread = this.$store.dispatch('threads/createThread', {
         task_id: this.task_id,
         title: this.thread_title,
         user: me
       })
+      $('.close').click()
     },
     updateButtonStyle: function() {
+      this.thread_title = ''
       const updated_style = this.applyTheme()
       this.buttonStyle = updated_style
       const header = document.querySelector('.modal-header')
@@ -67,6 +70,13 @@ export default {
         const footer = document.querySelector('.modal-footer')
         footer.style = updated_style
       }
+    },
+    makeToast(variant = null, content = '') {
+      this.$bvToast.toast(content, {
+        title: `${variant === 'success' ? 'Success' : 'Error'}`,
+        variant: variant,
+        solid: true
+      })
     }
   }
 }

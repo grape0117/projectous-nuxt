@@ -55,7 +55,7 @@
             <p class="m-0">{{ thread.title }}</p>
           </div>
           <div class="mt-3 ml-2" v-if="closed_threads.length > 0">
-            <a class="see-closed" @click="showClosedThreads()">See {{ closed_threads.length }} closed threads</a>
+            <a class="see-closed" href="javascript:void();" @click="showClosedThreads()">See {{ closed_threads.length }} closed threads</a>
             <div v-if="show_closed_threads" :class="`thread-item ${thread_id == thread.id ? 'active' : ''}`" v-for="thread in closed_threads" @click="openThread(thread)">
               <span v-if="getCompanyUserDetails(thread.owner.id)" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(thread.owner.id).color, cursor: 'pointer', display: 'inline-flex' }">
                 {{ abbrName(getCompanyUserDetails(thread.owner.id).name) }}
@@ -598,10 +598,8 @@ b {
 }
 
 .see-closed {
-  cursor: poiner;
   color: white;
 }
-
 ::-webkit-scrollbar {
   width: 10px;
 }
