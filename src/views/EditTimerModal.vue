@@ -89,12 +89,16 @@
                       </div>
                     </div>
                     <div class="form-group">
-                      <label class="control-label col-sm-4" for="timerTaskSelect">Task: </label>
-                      <div class="col-sm-8">
-                        <select name="task_id" id="timerTaskSelect" class="form-control" v-model="timer_data.task_id">
-                          <option value="0">***** Select Task *****</option>
-                          <option v-for="task in projecttasks(timer_data.project_id)" :value="task.id" :key="task.id">{{ task.title }}</option>
-                        </select>
+                      <label class="control-label " for="timerTaskSelect">Task: </label>
+                      <div class="col-sm-12">
+                        <v-select :options="projecttasks(timer_data.project_id)" :reduce="task => task.id" label="name" :filter-by="searchTask" v-model="timer_data.task_id" placeholder="Select a task">
+                          <template slot="selected-option" slot-scope="option">
+                            <div class="flex">
+                              <div class="col">{{ option.title }}</div>
+                            </div>
+                          </template>
+                          <template slot="option" slot-scope="option"> {{ option.title }}</template>
+                        </v-select>
                       </div>
                     </div>
                     <div v-if="isAdmin" class="form-group">
@@ -616,6 +620,10 @@ export default {
           .toLowerCase()
           .indexOf(search_value) > -1
       )
+    },
+    searchTask: function(option, label, search) {
+      let search_value = search.toLowerCase()
+      return option.title.toLowerCase().indexOf(search_value) > -1
     },
     addProject: function() {
       this.$router.push({ query: { new_project_client_company_id: this.client.client_company_id } })
