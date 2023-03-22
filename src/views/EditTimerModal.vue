@@ -88,12 +88,32 @@
                         </div>
                       </div>
                     </div>
+                    <div v-if="isAdmin" class="form-group">
+                      <label class="control-label col-sm-4" for="timerUserTime">Show not assigned to me </label>
+                      <div class="col-sm-8">
+                        <div class="checkbox">
+                          <label>
+                            <input name="not_assigned_to_me" type="checkbox" id="assigneCheckbox" value="0" v-model="not_assigned_to_me" aria-label="..." />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-if="isAdmin" class="form-group">
+                      <label class="control-label col-sm-4" for="timerUserTime">Show completed/closed </label>
+                      <div class="col-sm-8">
+                        <div class="checkbox">
+                          <label>
+                            <input name="completed_closed" type="checkbox" id="completedCheckbox" value="0" v-model="completed_closed" aria-label="..." />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
                     <div class="form-group">
                       <label class="control-label col-sm-4" for="timerTaskSelect">Task: </label>
                       <div class="col-sm-8">
                         <select name="task_id" id="timerTaskSelect" class="form-control" v-model="timer_data.task_id">
                           <option value="0">***** Select Task *****</option>
-                          <option v-for="task in projecttasks(timer_data.project_id)" :value="task.id" :key="task.id">{{ task.title }}</option>
+                          <option v-for="task in projecttasks" :value="task.id" :key="task.id">{{ task.title }}</option>
                         </select>
                       </div>
                     </div>
@@ -258,7 +278,10 @@ export default {
       buttonStyle: '',
       client: null,
       timer_data: {},
-      started_at: null
+      started_at: null,
+      not_assigned_to_me: false,
+      completed_closed: false,
+      projecttasks: []
     }
   },
   created() {
@@ -333,6 +356,7 @@ export default {
     // $('#timer-modal').on('hidden.bs.modal', function() {
     //   self.$store.dispatch('settings/closedModal')
     // })
+    this.getProjectTasks(this.timer_data.project_id)
   },
   watch: {
     'timer.id': async function() {
@@ -371,11 +395,40 @@ export default {
           push: true
         })
         this.$store.dispatch('projects/createProject')
+      } else {
+        this.getProjectTasks(project_id)
       }
+    },
+    'timer_data.project_id': function() {
+      this.getProjectTasks(this.timer_data.project_id)
+    },
+    not_assigned_to_me: function() {
+      this.getProjectTasks(this.timer_data.project_id)
+    },
+    completed_closed: function() {
+      this.getProjectTasks(this.timer_data.project_id)
     }
   },
   methods: {
     applyTheme,
+    getProjectTasks: async function(project_id) {
+      if (!this.not_assigned_to_me && !this.completed_closed) {
+        this.projecttasks = this.$store.getters['tasks/getByProjectId'](project_id)
+      } else {
+        var scope = 'me',
+          status = 'available'
+
+        if (this.not_assigned_to_me) {
+          scope = 'all'
+        }
+        if (this.completed_closed) {
+          status = 'all'
+        }
+        const resp = await this.$http().get('/project-tasks/' + project_id + '/' + scope + '/' + status)
+        this.projecttasks = resp.tasks
+      }
+      console.log('PROJEDT TASKS', this.projecttasks)
+    },
     updateDuration(duration) {
       this.timer_data.duration = duration
     },
@@ -443,9 +496,6 @@ export default {
     },
     isTimerTask: function(task_id) {
       return task_id == this.timer.task_id
-    },
-    projecttasks: function(project_id) {
-      return this.$store.getters['tasks/getByProjectId'](project_id)
     },
     isCurrentUserOrAdmin: function() {
       return this.$store.getters['settings/isCurrentUserOrAdmin'](this.timer.user_id)
