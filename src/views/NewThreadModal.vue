@@ -6,7 +6,7 @@
     <slot name="content">
       <div class="form-group col-sm-12">
         <label class="control-label white-text" for="thread-title">Thread title: </label>
-        <input id="thread-title" class="form-control" type="text" name="title" placeholder="Thread Title" v-model="thread_title" v-on:keyup.enter="saveThread" />
+        <input id="thread-title" ref="thread_title" class="form-control" type="text" name="title" placeholder="Thread Title" v-model="thread_title" v-on:keyup.enter="saveThread" />
       </div>
     </slot>
   </b-modal>
@@ -29,9 +29,6 @@ export default {
     return {
       thread_title: ''
     }
-  },
-  created() {
-    this.updateButtonStyle()
   },
   computed: {
     users: function() {
@@ -70,6 +67,9 @@ export default {
         const footer = document.querySelector('.modal-footer')
         footer.style = updated_style
       }
+      this.$nextTick(() => {
+        this.$refs.thread_title.focus()
+      })
     },
     makeToast(variant = null, content = '') {
       this.$bvToast.toast(content, {
