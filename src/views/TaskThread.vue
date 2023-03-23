@@ -28,23 +28,6 @@
         <pre class="msg-content" style="color: black;">{{ task.note }}</pre>
       </div>
     </div>
-    <!-- <ul class="nav nav-tabs" role="tablist">
-      <li @click="setTab('thread')" :class="tabClass('thread')" role="presentation">
-        <a aria-controls="closed" role="tab" data-toggle="tab"
-          >THREADS
-        </a>
-      </li>
-      <li @click="setTab('files')" :class="tabClass('files')" role="presentation">
-        <a aria-controls="closed" role="tab" data-toggle="tab"
-          >FILES
-        </a>
-      </li>
-      <li @click="setTab('log')" :class="tabClass('log')" role="presentation">
-        <a aria-controls="closed" role="tab" data-toggle="tab"
-          >LOG
-        </a>
-      </li>
-    </ul> -->
     <b-tabs content-class="mt-3 " class="threads-list p-3" active-nav-item-class="font-weight-bold text-uppercase tab-active" active-tab-class="font-weight-bold">
       <b-tab title="THREADS">
         <div class="thread-container">
@@ -114,7 +97,6 @@ export default {
         //   return "files[]";
         // },
       },
-      thread_id: null,
       show_closed_threads: false
     }
   },
@@ -134,7 +116,8 @@ export default {
       type: Object,
       require: true
     },
-    showChat: false
+    showChat: false,
+    thread_id: null
   },
   /* Load surveys and questionnaired on page load. */
   created() {},
@@ -224,9 +207,10 @@ export default {
     createThread() {
       this.$bvModal.show('new-thread-modal')
     },
-    openThread(thread) {
-      this.thread_id = thread.id
-      EventBus.$emit('open-thread', thread)
+    async openThread(thread) {
+      const TASK_ID = this.task.id
+      if (Object.keys(this.$route.query).length > 0 && this.$route.query.task === TASK_ID && this.$route.query.thread === thread.id) return
+      await this.$router.push({ query: { task: TASK_ID, thread: thread.id, showChat: 'true' } })
     },
     async setTab(tab) {
       this.tab = tab

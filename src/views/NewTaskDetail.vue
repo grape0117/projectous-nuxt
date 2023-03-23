@@ -99,7 +99,7 @@
         <b-tab title="Chat">
           <splitpanes class="default-theme " style="height: 100%">
             <pane min-size="30" max-size="50">
-              <task-thread class="task-cloud_task-message" :chat="chat" :showChat="showTab == 1" :task="task"> </task-thread>
+              <task-thread class="task-cloud_task-message" :chat="chat" :showChat="showTab == 1" :task="task" :thread_id="thread_id"> </task-thread>
             </pane>
             <pane min-size="30" v-if="showThread">
               <thread-message class="task-cloud_task-message" :chat="threadChat" :showChat="showTab == 1" :messageId="thread_message_id" :task_id="task.id" :thread_id="thread_id"> </thread-message>
@@ -144,7 +144,8 @@ export default Vue.extend({
       type: Object,
       required: false,
       default: false
-    }
+    },
+    thread: null
   },
   data() {
     return {
@@ -202,6 +203,15 @@ export default Vue.extend({
     },
     newMessage(newMessage, oldMessage) {
       this.chat.messages = [...this.chat.messages, newMessage]
+    },
+    thread(thread_id) {
+      if (thread_id) {
+        this.thread_id = thread_id
+        this.showThread = true
+      } else {
+        this.showThread = false
+        this.thread_id = null
+      }
     }
   },
   methods: {
@@ -404,6 +414,10 @@ export default Vue.extend({
     }
   },
   async created() {
+    if (this.thread) {
+      this.thread_id = this.thread
+      this.showThread = true
+    }
     if (!!this.getResources.length) {
       this.openTab(this.getResources[0].name)
     }
