@@ -1,7 +1,7 @@
 <template>
   <div class="message-panel" id="message-container">
-    <b-button v-if="!isNotificationEnabled && !enabledNotification" @click="enableNotification">Enable Notification</b-button>
-    <b-list-group class="message-panel_inner" ref="msgContainer" v-if="chat && Object.keys(chat).length > 0" @dragover="dragOver" @drop="dropFile">
+    <thread-title :thread="thread" />
+    <b-list-group class="thread-message-panel_inner" ref="msgContainer" @dragover="dragOver" @drop="dropFile">
       <div v-for="(message, index) in chatMessages" :key="message.id">
         <div class="date" v-if="isShowDate(index, message, chat.messages)">
           {{ date(message.created_at) }}
@@ -20,6 +20,10 @@
       <i class="icon-attach_file" @click="attachFile()" />
       <i class="icon-send" :style="s_message == '' || s_message == '\n' ? 'color: gray;' : 'color: darkorange;'" @click="saveMessage()" />
     </div>
+    <div class="thread-btns">
+      <b-button @click="closeThread">CLOSE THREAD</b-button>
+      <b-button @click="closeThread">SUBMIT</b-button>
+    </div>
   </div>
 </template>
 
@@ -30,6 +34,7 @@ import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import { chain, groupBy } from 'lodash'
 import { getCookie } from '@/utils/util-functions'
+import { EventBus } from '@/components/event-bus'
 
 export default {
   data() {
@@ -56,11 +61,15 @@ export default {
         // paramName: function(n) {
         //   return "files[]";
         // },
-      }
+      },
+      thread_title: '',
+      thread_message: null,
+      thread: null
     }
   },
   components: {
     'task-message-item': () => import('./TaskMessageItem.vue'),
+    'thread-title': () => import('./ThreadTitle.vue'),
     vueDropzone: vue2Dropzone
   },
   props: {
@@ -68,7 +77,10 @@ export default {
       type: Object,
       require: true
     },
-    showChat: false
+    showChat: false,
+    messageId: null,
+    task_id: null,
+    thread_id: null
   },
   /* Load surveys and questionnaired on page load. */
   created() {},
@@ -78,7 +90,24 @@ export default {
         let container = this.$refs.msgContainer
         container.scrollTop = container.scrollHeight + 120
       }
+    },
+    thread_id: function(thread_id) {
+      if (thread_id) {
+        let thread = this.$store.getters['threads/getById'](this.thread_id)[0]
+        if (thread) {
+          this.thread_title = thread.title
+          this.thread = thread
+        }
+      }
     }
+    // messageId: function(messageid) {
+    //   if (messageid) {
+    //     let message_content = this.$store.getters['task_messages/getById'](messageid)
+    //     this.thread_title = message_content ? message_content.message : ''
+    //     this.thread_message = message_content ? message_content : null
+    //     this.thread_id = message_content.task_id + '-' + message_content.timestamp
+    //   }
+    // }
   },
 
   computed: {
@@ -86,8 +115,7 @@ export default {
       return Notification.permission === 'granted'
     },
     chatMessages() {
-      const task_id = this.chat.chat_id
-      let messages = this.$store.getters['task_messages/getByTaskId'](task_id)
+      let messages = this.$store.getters['task_messages/getByThreadId'](this.thread_id)
       messages = messages.sort(function(a, b) {
         return new Date(b.created_at) - new Date(a.created_at)
       })
@@ -95,22 +123,10 @@ export default {
         let container = this.$refs.msgContainer
         container.scrollTop = container.scrollHeight + 120
       }, 100)
-
       return messages.reverse()
     },
-    // getMessages() {
-    //   let messages = this.$store.getters['task_messages/getByTaskId'](this.task_id)
-    //   messages.sort(function(a, b) {
-    //     return new Date(b.created_at) - new Date(a.created_at)
-    //   })
-    //   return messages.reverse()
-    // },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
-    },
-    current_company_user() {
-      const me = this.$store.getters['company_users/getMe']
-      return me
     }
   },
   mounted() {
@@ -118,8 +134,22 @@ export default {
       let container = this.$refs.msgContainer
       container.scrollTop = container.scrollHeight + 120
     }, 500)
+    if (this.thread_id) {
+      let thread = this.$store.getters['threads/getById'](this.thread_id)[0]
+      this.thread = thread
+    }
+    // if (this.messageId) {
+    //   let message_content = this.$store.getters['task_messages/getById'](this.messageId)
+    //   this.thread_title = message_content ? message_content.message : ''
+    //   this.thread_message = message_content ? message_content : null
+    //   this.thread_id = message_content.task_id + '-' + message_content.timestamp
+    // }
   },
   methods: {
+    async closeThread() {
+      const thread = await this.$store.dispatch('threads/closeThread', { thread_id: this.thread_id })
+      EventBus.$emit('close-thread')
+    },
     async enableNotification() {
       const notificationPermission = await Notification.requestPermission()
       if (notificationPermission == 'granted') {
@@ -162,20 +192,19 @@ export default {
       this.showDropzone = false
       this.$refs.chatDropzone.removeAllFiles()
 
-      let task_id = this.chat.chat_id
+      let task_id = this.task_id
       let company_user_id = this.current_company_user_id
       let message = this.s_message
       let task
-      let me = this.current_company_user
       if (this.selected_message == null) {
-        let task_message = this.$store.dispatch('task_messages/createTaskMessage', {
+        let task_message = this.$store.dispatch('task_messages/createThreadMessage', {
           task_id,
           company_user_id,
           file_path: response.file_path,
           message: response.name,
           is_file: true,
           thumbnail: response.thumbnail_path,
-          user: me
+          task_message_id: this.messageId
         })
         this.s_message = ''
         return
@@ -232,7 +261,7 @@ export default {
         this.s_message = ''
         return
       }
-      let task_id = this.chat.chat_id
+      let task_id = this.task_id
       let company_user_id = this.current_company_user_id
       let message = this.s_message
       let task
@@ -246,16 +275,16 @@ export default {
         //   created_at: moment().format('YYYY-MM-DD HH:mm:ss')
         // }
         // this.$store.dispatch('ADD_ONE', { module: 'task_messages', entity: [message] }, { root: true })
-        let me = this.current_company_user
-        let task_message = this.$store.dispatch('task_messages/createTaskMessage', {
+        let task_message = await this.$store.dispatch('task_messages/createThreadMessage', {
+          thread_id: this.thread_id,
           task_id,
           company_user_id,
-          message,
-          user: me
+          message
+          // task_message_id: this.messageId,
+          // timestamp: this.thread_message.timestamp
         })
-        // .then(res => {
+        console.log('task_message', task_message)
 
-        // })
         this.s_message = ''
         return
         task = this.$store.getters['tasks/getById'](task_id)
@@ -329,8 +358,15 @@ export default {
   color: white;
 }
 
-.message-panel_inner {
+.thread-message-panel_inner {
   background-color: rgba($color: #000000, $alpha: 0.7);
+}
+.task-cloud_task-message .thread-message-panel_inner {
+  min-height: 105px;
+  // min-height: calc(100vh - 305px);
+  max-height: calc(100vh - 405px);
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 .icon-attach_file {
   color: gray;
@@ -345,6 +381,11 @@ export default {
 .send-message {
   border: gray solid 1px;
   border-radius: 7px;
+}
+.thread-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
 }
 
 ::-webkit-scrollbar {

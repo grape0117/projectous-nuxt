@@ -161,12 +161,12 @@ export default {
       set: function(newValue) {}
     },
     showTimer() {
-      const running_timers = this.$store.getters['timers/runningTimers']
-      if (running_timers.length > 0 && running_timers[0].task_id == this.task.id) {
-        return true
-      } else if (running_timers.length > 0 && (!running_timers[0].task_id || running_timers[0].task_id != this.task.id)) {
-        return false
-      }
+      // const running_timers = this.$store.getters['timers/runningTimers']
+      // if (running_timers.length > 0 && running_timers[0].task_id == this.task.id) {
+      //   return true
+      // } else if (running_timers.length > 0 && (!running_timers[0].task_id || running_timers[0].task_id != this.task.id)) {
+      //   return false
+      // }
       return true
     }
   },

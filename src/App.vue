@@ -15,7 +15,7 @@
         <Header v-on:reload="reload" :showItems="!$route.meta.hideNavbar" />
         <div class="d-flex justify-content-between">
           <div class="router-view-class" style="width: 100px">
-            <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" :newMessage="newMessage" />
+            <new-task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" :thread="thread" :newMessage="newMessage" />
             <router-view style="width: 100%; height: 100%" />
           </div>
           <div class="d-flex">
@@ -90,6 +90,7 @@ export default {
     TaskTray: () => import('./views/TaskTray.vue'),
     TaskSideBar: () => import('./views/TaskSideBar.vue'),
     TaskDetail: () => import('./views/TaskDetail.vue'),
+    NewTaskDetail: () => import('./views/NewTaskDetail.vue'),
     EditClientModal,
     EditUserModal,
     InviteUserModal,
@@ -139,6 +140,9 @@ export default {
        */
       const task = this.$store.state.tasks.tasks.find(t => t.id === this.route_query_taskId)
       return task
+    },
+    thread() {
+      return this.route_query && this.route_query.thread
     },
     has_background_theme() {
       return !!this.bgTheme && !!this.bgStyle
@@ -332,11 +336,8 @@ export default {
           title = e.data.title
           body = JSON.stringify(e.data.sender + ' : ' + e.data.message)
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
-            that.newMessage1 = e.data
-            // that.updated_at = new Date().getTime()
-            if (this.route_query_taskId === e.data.task_id) {
-              that.newMessage = e.data
-            }
+            that.$store.commit('ADD_ONE', { module: 'task_messages', entity: e.data }, { root: true })
+
             that.$store.dispatch('tasks/updateChats')
           }
 

@@ -11,13 +11,21 @@
             </div>
           </button>
           <img v-if="!message.thumbnail && message.isFile" src="@/assets/img/attach-file.png" width="200" height="220" alt="thumbnail" />
-          <pre v-if="!message.thumbnail" class="msg-content" style="color: white;">{{ message.text }}</pre>
+          <pre v-if="!message.thumbnail" class="msg-content" style="color: white;">{{ message.message }}</pre>
         </div>
         <div class="message-actions" v-if="current_company_user_id == message.company_user_id">
-          <i class="icon-more_vert" @click="open_actions = !open_actions" />
-          <div class="message-actions-options" v-if="open_actions">
+          <!-- <i class="icon-more_vert" @click="open_actions = !open_actions" /> -->
+          <div class="message-actions-options">
             <i class="icon-edit" @click="editMessage(message)" />
             <i class="icon-delete" @click="deleteMessage(message)" />
+            <i class="icon-message" @click="showThread(message)" />
+            <i v-if="message.isFile" class="icon-download" @click="downloadFile(message)" />
+          </div>
+        </div>
+        <div class="message-actions" v-else>
+          <!-- <i class="icon-more_vert" @click="open_actions = !open_actions" /> -->
+          <div class="message-actions-options">
+            <i class="icon-message" @click="showThread(message)" />
             <i v-if="message.isFile" class="icon-download" @click="downloadFile(message)" />
           </div>
         </div>
@@ -31,6 +39,7 @@
 import moment from 'moment'
 import { abbrName } from '@/utils/util-functions'
 import { writeFileSync } from 'fs'
+import { EventBus } from '@/components/event-bus'
 
 export default {
   name: 'task-message-item',
@@ -91,6 +100,9 @@ export default {
     },
     deleteMessage(message) {
       this.$emit('delete-message', message)
+    },
+    showThread(message) {
+      EventBus.$emit('show-thread', message)
     }
   }
 }
@@ -123,6 +135,12 @@ export default {
   }
 }
 
+.message-panel_inner .message-panel_inner-message:hover .message-actions {
+  visibility: visible;
+}
+.message-panel_inner .message-actions {
+  visibility: hidden;
+}
 .message-wrapper {
   // border: 1px solid red;
   display: flex;
@@ -130,6 +148,7 @@ export default {
   // position: relative;
 
   .message-actions {
+    visibility: hidden;
     padding-top: 5px;
     // border: 1px solid red;
     position: relative;
@@ -142,7 +161,7 @@ export default {
       // border: 1px solid red;
       position: absolute;
       display: flex;
-      top: 3px;
+      top: -28px;
       right: 22px;
       background-color: rgba($color: #2b2929, $alpha: 1);
       box-shadow: 0px 0px 16px -6px white;

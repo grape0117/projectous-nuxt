@@ -43,7 +43,7 @@ export default {
           let update_chat_index = this.chats.findIndex(({ chat_id }) => chat_id == this.new_message.task_id)
           let newMessage = this.chats[update_chat_index]
           newMessage.last_message.text = this.new_message.message
-          newMessage.last_message.createdAt = this.new_message.createdAt
+          newMessage.last_message.created_at = this.new_message.created_at
           newMessage.last_message.id = this.new_message.id
           newMessage.last_message.user = { name: this.new_message.user.name, color: this.new_message.user.color, role: this.new_message.user.user_role, _id: this.new_message.user.id }
           this.chats.splice(update_chat_index, 1)

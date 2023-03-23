@@ -25,10 +25,7 @@ export const mutations: MutationTree<IRootState> = {
       try {
         if (entity.deleted_at == null) {
           //@ts-ignore
-          if (typeof state[module].lookup[entities[index].id] == 'undefined') {
-            //@ts-ignore
-            state[module][module].push(entity)
-          } else {
+          if (state[module].lookup && typeof state[module].lookup[entities[index].id] != 'undefined') {
             //@ts-ignore
             let key = state[module].lookup[entities[index].id]
             for (let property in entity) {
@@ -37,6 +34,8 @@ export const mutations: MutationTree<IRootState> = {
                 Vue.set(state[module][module][key], property, entity[property])
               }
             }
+          } else {
+            state[module][module].push(entity)
           }
 
           // @ts-ignore
@@ -73,13 +72,18 @@ export const mutations: MutationTree<IRootState> = {
   ADD_ONE(state: IRootState, { module, entity }) {
     if (!state[module]) return
     //@ts-ignore
-    state[module][module].push(entity)
+    const isNew = state[module][module].filter(({ id }) => id == entity.id).length == 0
+    if (isNew) {
+      state[module][module].push(entity)
+    }
 
     //@Mikhail is there a faster way to find the index? Can I search from the bottom of the array first?
     //@ts-ignore
     //TODO: call LOOKUP
     state[module][module].forEach((item: any, key: any) => {
-      state[module].lookup[item.id] = key
+      if (state[module].lookup) {
+        state[module].lookup[item.id] = key
+      }
     })
 
     // @ts-ignore

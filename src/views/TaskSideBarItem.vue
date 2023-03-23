@@ -11,6 +11,11 @@
       </p>
       <div class="d-flex align-items-center">
         <div>
+          <p class="task-thread-title">{{ chat.thread_title }}</p>
+        </div>
+      </div>
+      <div class="d-flex align-items-center">
+        <div>
           <p class="task-sidebar-title">{{ chat.last_message.text | messageContent }}</p>
         </div>
       </div>
@@ -23,7 +28,7 @@
         </span>
       </div>
       <div class="task-sidebar-last-message" style="margin-top: 0 !important;" @click="showTaskDetail">
-        <span class="task-sidebar-date">{{ chat.last_message.createdAt | showDate }}</span>
+        <span class="task-sidebar-date">{{ chat.last_message.created_at | showDate }}</span>
       </div>
       <!-- <span class="task-sidebar_go-to-task" @click="showTaskDetail">[ Go to task]</span> -->
     </div>
@@ -65,10 +70,11 @@ export default {
   methods: {
     async showTaskDetail() {
       const CHAT_ID = this.chat.chat_id
+      const THREAD_ID = this.chat.thread_id
 
-      if (Object.keys(this.$route.query).length > 0 && this.$route.query.task === CHAT_ID) return
+      if (Object.keys(this.$route.query).length > 0 && this.$route.query.task === CHAT_ID && this.$route.query.thread === THREAD_ID) return
 
-      await this.$router.push({ query: { task: CHAT_ID, showChat: 'true' } })
+      await this.$router.push({ query: { task: CHAT_ID, thread: this.chat.thread_id, showChat: 'true' } })
     }
   },
   watch: {
@@ -162,6 +168,10 @@ export default {
 }
 .task-sidebar_go-to-task:hover {
   color: #007fff;
+}
+.task-thread-title {
+  font-size: 19px;
+  font-weight: bold;
 }
 .task-sidebar-title {
   font-size: 12px;
