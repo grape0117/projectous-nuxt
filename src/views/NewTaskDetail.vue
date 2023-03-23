@@ -244,8 +244,8 @@ export default Vue.extend({
       } else {
         this.chat = { messages: this.$store.getters['task_messages/getByTaskId'](task_id) }
       }
+      const { chat } = await this.$http().get(`/chat-thread/${task_id}/${this.thread_id || this.thread}`)
 
-      const { chat } = await this.$http().get(`/chat/${task_id}`)
       this.chat = chat
       // this.$store.dispatch('task_messages/updateChats')
       this.$store.dispatch('PROCESS_INCOMING_DATA', { task_messages: chat.messages })
