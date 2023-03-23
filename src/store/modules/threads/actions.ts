@@ -28,5 +28,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     let task_thread = await this._vm.$http().post('/thread/close', { thread_id: thread_id })
     commit('closeByThreadId', thread_id)
     return task_thread
+  },
+  async reopenThread({ commit }, { thread_id }: any) {
+    // @ts-ignore
+    let task_thread = await this._vm.$http().post('/thread/reopen', { thread_id: thread_id })
+    commit('reopenByThreadId', thread_id)
+    return task_thread
   }
 }

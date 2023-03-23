@@ -15,14 +15,17 @@
         <div class="subtitle">...or click to select a file from your computer</div>
       </div>
     </vue-dropzone>
-    <div class="send-message">
+    <div class="send-message" v-if="thread && thread.status == 'open'">
       <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3" @keyup.enter.exact="changeText" @keydown.enter="handleEnter"> </b-form-textarea>
       <i class="icon-attach_file" @click="attachFile()" />
       <i class="icon-send" :style="s_message == '' || s_message == '\n' ? 'color: gray;' : 'color: darkorange;'" @click="saveMessage()" />
     </div>
-    <div class="thread-btns">
+    <div class="thread-btns" v-if="thread && thread.status == 'open'">
       <b-button @click="closeThread">CLOSE THREAD</b-button>
-      <b-button @click="closeThread">SUBMIT</b-button>
+      <b-button @click="saveMessage()">SUBMIT</b-button>
+    </div>
+    <div class="thread-btns" v-else>
+      <b-button @click="reopenThread">Reopen THREAD</b-button>
     </div>
   </div>
 </template>
@@ -150,6 +153,11 @@ export default {
       const thread = await this.$store.dispatch('threads/closeThread', { thread_id: this.thread_id })
       EventBus.$emit('close-thread')
     },
+    async reopenThread() {
+      const thread = await this.$store.dispatch('threads/reopenThread', { thread_id: this.thread_id })
+      EventBus.$emit('reopen-thread')
+    },
+
     async enableNotification() {
       const notificationPermission = await Notification.requestPermission()
       if (notificationPermission == 'granted') {

@@ -130,10 +130,10 @@ export default {
     EventBus.$on('toggle_timers', () => {
       this.getMonthStats()
     })
-    window.addEventListener('keyup', this.startTimer)
+    // window.addEventListener('keyup', this.startTimer)
   },
   beforeDestroy() {
-    window.removeEventListener('keyup', this.startTimer)
+    // window.removeEventListener('keyup', this.startTimer)
   }
 }
 </script>

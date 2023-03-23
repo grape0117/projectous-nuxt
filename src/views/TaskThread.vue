@@ -544,6 +544,7 @@ b {
   margin-top: 10px;
   background-color: #5755ac;
   height: calc(100% - 158px);
+  min-height: 200px;
   position: relative;
 }
 .nav-tabs .nav-link.active,
@@ -574,10 +575,12 @@ b {
 
 .thread-container {
   max-height: 90%;
+  height: calc(100vh - 490px);
+  overflow: auto;
 }
 .new-thread-btn {
   position: absolute;
-  bottom: 30px;
+  bottom: 15px;
   right: 20px;
 }
 
