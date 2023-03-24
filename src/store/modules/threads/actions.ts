@@ -14,14 +14,10 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     }
 
     // @ts-ignore
-    let task_thread = this._vm
-      .$http()
-      .post('/thread', { task_thread: thread })
-      // @ts-ignore
-      .then(res => {
-        commit('ADD_ONE', { module: 'threads', entity: { ...res.task_thread, owner: user } }, { root: true })
-      }).task_thread
-    return task_thread
+    const res = await this._vm.$http().post('/thread', { task_thread: thread })
+    // @ts-ignore
+    commit('ADD_ONE', { module: 'threads', entity: { ...res.task_thread, owner: user } }, { root: true })
+    return res
   },
   async closeThread({ commit }, { thread_id }: any) {
     // @ts-ignore
