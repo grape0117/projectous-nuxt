@@ -16,7 +16,7 @@
       </div>
     </vue-dropzone>
     <div class="send-message" v-if="thread && thread.status == 'open'">
-      <b-form-textarea type="text" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3" @keyup.enter.exact="changeText" @keydown.enter="handleEnter"> </b-form-textarea>
+      <b-form-textarea type="text" ref="message_content" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3" @keyup.enter.exact="changeText" @keydown.enter="handleEnter"> </b-form-textarea>
       <i class="icon-attach_file" @click="attachFile()" />
       <i class="icon-send" :style="s_message == '' || s_message == '\n' ? 'color: gray;' : 'color: darkorange;'" @click="saveMessage()" />
     </div>
@@ -85,8 +85,11 @@ export default {
     task_id: null,
     thread_id: null
   },
-  /* Load surveys and questionnaired on page load. */
-  created() {},
+  created() {
+    this.$nextTick(() => {
+      this.$refs.message_content.focus()
+    })
+  },
   watch: {
     showChat: function(show) {
       if (show) {
@@ -96,6 +99,7 @@ export default {
     },
     thread_id: function(thread_id) {
       if (thread_id) {
+        this.$refs.message_content.focus()
         let thread = this.$store.getters['threads/getById'](this.thread_id)[0]
         if (thread) {
           this.thread_title = thread.title
