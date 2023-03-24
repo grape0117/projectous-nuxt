@@ -45,6 +45,11 @@ const router = new Router({
       }
     },
     {
+      path: '/change-company',
+      name: 'Change Company',
+      component: () => import(/* webpackChunkName: "forgot-password" */ '@/views/ChangeCompany.vue')
+    },
+    {
       path: '/reset-password/:api_token',
       name: 'Reset Password',
       component: () => import(/* webpackChunkName: "reset-password" */ '@/views/ResetPassword.vue'),
