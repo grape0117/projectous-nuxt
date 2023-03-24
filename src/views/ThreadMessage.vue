@@ -151,6 +151,7 @@ export default {
   methods: {
     async closeThread() {
       const thread = await this.$store.dispatch('threads/closeThread', { thread_id: this.thread_id })
+      this.$store.dispatch('tasks/updateChats')
       EventBus.$emit('close-thread')
     },
     async reopenThread() {
