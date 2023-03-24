@@ -383,7 +383,13 @@ export default {
           that.$store.commit('company_users/updateUser', userInfo)
           break
       }
-      if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) var notification = new Notification(title, { body: body, icon: 'img' })
+      if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
+        var notification = new Notification(title, { body: body, icon: 'img' })
+        notification.onclick = event => {
+          event.preventDefault()
+          window.open(e.data.link, '_blank')
+        }
+      }
 
       // that.$store.dispatch('GET_NEW_DATA')
     })
