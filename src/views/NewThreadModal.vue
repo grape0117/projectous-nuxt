@@ -48,11 +48,12 @@ export default {
         this.makeToast('danger', 'Title is required!')
         return
       }
-      let thread = this.$store.dispatch('threads/createThread', {
+      let thread = await this.$store.dispatch('threads/createThread', {
         task_id: this.task_id,
         title: this.thread_title,
         user: me
       })
+      this.$store.dispatch('tasks/updateChats')
       $('.close').click()
     },
     updateButtonStyle: function() {
