@@ -36,6 +36,9 @@
               {{ abbrName(getCompanyUserDetails(thread.owner.id).name) }}
             </span>
             <p class="m-0">{{ thread.title }}</p>
+            <div class="unread-message-num" v-if="thread.num_unread > 0" style="position: relative;">
+              <span class="rounded-circle task-sidebar-item_badge">{{ thread.num_unread }}</span>
+            </div>
           </div>
           <div class="mt-3 ml-2" v-if="closed_threads.length > 0">
             <a class="see-closed" href="javascript:void();" @click="showClosedThreads()">See {{ closed_threads.length }} closed threads</a>
@@ -587,6 +590,19 @@ b {
 .see-closed {
   color: white;
 }
+.unread-message-num span {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  border: 1px solid red;
+  position: absolute;
+  right: -47px;
+  top: -11px;
+  font-size: 14px;
+  width: 20px;
+  height: 20px;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
 }
