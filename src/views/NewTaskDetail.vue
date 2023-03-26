@@ -278,7 +278,6 @@ export default Vue.extend({
     async saveTask(isRedirect = true) {
       this.task.files = this.selectedFile
       await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
-
       if (isRedirect) {
         this.isEditResource = null
 
@@ -290,6 +289,7 @@ export default Vue.extend({
           await this.$router.replace({ query })
         }
       }
+      this.$store.dispatch('tasks/updateChats')
     },
     async deleteTask(e) {
       let to_delete = await this.$bvModal.msgBoxConfirm('Are you sure you want to delete?', {
