@@ -215,6 +215,7 @@ import InvoiceableTimerRow from './InvoiceableItemRow.vue'
 import ReportTimerRow from './ReportTimerRow.vue'
 import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
 import { applyTheme } from '@/utils/util-functions'
+import { EventBus } from '@/components/event-bus'
 
 export default {
   name: 'invoiceable-template',
