@@ -35,7 +35,7 @@
             <span v-if="getCompanyUserDetails(thread.owner.id)" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(thread.owner.id).color, cursor: 'pointer', display: 'inline-flex' }">
               {{ abbrName(getCompanyUserDetails(thread.owner.id).name) }}
             </span>
-            <p class="m-0">{{ thread.title }}</p>
+            <p :class="`m-0 ${thread.num_unread > 0 ? 'unread-item' : ''}`" :style="`color: ${thread.num_unread > 0 ? 'white' : ''};`">{{ thread.title }}</p>
             <div class="unread-message-num" v-if="thread.num_unread > 0" style="position: relative;">
               <span class="rounded-circle task-sidebar-item_badge">{{ thread.num_unread }}</span>
             </div>
@@ -542,11 +542,12 @@ b {
   margin-bottom: 0;
   white-space: pre-wrap;
   font-size: 17px;
+  min-height: 93%;
 }
 .threads-list {
   margin-top: 10px;
   background-color: #5755ac;
-  height: calc(100% - 158px);
+  height: calc(100% - 230px);
   min-height: 200px;
   position: relative;
 }
@@ -578,7 +579,7 @@ b {
 
 .thread-container {
   max-height: 90%;
-  height: calc(100vh - 490px);
+  height: calc(100vh - 547px);
   overflow: auto;
 }
 .new-thread-btn {
@@ -601,6 +602,15 @@ b {
   font-size: 14px;
   width: 20px;
   height: 20px;
+}
+.task-description {
+  height: 94px;
+  overflow: auto;
+}
+
+.unread-item {
+  font-weight: bolder;
+  color: white;
 }
 
 ::-webkit-scrollbar {
