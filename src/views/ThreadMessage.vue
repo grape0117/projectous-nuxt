@@ -87,7 +87,9 @@ export default {
   },
   created() {
     this.$nextTick(() => {
-      this.$refs.message_content.focus()
+      if (this.$refs.message_content) {
+        this.$refs.message_content.focus()
+      }
     })
   },
   watch: {
@@ -99,7 +101,9 @@ export default {
     },
     thread_id: function(thread_id) {
       if (thread_id) {
-        this.$refs.message_content.focus()
+        if (this.$refs.message_content) {
+          this.$refs.message_content.focus()
+        }
         let thread = this.$store.getters['threads/getById'](this.thread_id)[0]
         if (thread) {
           this.thread_title = thread.title
