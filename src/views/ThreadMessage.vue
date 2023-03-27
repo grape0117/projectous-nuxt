@@ -332,8 +332,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#message-container {
+  position: relative;
+}
 #dropzone {
-  height: calc(100% - 238px);
+  height: calc(100% - 201px);
 
   .dropzone-custom-content {
     margin-top: 40% !important;
@@ -361,7 +364,7 @@ export default {
 .dropzone {
   position: absolute;
   width: 100%;
-  bottom: 126px;
+  bottom: 163px;
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.2);
   border: none;
