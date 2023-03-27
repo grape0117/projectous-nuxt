@@ -87,7 +87,9 @@ export default {
   },
   created() {
     this.$nextTick(() => {
-      this.$refs.message_content.focus()
+      if (this.$refs.message_content) {
+        this.$refs.message_content.focus()
+      }
     })
   },
   watch: {
@@ -99,7 +101,9 @@ export default {
     },
     thread_id: function(thread_id) {
       if (thread_id) {
-        this.$refs.message_content.focus()
+        if (this.$refs.message_content) {
+          this.$refs.message_content.focus()
+        }
         let thread = this.$store.getters['threads/getById'](this.thread_id)[0]
         if (thread) {
           this.thread_title = thread.title
@@ -126,10 +130,10 @@ export default {
       messages = messages.sort(function(a, b) {
         return new Date(b.created_at) - new Date(a.created_at)
       })
-      setTimeout(() => {
+      this.$nextTick(() => {
         let container = this.$refs.msgContainer
         container.scrollTop = container.scrollHeight + 120
-      }, 100)
+      })
       return messages.reverse()
     },
     current_company_user_id() {
@@ -212,6 +216,7 @@ export default {
       if (this.selected_message == null) {
         let task_message = this.$store.dispatch('task_messages/createThreadMessage', {
           task_id,
+          thread_id: this.thread_id,
           company_user_id,
           file_path: response.file_path,
           message: response.name,
@@ -331,8 +336,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#message-container {
+  position: relative;
+}
 #dropzone {
-  height: calc(100% - 238px);
+  height: calc(100% - 201px);
 
   .dropzone-custom-content {
     margin-top: 40% !important;
@@ -360,7 +368,7 @@ export default {
 .dropzone {
   position: absolute;
   width: 100%;
-  bottom: 126px;
+  bottom: 163px;
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.2);
   border: none;
@@ -376,8 +384,7 @@ export default {
 }
 .task-cloud_task-message .thread-message-panel_inner {
   min-height: 105px;
-  // min-height: calc(100vh - 305px);
-  max-height: calc(100vh - 405px);
+  height: calc(100vh - 379px);
   overflow-y: scroll;
   overflow-x: hidden;
 }

@@ -193,7 +193,7 @@ export default Vue.extend({
       immediate: true,
       handler(query) {
         if (query.task && Object.keys(query.task).length > 0) {
-          this.getChat(query.task)
+          this.getChat(query.task, query.thread)
         }
 
         if (query.showChat && query.showChat === 'true') {
@@ -238,13 +238,13 @@ export default Vue.extend({
     toggleNewResource() {
       this.newResource = !this.newResource
     },
-    async getChat(task_id) {
+    async getChat(task_id, thread_id) {
       if (!task_id) {
         this.chat = []
       } else {
         this.chat = { messages: this.$store.getters['task_messages/getByTaskId'](task_id) }
       }
-      const { chat } = await this.$http().get(`/chat-thread/${task_id}/${this.thread_id || this.thread}`)
+      const { chat } = await this.$http().get(`/chat-thread/${task_id}/${thread_id}`)
 
       this.chat = chat
       // this.$store.dispatch('task_messages/updateChats')

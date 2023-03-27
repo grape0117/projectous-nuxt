@@ -349,6 +349,13 @@ export default {
             that.$store.dispatch('PROCESS_INCOMING_DATA', { new_task: JSON.parse(e.data.new_task) })
           }
           break
+        case 'THREAD':
+          title = e.data.title
+          body = JSON.stringify(e.data.message)
+          if (Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
+            that.$store.dispatch('tasks/updateChats')
+          }
+          break
         case 'UPDATE_TASK':
           title = e.data.title
           body = JSON.stringify(e.data.message)
