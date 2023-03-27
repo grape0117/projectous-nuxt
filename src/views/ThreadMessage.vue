@@ -212,6 +212,7 @@ export default {
       if (this.selected_message == null) {
         let task_message = this.$store.dispatch('task_messages/createThreadMessage', {
           task_id,
+          thread_id: this.thread_id,
           company_user_id,
           file_path: response.file_path,
           message: response.name,
@@ -376,8 +377,7 @@ export default {
 }
 .task-cloud_task-message .thread-message-panel_inner {
   min-height: 105px;
-  // min-height: calc(100vh - 305px);
-  max-height: calc(100vh - 405px);
+  height: calc(100vh - 379px);
   overflow-y: scroll;
   overflow-x: hidden;
 }

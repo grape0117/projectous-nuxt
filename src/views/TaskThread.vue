@@ -543,6 +543,7 @@ b {
   white-space: pre-wrap;
   font-size: 17px;
   min-height: 93%;
+  word-break: break-word;
 }
 .threads-list {
   margin-top: 10px;
