@@ -338,6 +338,7 @@ export default {
 <style lang="scss" scoped>
 #message-container {
   position: relative;
+  background-color: #cdcdcd;
 }
 #dropzone {
   height: calc(100% - 201px);
@@ -401,6 +402,7 @@ export default {
 .send-message {
   border: gray solid 1px;
   border-radius: 7px;
+  background-color: white;
 }
 .thread-btns {
   display: flex;
