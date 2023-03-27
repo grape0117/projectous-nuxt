@@ -126,10 +126,10 @@ export default {
       messages = messages.sort(function(a, b) {
         return new Date(b.created_at) - new Date(a.created_at)
       })
-      setTimeout(() => {
+      this.$nextTick(() => {
         let container = this.$refs.msgContainer
         container.scrollTop = container.scrollHeight + 120
-      }, 100)
+      })
       return messages.reverse()
     },
     current_company_user_id() {
