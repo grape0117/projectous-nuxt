@@ -2,11 +2,7 @@
   <b-list-group-item class="message-panel_inner-message" style="float: right;" v-if="thread">
     <b-avatar class="mr-1 mb-2" :text="user_name" v-b-tooltip.hover :title="full_name" size="25px" />
     <div>
-      <div class="message-wrapper">
-        <div class="message-container">
-          <pre class="msg-content" style="color: white;">{{ title }}</pre>
-        </div>
-      </div>
+      <pre class="msg-content" style="color: white;">{{ title }}</pre>
     </div>
   </b-list-group-item>
 </template>
@@ -49,13 +45,14 @@ export default {
 
 <style lang="scss" scoped>
 .msg-content {
-  padding: 8px 12px;
-  background-color: gray;
-  // border: solid 1px grey;
+  padding: 0px 12px 4px;
   border-radius: 4px;
   margin-top: 5px;
   margin-bottom: 0;
   white-space: pre-wrap;
+  color: white;
+  font-weight: bolder;
+  font-size: 23px;
 }
 
 .message-panel_inner-message {

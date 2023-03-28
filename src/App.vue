@@ -352,7 +352,7 @@ export default {
         case 'THREAD':
           title = e.data.title
           body = JSON.stringify(e.data.message)
-          if (Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             that.$store.dispatch('tasks/updateChats')
           }
           break
