@@ -25,7 +25,7 @@
       <div v-if="timer.project_id">
         <div class="timer-row-client">{{ getClientNameFromProjectId(timer.project_id) }}</div>
         <div class="timer-row-project">{{ getProjectName(timer.project_id) }}</div>
-        <div class="timer-row-task">{{ getTaskTitle(timer.task_id) }}</div>
+        <div class="timer-row-task">{{ timer.task_title }}</div>
       </div>
       <span v-else style="color: red">No Project</span>
       <div v-if="isAdmin()" class="timer-row-user">{{ timerUser(timer.user_id) }}</div>
