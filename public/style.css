@@ -14,7 +14,7 @@ body {
  */
 
  .avatar {
-    width: 25px;
+    min-width: 25px;
     height: 25px;
     border-radius: 50px;
     background-color: gray;
