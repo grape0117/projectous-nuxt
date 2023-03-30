@@ -48,11 +48,13 @@ export default {
         this.makeToast('danger', 'Title is required!')
         return
       }
-      let thread = await this.$store.dispatch('threads/createThread', {
+      const { task_thread } = await this.$store.dispatch('threads/createThread', {
         task_id: this.task_id,
         title: this.thread_title,
         user: me
       })
+      await this.$router.push({ query: { task: this.task_id, thread: task_thread.id, showChat: 'true' } })
+
       this.$store.dispatch('tasks/updateChats')
       $('.close').click()
     },
