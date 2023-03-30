@@ -1,6 +1,6 @@
 <template>
   <b-list-group-item class="message-panel_inner-message" style="float: right;" v-if="thread">
-    <b-avatar class="mr-1 mb-2" :text="user_name" v-b-tooltip.hover :title="full_name" size="25px" />
+    <b-avatar class="mr-1 mb-2 avatar" :text="user_name" v-b-tooltip.hover :title="full_name" size="25px" />
     <div>
       <pre class="msg-content" style="color: white;">{{ title }}</pre>
     </div>
@@ -64,6 +64,9 @@ export default {
   max-width: 90%;
   .b-avatar-text {
     width: 25px !important;
+  }
+  .avatar {
+    min-width: 25px !important;
   }
 
   .message-dateTime {

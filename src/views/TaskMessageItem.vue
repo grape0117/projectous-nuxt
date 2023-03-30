@@ -125,6 +125,7 @@ export default {
   margin-top: 5px;
   margin-bottom: 0;
   white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .message-panel_inner-message {
