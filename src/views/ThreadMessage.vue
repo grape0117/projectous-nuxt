@@ -18,7 +18,7 @@
     <div class="send-message" v-if="thread && thread.status == 'open'">
       <b-form-textarea type="text" ref="message_content" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3" @keyup.enter.exact="changeText" @keydown.enter="handleEnter"> </b-form-textarea>
       <i class="icon-attach_file" @click="attachFile()" />
-      <i class="icon-send" :style="s_message == '' || s_message == '\n' ? 'color: gray;' : 'color: darkorange;'" @click="saveMessage()" />
+      <i class="icon-send" :style="(s_message !== '' && s_message !== '\n') || fileExist ? 'color: darkorange;' : 'color: gray;'" @click="saveMessage()" />
     </div>
     <div class="thread-btns" v-if="thread && thread.status == 'open'">
       <b-button @click="closeThread">CLOSE THREAD</b-button>
@@ -207,6 +207,7 @@ export default {
     sendingFiles(file, xhr, formData) {},
     uploadSuccess(file, response) {
       this.showDropzone = false
+      this.fileExist = false
       this.$refs.chatDropzone.removeAllFiles()
 
       let task_id = this.task_id
@@ -230,6 +231,7 @@ export default {
     },
     afterComplete(response) {
       this.showDropzone = false
+      this.fileExist = false
       this.$refs.chatDropzone.removeAllFiles()
     },
     cancelUpload(file) {},
@@ -293,6 +295,7 @@ export default {
         //   created_at: moment().format('YYYY-MM-DD HH:mm:ss')
         // }
         // this.$store.dispatch('ADD_ONE', { module: 'task_messages', entity: [message] }, { root: true })
+        this.s_message = ''
         let task_message = await this.$store.dispatch('task_messages/createThreadMessage', {
           thread_id: this.thread_id,
           task_id,
@@ -303,7 +306,6 @@ export default {
         })
         console.log('task_message', task_message)
 
-        this.s_message = ''
         return
         task = this.$store.getters['tasks/getById'](task_id)
         task.last_task_message_id = task_message.task_messages.id

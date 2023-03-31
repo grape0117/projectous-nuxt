@@ -1,6 +1,6 @@
 <template>
   <b-list-group-item class="message-panel_inner-message" :style="is_me ? 'float: right;' : ''">
-    <b-avatar v-if="!is_me" class="mr-1 mb-4" :text="user_name" v-b-tooltip.hover :title="message.user.name" size="25px" />
+    <b-avatar v-if="!is_me" class="mr-1 mb-4 avatar" :text="user_name" v-b-tooltip.hover :title="message.user.name" size="25px" style="width: 25px;" />
     <div>
       <div class="message-wrapper">
         <div class="message-container" v-on:mouseover="showDownloadBtn = true" v-on:mouseleave="showDownloadBtn = false">
@@ -125,6 +125,7 @@ export default {
   margin-top: 5px;
   margin-bottom: 0;
   white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .message-panel_inner-message {
@@ -134,8 +135,9 @@ export default {
   border: 0 !important;
   padding: 0px 10px 5px 10px;
   max-width: 90%;
-  .b-avatar-text {
-    width: 25px !important;
+  .b-avatar-text,
+  .avatar {
+    min-width: 25px !important;
   }
 
   .message-dateTime {
@@ -157,6 +159,7 @@ export default {
 
   .message-container {
     background-color: gray;
+    position: relative;
     .download-bg {
       position: absolute;
       top: 0;
