@@ -293,6 +293,7 @@ export default {
         //   created_at: moment().format('YYYY-MM-DD HH:mm:ss')
         // }
         // this.$store.dispatch('ADD_ONE', { module: 'task_messages', entity: [message] }, { root: true })
+        this.s_message = ''
         let task_message = await this.$store.dispatch('task_messages/createThreadMessage', {
           thread_id: this.thread_id,
           task_id,
@@ -303,7 +304,6 @@ export default {
         })
         console.log('task_message', task_message)
 
-        this.s_message = ''
         return
         task = this.$store.getters['tasks/getById'](task_id)
         task.last_task_message_id = task_message.task_messages.id
