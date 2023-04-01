@@ -53,7 +53,7 @@
       <div>
         <span>{{ durationDisplay }}</span>
 
-        <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-3" :style="{ width: task.due_date ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
+        <input id="task-list-due-date" @change="saveDueDate" :class="task.due_date && task.due_date !== '0000-00-00 00:00:00' ? 'badge badge-danger mr-3' : 'badge badge-danger mr-3  show-on-hovered'" :style="{ width: task.due_date && task.due_date !== '0000-00-00 00:00:00' ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
       </div>
     </div>
   </div>
@@ -293,6 +293,7 @@ export default {
       return project ? project.acronym : false
     },
     dueDate(due_date) {
+      console.log(due_date)
       let formatted_date
       if (due_date) {
         formatted_date = moment(due_date, 'yyyy-MM-DD').format('yyyy-MM-DD')
@@ -330,7 +331,7 @@ export default {
         color = '#17a2b8'
       }
       if (!due_date) {
-        color = '#28a745'
+        color = 'rgba(255,255,255,.4)'
       }
       if (return_color) {
         return_value = color
