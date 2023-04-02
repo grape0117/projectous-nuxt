@@ -16,7 +16,7 @@
       </div>
     </vue-dropzone>
     <div class="send-message" v-if="thread && thread.status == 'open'">
-      <b-form-textarea type="text" ref="message_content" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3" @keyup.enter.exact="changeText" @keydown.enter="handleEnter"> </b-form-textarea>
+      <b-form-textarea type="text" ref="message_content" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3" @keyup.enter.exact="changeText" @keydown.enter="handleEnter" @paste="$event => onMessagePaste($event)"> </b-form-textarea>
       <i class="icon-attach_file" @click="attachFile()" />
       <i class="icon-send" :style="(s_message !== '' && s_message !== '\n') || fileExist ? 'color: darkorange;' : 'color: gray;'" @click="saveMessage()" />
     </div>
@@ -332,6 +332,19 @@ export default {
       setTimeout(() => {
         that.$refs.chatDropzone.$el.click()
       }, 500)
+    },
+    onMessagePaste(event) {
+      this.showDropzone = true
+      this.$nextTick(() => {
+        const items = event.clipboardData.items
+        for (const item of items) {
+          if (item.kind === 'file') {
+            const blob = item.getAsFile()
+            const reader = new FileReader()
+            this.$refs.chatDropzone.addFile(blob)
+          }
+        }
+      })
     }
   }
 }
