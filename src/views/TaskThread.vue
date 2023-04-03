@@ -535,6 +535,9 @@ b {
 }
 .task-title {
   color: #fffdfd;
+  height: 32px;
+  overflow: auto;
+  overflow-x: hidden;
 }
 .duration {
   display: flex;
