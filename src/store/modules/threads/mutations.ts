@@ -28,5 +28,10 @@ export const mutations: MutationTree<IModuleState> = {
   updateThreads(state: IModuleState, threads) {
     //@ts-ignore
     state.threads = threads
+  },
+  changeResponsibility(state: IModuleState, threadInfo) {
+    //@ts-ignore
+    let thread_index = state.threads.findIndex(({ id }) => id == threadInfo.thread_id)
+    state.threads[thread_index].responsibility_company_user_id = threadInfo.responsibility_company_user_id
   }
 }

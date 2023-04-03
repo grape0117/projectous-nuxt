@@ -30,5 +30,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     let task_thread = await this._vm.$http().post('/thread/reopen', { thread_id: thread_id })
     commit('reopenByThreadId', thread_id)
     return task_thread
+  },
+  async changeResponsibility({ commit }, { company_user_id, thread_id }: any) {
+    // @ts-ignore
+    let task_thread = await this._vm.$http().post(`/thread/update_responsibility/${thread_id}`, { responsibility_company_user_id: company_user_id })
+    commit('changeResponsibility', { thread_id: thread_id, responsibility_company_user_id: company_user_id })
+    return task_thread
   }
 }

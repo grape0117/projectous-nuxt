@@ -39,6 +39,9 @@
             <div class="unread-message-num" v-if="thread.num_unread > 0" style="position: relative;">
               <span class="rounded-circle task-sidebar-item_badge">{{ thread.num_unread }}</span>
             </div>
+            <span @click="selectReponsibility(thread)" v-if="thread.responsibility_company_user_id && getCompanyUserDetails(thread.responsibility_company_user_id)" :class="`avatar mr-1 pointer ml-4 responsibility`" :style="{ 'background-color': getCompanyUserDetails(thread.responsibility_company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+              {{ abbrName(getCompanyUserDetails(thread.responsibility_company_user_id).name) }}
+            </span>
           </div>
           <div class="mt-3 ml-2" v-if="closed_threads.length > 0">
             <a class="see-closed" href="javascript:void();" @click="showClosedThreads()"><span v-if="show_closed_threads">Hide</span><span v-else>See</span> {{ closed_threads.length }} closed threads</a>
@@ -60,6 +63,7 @@
       </b-tab>
     </b-tabs>
     <new-thread-modal id="new-thread" :task_id="this.task.id" />
+    <select-responsibility-modal id="select-responsibility" :thread="thread" :task_id="this.task.id" />
   </div>
 </template>
 
@@ -73,6 +77,7 @@ import { chain, groupBy } from 'lodash'
 import { getCookie, abbrName } from '@/utils/util-functions'
 import DatePicker from './DatePicker'
 import NewThreadModal from './NewThreadModal'
+import SelectResponsibilityModal from './SelectResponsibilityModal'
 
 export default {
   data() {
@@ -100,14 +105,17 @@ export default {
         //   return "files[]";
         // },
       },
-      show_closed_threads: false
+      show_closed_threads: false,
+      usersList: [],
+      thread: null
     }
   },
   components: {
     'task-message-item': () => import('./TaskMessageItem.vue'),
     vueDropzone: vue2Dropzone,
     'date-picker': DatePicker,
-    NewThreadModal
+    NewThreadModal,
+    SelectResponsibilityModal
   },
   props: {
     task: {
@@ -123,7 +131,11 @@ export default {
     thread_id: null
   },
   /* Load surveys and questionnaired on page load. */
-  created() {},
+  created() {
+    EventBus.$on('selectReponsibility', thread => {
+      this.selectReponsibility(JSON.parse(thread))
+    })
+  },
   watch: {
     showChat: function(show) {}
   },
@@ -437,6 +449,13 @@ export default {
       return moment(date).format('MMM DD, YYYY | ddd')
     },
 
+    selectReponsibility(thread) {
+      console.log(thread)
+      this.thread = thread
+      this.$nextTick(() => {
+        this.$bvModal.show('select-responsibility-modal')
+      })
+    },
     async saveMessage() {
       if (this.$refs.chatDropzone && this.$refs.chatDropzone.getActiveFiles().length > 0) {
         this.$refs.chatDropzone.processQueue()
@@ -569,6 +588,13 @@ b {
   align-items: center;
   margin-top: 10px;
   cursor: pointer;
+  position: relative;
+}
+.thread-item .responsibility {
+  position: absolute;
+  right: 0px;
+  z-index: 999;
+  border: solid red 2px;
 }
 
 .thread-item:hover {
