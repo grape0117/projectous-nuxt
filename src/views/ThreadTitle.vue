@@ -4,12 +4,18 @@
     <div>
       <pre class="msg-content" style="color: white;">{{ title }}</pre>
     </div>
+    <span @click="selectReponsibility()" v-if="responsibility_company_user_id && getCompanyUserDetails(responsibility_company_user_id)" :class="`responsibility avatar mr-1 pointer ml-4 responsibility`" :style="{ 'background-color': getCompanyUserDetails(responsibility_company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+      {{ abbrName(getCompanyUserDetails(responsibility_company_user_id).name) }}
+    </span>
   </b-list-group-item>
 </template>
 
 <script>
 import moment from 'moment'
+import { EventBus } from '@/components/event-bus'
+
 import { abbrName } from '@/utils/util-functions'
+import SelectResponsibilityModal from './SelectResponsibilityModal'
 
 export default {
   name: 'task-message-item',
@@ -19,6 +25,9 @@ export default {
       full_name: '',
       title: ''
     }
+  },
+  components: {
+    SelectResponsibilityModal
   },
   props: ['thread'],
   watch: {
@@ -30,6 +39,12 @@ export default {
       }
     }
   },
+  computed: {
+    responsibility_company_user_id() {
+      const thread = this.$store.state.threads.threads.filter(({ id }) => id == this.thread.id)[0]
+      return thread ? thread.responsibility_company_user_id : null
+    }
+  },
   created() {
     if (this.thread) {
       this.user_name = abbrName(this.thread.owner.name)
@@ -38,7 +53,15 @@ export default {
     }
   },
   methods: {
-    abbrName
+    abbrName,
+    getCompanyUserDetails(company_user_id) {
+      const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
+
+      return user_details
+    },
+    selectReponsibility() {
+      EventBus.$emit('selectReponsibility', JSON.stringify(this.thread))
+    }
   }
 }
 </script>
@@ -55,6 +78,11 @@ export default {
   font-size: 23px;
 }
 
+.responsibility {
+  position: absolute;
+  right: 0px;
+  top: 10px;
+}
 .message-panel_inner-message {
   display: flex;
   align-items: flex-end;
