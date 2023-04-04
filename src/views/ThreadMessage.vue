@@ -9,7 +9,7 @@
         <task-message-item :message="message" @edit-message="editMessage" @delete-message="deleteMessage" :is_me="message.company_user_id == current_company_user_id" />
       </div>
     </b-list-group>
-    <vue-dropzone @vdropzone-drag-leave="dragLeave" ref="chatDropzone" id="dropzone" :options="dropzoneOptions" @vdropzone-complete="afterComplete" @vdropzone-sending="sendingFiles" v-if="showDropzone" :useCustomSlot="true" @vdropzone-file-added="fileAdded" @vdropzone-files-added="filesAdded" @vdropzone-canceled="cancelUpload" @vdropzone-removed-file="removedFile" @vdropzone-success="uploadSuccess">
+    <vue-dropzone @vdropzone-drag-leave="dragLeave" ref="chatDropzone" id="dropzone" :options="dropzoneOptions" @vdropzone-complete-multiple="afterComplete" @vdropzone-sending="sendingFiles" v-if="showDropzone" :useCustomSlot="true" @vdropzone-file-added="fileAdded" @vdropzone-files-added="filesAdded" @vdropzone-canceled="cancelUpload" @vdropzone-removed-file="removedFile" @vdropzone-success-multiple="uploadSuccess">
       <div class="dropzone-custom-content">
         <h3 class="dropzone-custom-title">Drag and drop a file</h3>
         <div class="subtitle">...or click to select a file from your computer</div>
@@ -51,9 +51,11 @@ export default {
       dropzoneOptions: {
         // url: `${process.env.VUE_APP_API_URL}/store-file`,
         url: `https://testing.projectous.com/upload`,
+        // url: `http://localhost:3000/upload`,
         thumbnailWidth: 150,
         maxFilesize: 500,
         maxFiles: 1000,
+        parallelUploads: 100,
         uploadMultiple: true,
         autoProcessQueue: false,
         addRemoveLinks: true,
@@ -212,22 +214,23 @@ export default {
       this.showDropzone = false
       this.fileExist = false
       this.$refs.chatDropzone.removeAllFiles()
-
       let task_id = this.task_id
       let company_user_id = this.current_company_user_id
       let message = this.s_message
       let task
       if (this.selected_message == null) {
-        let task_message = this.$store.dispatch('task_messages/createThreadMessage', {
-          task_id,
-          thread_id: this.thread_id,
-          company_user_id,
-          file_path: response.file_path,
-          message: response.name,
-          is_file: true,
-          thumbnail: response.thumbnail_path,
-          task_message_id: this.messageId
-        })
+        for (const res of response) {
+          let task_message = this.$store.dispatch('task_messages/createThreadMessage', {
+            task_id,
+            thread_id: this.thread_id,
+            company_user_id,
+            file_path: res.file_path,
+            message: res.name,
+            is_file: true,
+            thumbnail: res.thumbnail_path,
+            task_message_id: this.messageId
+          })
+        }
         this.s_message = ''
         return
       }
@@ -337,17 +340,19 @@ export default {
       }, 500)
     },
     onMessagePaste(event) {
-      this.showDropzone = true
-      this.$nextTick(() => {
-        const items = event.clipboardData.items
-        for (const item of items) {
-          if (item.kind === 'file') {
-            const blob = item.getAsFile()
-            const reader = new FileReader()
-            this.$refs.chatDropzone.addFile(blob)
+      const items = event.clipboardData.items
+      if (items[0].kind === 'file') {
+        this.showDropzone = true
+        this.$nextTick(() => {
+          for (const item of items) {
+            if (item.kind === 'file') {
+              const blob = item.getAsFile()
+              const reader = new FileReader()
+              this.$refs.chatDropzone.addFile(blob)
+            }
           }
-        }
-      })
+        })
+      }
     }
   }
 }
