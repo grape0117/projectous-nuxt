@@ -1,7 +1,7 @@
 <template>
-  <div class="message-panel" id="message-container">
+  <div class="message-panel" id="message-container" @dragover="dragOver" @drop="dropFile">
     <thread-title :thread="thread" />
-    <b-list-group class="thread-message-panel_inner" ref="msgContainer" @dragover="dragOver" @drop="dropFile">
+    <b-list-group class="thread-message-panel_inner" ref="msgContainer">
       <div v-for="(message, index) in chatMessages" :key="message.id">
         <div class="date" v-if="isShowDate(index, message, chat.messages)">
           {{ date(message.created_at) }}
@@ -198,6 +198,7 @@ export default {
     dropFile(event) {},
     dragOver(event) {
       this.showDropzone = true
+      $('#dropzone').addClass('dz-drag-hover')
       event.preventDefault()
     },
     fileAdded(file) {
@@ -205,7 +206,7 @@ export default {
       this.fileExist = true
     },
     filesAdded(file) {
-      $('#dropzone').addClass('dropzone-file-contentainer')
+      // $('#dropzone').addClass('dropzone-file-contentainer')
       this.showDropzone = true
       this.fileExist = true
     },
@@ -344,6 +345,7 @@ export default {
       if (items[0].kind === 'file') {
         this.showDropzone = true
         this.$nextTick(() => {
+          // $('#dropzone').addClass('dropzone-file-contentainer')
           for (const item of items) {
             if (item.kind === 'file') {
               const blob = item.getAsFile()
@@ -394,10 +396,15 @@ export default {
   width: 100%;
   bottom: 163px;
   z-index: 10;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.5);
   border: none;
 }
 
+.dz-drag-hover {
+  height: 100% !important;
+  bottom: 0px !important;
+  padding-top: 57px;
+}
 .dropzone-custom-title,
 .subtitle {
   color: white;
