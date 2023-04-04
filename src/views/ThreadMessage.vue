@@ -47,11 +47,14 @@ export default {
       s_message: '',
       selected_message: null,
       enabledNotification: false,
+      timeout: 100000,
       dropzoneOptions: {
         // url: `${process.env.VUE_APP_API_URL}/store-file`,
         url: `https://testing.projectous.com/upload`,
         thumbnailWidth: 150,
         maxFilesize: 500,
+        maxFiles: 1000,
+        uploadMultiple: true,
         autoProcessQueue: false,
         addRemoveLinks: true,
         headers: {
