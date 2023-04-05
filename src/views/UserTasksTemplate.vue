@@ -24,13 +24,6 @@
               <span v-if="others_high_count > 0" class="badge badge-danger label-primary" v-html="others_high_count"></span>
             </a>
           </li>
-          <li @click="setCompanyUserId(user.id)" :class="tabClass(user.id)" role="presentation" v-for="user in usersNotMe" v-bind:user="user">
-            <a aria-controls="closed" role="tab" data-toggle="tab"
-              >{{ user.name }}
-              <span v-if="filter_task_count(user.id) > 0" :class="badgeClass(user)" v-html="filter_task_count(user.id)"></span>
-              <span v-if="filter_task_high_count(user.id).length > 0 && filter_task_high_count(user.id)[0]['count'] > 0" class="badge badge-danger label-primary" v-html="filter_task_high_count(user.id)[0]['count']"></span>
-            </a>
-          </li>
           <li @click="setTab('today_tasks')" :class="tabClass('today_tasks')" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >Today
@@ -46,6 +39,17 @@
             </a>
           </li>
         </ul>
+        <ul class="nav nav-tabs" role="tablist">
+          <li @click="setCompanyUserId(user.id)" :class="tabClass(user.id)" role="presentation" v-for="user in usersNotMe" v-bind:user="user">
+            <a aria-controls="closed" role="tab" data-toggle="tab"
+              ><span v-if="user.id" :title="`${user.name}`" :class="`avatar mr-1 pointer ${user.status}`" :style="{ color: 'black', 'background-color': user.color ? user.color : '', cursor: 'pointer', display: 'inline-flex' }">
+                {{ abbrName(user.name) }}
+              </span>
+              <span v-if="filter_task_count(user.id) > 0" :class="badgeClass(user)" v-html="filter_task_count(user.id)"></span>
+              <span v-if="filter_task_high_count(user.id).length > 0 && filter_task_high_count(user.id)[0]['count'] > 0" class="badge badge-danger label-primary" v-html="filter_task_high_count(user.id)[0]['count']"></span>
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
     <div class="col-md-12" v-if="isAdmin">
@@ -56,17 +60,17 @@
               Owner
             </b-form-checkbox>
             <span class="input-group" style="display: inline;">
-              <input v-model="task_filter" :class="'form-control input-sm ' + taskFilterClass()" style="width: 200px; background: transparent;" /><button v-if="task_filter" class="btn btn-sm btn-default" @click="clearSearch()">&times;</button><button class="btn btn-sm btn-default"><i class="glyphicon glyphicon-search"></i></button>
+              <input placeholder="search" v-model="task_filter" :class="'form-control input-sm ' + taskFilterClass()" style="width: 200px; border: solid 1px rgba(0,0,0,.8); background: white;" /><button v-if="task_filter" class="btn btn-sm btn-default" @click="clearSearch()">&times;</button><button class="btn btn-sm btn-default"><i class="glyphicon glyphicon-search"></i></button>
             </span>
           </li>
         </ul>
         <b style="font-size:13px;">Project: </b>
         <b v-for="project_id in project_list">
-          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'background-color': isActiveProjectFilter(project_id) ? getClientAcronymColor(project_id) : 'white', color: isActiveProjectFilter(project_id) ? 'white' : 'black', cursor: 'pointer' }" v-b-tooltip.hover :title="taskProjectName(project_id) && taskProjectName(project_id)">
+          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'font-size': isActiveProjectFilter(project_id) ? '12px' : '18px', 'background-color': getClientAcronymColor(project_id), color: 'white', cursor: 'pointer' }" v-b-tooltip.hover :title="taskProjectName(project_id) && taskProjectName(project_id)">
             {{ getProjectDetails(project_id) }}
           </b-badge>
         </b>
-        <div>
+        <!--<div>
           <b style="font-size:13px;">Status: </b>
           <b-badge @click="updateStatusFilter('open')" :variant="isActiveStatusFilter('open') ? 'secondary' : 'light'" class="mr-1" style="cursor:pointer">Open</b-badge>
           <b-badge @click="updateStatusFilter('turned-in')" :variant="isActiveStatusFilter('turned-in') ? 'info' : 'light'" class="mr-1" style="cursor:pointer">Turned-In</b-badge>
@@ -80,7 +84,7 @@
           <b-badge @click="updateStepFilter('test')" :variant="isActiveStepFilter('test') ? 'info' : 'light'" class="mr-1" style="cursor:pointer">Test</b-badge>
           <b-badge @click="updateStepFilter('get client feedback')" :variant="isActiveStepFilter('get client feedback') ? 'primary' : 'light'" class="mr-1" style="cursor:pointer">Get Client Feedback</b-badge>
           <b-badge @click="updateStepFilter('notify client')" :variant="isActiveStepFilter('notify client') ? 'success' : 'light'" class="mr-1" style="cursor:pointer">Notify Client</b-badge>
-        </div>
+        </div>-->
         <div role="tabpanel" class="tab-pane active" id="active">
           <h3 v-if="current_project_id">{{ getCurrentProjectNameById() }}</h3>
           <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab" @updateData="updateData"> </tasks-tab>
@@ -344,6 +348,19 @@ export default {
     }
   },
   methods: {
+    abbrName(name) {
+      if (!name) return ''
+      let matches = name.match(/\b(\w)/g) // ['J','S','O','N']
+      if (matches) {
+        let acronym = matches.join('') // JSON
+        return acronym.toUpperCase()
+      }
+    },
+    getCompanyUserDetails(company_user_id) {
+      const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
+
+      return user_details
+    },
     getClientAcronymColor(project_id) {
       return this.getProjectDetails(project_id, true)
     },
@@ -669,15 +686,15 @@ table {
   /* border-radius: 2px !important; */
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
-  border-top: solid 3px #7e5813;
-  background: #7e5813;
+  border-top: solid 3px rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.4);
   margin-bottom: 0;
   margin-right: 2px;
   cursor: pointer;
   padding: 4px;
 }
 .nav-tabs li:hover {
-  background: #ffa500 !important;
+  background: rgba(0, 0, 0, 0.8) !important;
 }
 
 .nav-tabs li a {
@@ -687,10 +704,10 @@ table {
 }
 
 .nav-tabs li.active {
-  background: #ffa500;
-  border-top: solid 3px #007bff;
-  border-left: solid 2px #bb7c08;
-  border-right: solid 2px #bb7c08;
+  background: rgba(0, 0, 0, 0.1);
+  border-top: solid 3px rgba(0, 0, 0, 0.4);
+  border-left: solid 2px rgba(0, 0, 0, 0.4);
+  border-right: solid 2px rgba(0, 0, 0, 0.4);
   margin-bottom: 1px;
   font-weight: bold;
 }

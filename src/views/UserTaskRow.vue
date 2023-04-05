@@ -1,60 +1,59 @@
 <template>
-  <div class="col-md-12  user-task-row" v-show="showTimer">
-    <div class="card" :id="'task_' + task.id" :style="{ margin: hasMargin ? '20px 15px 5px 15px' : '5px 15px', 'background-color': 'rgba(0,0,0,.4)', color: 'white', opacity: isCompletedTask ? 0.5 : 1 }">
-      <div class="card-body" :style="{ padding: '10px 20px 10px 25px', border: isNewTask ? 'white dashed 3px' : 'none' }">
-        <div class="row" style="padding: 0px;">
-          <div class="col-md-9" style="align-self:center">
-            <h6 class="card-text">
-              <b-icon v-if="task['isToday']" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 0)"></b-icon>
-              <b-icon v-else :icon="is_mouse_enter ? 'star-fill' : 'star'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 1)"></b-icon>
-              <i class="icon-play_arrow" @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" style="color:green;cursor:pointer;"></i>
-              <i class="icon-stop" @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" style="color:red;cursor:pointer;"></i>
-              <b>
-                <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
-                  {{ getProjectDetails(task.project_id) }}
-                </b-badge>
+  <div :id="'task_' + task.id" @mouseenter="addHoverClass" @mouseleave="removeHoverClass" :style="{ border: isNewTask ? 'white dashed 3px' : 'none', opacity: isCompletedTask ? 0.5 : 1, display: 'table-row', background: 'rgba(0,0,0,.4)' }" class="col-md-12 user-task-row" v-show="showTimer">
+    <div :style="{ 'white-space': 'nowrap', 'text-align': 'right', display: 'table-cell' }">
+      <b-icon v-if="task['isToday']" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 0)"></b-icon>
+      <b-icon v-else :icon="is_mouse_enter ? 'star-fill' : 'star'" font-scale="1" variant="warning" class="show-on-hovered mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 1)"></b-icon>
+      <i class="show-on-hovered icon-play_arrow" @click="startTimer()" v-if="!getTaskTimers(task.id, 'button_status')" style="color:green;cursor:pointer;"></i>
+      <i class="icon-stop" @click="stopTimer()" v-if="getTaskTimers(task.id, 'button_status')" style="color:red;cursor:pointer;"></i>
+    </div>
+    <div :style="{ 'white-space': 'nowrap', 'text-align': 'right', display: 'table-cell' }">
+      <b>
+        <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
+          {{ getProjectDetails(task.project_id) }}
+        </b-badge>
 
-                <b-badge v-else-if="task.project_id" :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2">
-                  {{ getProject(task.project_id) ? getProject(task.project_id).name : '--' }}
-                </b-badge>
+        <b-badge v-else-if="task.project_id" :style="{ 'max-width': '100px', overflow: 'hidden', 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2">
+          {{ getProject(task.project_id) ? getProject(task.project_id).name : '--' }}
+        </b-badge>
 
-                <b-badge v-else :style="{ 'background-color': 'transparent' }" variant="primary" class="mr-2 ml-2">
-                  --
-                </b-badge>
+        <b-badge v-else :style="{ 'background-color': 'transparent' }" variant="primary" class="mr-2 ml-2">
+          --
+        </b-badge>
+      </b>
+    </div>
+    <div style="white-space: nowrap; display: table-cell">
+      <b>
+        <b-dropdown class="mr-3" id="priorities-dropdown" :text="task.priority ? capitalizeFirstLetter(task.priority) : ''" :variant="priorityColor(task.priority)" style="border:none;">
+          <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
+          <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
+          <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
+          <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
+        </b-dropdown>
+      </b>
+    </div>
+    <div style="display: table-cell; width: 99%">
+      <span @click="showTaskDetail" style="cursor: pointer;">{{ task.title ? task.title : '---' }}</span>
+      <span v-for="user in task_users" v-if="isAdmin() || is_owner">
+        <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+          {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
+        </span>
+      </span>
+      <span class="show-on-hovered" v-if="isMyTask">
+        <span title="Complete" class="add-dev-btn" v-if="!isCompletedTask" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></span>
+        <span title="Cancel Complete" class="add-dev-btn" v-else variant="outline-success" @click="notCompleteMyTask(task.id)" pill><i class="icon-close"/></span>
+      </span>
+      <span title="Add developer" v-if="isAdmin()" class="show-on-hovered add-dev-btn" @click="addDeveloper(task.id)" pill><i class="icon-add"/></span>
+      <span v-if="isAdmin() || is_owner" title="Delete" class="show-on-hovered add-dev-btn" variant="outline-error" @click="deleteTask(task.id)" pill><i class="icon-delete"/></span>
+      <!-- <b-button v-if="isAdmin" variant="outline-light" @click="addDeveloper(task.id)" pill><i class="icon-person_add"/></b-button> -->
+      <h5 v-if="isMyTask">
+        {{ myStepAndNotes }}
+      </h5>
+    </div>
+    <div class="col-md-3" style="white-space: nowrap; display: table-cell; align-self:center">
+      <div>
+        <span>{{ durationDisplay }}</span>
 
-                <span @click="showTaskDetail" style="cursor: pointer;">{{ task.title ? task.title : '---' }}</span>
-                <span v-for="user in task_users" v-if="isAdmin() || is_owner">
-                  <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
-                    {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
-                  </span>
-                </span>
-                <span v-if="isMyTask">
-                  <span title="Complete" class="add-dev-btn" v-if="!isCompletedTask" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></span>
-                  <span title="Cancel Complete" class="add-dev-btn" v-else variant="outline-success" @click="notCompleteMyTask(task.id)" pill><i class="icon-close"/></span>
-                </span>
-                <span title="Add developer" v-if="isAdmin()" class="add-dev-btn" @click="addDeveloper(task.id)" pill><i class="icon-add"/></span>
-                <span v-if="isAdmin() || is_owner" title="Delete" class="add-dev-btn" variant="outline-error" @click="deleteTask(task.id)" pill><i class="icon-delete"/></span>
-                <!-- <b-button v-if="isAdmin" variant="outline-light" @click="addDeveloper(task.id)" pill><i class="icon-person_add"/></b-button> -->
-              </b>
-            </h6>
-            <h5 v-if="isMyTask">
-              {{ myStepAndNotes }}
-            </h5>
-          </div>
-          <div class="col-md-3" style="align-self:center">
-            <div>
-              <span>{{ durationDisplay }}</span>
-              <b-badge variant="primary mr-2" style="cursor:pointer; float:right" @click="showTaskDetail"><i class="icon-open_in_new"></i>Open task</b-badge>
-              <b-dropdown class="mr-3" id="priorities-dropdown" :text="task.priority ? capitalizeFirstLetter(task.priority) : ''" :variant="priorityColor(task.priority)" style="border:none; float: right;">
-                <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
-                <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
-                <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
-                <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
-              </b-dropdown>
-              <input id="task-list-due-date" @change="saveDueDate" class="badge badge-danger mr-3" :style="{ width: task.due_date ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
-            </div>
-          </div>
-        </div>
+        <input id="task-list-due-date" @change="saveDueDate" :class="task.due_date && task.due_date !== '0000-00-00 00:00:00' ? 'badge badge-danger mr-3' : 'badge badge-danger mr-3  show-on-hovered'" :style="{ width: task.due_date && task.due_date !== '0000-00-00 00:00:00' ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
       </div>
     </div>
   </div>
@@ -125,6 +124,7 @@ export default {
     },
     durationDisplay() {
       const totalDuration = this.task.total_time_spent
+      if (totalDuration === 0) return ''
       let durationHours = totalDuration ? Math.floor(totalDuration / 3600) : 0
       let durationMinutes = totalDuration ? ('00' + Math.floor((totalDuration % 3600) / 60)).slice(-2) : '00'
       let durationSeconds = totalDuration ? ('00' + Math.floor(totalDuration % 60)).slice(-2) : '00'
@@ -171,6 +171,12 @@ export default {
     }
   },
   methods: {
+    addHoverClass: function(e) {
+      e.target.classList.add('hovered')
+    },
+    removeHoverClass: function(e) {
+      e.target.classList.remove('hovered')
+    },
     getProject(project_id) {
       const project = this.$store.getters['projects/getById'](project_id)
       return project
@@ -287,6 +293,7 @@ export default {
       return project ? project.acronym : false
     },
     dueDate(due_date) {
+      console.log(due_date)
       let formatted_date
       if (due_date) {
         formatted_date = moment(due_date, 'yyyy-MM-DD').format('yyyy-MM-DD')
@@ -324,7 +331,7 @@ export default {
         color = '#17a2b8'
       }
       if (!due_date) {
-        color = '#28a745'
+        color = 'rgba(255,255,255,.4)'
       }
       if (return_color) {
         return_value = color
@@ -509,6 +516,19 @@ span.avatar.notes:before {
 .user-task-row .icon-stop:hover {
   background-color: #fff;
 }
+
+.show-on-hovered {
+  visibility: hidden;
+}
+
+.hovered .show-on-hovered {
+  visibility: visible;
+}
+
+.hovered > div {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
 /* span.avatar.test:after {
   background: url(../assets/icons/test.png) no-repeat;
   content: '';
