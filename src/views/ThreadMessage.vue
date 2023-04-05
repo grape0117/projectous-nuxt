@@ -3,7 +3,7 @@
     <thread-title :thread="thread" />
     <b-list-group class="thread-message-panel_inner" ref="msgContainer">
       <div v-for="(message, index) in chatMessages" :key="message.id">
-        <div class="date" v-if="isShowDate(index, message, chat.messages)">
+        <div class="date" v-if="isShowDate(index, message, chatMessages)">
           {{ date(message.created_at) }}
         </div>
         <task-message-item :message="message" @edit-message="editMessage" @delete-message="deleteMessage" :is_me="message.company_user_id == current_company_user_id" />
