@@ -106,6 +106,7 @@ export default {
     },
     thread_id: function(thread_id) {
       if (thread_id) {
+        this.s_message = ''
         if (this.$refs.message_content) {
           this.$refs.message_content.focus()
         }
