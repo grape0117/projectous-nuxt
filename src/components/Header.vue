@@ -471,7 +471,7 @@ export default Vue.extend({
         this.new_task_project_id = null
         this.new_company_user_id = null
       }
-      if (!this.new_company_user_id) {
+      if (!this.new_company_user_id || this.new_task_title.trim() == '') {
         return
       }
       this.$refs.noteInput.value = ''

@@ -63,5 +63,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('UPDATE', { module: 'task_messages', entity: taskMessage }, { root: true })
     // @ts-ignore
     const task_message = await this._vm.$http().put('/task_messages/', taskMessage.id, { task_message: taskMessage })
+  },
+  async getMoreMessages({ commit }: any, taskMessage: ITaskMessage) {
+    // @ts-ignore
+    let { messages } = await this._vm.$http().get(`/more_messages/${taskMessage.task_id}/${taskMessage.thread_id}`, taskMessage.id)
+    // @ts-ignore
+    commit('addMessages', messages)
   }
 }

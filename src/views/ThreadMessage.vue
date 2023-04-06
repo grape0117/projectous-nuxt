@@ -1,9 +1,9 @@
 <template>
   <div class="message-panel" id="message-container" @dragover="dragOver" @drop="dropFile">
     <thread-title :thread="thread" />
-    <b-list-group class="thread-message-panel_inner" ref="msgContainer">
+    <b-list-group class="thread-message-panel_inner" ref="msgContainer" @scroll="getNextMessages">
       <div v-for="(message, index) in chatMessages" :key="message.id">
-        <div class="date" v-if="isShowDate(index, message, chat.messages)">
+        <div class="date" v-if="isShowDate(index, message, chatMessages)">
           {{ date(message.created_at) }}
         </div>
         <task-message-item :message="message" @edit-message="editMessage" @delete-message="deleteMessage" :is_me="message.company_user_id == current_company_user_id" />
@@ -38,6 +38,7 @@ import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import { chain, groupBy } from 'lodash'
 import { getCookie } from '@/utils/util-functions'
 import { EventBus } from '@/components/event-bus'
+import _ from 'lodash'
 
 export default {
   data() {
@@ -72,7 +73,8 @@ export default {
       },
       thread_title: '',
       thread_message: null,
-      thread: null
+      thread: null,
+      last_message_timestamp: null
     }
   },
   components: {
@@ -106,6 +108,7 @@ export default {
     },
     thread_id: function(thread_id) {
       if (thread_id) {
+        this.s_message = ''
         if (this.$refs.message_content) {
           this.$refs.message_content.focus()
         }
@@ -136,8 +139,11 @@ export default {
         return new Date(b.created_at) - new Date(a.created_at)
       })
       this.$nextTick(() => {
-        let container = this.$refs.msgContainer
-        container.scrollTop = container.scrollHeight + 120
+        if (this.last_message_timestamp <= messages[0].timestamp) {
+          this.last_message_timestamp = messages[0].timestamp
+          let container = this.$refs.msgContainer
+          container.scrollTop = container.scrollHeight + 120
+        }
       })
       return messages.reverse()
     },
@@ -154,6 +160,7 @@ export default {
       let thread = this.$store.getters['threads/getById'](this.thread_id)[0]
       this.thread = thread
     }
+    this.getNextMessages()
     // if (this.messageId) {
     //   let message_content = this.$store.getters['task_messages/getById'](this.messageId)
     //   this.thread_title = message_content ? message_content.message : ''
@@ -162,6 +169,14 @@ export default {
     // }
   },
   methods: {
+    getNextMessages: _.debounce(function() {
+      const msgContainer = this.$refs.msgContainer
+      let topOfWindow = msgContainer.scrollTop
+      if (topOfWindow < 20) {
+        const result = this.$store.dispatch('task_messages/getMoreMessages', this.chatMessages[0])
+      }
+    }, 1000),
+
     async closeThread() {
       const thread = await this.$store.dispatch('threads/closeThread', { thread_id: this.thread_id })
       // this.$store.dispatch('tasks/updateChats')

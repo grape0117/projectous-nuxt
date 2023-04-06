@@ -211,7 +211,7 @@ export default {
 
       tasks = tasks
         .filter(task => {
-          if ((self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter))) {
+          if ((self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter)) || task.status === 'completed') {
             return false
           }
           if (self.project_filter.length > 0 || self.status_filter.length > 0 || self.step_filter.length > 0) {
