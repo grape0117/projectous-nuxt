@@ -182,11 +182,12 @@ export default Vue.extend({
           options: [
             'rgb(255, 0, 0)', //paletteRed
             'rgb(0, 128, 0)', //paletteGreen
-            'rgb(0, 0, 255)', //paletteBlue
+            'rgb(94, 182, 218)', //paletteBlue
             'rgb(255, 165, 0)', //paletteOrange
             'rgb(255, 192, 203)', //palettePink
-            'rgb(238, 130, 238)', //paletteViolet
-            'rgb(255, 255, 0)' //paletteYellow
+            'rgb(199, 162, 255)', //paletteViolet
+            'rgb(255, 255, 0)', //paletteYellow
+            'rgb(185, 204, 156)' //paletteOlive
           ]
         },
         {
