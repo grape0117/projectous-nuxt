@@ -22,5 +22,13 @@ export const mutations: MutationTree<IModuleState> = {
         this.commit('DELETE', { module: 'task_messages', entity: task_message }, { root: true })
       }
     })
+  },
+  addMessages(state: IModuleState, messages) {
+    for (const message of messages) {
+      const alreadyExist = state.task_messages.find(({ id }) => id == message.id)
+      if (!alreadyExist) {
+        state.task_messages.push(message)
+      }
+    }
   }
 }
