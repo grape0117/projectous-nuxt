@@ -42,8 +42,8 @@
         <ul class="nav nav-tabs" role="tablist">
           <li @click="setCompanyUserId(user.id)" :class="tabClass(user.id)" role="presentation" v-for="user in usersNotMe" v-bind:user="user">
             <a aria-controls="closed" role="tab" data-toggle="tab"
-              ><span v-if="user.id" :title="`${user.name}`" :class="`avatar mr-1 pointer ${user.status}`" :style="{ color: 'black', 'background-color': user.color ? user.color : '', cursor: 'pointer', display: 'inline-flex' }">
-                {{ abbrName(user.name) }}
+              ><span v-if="user.id" :title="`${user.name}`" :class="`mr-1 pointer ${user.status}`" :style="{ color: 'white', cursor: 'pointer', display: 'inline-flex' }">
+                {{ user.name }}
               </span>
               <span v-if="filter_task_count(user.id) > 0" :class="badgeClass(user)" v-html="filter_task_count(user.id)"></span>
               <span v-if="filter_task_high_count(user.id).length > 0 && filter_task_high_count(user.id)[0]['count'] > 0" class="badge badge-danger label-primary" v-html="filter_task_high_count(user.id)[0]['count']"></span>
@@ -59,14 +59,16 @@
             <b-form-checkbox v-if="tab == 'my_tasks'" v-model="is_owner" name="check-button" switch variant="warning">
               Owner
             </b-form-checkbox>
-            <span class="input-group" style="display: inline;">
-              <input placeholder="search" v-model="task_filter" :class="'form-control input-sm ' + taskFilterClass()" style="width: 200px; border: solid 1px rgba(0,0,0,.8); background: white;" /><button v-if="task_filter" class="btn btn-sm btn-default" @click="clearSearch()">&times;</button><button class="btn btn-sm btn-default"><i class="glyphicon glyphicon-search"></i></button>
-            </span>
+            <b-input-group prepend="Search" style="width:30%">
+              <b-form-input v-model="task_filter" :class="'form-control input-sm ' + taskFilterClass()"></b-form-input>
+              <b-input-group-append>
+                <b-button variant="light" @click="clearSearch()"><i class="icon-close"/></b-button>
+              </b-input-group-append>
+            </b-input-group>
           </li>
         </ul>
-        <b style="font-size:13px;">Project: </b>
         <b v-for="project_id in project_list">
-          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'font-size': isActiveProjectFilter(project_id) ? '12px' : '18px', 'background-color': getClientAcronymColor(project_id), color: 'white', cursor: 'pointer' }" v-b-tooltip.hover :title="taskProjectName(project_id) && taskProjectName(project_id)">
+          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'background-color': getClientAcronymColor(project_id), color: 'white', cursor: 'pointer', border: isActiveProjectFilter(project_id) ? 'none' : 'solid 2px white' }" :title="taskProjectName(project_id) && taskProjectName(project_id)">
             {{ getProjectDetails(project_id) }}
           </b-badge>
         </b>
