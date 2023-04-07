@@ -1,5 +1,5 @@
 <template>
-  <div :id="'task_' + task.id" @mouseenter="addHoverClass" @mouseleave="removeHoverClass" :style="{ border: isNewTask ? 'white dashed 3px' : 'none', opacity: isCompletedTask ? 0.5 : 1, display: 'table-row', background: 'rgba(0,0,0,.4)' }" class="col-md-12 user-task-row" v-show="showTimer">
+  <div :id="'task_' + task.id" @mouseenter="addHoverClass" @mouseleave="removeHoverClass" :style="{ border: isNewTask ? 'white dashed 3px' : 'none', display: 'table-row', background: 'rgba(0,0,0,.4)' }" class="col-md-12 user-task-row" v-show="showTimer">
     <div :style="{ 'white-space': 'nowrap', 'text-align': 'right', display: 'table-cell' }">
       <b-icon v-if="task['isToday']" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 0)"></b-icon>
       <b-icon v-else :icon="is_mouse_enter ? 'star-fill' : 'star'" font-scale="1" variant="warning" class="show-on-hovered mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 1)"></b-icon>
@@ -8,7 +8,7 @@
     </div>
     <div :style="{ 'white-space': 'nowrap', 'text-align': 'right', display: 'table-cell' }">
       <b>
-        <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2" v-if="getProjectDetails(task.project_id)" v-b-tooltip.hover :title="taskProjectName(task.project_id)">
+        <b-badge :style="{ 'background-color': getClientAcronymColor(task.project_id) }" variant="primary" class="mr-2 ml-2" v-if="getProjectDetails(task.project_id)" :title="taskProjectName(task.project_id)">
           {{ getProjectDetails(task.project_id) }}
         </b-badge>
 
@@ -22,19 +22,19 @@
       </b>
     </div>
     <div style="white-space: nowrap; display: table-cell">
-      <b>
-        <b-dropdown class="mr-3" id="priorities-dropdown" :text="task.priority ? capitalizeFirstLetter(task.priority) : ''" :variant="priorityColor(task.priority)" style="border:none;">
-          <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
-          <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
-          <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
-          <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
-        </b-dropdown>
-      </b>
+      <b-dropdown class="mr-3" id="priorities-dropdown" :variant="priorityColor(task.priority)">
+        <b-dropdown-item @click="updatePriority('high')">High</b-dropdown-item>
+        <b-dropdown-item @click="updatePriority('regular')">Regular</b-dropdown-item>
+        <b-dropdown-item @click="updatePriority('low')">Low</b-dropdown-item>
+        <b-dropdown-item @click="updatePriority('hold')">Hold</b-dropdown-item>
+      </b-dropdown>
     </div>
     <div style="display: table-cell; width: 99%">
-      <span @click="showTaskDetail" style="cursor: pointer;">{{ task.title ? task.title : '---' }}</span>
+      <span style="float: right; margin-right: 10px;" class="white-text">{{ durationDisplay }}</span>
+      <span v-if="isCompletedTask" style="margin-right: 5px;"><b-badge variant="success">Completed</b-badge></span>
+      <span @click="showTaskDetail" :style="{ cursor: 'pointer', 'font-weight': `${task.messages.length > 0 ? 'bolder' : 'normal'}` }" class="white-text">{{ task.title ? task.title : '---' }} </span>
       <span v-for="user in task_users" v-if="isAdmin() || is_owner">
-        <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+        <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex', 'margin-left': '5px' }">
           {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
         </span>
       </span>
@@ -51,8 +51,6 @@
     </div>
     <div class="col-md-3" style="white-space: nowrap; display: table-cell; align-self:center">
       <div>
-        <span>{{ durationDisplay }}</span>
-
         <input id="task-list-due-date" @change="saveDueDate" :class="task.due_date && task.due_date !== '0000-00-00 00:00:00' ? 'badge badge-danger mr-3' : 'badge badge-danger mr-3  show-on-hovered'" :style="{ width: task.due_date && task.due_date !== '0000-00-00 00:00:00' ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
       </div>
     </div>
@@ -319,7 +317,7 @@ export default {
       let color
       if (days < 0) {
         return_value = 'Past due'
-        color = '#ffc107'
+        color = '#484848'
       } else if (days === 0) {
         return_value = 'Due today'
         color = 'red'
@@ -328,6 +326,9 @@ export default {
         color = 'orange'
       } else {
         return_value = `Due on ${moment(due_date).format('MMMM DD')}`
+        if (due_date === '0000-00-00 00:00:00') {
+          return_value = 'Select a due date'
+        }
         color = '#17a2b8'
       }
       if (!due_date) {
@@ -462,7 +463,9 @@ tr {
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
-  border-radius: 0.25rem;
+  border-radius: 8px !important;
+  width: 13px !important;
+  height: 13px !important;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
 }
 
@@ -474,8 +477,7 @@ tr {
   height: 20px;
 }
 .completed {
-  border: solid 4px #28a745;
-  padding: 14px;
+  border: solid 2px #28a745;
 }
 .add-dev-btn {
   border-radius: 50%;
@@ -527,6 +529,10 @@ span.avatar.notes:before {
 
 .hovered > div {
   background-color: rgba(0, 0, 0, 0.4);
+}
+
+#priorities-dropdown > .btn::after {
+  content: none;
 }
 
 /* span.avatar.test:after {
