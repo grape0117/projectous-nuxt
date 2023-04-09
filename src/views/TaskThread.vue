@@ -292,6 +292,9 @@ export default {
         color = 'orange'
       } else {
         return_value = `Due on ${moment(due_date).format('MMMM DD')}`
+        if (due_date === '0000-00-00 00:00:00') {
+          return_value = 'No due date selected'
+        }
         color = '#17a2b8'
       }
       if (!due_date) {
