@@ -389,6 +389,13 @@ export default {
           let userInfo = JSON.parse(e.data.value)
           that.$store.commit('company_users/updateUser', userInfo)
           break
+        case 'TASK_COMPLETED':
+          title = e.data.title
+          body = JSON.stringify(e.data.message)
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            that.$store.dispatch('tasks/updateChats')
+          }
+          break
       }
       if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
         var notification = new Notification(title, { body: body, icon: 'img' })
