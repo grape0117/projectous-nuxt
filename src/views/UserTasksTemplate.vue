@@ -127,12 +127,12 @@ export default {
       return this.$store.getters['settings/isAdmin']
     },
     my_tasks() {
-      this.my_high_count = this.$store.state.tasks.my_tasks.filter(({ priority }) => priority == 'high').length
+      this.my_high_count = this.$store.state.tasks.my_tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       const current_user_id = this.$store.state.settings.current_company_user_id
       if (this.is_owner) {
         return this.$store.state.tasks.tasks.filter(({ owner }) => owner == current_user_id)
       }
-      let my_tasks = this.$store.state.tasks.my_tasks
+      let my_tasks = this.$store.state.tasks.my_tasks.filter(({ status }) => status !== 'completed')
       // let my_tasks = this.$store.getters['tasks/getByCompanyUserId'](current_user_id)
       let self = this
       my_tasks = my_tasks.sort((a, b) => {
@@ -157,19 +157,19 @@ export default {
       return my_tasks
     },
     all_tasks() {
-      this.all_high_count = this.$store.state.tasks.all_tasks.filter(({ priority }) => priority == 'high').length
+      this.all_high_count = this.$store.state.tasks.all_tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
       return this.$store.state.tasks.all_tasks
     },
     others_tasks() {
-      this.others_high_count = this.$store.state.tasks.others_tasks.filter(({ priority }) => priority == 'high').length
+      this.others_high_count = this.$store.state.tasks.others_tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
       return this.$store.state.tasks.others_tasks
     },
     for_today_tasks() {
-      this.others_high_count = this.$store.state.tasks.today_tasks.filter(({ priority }) => priority == 'high').length
+      this.others_high_count = this.$store.state.tasks.today_tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
       return this.$store.state.tasks.today_tasks
     },
     due_tasks() {
-      this.others_high_count = this.$store.state.tasks.past_due_tasks.filter(({ priority }) => priority == 'high').length
+      this.others_high_count = this.$store.state.tasks.past_due_tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
       return this.$store.state.tasks.past_due_tasks
     },
     getUserProjects(user_tasks) {},
@@ -182,11 +182,11 @@ export default {
       if (this.tab === 'all') {
         tasks = this.$store.state.tasks.all_tasks
         this.all_count = tasks.length
-        this.all_high_count = tasks.filter(({ priority }) => priority == 'high').length
+        this.all_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'others') {
         tasks = this.$store.state.tasks.others_tasks
         this.others_count = tasks.length
-        this.others_high_count = tasks.filter(({ priority }) => priority == 'high').length
+        this.others_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'my_tasks') {
         user_id = self.current_company_user.id
         if (this.is_owner) {
@@ -194,17 +194,17 @@ export default {
         } else {
           tasks = this.$store.state.tasks.my_tasks
         }
-        this.my_high_count = tasks.filter(task => task.priority == 'high').length
+        this.my_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'today_tasks') {
         user_id = self.current_company_user.id
         tasks = this.$store.state.tasks.today_tasks
         this.today_count = tasks.length
-        this.today_high_count = tasks.filter(task => task.priority == 'high').length
+        this.today_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'past_due') {
         user_id = self.current_company_user.id
         tasks = this.$store.state.tasks.past_due_tasks
         this.past_due_count = tasks.length
-        this.past_due_high_count = tasks.filter(task => task.priority == 'high').length
+        this.past_due_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'managing') {
       } else if (isFinite(this.tab)) {
         user_id = this.tab
@@ -554,7 +554,7 @@ export default {
     async getData() {
       if (this.current_company_user_id) {
         const response = await this.$http().get('/company_users/' + this.current_company_user_id + '/tasks')
-        let count_of_heigh = response.tasks.filter(task => task.priority == 'high').length
+        let count_of_heigh = response.tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
         if (this.high_count_of_users.filter(({ user_id }) => user_id == this.current_company_user_id).length == 0) {
           this.high_count_of_users.push({
             user_id: this.current_company_user_id,
