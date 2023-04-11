@@ -552,14 +552,14 @@ export default {
       return { invoices, invoice_years, open_invoice_count, invoice_count_per_year }
     },
     async getData() {
-      const { invoices, invoice_years, open_invoice_count, invoice_count_per_year } = await this.getInvoicesByYear(this.status_filter) //new Date().getFullYear()
+      const { invoices, invoice_years, open_invoice_count, invoice_count_per_year } = await this.getInvoicesByYear(this.selectedYear) //new Date().getFullYear()
 
       this.invoices = invoices
       this.processBreakdownPerStatus(invoices)
       this.invoice_years = invoice_years
       this.open_invoice_count = open_invoice_count
       this.invoice_count_per_year = invoice_count_per_year
-      this.getCountPerStatus('all')
+      this.getCountPerStatus(this.selectedYear)
     },
     async getCountPerStatus(year) {
       const { count, total_per_status } = await this.$http().get(`/invoices_count_per_status/${year}`)
