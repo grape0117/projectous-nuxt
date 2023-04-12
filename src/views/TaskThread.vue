@@ -157,7 +157,7 @@ export default {
     durationDisplay() {
       const totalDuration = this.task.total_time_spent
       // let durationHours = totalDuration ? Math.floor(totalDuration / 3600) : '0'
-      let durationHours = Math.floor(totalDuration / 3600)
+      let durationHours = Math.floor(totalDuration / 3600) || '0'
       let time_estimate = this.task.estimate ? this.task.estimate : '?'
       // let durationMinutes = totalDuration ? ('00' + Math.floor((totalDuration % 3600) / 60)).slice(-2) : '00'
       // let durationSeconds = totalDuration ? ('00' + Math.floor(totalDuration % 60)).slice(-2) : '00'
@@ -173,26 +173,6 @@ export default {
       set: function(newValue) {}
     },
 
-    // chatMessages() {
-    //   const task_id = this.chat.chat_id
-    //   let messages = this.$store.getters['task_messages/getByTaskId'](task_id)
-    //   messages = messages.sort(function(a, b) {
-    //     return new Date(b.created_at) - new Date(a.created_at)
-    //   })
-    //   setTimeout(() => {
-    //     let container = this.$refs.msgContainer
-    //     container.scrollTop = container.scrollHeight + 120
-    //   }, 100)
-
-    //   return messages.reverse()
-    // },
-    // getMessages() {
-    //   let messages = this.$store.getters['task_messages/getByTaskId'](this.task_id)
-    //   messages.sort(function(a, b) {
-    //     return new Date(b.created_at) - new Date(a.created_at)
-    //   })
-    //   return messages.reverse()
-    // },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
     },
@@ -386,68 +366,6 @@ export default {
       return project ? project.acronym : false
     },
 
-    changeText(e) {
-      if (this.s_message == '\n' || this.s_message == '') {
-        this.s_message = ''
-      }
-    },
-    dragLeave(event) {
-      if (!this.fileExist) {
-        this.showDropzone = false
-      }
-    },
-    dropFile(event) {},
-    dragOver(event) {
-      this.showDropzone = true
-      event.preventDefault()
-    },
-    fileAdded(file) {
-      this.showDropzone = true
-      this.fileExist = true
-    },
-    filesAdded(file) {
-      $('#dropzone').addClass('dropzone-file-contentainer')
-      this.showDropzone = true
-      this.fileExist = true
-    },
-    sendingFiles(file, xhr, formData) {},
-    uploadSuccess(file, response) {
-      this.showDropzone = false
-      this.$refs.chatDropzone.removeAllFiles()
-
-      let task_id = this.chat.chat_id
-      let company_user_id = this.current_company_user_id
-      let message = this.s_message
-      let task
-      let me = this.current_company_user
-      if (this.selected_message == null) {
-        let task_message = this.$store.dispatch('task_messages/createTaskMessage', {
-          task_id,
-          company_user_id,
-          file_path: response.file_path,
-          message: response.name,
-          is_file: true,
-          thumbnail: response.thumbnail_path,
-          user: me
-        })
-        this.s_message = ''
-        return
-      }
-    },
-    afterComplete(response) {
-      this.showDropzone = false
-      this.$refs.chatDropzone.removeAllFiles()
-    },
-    cancelUpload(file) {},
-    removedFile(file, error, xhr) {
-      if (this.$refs.chatDropzone.getActiveFiles().length == 0) {
-        this.showDropzone = false
-      }
-    },
-    isShowDate(index, message, messages) {
-      if (index === 0) return true
-      return messages && messages.length > 0 && this.date(message.created_at) !== this.date(messages[index > 0 ? index - 1 : index].created_at)
-    },
     date(date) {
       return moment(date).format('MMM DD, YYYY | ddd')
     },
@@ -458,66 +376,6 @@ export default {
       this.$nextTick(() => {
         this.$bvModal.show('select-responsibility-modal')
       })
-    },
-    async saveMessage() {
-      if (this.$refs.chatDropzone && this.$refs.chatDropzone.getActiveFiles().length > 0) {
-        this.$refs.chatDropzone.processQueue()
-      }
-      if (this.s_message == '\n' || this.s_message == '') {
-        this.s_message = ''
-        return
-      }
-      let task_id = this.chat.chat_id
-      let company_user_id = this.current_company_user_id
-      let message = this.s_message
-      let task
-      if (this.selected_message == null) {
-        // create
-        // let message = {
-        //   id: uuid.v4(),
-        //   task_id: this.task_id,
-        //   company_user_id: this.current_company_user_id,
-        //   message: this.s_message,
-        //   created_at: moment().format('YYYY-MM-DD HH:mm:ss')
-        // }
-        // this.$store.dispatch('ADD_ONE', { module: 'task_messages', entity: [message] }, { root: true })
-        let me = this.current_company_user
-        let task_message = this.$store.dispatch('task_messages/createTaskMessage', {
-          task_id,
-          company_user_id,
-          message,
-          user: me
-        })
-        // .then(res => {
-
-        // })
-        this.s_message = ''
-        return
-        task = this.$store.getters['tasks/getById'](task_id)
-        task.last_task_message_id = task_message.task_messages.id
-        task.last_task_message_created_at = moment().format('YYYY-MM-DD HH:mm:ss')
-      } else {
-        // update
-        // update task_message
-        this.selected_message.message = this.s_message
-        this.$store.dispatch('UPDATE', { module: 'task_messages', entity: this.selected_message }, { root: true })
-        // update task
-        task = this.$store.getters['tasks/getById'](this.selected_message.task_id)
-        task.last_task_message_id = this.selected_message.id
-        task.last_task_message_created_at = moment().format('YYYY-MM-DD HH:mm:ss')
-        this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
-        // initialize
-        this.selected_message = null
-        this.s_message = ''
-      }
-      this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
-    },
-    attachFile() {
-      this.showDropzone = true
-      var that = this
-      setTimeout(() => {
-        that.$refs.chatDropzone.$el.click()
-      }, 500)
     }
   }
 }

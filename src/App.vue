@@ -15,7 +15,7 @@
         <Header v-on:reload="reload" :showItems="!$route.meta.hideNavbar" />
         <div class="d-flex justify-content-between">
           <div class="router-view-class" style="width: 100px">
-            <new-task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" :thread="thread" :newMessage="newMessage" />
+            <new-task-detail v-if="has_route_query_task" class="app_task-detail" :task_id="route_query_taskId" :thread_id="route_query_threadId" :thread="thread" />
             <router-view style="width: 100%; height: 100%" />
           </div>
           <div class="d-flex">
@@ -123,6 +123,12 @@ export default {
     // check if has $route.query.task
     has_route_query_task() {
       return this.route_query && this.route_query.task ? true : false
+    },
+    route_query_threadId() {
+      if (this.route_query.thread) {
+        return this.route_query.thread
+      }
+      return null
     },
     has_route_query_showChatSection() {
       return this.route_query.showChatSection === 'true' ? true : false

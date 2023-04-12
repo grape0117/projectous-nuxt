@@ -1,5 +1,5 @@
 <template>
-  <div id="new-task-detail" v-if="task">
+  <div id="new-task-detail" v-if="task_id">
     <div class="left-section">
       <div class="task-detail-top-buttons">
         <button @click="saveTask">Close (ESC)</button>
@@ -102,7 +102,7 @@
               <task-thread class="task-cloud_task-message" :chat="chat" :showChat="showTab == 1" :task="task" :thread_id="thread_id"> </task-thread>
             </pane>
             <pane min-size="30" v-if="showThread">
-              <thread-message class="task-cloud_task-message" :chat="threadChat" :showChat="showTab == 1" :messageId="thread_message_id" :task_id="task.id" :thread_id="thread_id"> </thread-message>
+              <thread-message class="task-cloud_task-message" :chat="threadChat" :showChat="showTab == 1" :messageId="thread_message_id" :task_id="task_id" :thread_id="thread_id"> </thread-message>
             </pane>
           </splitpanes>
         </b-tab>
@@ -135,17 +135,8 @@ export default Vue.extend({
     Pane
   },
   props: {
-    task: {
-      type: Object,
-      required: false,
-      default: () => {}
-    },
-    newMessage: {
-      type: Object,
-      required: false,
-      default: false
-    },
-    thread: null
+    thread_id: null,
+    task_id: null
   },
   data() {
     return {
@@ -161,8 +152,8 @@ export default Vue.extend({
       showThread: false,
       threadChat: {},
       thread_message_id: null,
-      thread_id: null,
-      task_id: null
+      task: {},
+      thread: {}
     }
   },
   computed: {
@@ -200,18 +191,6 @@ export default Vue.extend({
           this.showTab = 1
         }
       }
-    },
-    newMessage(newMessage, oldMessage) {
-      this.chat.messages = [...this.chat.messages, newMessage]
-    },
-    thread(thread_id) {
-      if (thread_id) {
-        this.thread_id = thread_id
-        this.showThread = true
-      } else {
-        this.showThread = false
-        this.thread_id = null
-      }
     }
   },
   methods: {
@@ -244,12 +223,23 @@ export default Vue.extend({
       } else {
         this.chat = { messages: this.$store.getters['task_messages/getByTaskId'](task_id) }
       }
-      const { chat } = await this.$http().get(`/chat-thread/${task_id}/${thread_id}`)
-
+      const { chat, task, company_users, clients, task_users, current_company_id, user_id, current_company_user_id } = await this.$http().get(`/chat-thread/${task_id}/${thread_id}`)
       this.chat = chat
+
+      this.task = task
+
       // this.$store.dispatch('task_messages/updateChats')
-      this.$store.dispatch('PROCESS_INCOMING_DATA', { task_messages: chat.messages })
+      this.$store.dispatch('PROCESS_INCOMING_DATA', {
+        task_messages: chat.messages,
+        company_users: company_users,
+        clients: clients,
+        task_users: task_users,
+        current_company_id,
+        user_id,
+        current_company_user_id
+      })
       this.$store.dispatch('tasks/updateChats')
+      this.showThread = true
     },
     async addResource() {
       if (!this.task.settings) {
@@ -414,10 +404,6 @@ export default Vue.extend({
     }
   },
   async created() {
-    if (this.thread) {
-      this.thread_id = this.thread
-      this.showThread = true
-    }
     if (!!this.getResources.length) {
       this.openTab(this.getResources[0].name)
     }
@@ -426,12 +412,11 @@ export default Vue.extend({
       this.showThread = true
     })
     EventBus.$on('open-thread', thread => {
-      this.thread_id = thread.id
+      // this.thread_id = thread.id
       this.showThread = true
     })
     EventBus.$on('close-thread', () => {
       this.showThread = false
-      this.thread_id = null
     })
   },
   mounted() {
