@@ -95,10 +95,10 @@
             <!-- <input type="checkbox" :value="data.item.id" class="invoice-checkbox" :name="'item[' + data.item.id + ']'" /> -->
             <b-form-checkbox name="selected-invoice" v-model="selected_invoice_id" :value="data.item.invoice_id"> </b-form-checkbox>
             <b-button-group size="sm" style="height:30px">
-              <b-button @click="updateStatus(data.item.id, 'open')" :style="{ background: backgroundColor('open', data.item), border: 'none' }">Open</b-button>
-              <b-button @click="updateStatus(data.item.id, 'sent')" :style="{ background: backgroundColor('sent', data.item), border: 'none' }">Sent</b-button>
-              <b-button @click="updateStatus(data.item.id, 'paid')" :style="{ background: backgroundColor('paid', data.item), border: 'none' }">Paid</b-button>
-              <b-button @click="updateStatus(data.item.id, 'voided')" :style="{ background: backgroundColor('voided', data.item), border: 'none' }">Voided</b-button>
+              <b-button @click="updateStatus(data.item.id, 'open', data.item)" :style="{ background: backgroundColor('open', data.item), border: 'none' }">Open</b-button>
+              <b-button @click="updateStatus(data.item.id, 'sent', data.item)" :style="{ background: backgroundColor('sent', data.item), border: 'none' }">Sent</b-button>
+              <b-button @click="updateStatus(data.item.id, 'paid', data.item)" :style="{ background: backgroundColor('paid', data.item), border: 'none' }">Paid</b-button>
+              <b-button @click="updateStatus(data.item.id, 'voided', data.item)" :style="{ background: backgroundColor('voided', data.item), border: 'none' }">Voided</b-button>
             </b-button-group>
           </span>
         </template>
@@ -140,6 +140,7 @@
       </b-table>
     </div>
     <invoices-apply-payment />
+    <update-invoice-status-modal :show="show_update_status_modal" @hide="hideUpdateStatusModal" :invoice_details="invoice_details" :updateInvoiceStatus="updateInvoiceStatus" />
   </div>
 </template>
 
@@ -155,7 +156,8 @@ export default {
   name: 'invoices-template',
   components: {
     'invoices-row': InvoicesRow,
-    'invoices-apply-payment': () => import('./InvoicesApplyPayment.vue')
+    'invoices-apply-payment': () => import('./InvoicesApplyPayment.vue'),
+    'update-invoice-status-modal': () => import('./UpdateInvoiceStatusModal.vue')
   },
   mixins: [colorThemes],
   data: function() {
@@ -224,7 +226,9 @@ export default {
       unpaid_total: 0,
       paid_total: 0,
       voided_total: 0,
-      invoice_count_per_year: []
+      invoice_count_per_year: [],
+      show_update_status_modal: false,
+      invoice_details: null
     }
   },
   created() {},
@@ -391,9 +395,22 @@ export default {
       } else {
         this.selected_invoice_id = []
       }
+    },
+    show_update_status_modal: function() {
+      if (this.show_update_status_modal == false) {
+        this.getData()
+        this.invoice_details = null
+        return
+      }
     }
   },
   methods: {
+    showUpdateStatusModal() {
+      this.show_update_status_modal = true
+    },
+    hideUpdateStatusModal() {
+      this.show_update_status_modal = false
+    },
     async get_count() {
       const counts = await this.$http().get('/invoices/counts')
       this.invoice_years = counts.invoice_years
@@ -596,10 +613,13 @@ export default {
           })
       }
     },
-    async updateStatus(id, status) {
-      const { invoices } = await this.$http().patch('/invoices/', id, { attribute: 'status', value: status })
-      this.updateInvoiceStatus(invoices)
-      this.getData()
+    async updateStatus(id, status, data) {
+      if (status != this.status_filter) {
+        this.showUpdateStatusModal()
+        let temp_data = { ...data }
+        temp_data.status = status
+        this.invoice_details = temp_data
+      }
     },
     redirect(to, invoice_id) {
       const path = 'http://old.projectous.com/'
