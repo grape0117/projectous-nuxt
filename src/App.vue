@@ -21,7 +21,7 @@
           <div class="d-flex">
             <task-tray v-show="showTaskSection" />
             <task-side-bar :updated_at="updated_at" :new_message="newMessage1" v-show="has_route_query_showChatSection || showChatSection" :show="has_route_query_showChatSection || showChatSection" />
-            <timer-tab v-show="showTimerSection" />
+            <timer-tab v-show="showTimerSection" :show="showTimerSection" />
           </div>
         </div>
       </div>

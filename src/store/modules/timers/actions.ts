@@ -121,5 +121,10 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   async updateTimer(context, timer) {
     context.commit('updateTimer', timer)
+  },
+  async getTimers({ commit, dispatch }: any) {
+    // @ts-ignore
+    let response = await this._vm.$http().get('/timers')
+    dispatch('PROCESS_INCOMING_DATA', response, { root: true })
   }
 }
