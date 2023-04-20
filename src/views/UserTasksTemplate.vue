@@ -135,16 +135,46 @@ export default {
       let my_tasks = this.$store.state.tasks.my_tasks.filter(({ status }) => status !== 'completed')
       // let my_tasks = this.$store.getters['tasks/getByCompanyUserId'](current_user_id)
       let self = this
-      my_tasks = my_tasks.sort((a, b) => {
-        if (a.priority !== b.priority) {
-          return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
-        } else {
-          const distantFuture = new Date(8640000000000000)
+      var now = new Date().getTime()
+      const distantFuture = new Date(8640000000000000)
+
+      let dueTasks = my_tasks
+        .filter(task => {
+          let dueDate = task['due_date'] ? new Date(task['due_date']) : distantFuture
+          if (dueDate.getTime() && dueDate.getTime() <= now) {
+            return true
+          } else {
+            return false
+          }
+        })
+        .sort((a, b) => {
           let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
           let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
-          return dateA.getTime() - dateB.getTime()
-        }
-      })
+          if (dateA !== dateB) {
+            return dateA.getTime() - dateB.getTime()
+          } else if (a.priority !== b.priority) {
+            return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
+          }
+        })
+      let notDueTasks = my_tasks
+        .filter(task => {
+          let dueDate = task['due_date'] ? new Date(task['due_date']) : distantFuture
+          if (!dueDate.getTime() || dueDate.getTime() > now) {
+            return true
+          } else {
+            return false
+          }
+        })
+        .sort((a, b) => {
+          let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
+          let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
+          if (a.priority !== b.priority) {
+            return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
+          } else {
+            return dateA.getTime() - dateB.getTime()
+          }
+        })
+      my_tasks = [...dueTasks, ...notDueTasks]
       let tmp_priority = my_tasks.length > 0 ? my_tasks[0].priority : ''
       my_tasks.forEach((task, i) => {
         if (task.priority !== tmp_priority) {
@@ -211,40 +241,68 @@ export default {
         tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
       }
 
-      tasks = tasks
-        .filter(task => {
-          if ((self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter)) || task.status === 'completed') {
+      tasks = tasks.filter(task => {
+        if ((self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter)) || task.status === 'completed') {
+          return false
+        }
+        if (self.project_filter.length > 0 || self.status_filter.length > 0 || self.step_filter.length > 0) {
+          const check_project_filter = self.project_filter.includes(task.project_id)
+          const check_status_filter = self.status_filter.includes(task.status)
+          let check_step_filter = false
+          for (let i = 0; i < task.users.length; i++) {
+            const user = task.users[i]
+            if (user.step === self.step_filter[0]) {
+              check_step_filter = true
+              break
+            }
+          }
+          if (check_project_filter || check_status_filter || check_step_filter) {
+            return true
+          } else {
             return false
           }
-          if (self.project_filter.length > 0 || self.status_filter.length > 0 || self.step_filter.length > 0) {
-            const check_project_filter = self.project_filter.includes(task.project_id)
-            const check_status_filter = self.status_filter.includes(task.status)
-            let check_step_filter = false
-            for (let i = 0; i < task.users.length; i++) {
-              const user = task.users[i]
-              if (user.step === self.step_filter[0]) {
-                check_step_filter = true
-                break
-              }
-            }
-            if (check_project_filter || check_status_filter || check_step_filter) {
-              return true
-            } else {
-              return false
-            }
+        }
+        return true
+      })
+      var now = new Date().getTime()
+      const distantFuture = new Date(8640000000000000)
+      let dueTasks = tasks
+        .filter(task => {
+          let dueDate = task['due_date'] ? new Date(task['due_date']) : distantFuture
+          if (dueDate.getTime() && dueDate.getTime() <= now) {
+            return true
+          } else {
+            return false
           }
-          return true
         })
         .sort((a, b) => {
+          let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
+          let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
+          if (dateA !== dateB) {
+            return dateA.getTime() - dateB.getTime()
+          } else if (a.priority !== b.priority) {
+            return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
+          }
+        })
+      let notDueTasks = tasks
+        .filter(task => {
+          let dueDate = task['due_date'] ? new Date(task['due_date']) : distantFuture
+          if (!dueDate.getTime() || dueDate.getTime() > now) {
+            return true
+          } else {
+            return false
+          }
+        })
+        .sort((a, b) => {
+          let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
+          let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
           if (a.priority !== b.priority) {
             return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
           } else {
-            const distantFuture = new Date(8640000000000000)
-            let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
-            let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
             return dateA.getTime() - dateB.getTime()
           }
         })
+      tasks = [...dueTasks, ...notDueTasks]
       let tmp_priority = tasks.length > 0 ? tasks[0].priority : ''
       tasks.forEach((task, i) => {
         const { project_id } = task
