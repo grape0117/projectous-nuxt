@@ -51,7 +51,7 @@
             <b-th colspan="1">
               <b-button @click="applyAction()">Go</b-button>
             </b-th>
-            <b-th colspan="8"></b-th>
+            <b-th colspan="9"></b-th>
           </b-tr>
         </template>
         <template #table-busy>
@@ -120,6 +120,9 @@
         <template #cell(note)="data">
           <b-form-textarea style="min-width: 100px" class="transparent-input-note" v-model="data.item.note" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
         </template>
+        <template #cell(log)="data">
+          <b-form-textarea disabled style="min-width: 100px" class="transparent-input-note" v-model="data.item.log" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
+        </template>
         <template #cell(start_date)="data">
           {{ formatDate(data.item.start_date) }}
         </template>
@@ -150,7 +153,7 @@ import { colorThemes } from '@/mixins/colorThemes'
 
 import InvoicesRow from './InvoicesRow.vue'
 import { EventBus } from '@/components/event-bus'
-// import { getCookie } from '@/utils/util-functions'
+import { getCookie } from '@/utils/util-functions'
 
 export default {
   name: 'invoices-template',
@@ -209,6 +212,10 @@ export default {
         {
           key: 'note',
           sortable: true
+        },
+        {
+          key: 'log',
+          sortable: false
         },
 
         { key: 'start_date', sortable: true },
@@ -613,12 +620,35 @@ export default {
           })
       }
     },
+    getCompanyUserDetails(company_user_id) {
+      const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
+
+      return user_details
+    },
     async updateStatus(id, status, data) {
-      if (status != this.status_filter) {
+      let company_user_user_id = this.$store.state.settings.current_company_user_id
+      let company_user_details = this.getCompanyUserDetails(company_user_user_id)
+
+      let temp_data = { ...data }
+      temp_data.status = status
+
+      if (status != this.status_filter && ['paid', 'voided'].includes(status)) {
         this.showUpdateStatusModal()
-        let temp_data = { ...data }
-        temp_data.status = status
         this.invoice_details = temp_data
+      } else {
+        const current_ts = new Date()
+        const timezone = moment.tz.guess()
+        const timezone_date = moment.tz(current_ts, timezone)
+        const gmt_date = timezone_date
+          .clone()
+          .tz('GMT')
+          .format('YYYY-MM-DD h:mm a')
+        const log = `${company_user_details.name} moved invoice to ${status} at ${gmt_date}`
+        temp_data.log = log
+
+        const { invoices } = await this.$http().put('/invoices/', id, temp_data)
+        this.updateInvoiceStatus(invoices)
+        this.getData()
       }
     },
     redirect(to, invoice_id) {

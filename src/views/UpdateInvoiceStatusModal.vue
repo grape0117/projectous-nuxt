@@ -57,11 +57,26 @@ export default {
     hide() {
       this.$emit('hide')
     },
+    getCompanyUserDetails(company_user_id) {
+      const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
+
+      return user_details
+    },
     async saveUpdatedInvoiceStatus() {
+      let company_user_user_id = this.$store.state.settings.current_company_user_id
+      let company_user_details = this.getCompanyUserDetails(company_user_user_id)
+      const current_ts = new Date()
+      const timezone = moment.tz.guess()
+      const timezone_date = moment.tz(current_ts, timezone)
+      const gmt_date = timezone_date
+        .clone()
+        .tz('GMT')
+        .format('YYYY-MM-DD h:mm a')
       let temp_data = { ...this.invoice_details }
       let user_id = getCookie('user_id')
+      const log = `${company_user_details.name} moved invoice to ${temp_data.status} at ${gmt_date}`
       temp_data.note = this.invoice_notes
-      temp_data.updated_by = user_id
+      temp_data.log = log
       const { invoices } = await this.$http().put('/invoices/', this.invoice_details.id, temp_data)
       this.updateInvoiceStatus(invoices)
       this.invoice_notes = ''
