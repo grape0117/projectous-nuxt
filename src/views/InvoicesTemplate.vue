@@ -121,7 +121,7 @@
           <b-form-textarea style="min-width: 100px" class="transparent-input-note" v-model="data.item.note" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
         </template>
         <template #cell(log)="data">
-          <b-form-textarea disabled style="min-width: 100px" class="transparent-input-note" v-model="data.item.log" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
+          <b-form-textarea disabled style="min-width: 100px" class="transparent-input-note" :value="getLatestLog(data.item.log)" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
         </template>
         <template #cell(start_date)="data">
           {{ formatDate(data.item.start_date) }}
@@ -644,7 +644,9 @@ export default {
           .tz('GMT')
           .format('YYYY-MM-DD h:mm a')
         const log = `${company_user_details.name} moved invoice to ${status} at ${gmt_date}`
-        temp_data.log = log
+        let parse_log_data = temp_data.log ? JSON.parse(temp_data.log) : []
+        parse_log_data.push(log)
+        temp_data.log = JSON.stringify(parse_log_data)
 
         const { invoices } = await this.$http().put('/invoices/', id, temp_data)
         this.updateInvoiceStatus(invoices)
@@ -685,6 +687,14 @@ export default {
       const { id } = invoice
 
       const { invoices } = await this.$http().patch('/invoices/', id, { attribute: 'note', value: note })
+    },
+    getLatestLog(log) {
+      const parse_log = log ? JSON.parse(log) : ''
+      if (log == null) {
+        return ''
+      }
+
+      return parse_log.legth == 1 ? parse_log[0] : parse_log[parse_log.length - 1]
     }
   }
 }

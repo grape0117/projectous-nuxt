@@ -75,8 +75,11 @@ export default {
       let temp_data = { ...this.invoice_details }
       let user_id = getCookie('user_id')
       const log = `${company_user_details.name} moved invoice to ${temp_data.status} at ${gmt_date}`
+      let parse_log_data = temp_data.log ? JSON.parse(temp_data.log) : []
+
+      parse_log_data.push(log)
       temp_data.note = this.invoice_notes
-      temp_data.log = log
+      temp_data.log = JSON.stringify(parse_log_data)
       const { invoices } = await this.$http().put('/invoices/', this.invoice_details.id, temp_data)
       this.updateInvoiceStatus(invoices)
       this.invoice_notes = ''
