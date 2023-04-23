@@ -223,7 +223,7 @@ export default Vue.extend({
       } else {
         this.chat = { messages: this.$store.getters['task_messages/getByTaskId'](task_id) }
       }
-      const { chat, task, company_users, clients, task_users, current_company_id, user_id, current_company_user_id } = await this.$http().get(`/chat-thread/${task_id}/${thread_id}`)
+      const { chat, task, company_users, task_users, current_company_id, user_id, current_company_user_id } = await this.$http().get(`/chat-thread/${task_id}/${thread_id}`)
       this.chat = chat
 
       this.task = task
@@ -232,7 +232,6 @@ export default Vue.extend({
       this.$store.dispatch('PROCESS_INCOMING_DATA', {
         task_messages: chat.messages,
         company_users: company_users,
-        clients: clients,
         task_users: task_users,
         current_company_id,
         user_id,
