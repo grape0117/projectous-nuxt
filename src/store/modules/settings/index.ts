@@ -30,7 +30,8 @@ export const settings = {
     timer_watch: 1,
     logged_in: false,
     invoices_status: 'open',
-    unread_messages_num: 0
+    unread_messages_num: 0,
+    total_chats_count: 0
   },
   mutations,
   actions,

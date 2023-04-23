@@ -110,5 +110,8 @@ export const mutations: MutationTree<IModuleState> = {
   },
   setCurrentRunningTimer(state, timer) {
     state.current_running_timer = timer
+  },
+  setTotalChats(state, total_chats_count) {
+    state.total_chats_count = total_chats_count
   }
 }

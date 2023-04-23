@@ -72,7 +72,7 @@
           </div>
           <div class="chat-right-icons" v-if="icon.name === 'chat'">
             <div class="chat-right-icon" style="background-color: green">
-              <span class="chat-right-icon-text">0</span>
+              <span class="chat-right-icon-text">{{ total_chats_count }}</span>
             </div>
             <div class="chat-right-icon" style="background-color: red">
               <span class="chat-right-icon-text">{{ unread_messages_num }}</span>
@@ -281,6 +281,9 @@ export default Vue.extend({
         total_unread_num = total_unread_num + num_unread
       })
       return total_unread_num
+    },
+    total_chats_count() {
+      return this.$store.state.settings.total_chats_count
     },
     is_loggedIn() {
       return this.$store.state.settings.logged_in

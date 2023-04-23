@@ -2,6 +2,7 @@
   <div class="task-side-bar">
     <div class="task-side-bar-label">
       <span>CHAT</span>
+      <span>{{ total_chats_count }}/{{ unread_messages_num }}</span>
       <div class="message-sidebar_new-task" @click="createTask">+</div>
     </div>
     <div class="message-sidebar">
@@ -53,6 +54,16 @@ export default {
     }
   },
   computed: {
+    unread_messages_num() {
+      let total_unread_num = 0
+      this.$store.state.tasks.chats.map(({ num_unread }) => {
+        total_unread_num = total_unread_num + num_unread
+      })
+      return total_unread_num
+    },
+    total_chats_count() {
+      return this.$store.state.settings.total_chats_count
+    },
     is_loggedIn() {
       return this.$store.state.settings.logged_in
     },
