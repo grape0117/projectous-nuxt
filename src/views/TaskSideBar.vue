@@ -2,7 +2,10 @@
   <div class="task-side-bar">
     <div class="task-side-bar-label">
       <span>CHAT</span>
-      <span>{{ total_chats_count }}/{{ unread_messages_num }}</span>
+      <div style="display: flex;">
+        <span class="total-chats-num rounded-circle task-sidebar-item_badge">{{ total_chats_count }}</span
+        >/<span class="unread-message-num rounded-circle task-sidebar-item_badge">{{ unread_messages_num }}</span>
+      </div>
       <div class="message-sidebar_new-task" @click="createTask">+</div>
     </div>
     <div class="message-sidebar">
@@ -253,5 +256,23 @@ html {
   padding: 10px 20px;
   border-radius: 5px;
   background-color: rgba(0, 0, 0, 0.2);
+}
+.unread-message-num {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  border: 1px solid red;
+  font-size: 18px;
+  width: 25px;
+  height: 25px;
+}
+.total-chats-num {
+  background-color: green;
+  color: white;
+  font-weight: bold;
+  border: 1px solid green;
+  font-size: 18px;
+  width: 25px;
+  height: 25px;
 }
 </style>
