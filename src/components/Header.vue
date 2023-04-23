@@ -144,7 +144,7 @@ export default Vue.extend({
       task_content: '',
       new_company_user_id: false,
       new_user_name: '',
-      new_priority: 'active',
+      new_priority: 'regular',
       new_task_due_date: '',
       showMenu: false,
       timerEmptyFields: 0,
@@ -499,11 +499,14 @@ export default Vue.extend({
       }, 100)
     },
     creatingTask: _.debounce(function(e) {
-      let notesWithTaskTile = e.target.value
+      let notesWithTaskTile = ' ' + e.target.value
       if (notesWithTaskTile == '') {
         this.showResult = false
       }
-      const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+))|([A-Z-]+):|@([a-z]+)|([^:@]+)|([a-z][A-Z]@+))', 'g')
+
+      const projectRegex = RegExp('(?:(^([A-Z]+):@([a-z]+)#([a-z]+)~([0-9]+))|([A-Z]+):|@([a-z]+)|#([a-z]+)|~([0-9]+)|([^:@#~]+)|([a-z][A-Z]@+))', 'g')
+
+      // const projectRegex = RegExp('(?:(^([A-Z-]+):@([a-z]+)#([a-z]+)~([0-9]+))|([A-Z-]+):|@([a-z]+)|([^:@]+)|([a-z][A-Z]@+)|#([a-z]+)|~([0-9]+))', 'g')
 
       const acronym_matchs = notesWithTaskTile ? notesWithTaskTile.match(projectRegex) : null
       if (!acronym_matchs) {
@@ -511,15 +514,22 @@ export default Vue.extend({
       }
       let project_captured = false
       let user_name_captured = false
+      let priority_captured = false
       let title_captured = false
       let user_name = null
       let task_title = null
       let project_title = null
+      let priority = null
+      let due_date = null
       for (let i = 0; i < acronym_matchs.length; i++) {
-        const acronym_match = acronym_matchs[i]
-
+        const acronym_match = acronym_matchs[i].trim()
+        if (!acronym_match) {
+          continue
+        }
         user_name = acronym_match.indexOf('@') >= 0 ? acronym_match.split('@')[1] : user_name
-        project_title = acronym_match.indexOf(':') > 0 ? acronym_match.split(':')[0] : project_title
+        project_title = acronym_match.indexOf(':') > 0 ? acronym_match.split(':')[0].trim() : acronym_matchs[0].trim()
+        priority = acronym_match.indexOf('#') >= 0 ? acronym_match.split('#')[1] : priority
+        due_date = acronym_match.indexOf('~') >= 0 ? acronym_match.split('~')[1] : due_date
         task_title = acronym_match.indexOf(':') < 0 && acronym_match.indexOf('@') < 0 ? acronym_match : task_title
       }
 
@@ -543,6 +553,15 @@ export default Vue.extend({
           this.assignedUser = new_company_user
           this.new_task_title = task_title
         }
+      }
+      if (priority) {
+        priority_captured = true
+        this.new_priority = priority
+      }
+      if (due_date) {
+        this.new_task_due_date = moment()
+          .add(due_date, 'days')
+          .format('yyyy-MM-DD')
       }
       if (task_title) {
         title_captured = true
