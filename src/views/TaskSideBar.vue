@@ -3,8 +3,8 @@
     <div class="task-side-bar-label">
       <span>CHAT</span>
       <div style="display: flex;">
-        <span class="total-chats-num rounded-circle task-sidebar-item_badge">{{ total_chats_count }}</span
-        >/<span class="unread-message-num rounded-circle task-sidebar-item_badge">{{ unread_messages_num }}</span>
+        <span v-if="total_chats_count > 0" class="total-chats-num rounded-circle task-sidebar-item_badge">{{ total_chats_count }}</span
+        ><span v-if="total_chats_count > 0 && unread_messages_num > 0">/</span><span v-if="unread_messages_num > 0" class="unread-message-num rounded-circle task-sidebar-item_badge">{{ unread_messages_num }}</span>
       </div>
       <div class="message-sidebar_new-task" @click="createTask">+</div>
     </div>
