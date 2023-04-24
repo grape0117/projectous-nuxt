@@ -120,8 +120,8 @@
         <template #cell(note)="data">
           <b-form-textarea style="min-width: 100px" class="transparent-input-note" v-model="data.item.note" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
         </template>
-        <template #cell(log)="data">
-          <b-form-textarea disabled style="min-width: 100px" class="transparent-input-note" :value="getLatestLog(data.item.log)" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
+        <template #cell(payment_notes)="data">
+          {{ data.item.payment_notes }}
         </template>
         <template #cell(start_date)="data">
           {{ formatDate(data.item.start_date) }}
@@ -134,6 +134,7 @@
             <b-button-group size="sm" style="height:30px">
               <b-button :style="{ background: 'rgb(68 64 55)', border: 'none' }" @click="redirect('task_invoice', data.item.invoice_id)"><i class="icon-open_in_new"/></b-button>
               <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('invoice', data.item.invoice_id)"><i class="icon-open_in_new"/></b-button>
+              <b-button variant="info" @click="showInvoiceLogsModal(data.item.log)"><i class="icon-list"/></b-button>
               <b-button :style="{ background: default_theme_color, border: 'none' }" @click="redirect('csv', data.item.invoice_id)">CSV</b-button>
               <b-button style="border:none" variant="danger" @click="deleteInvoice(data.item)"><i class="icon-delete_outline"/></b-button>
               <b-button style="border:none" variant="primary" @click="applyPayment(data.item)">Payment</b-button>
@@ -144,6 +145,7 @@
     </div>
     <invoices-apply-payment />
     <update-invoice-status-modal :show="show_update_status_modal" @hide="hideUpdateStatusModal" :invoice_details="invoice_details" :updateInvoiceStatus="updateInvoiceStatus" />
+    <invoice-logs-modal :show="show_logs_modal" @hide="hideInvoiceLogsModal" :logs="selected_invoice_logs" />
   </div>
 </template>
 
@@ -160,7 +162,8 @@ export default {
   components: {
     'invoices-row': InvoicesRow,
     'invoices-apply-payment': () => import('./InvoicesApplyPayment.vue'),
-    'update-invoice-status-modal': () => import('./UpdateInvoiceStatusModal.vue')
+    'update-invoice-status-modal': () => import('./UpdateInvoiceStatusModal.vue'),
+    'invoice-logs-modal': () => import('./InvoiceLogsModal.vue')
   },
   mixins: [colorThemes],
   data: function() {
@@ -214,10 +217,9 @@ export default {
           sortable: true
         },
         {
-          key: 'log',
-          sortable: false
+          key: 'payment_notes',
+          sortable: true
         },
-
         { key: 'start_date', sortable: true },
         { key: 'end_date', sortable: true },
         { key: 'options', sortable: false }
@@ -235,7 +237,9 @@ export default {
       voided_total: 0,
       invoice_count_per_year: [],
       show_update_status_modal: false,
-      invoice_details: null
+      invoice_details: null,
+      show_logs_modal: false,
+      selected_invoice_logs: null
     }
   },
   created() {},
@@ -409,9 +413,22 @@ export default {
         this.invoice_details = null
         return
       }
+    },
+    show_logs_modal: function() {
+      if (this.show_logs_modal == false) {
+        this.selected_invoice_logs = null
+        return
+      }
     }
   },
   methods: {
+    showInvoiceLogsModal(logs) {
+      this.show_logs_modal = true
+      this.selected_invoice_logs = logs ? JSON.parse(logs) : []
+    },
+    hideInvoiceLogsModal() {
+      this.show_logs_modal = false
+    },
     showUpdateStatusModal() {
       this.show_update_status_modal = true
     },
@@ -645,7 +662,7 @@ export default {
           .format('YYYY-MM-DD h:mm a')
         const log = `${company_user_details.name} moved invoice to ${status} at ${gmt_date}`
         let parse_log_data = temp_data.log ? JSON.parse(temp_data.log) : []
-        parse_log_data.push(log)
+        parse_log_data.push({ note: '', status, log, date: gmt_date })
         temp_data.log = JSON.stringify(parse_log_data)
 
         const { invoices } = await this.$http().put('/invoices/', id, temp_data)

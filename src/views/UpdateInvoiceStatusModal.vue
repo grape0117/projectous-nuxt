@@ -77,8 +77,13 @@ export default {
       const log = `${company_user_details.name} moved invoice to ${temp_data.status} at ${gmt_date}`
       let parse_log_data = temp_data.log ? JSON.parse(temp_data.log) : []
 
-      parse_log_data.push(log)
-      temp_data.note = this.invoice_notes
+      parse_log_data.push({
+        note: this.invoice_notes,
+        status: temp_data.status,
+        log,
+        date: gmt_date
+      })
+      temp_data.payment_notes = this.invoice_notes
       temp_data.log = JSON.stringify(parse_log_data)
       const { invoices } = await this.$http().put('/invoices/', this.invoice_details.id, temp_data)
       this.updateInvoiceStatus(invoices)
