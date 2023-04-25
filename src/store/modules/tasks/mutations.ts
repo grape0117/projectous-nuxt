@@ -125,7 +125,15 @@ export const mutations: MutationTree<IModuleState> = {
     })
   },
   updateChats(state: IModuleState, chats) {
-    state.chats = chats
+    for (const chat of chats) {
+      const chatIndex = state.chats.findIndex(({ thread_id }) => thread_id == chat.thread_id)
+      if (chatIndex < 0) {
+        state.chats = [...state.chats, chat]
+      } else {
+        state.chats[chatIndex] = chat
+      }
+    }
+    state.chats = [...state.chats]
   }
   /*,
   uuid_to_id(state: IModuleState, { uuid, id }) {

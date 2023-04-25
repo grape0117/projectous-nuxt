@@ -8,7 +8,7 @@
       </div>
       <div class="message-sidebar_new-task" @click="createTask">+</div>
     </div>
-    <div class="message-sidebar">
+    <div class="message-sidebar" ref="chatsContainer" @scroll="getNextChats">
       <b-list-group v-if="chats && chats.length > 0" class="task-side-bar_list">
         <task-sidebar-item v-for="(chat, index) in chats" :key="index" :chat="chat" />
       </b-list-group>
@@ -82,6 +82,12 @@ export default {
     async getChats() {
       this.$store.dispatch('tasks/updateChats')
     },
+    getNextChats: _.debounce(function() {
+      const chatsContainer = this.$refs.chatsContainer
+      if (chatsContainer.scrollTop + chatsContainer.clientHeight + 20 >= chatsContainer.scrollHeight) {
+        const result = this.$store.dispatch('tasks/getMoreChats', this.chats.slice(-1)[0].thread_id)
+      }
+    }, 500),
     async createTask() {
       let newTask = { id: uuid.v4() }
       await this.$store.dispatch('UPSERT', { module: 'tasks', entity: newTask })
