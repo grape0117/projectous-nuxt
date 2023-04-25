@@ -2,9 +2,13 @@
   <div class="task-side-bar">
     <div class="task-side-bar-label">
       <span>CHAT</span>
+      <div style="display: flex;">
+        <span v-if="total_chats_count > 0" class="total-chats-num rounded-circle task-sidebar-item_badge">{{ total_chats_count }}</span
+        ><span v-if="total_chats_count > 0 && unread_messages_num > 0">/</span><span v-if="unread_messages_num > 0" class="unread-message-num rounded-circle task-sidebar-item_badge">{{ unread_messages_num }}</span>
+      </div>
       <div class="message-sidebar_new-task" @click="createTask">+</div>
     </div>
-    <div class="message-sidebar">
+    <div class="message-sidebar" ref="chatsContainer" @scroll="getNextChats">
       <b-list-group v-if="chats && chats.length > 0" class="task-side-bar_list">
         <task-sidebar-item v-for="(chat, index) in chats" :key="index" :chat="chat" />
       </b-list-group>
@@ -53,6 +57,16 @@ export default {
     }
   },
   computed: {
+    unread_messages_num() {
+      let total_unread_num = 0
+      this.$store.state.tasks.chats.map(({ num_unread }) => {
+        total_unread_num = total_unread_num + num_unread
+      })
+      return total_unread_num
+    },
+    total_chats_count() {
+      return this.$store.state.settings.total_chats_count
+    },
     is_loggedIn() {
       return this.$store.state.settings.logged_in
     },
@@ -68,6 +82,12 @@ export default {
     async getChats() {
       this.$store.dispatch('tasks/updateChats')
     },
+    getNextChats: _.debounce(function() {
+      const chatsContainer = this.$refs.chatsContainer
+      if (chatsContainer.scrollTop + chatsContainer.clientHeight + 20 >= chatsContainer.scrollHeight) {
+        const result = this.$store.dispatch('tasks/getMoreChats', this.chats.slice(-1)[0].thread_id)
+      }
+    }, 500),
     async createTask() {
       let newTask = { id: uuid.v4() }
       await this.$store.dispatch('UPSERT', { module: 'tasks', entity: newTask })
@@ -242,5 +262,23 @@ html {
   padding: 10px 20px;
   border-radius: 5px;
   background-color: rgba(0, 0, 0, 0.2);
+}
+.unread-message-num {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  border: 1px solid red;
+  font-size: 18px;
+  width: 25px;
+  height: 25px;
+}
+.total-chats-num {
+  background-color: green;
+  color: white;
+  font-weight: bold;
+  border: 1px solid green;
+  font-size: 18px;
+  width: 25px;
+  height: 25px;
 }
 </style>

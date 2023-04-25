@@ -4,15 +4,14 @@
     <div>
       <div class="message-wrapper">
         <div class="message-container d-flex" v-on:mouseover="showDownloadBtn = true" v-on:mouseleave="showDownloadBtn = false">
-          <button v-if="message.thumbnail" @click="openImage" role="button" title="Open image" aria-label="Open image" aria-disabled="false" tabindex="-1" style="position: relative; display: flex; flex-direction: column; flex-grow: 0; flex-shrink: 0; overflow: hidden; align-items: center; justify-content: center; app-region: no-drag; background-color: transparent; border-color: transparent; text-align: left; border-width: 0px; width: 299.995px; height: 259.938px; border-radius: 0px 10px 10px; padding: 0px; cursor: pointer; border-style: solid;">
-            <div role="none" style="position: relative; display: flex; flex-direction: column; flex-grow: 0; flex-shrink: 0; overflow: hidden; align-items: stretch; justify-content: center; border-radius: 0px 10px 10px; width: 299.995px; height: 259.938px;">
-              <img v-if="!image_loaded" src="@/assets/img/no-image.png" width="300" height="260" alt="thumbnail" style="position: absolute;" />
-              <img :src="'https://projectous-chat-bucket.sfo3.digitaloceanspaces.com/' + message.thumbnail" width="300" height="260" alt="thumbnail" @load="imgLoaded" />
-            </div>
-          </button>
+          <div v-if="message.thumbnail" style="position: relative; display: flex; flex-direction: column; flex-grow: 0; flex-shrink: 0; overflow: hidden; align-items: center; justify-content: center; app-region: no-drag; background-color: transparent; border-color: transparent; text-align: left; border-width: 0px; width: 299.995px; height: 259.938px; border-radius: 0px 10px 10px; padding: 0px; cursor: pointer; border-style: solid;">
+            <img v-if="!image_loaded" src="@/assets/img/no-image.png" width="300" height="260" alt="thumbnail" style="position: absolute;" />
+            <img :src="'https://projectous-chat-bucket.sfo3.digitaloceanspaces.com/' + message.thumbnail" width="300" height="260" alt="thumbnail" @load="imgLoaded" />
+          </div>
           <img v-if="!message.thumbnail && message.isFile" src="@/assets/img/attach-file.png" width="30" height="34" alt="thumbnail" style="margin-top: 3px; margin-left: 5px;" />
-          <div class="download-bg" v-if="!message.thumbnail && message.isFile && showDownloadBtn">
+          <div class="download-bg" v-if="message.isFile && showDownloadBtn">
             <i class="icon-download" @click="downloadFile(message)" />
+            <i v-if="message.thumbnail" class="icon-open_in_new" @click="openImage()" />
           </div>
           <pre v-if="!message.thumbnail" class="msg-content" style="color: white;">{{ message.message }}</pre>
         </div>
@@ -167,13 +166,16 @@ export default {
       width: 100%;
       background-color: rgba(0, 0, 0, 0.7);
       display: flex;
+      align-items: center;
+      justify-content: center;
+      .icon-open_in_new,
       .icon-download {
-        color: white;
-        margin: auto;
         font-size: 31px;
       }
+      .icon-open_in_new:hover,
       .icon-download:hover {
         cursor: pointer;
+        color: white;
       }
     }
   }

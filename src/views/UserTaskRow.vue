@@ -291,7 +291,6 @@ export default {
       return project ? project.acronym : false
     },
     dueDate(due_date) {
-      console.log(due_date)
       let formatted_date
       if (due_date) {
         formatted_date = moment(due_date, 'yyyy-MM-DD').format('yyyy-MM-DD')

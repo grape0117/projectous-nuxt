@@ -42,6 +42,7 @@ import { EventBus } from '@/components/event-bus'
 import MySideBarTimer from './MySidebarTimer.vue'
 
 export default {
+  props: ['show'],
   name: 'timer-tab',
   data: function() {
     return {
@@ -51,7 +52,20 @@ export default {
       month_stats: 0
     }
   },
+  watch: {
+    show: {
+      immediate: true,
+      handler(val) {
+        if (this.is_loggedIn && val) {
+          this.getTimers()
+        }
+      }
+    }
+  },
   computed: {
+    is_loggedIn() {
+      return this.$store.state.settings.logged_in
+    },
     isAdmin() {
       return this.$store.getters['settings/isAdmin']
     },
@@ -75,6 +89,9 @@ export default {
     'my-sidebar-timer': MySideBarTimer
   },
   methods: {
+    async getTimers() {
+      this.$store.dispatch('timers/getTimers')
+    },
     async getMonthStats() {
       // const { profit } = await this.$http().get('/stats/month')
       // this.month_stats = profit

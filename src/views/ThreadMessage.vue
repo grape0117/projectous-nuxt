@@ -71,9 +71,7 @@ export default {
         //   return "files[]";
         // },
       },
-      thread_title: '',
       thread_message: null,
-      thread: null,
       last_message_timestamp: null
     }
   },
@@ -112,12 +110,11 @@ export default {
         if (this.$refs.message_content) {
           this.$refs.message_content.focus()
         }
-        let thread = this.$store.getters['threads/getById'](this.thread_id)[0]
-        if (thread) {
-          this.thread_title = thread.title
-          this.thread = thread
-        }
       }
+      this.$nextTick(() => {
+        let container = this.$refs.msgContainer
+        container.scrollTop = container.scrollHeight + 120
+      })
     }
     // messageId: function(messageid) {
     //   if (messageid) {
@@ -139,13 +136,16 @@ export default {
         return new Date(b.created_at) - new Date(a.created_at)
       })
       this.$nextTick(() => {
-        if (this.last_message_timestamp <= messages[0].timestamp) {
+        if (messages.length > 0 && this.last_message_timestamp <= messages[0].timestamp) {
           this.last_message_timestamp = messages[0].timestamp
           let container = this.$refs.msgContainer
           container.scrollTop = container.scrollHeight + 120
         }
       })
       return messages.reverse()
+    },
+    thread() {
+      return this.$store.getters['threads/getById'](this.thread_id)[0]
     },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
@@ -156,17 +156,7 @@ export default {
       let container = this.$refs.msgContainer
       container.scrollTop = container.scrollHeight + 120
     }, 500)
-    if (this.thread_id) {
-      let thread = this.$store.getters['threads/getById'](this.thread_id)[0]
-      this.thread = thread
-    }
     this.getNextMessages()
-    // if (this.messageId) {
-    //   let message_content = this.$store.getters['task_messages/getById'](this.messageId)
-    //   this.thread_title = message_content ? message_content.message : ''
-    //   this.thread_message = message_content ? message_content : null
-    //   this.thread_id = message_content.task_id + '-' + message_content.timestamp
-    // }
   },
   methods: {
     getNextMessages: _.debounce(function() {
@@ -308,15 +298,6 @@ export default {
       let message = this.s_message
       let task
       if (this.selected_message == null) {
-        // create
-        // let message = {
-        //   id: uuid.v4(),
-        //   task_id: this.task_id,
-        //   company_user_id: this.current_company_user_id,
-        //   message: this.s_message,
-        //   created_at: moment().format('YYYY-MM-DD HH:mm:ss')
-        // }
-        // this.$store.dispatch('ADD_ONE', { module: 'task_messages', entity: [message] }, { root: true })
         this.s_message = ''
         let task_message = await this.$store.dispatch('task_messages/createThreadMessage', {
           thread_id: this.thread_id,
@@ -327,7 +308,11 @@ export default {
           // timestamp: this.thread_message.timestamp
         })
         console.log('task_message', task_message)
-
+        this.$nextTick(() => {
+          this.last_message_timestamp = messages[0].timestamp
+          let container = this.$refs.msgContainer
+          container.scrollTop = container.scrollHeight + 120
+        })
         return
         task = this.$store.getters['tasks/getById'](task_id)
         task.last_task_message_id = task_message.task_messages.id

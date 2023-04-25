@@ -20,5 +20,8 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     } else {
       return { id: '', name: '' }
     }
+  },
+  get_total_chats_count: state => {
+    return state.total_chats_count
   }
 }
