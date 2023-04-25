@@ -619,7 +619,7 @@ export default {
             count: count_of_heigh
           })
         }
-        const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', response)
+        const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', { task_users: response.task_users, tasks: response.tasks, all_tasks: response.tasks })
       }
     },
     async updateData() {
