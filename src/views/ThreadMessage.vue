@@ -309,7 +309,7 @@ export default {
         })
         console.log('task_message', task_message)
         this.$nextTick(() => {
-          this.last_message_timestamp = messages[0].timestamp
+          this.last_message_timestamp = task_message.timestamp
           let container = this.$refs.msgContainer
           container.scrollTop = container.scrollHeight + 120
         })

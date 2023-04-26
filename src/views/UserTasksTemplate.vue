@@ -187,8 +187,8 @@ export default {
       return my_tasks
     },
     all_tasks() {
-      this.all_high_count = this.$store.state.tasks.all_tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
-      return this.$store.state.tasks.all_tasks
+      this.all_high_count = this.$store.state.tasks.tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
+      return this.$store.state.tasks.tasks
     },
     others_tasks() {
       this.others_high_count = this.$store.state.tasks.others_tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
@@ -210,7 +210,7 @@ export default {
       const current_user_id = this.$store.state.settings.current_company_user_id
 
       if (this.tab === 'all') {
-        tasks = this.$store.state.tasks.all_tasks
+        tasks = this.$store.state.tasks.tasks
         this.all_count = tasks.length
         this.all_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'others') {
