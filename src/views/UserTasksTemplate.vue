@@ -430,6 +430,8 @@ export default {
       if (is_color && project) {
         client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
         return client_data.color
+      } else if (!project) {
+        return 'gray'
       }
       return project.acronym ? project.acronym : project.name
     },
