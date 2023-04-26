@@ -51,7 +51,7 @@
     </div>
     <div class="col-md-3" style="white-space: nowrap; display: table-cell; align-self:center">
       <div>
-        <input id="task-list-due-date" @change="saveDueDate" :class="task.due_date && task.due_date !== '0000-00-00 00:00:00' ? 'badge badge-danger mr-3' : 'badge badge-danger mr-3  show-on-hovered'" :style="{ width: task.due_date && task.due_date !== '0000-00-00 00:00:00' ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
+        <input id="task-list-due-date" @change="saveDueDate" :class="task.due_date && task.due_date !== '0000-00-00 00:00:00' ? 'badge badge-danger mr-3' : 'badge badge-danger mr-3  show-on-hovered'" :style="{ width: task.due_date && task.due_date !== '0000-00-00 00:00:00' ? '' : '34px!important', float: 'left', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
       </div>
     </div>
   </div>
@@ -492,7 +492,7 @@ tr {
 }
 
 #task-list-due-date {
-  color: white !important;
+  color: white;
   border: none !important;
   text-align: center !important;
   width: 135px !important;
@@ -556,7 +556,28 @@ span.avatar.notes:before {
 #priorities-dropdown > .btn::after {
   content: none;
 }
+input[value='']::-webkit-datetime-edit {
+  color: transparent;
+}
+input:focus::-webkit-datetime-edit {
+  color: #000;
+}
 
+input[type='date'].show-on-hovered::-webkit-calendar-picker-indicator {
+  bottom: 0;
+  cursor: pointer;
+  height: auto;
+  left: 5px;
+  position: absolute;
+  right: 125px;
+  top: 0;
+  width: auto;
+}
+input[type='date'].show-on-hovered,
+input[type='date'].show-on-hovered:focus {
+  color: transparent !important;
+  float: left;
+}
 /* span.avatar.test:after {
   background: url(../assets/icons/test.png) no-repeat;
   content: '';
