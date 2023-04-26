@@ -430,6 +430,8 @@ export default {
       if (is_color && project) {
         client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
         return client_data.color
+      } else if (!project) {
+        return 'gray'
       }
       return project.acronym ? project.acronym : project.name
     },
@@ -619,7 +621,7 @@ export default {
             count: count_of_heigh
           })
         }
-        const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', response)
+        const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', { task_users: response.task_users, tasks: response.tasks, all_tasks: response.tasks })
       }
     },
     async updateData() {
