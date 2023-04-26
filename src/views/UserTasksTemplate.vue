@@ -210,12 +210,11 @@ export default {
       const current_user_id = this.$store.state.settings.current_company_user_id
 
       if (this.tab === 'all') {
-        tasks = this.$store.state.tasks.all_tasks
-        this.all_count = tasks.length
+        tasks = this.$store.state.tasks.tasks
+        // this.all_count = this.$store.state.tasks.all_tasks.length
         this.all_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'others') {
         tasks = this.$store.state.tasks.others_tasks
-        this.others_count = tasks.length
         this.others_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'my_tasks') {
         user_id = self.current_company_user.id
@@ -322,6 +321,12 @@ export default {
         const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: task.id, company_user_id: current_user_id })[0]
         task['isToday'] = task_user && task_user['next_work_day'] && moment(task_user['next_work_day']).format('yyyy-MM-DD') <= moment().format('yyyy-MM-DD')
       })
+
+      if (this.tab === 'all') {
+        this.all_count = tasks.length
+      } else if (this.tab === 'others') {
+        this.others_count = tasks.length
+      }
       return tasks
     },
 
@@ -621,7 +626,8 @@ export default {
             count: count_of_heigh
           })
         }
-        const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', { task_users: response.task_users, tasks: response.tasks, all_tasks: response.tasks })
+        const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', response)
+        // const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', { task_users: response.task_users, tasks: response.tasks, all_tasks: response.tasks })
       }
     },
     async updateData() {
