@@ -180,6 +180,23 @@ export default {
       return project
     },
     priorityColor(priority) {
+      if (this.task.due_date) {
+        const timezone = moment.tz.guess()
+        const timezone_date = moment()
+          .tz(timezone)
+          .format('YYYY-MM-DD')
+        const task_due_date = moment(this.task.due_date).format('YYYY-MM-DD')
+
+        const diff = moment.duration(moment(task_due_date).diff(moment(timezone_date)))
+        const days = diff.asDays()
+        if (days < 0) {
+          color = 'past_due_color'
+          return color
+        } else if (days === 0) {
+          color = 'due_today_color'
+          return color
+        }
+      }
       let color = 'primary'
       switch (priority) {
         case 'high':
@@ -466,6 +483,12 @@ tr {
   width: 13px !important;
   height: 13px !important;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+}
+#priorities-dropdown > .btn.btn-past_due_color {
+  background-color: #484848;
+}
+#priorities-dropdown > .btn.btn-due_today_color {
+  background-color: red;
 }
 
 #task-list-due-date {
