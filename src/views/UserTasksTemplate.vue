@@ -210,12 +210,11 @@ export default {
       const current_user_id = this.$store.state.settings.current_company_user_id
 
       if (this.tab === 'all') {
-        tasks = this.$store.state.tasks.all_tasks
-        this.all_count = tasks.length
+        tasks = this.$store.state.tasks.tasks
+        // this.all_count = this.$store.state.tasks.all_tasks.length
         this.all_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'others') {
         tasks = this.$store.state.tasks.others_tasks
-        this.others_count = tasks.length
         this.others_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'my_tasks') {
         user_id = self.current_company_user.id
@@ -242,7 +241,7 @@ export default {
       }
 
       tasks = tasks.filter(task => {
-        if ((self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter)) || task.status === 'completed') {
+        if (!task || (self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter)) || task.status === 'completed') {
           return false
         }
         if (self.project_filter.length > 0 || self.status_filter.length > 0 || self.step_filter.length > 0) {
@@ -322,6 +321,12 @@ export default {
         const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: task.id, company_user_id: current_user_id })[0]
         task['isToday'] = task_user && task_user['next_work_day'] && moment(task_user['next_work_day']).format('yyyy-MM-DD') <= moment().format('yyyy-MM-DD')
       })
+
+      if (this.tab === 'all') {
+        this.all_count = tasks.length
+      } else if (this.tab === 'others') {
+        this.others_count = tasks.length
+      }
       return tasks
     },
 
@@ -430,6 +435,8 @@ export default {
       if (is_color && project) {
         client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
         return client_data.color
+      } else if (!project) {
+        return is_color ? 'gray' : 'No project'
       }
       return project.acronym ? project.acronym : project.name
     },
@@ -600,7 +607,7 @@ export default {
       this.new_task_project_id = null
     },
     filter_task_count(company_user_id) {
-      return this.$store.getters['task_users/getByCompanyUserId'](company_user_id).length
+      return this.$store.getters['tasks/getOnlyAssignedTasksByCompanyUserId'](company_user_id).length
     },
     filter_task_high_count(company_user_id) {
       return this.high_count_of_users.filter(({ user_id }) => user_id == company_user_id)
@@ -620,6 +627,7 @@ export default {
           })
         }
         const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', response)
+        // const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', { task_users: response.task_users, tasks: response.tasks, all_tasks: response.tasks })
       }
     },
     async updateData() {

@@ -51,7 +51,7 @@
             <b-th colspan="1">
               <b-button @click="applyAction()">Go</b-button>
             </b-th>
-            <b-th colspan="8"></b-th>
+            <b-th colspan="9"></b-th>
           </b-tr>
         </template>
         <template #table-busy>
@@ -95,10 +95,10 @@
             <!-- <input type="checkbox" :value="data.item.id" class="invoice-checkbox" :name="'item[' + data.item.id + ']'" /> -->
             <b-form-checkbox name="selected-invoice" v-model="selected_invoice_id" :value="data.item.invoice_id"> </b-form-checkbox>
             <b-button-group size="sm" style="height:30px">
-              <b-button @click="updateStatus(data.item.id, 'open')" :style="{ background: backgroundColor('open', data.item), border: 'none' }">Open</b-button>
-              <b-button @click="updateStatus(data.item.id, 'sent')" :style="{ background: backgroundColor('sent', data.item), border: 'none' }">Sent</b-button>
-              <b-button @click="updateStatus(data.item.id, 'paid')" :style="{ background: backgroundColor('paid', data.item), border: 'none' }">Paid</b-button>
-              <b-button @click="updateStatus(data.item.id, 'voided')" :style="{ background: backgroundColor('voided', data.item), border: 'none' }">Voided</b-button>
+              <b-button @click="updateStatus(data.item.id, 'open', data.item)" :style="{ background: backgroundColor('open', data.item), border: 'none' }">Open</b-button>
+              <b-button @click="updateStatus(data.item.id, 'sent', data.item)" :style="{ background: backgroundColor('sent', data.item), border: 'none' }">Sent</b-button>
+              <b-button @click="updateStatus(data.item.id, 'paid', data.item)" :style="{ background: backgroundColor('paid', data.item), border: 'none' }">Paid</b-button>
+              <b-button @click="updateStatus(data.item.id, 'voided', data.item)" :style="{ background: backgroundColor('voided', data.item), border: 'none' }">Voided</b-button>
             </b-button-group>
           </span>
         </template>
@@ -120,6 +120,9 @@
         <template #cell(note)="data">
           <b-form-textarea style="min-width: 100px" class="transparent-input-note" v-model="data.item.note" debounce="500" rows="0" max-rows="7" cols="300" @change="setNoteValue($event, data.item)"></b-form-textarea>
         </template>
+        <template #cell(payment_notes)="data">
+          {{ data.item.payment_notes }}
+        </template>
         <template #cell(start_date)="data">
           {{ formatDate(data.item.start_date) }}
         </template>
@@ -140,6 +143,8 @@
       </b-table>
     </div>
     <invoices-apply-payment />
+    <update-invoice-status-modal :show="show_update_status_modal" @hide="hideUpdateStatusModal" :invoice_details="invoice_details" :updateInvoiceStatus="updateInvoiceStatus" />
+    <invoice-logs-modal :show="show_logs_modal" @hide="hideInvoiceLogsModal" :logs="selected_invoice_logs" />
   </div>
 </template>
 
@@ -149,13 +154,15 @@ import { colorThemes } from '@/mixins/colorThemes'
 
 import InvoicesRow from './InvoicesRow.vue'
 import { EventBus } from '@/components/event-bus'
-// import { getCookie } from '@/utils/util-functions'
+import { getCookie } from '@/utils/util-functions'
 
 export default {
   name: 'invoices-template',
   components: {
     'invoices-row': InvoicesRow,
-    'invoices-apply-payment': () => import('./InvoicesApplyPayment.vue')
+    'invoices-apply-payment': () => import('./InvoicesApplyPayment.vue'),
+    'update-invoice-status-modal': () => import('./UpdateInvoiceStatusModal.vue'),
+    'invoice-logs-modal': () => import('./InvoiceLogsModal.vue')
   },
   mixins: [colorThemes],
   data: function() {
@@ -208,7 +215,10 @@ export default {
           key: 'note',
           sortable: true
         },
-
+        {
+          key: 'payment_notes',
+          sortable: true
+        },
         { key: 'start_date', sortable: true },
         { key: 'end_date', sortable: true },
         { key: 'options', sortable: false }
@@ -224,7 +234,11 @@ export default {
       unpaid_total: 0,
       paid_total: 0,
       voided_total: 0,
-      invoice_count_per_year: []
+      invoice_count_per_year: [],
+      show_update_status_modal: false,
+      invoice_details: null,
+      show_logs_modal: false,
+      selected_invoice_logs: null
     }
   },
   created() {},
@@ -391,9 +405,35 @@ export default {
       } else {
         this.selected_invoice_id = []
       }
+    },
+    show_update_status_modal: function() {
+      if (this.show_update_status_modal == false) {
+        this.getData()
+        this.invoice_details = null
+        return
+      }
+    },
+    show_logs_modal: function() {
+      if (this.show_logs_modal == false) {
+        this.selected_invoice_logs = null
+        return
+      }
     }
   },
   methods: {
+    showInvoiceLogsModal(logs) {
+      this.show_logs_modal = true
+      this.selected_invoice_logs = logs ? JSON.parse(logs) : []
+    },
+    hideInvoiceLogsModal() {
+      this.show_logs_modal = false
+    },
+    showUpdateStatusModal() {
+      this.show_update_status_modal = true
+    },
+    hideUpdateStatusModal() {
+      this.show_update_status_modal = false
+    },
     async get_count() {
       const counts = await this.$http().get('/invoices/counts')
       this.invoice_years = counts.invoice_years
@@ -552,17 +592,17 @@ export default {
       return { invoices, invoice_years, open_invoice_count, invoice_count_per_year }
     },
     async getData() {
-      const { invoices, invoice_years, open_invoice_count, invoice_count_per_year } = await this.getInvoicesByYear(this.status_filter) //new Date().getFullYear()
+      const { invoices, invoice_years, open_invoice_count, invoice_count_per_year } = await this.getInvoicesByYear(this.selectedYear) //new Date().getFullYear()
 
       this.invoices = invoices
       this.processBreakdownPerStatus(invoices)
       this.invoice_years = invoice_years
       this.open_invoice_count = open_invoice_count
       this.invoice_count_per_year = invoice_count_per_year
-      this.getCountPerStatus('all')
+      this.getCountPerStatus(this.selectedYear)
     },
-    async getCountPerStatus(year) {
-      const { count, total_per_status } = await this.$http().get(`/invoices_count_per_status/${year}`)
+    async getCountPerStatus() {
+      const { count, total_per_status } = await this.$http().get(`/invoices_count_per_status/${this.selectedYear}`)
       const check_open_count = count.find(e => e.status === 'open')
       const check_sent_count = count.find(e => e.status === 'sent')
       const check_paid = count.find(e => e.status === 'paid')
@@ -596,9 +636,38 @@ export default {
           })
       }
     },
-    async updateStatus(id, status) {
-      const { invoices } = await this.$http().patch('/invoices/', id, { attribute: 'status', value: status })
-      this.updateInvoiceStatus(invoices)
+    getCompanyUserDetails(company_user_id) {
+      const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
+
+      return user_details
+    },
+    async updateStatus(id, status, data) {
+      let company_user_user_id = this.$store.state.settings.current_company_user_id
+      let company_user_details = this.getCompanyUserDetails(company_user_user_id)
+
+      let temp_data = { ...data }
+      temp_data.status = status
+
+      if (status != this.status_filter && ['paid', 'voided'].includes(status)) {
+        this.showUpdateStatusModal()
+        this.invoice_details = temp_data
+      } else {
+        const current_ts = new Date()
+        const timezone = moment.tz.guess()
+        const timezone_date = moment.tz(current_ts, timezone)
+        const gmt_date = timezone_date
+          .clone()
+          .tz('GMT')
+          .format('YYYY-MM-DD h:mm a')
+        const log = `${company_user_details.name} moved invoice to ${status} at ${gmt_date}`
+        let parse_log_data = temp_data.log ? JSON.parse(temp_data.log) : []
+        parse_log_data.push({ note: '', status, log, date: gmt_date })
+        temp_data.log = JSON.stringify(parse_log_data)
+
+        const { invoices } = await this.$http().put('/invoices/', id, temp_data)
+        this.updateInvoiceStatus(invoices)
+        this.getData()
+      }
     },
     redirect(to, invoice_id) {
       const path = 'http://old.projectous.com/'
@@ -634,6 +703,14 @@ export default {
       const { id } = invoice
 
       const { invoices } = await this.$http().patch('/invoices/', id, { attribute: 'note', value: note })
+    },
+    getLatestLog(log) {
+      const parse_log = log ? JSON.parse(log) : ''
+      if (log == null) {
+        return ''
+      }
+
+      return parse_log.legth == 1 ? parse_log[0] : parse_log[parse_log.length - 1]
     }
   }
 }

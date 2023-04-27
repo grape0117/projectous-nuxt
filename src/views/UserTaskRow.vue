@@ -32,7 +32,7 @@
     <div style="display: table-cell; width: 99%">
       <span style="float: right; margin-right: 10px;" class="white-text">{{ durationDisplay }}</span>
       <span v-if="isCompletedTask" style="margin-right: 5px;"><b-badge variant="success">Completed</b-badge></span>
-      <span @click="showTaskDetail" :style="{ cursor: 'pointer', 'font-weight': `${task.messages.length > 0 ? 'bolder' : 'normal'}` }" class="white-text">{{ task.title ? task.title : '---' }} </span>
+      <span @click="showTaskDetail" :style="{ cursor: 'pointer', 'font-weight': `${task.messages && task.messages.length > 0 ? 'bolder' : 'normal'}` }" class="white-text">{{ task.title ? task.title : '---' }} </span>
       <span v-for="user in task_users" v-if="isAdmin() || is_owner">
         <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex', 'margin-left': '5px' }">
           {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
@@ -51,7 +51,7 @@
     </div>
     <div class="col-md-3" style="white-space: nowrap; display: table-cell; align-self:center">
       <div>
-        <input id="task-list-due-date" @change="saveDueDate" :class="task.due_date && task.due_date !== '0000-00-00 00:00:00' ? 'badge badge-danger mr-3' : 'badge badge-danger mr-3  show-on-hovered'" :style="{ width: task.due_date && task.due_date !== '0000-00-00 00:00:00' ? '' : '26px!important', float: 'right', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
+        <input id="task-list-due-date" @change="saveDueDate" :class="task.due_date && task.due_date !== '0000-00-00 00:00:00' ? 'badge badge-danger mr-3' : 'badge badge-danger mr-3  show-on-hovered'" :style="{ width: task.due_date && task.due_date !== '0000-00-00 00:00:00' ? '' : '34px!important', float: 'left', display: 'flex', cursor: 'pointer', 'background-color': dueDateDetails(task.due_date, true) }" type="date" name="due_at" placeholder="Due Date" :value="dueDate(task.due_date)" v-b-tooltip.hover :title="dueDateDetails(task.due_date)" />
       </div>
     </div>
   </div>
@@ -180,6 +180,23 @@ export default {
       return project
     },
     priorityColor(priority) {
+      if (this.task.due_date) {
+        const timezone = moment.tz.guess()
+        const timezone_date = moment()
+          .tz(timezone)
+          .format('YYYY-MM-DD')
+        const task_due_date = moment(this.task.due_date).format('YYYY-MM-DD')
+
+        const diff = moment.duration(moment(task_due_date).diff(moment(timezone_date)))
+        const days = diff.asDays()
+        if (days < 0) {
+          color = 'past_due_color'
+          return color
+        } else if (days === 0) {
+          color = 'due_today_color'
+          return color
+        }
+      }
       let color = 'primary'
       switch (priority) {
         case 'high':
@@ -467,9 +484,15 @@ tr {
   height: 13px !important;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
 }
+#priorities-dropdown > .btn.btn-past_due_color {
+  background-color: #484848;
+}
+#priorities-dropdown > .btn.btn-due_today_color {
+  background-color: red;
+}
 
 #task-list-due-date {
-  color: white !important;
+  color: white;
   border: none !important;
   text-align: center !important;
   width: 135px !important;
@@ -533,7 +556,28 @@ span.avatar.notes:before {
 #priorities-dropdown > .btn::after {
   content: none;
 }
+input[value='']::-webkit-datetime-edit {
+  color: transparent;
+}
+input:focus::-webkit-datetime-edit {
+  color: #000;
+}
 
+input[type='date'].show-on-hovered::-webkit-calendar-picker-indicator {
+  bottom: 0;
+  cursor: pointer;
+  height: auto;
+  left: 5px;
+  position: absolute;
+  right: 125px;
+  top: 0;
+  width: auto;
+}
+input[type='date'].show-on-hovered,
+input[type='date'].show-on-hovered:focus {
+  color: transparent !important;
+  float: left;
+}
 /* span.avatar.test:after {
   background: url(../assets/icons/test.png) no-repeat;
   content: '';
