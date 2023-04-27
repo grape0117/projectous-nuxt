@@ -241,7 +241,7 @@ export default {
       }
 
       tasks = tasks.filter(task => {
-        if ((self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter)) || task.status === 'completed') {
+        if (!task || (self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter)) || task.status === 'completed') {
           return false
         }
         if (self.project_filter.length > 0 || self.status_filter.length > 0 || self.step_filter.length > 0) {
@@ -607,7 +607,7 @@ export default {
       this.new_task_project_id = null
     },
     filter_task_count(company_user_id) {
-      return this.$store.getters['task_users/getByCompanyUserId'](company_user_id).length
+      return this.$store.getters['tasks/getOnlyAssignedTasksByCompanyUserId'](company_user_id).length
     },
     filter_task_high_count(company_user_id) {
       return this.high_count_of_users.filter(({ user_id }) => user_id == company_user_id)
