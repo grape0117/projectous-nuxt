@@ -125,8 +125,9 @@ export const mutations: MutationTree<IModuleState> = {
     })
   },
   updateChats(state: IModuleState, chats) {
+    let openChats = state.chats.filter(({ thread_status }) => thread_status !== 'closed')
     let restChats = []
-    for (const chat of state.chats) {
+    for (const chat of openChats) {
       // @ts-ignore
       const chatIndex = chats.findIndex(({ thread_id }) => thread_id == chat.thread_id)
       if (chatIndex < 0) {
@@ -134,6 +135,9 @@ export const mutations: MutationTree<IModuleState> = {
       }
     }
     state.chats = [...chats, ...restChats]
+  },
+  updateMoreChats(state: IModuleState, chats) {
+    state.chats = [...state.chats, ...chats]
   }
   /*,
   uuid_to_id(state: IModuleState, { uuid, id }) {

@@ -170,6 +170,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // @ts-ignore
     let { chats, threads, total_chats_count } = await this._vm.$http().get(`/chats/${last_chat_id}`)
     commit('updateChats', chats)
+    commit('updateMoreChats', chats)
     this.commit('threads/updateThreads', threads)
     this.commit('settings/setTotalChats', total_chats_count)
   },
