@@ -181,9 +181,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   async getMoreChats({ commit }: any, last_chat_id: number) {
     // @ts-ignore
-    let { chats, threads, total_chats_count } = await this._vm.$http().get(`/chats/${last_chat_id}`)
-    this.commit('threads/updateThreads', threads)
-    this.commit('settings/setTotalChats', total_chats_count)
+    let { chats } = await this._vm.$http().get(`/chats/${last_chat_id}`)
     commit('updateMoreChats', chats)
   },
   async CASCADE_DELETE({ rootState, commit }, task) {
