@@ -159,20 +159,32 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // TODO @stephane send task to server
     commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
   },
-  async updateChats({ commit }: any) {
+  async updateChats({ commit, state }: any) {
+    let newChats = []
     // @ts-ignore
     let { chats, threads, total_chats_count } = await this._vm.$http().get('/chats')
-    commit('updateChats', chats)
+    // @ts-ignore
+    let openChats = state.chats.filter(({ thread_id }) => threads.filter(thread => thread.id === thread_id)[0]['status'] !== 'closed')
+    let restChats = []
+    for (const chat of openChats) {
+      // @ts-ignore
+      const chatIndex = chats.findIndex(({ thread_id }) => thread_id == chat.thread_id)
+      if (chatIndex < 0) {
+        restChats.push(chat)
+      }
+    }
+    newChats = [...chats, ...restChats]
+
+    commit('updateChats', newChats)
     this.commit('threads/updateThreads', threads)
     this.commit('settings/setTotalChats', total_chats_count)
   },
   async getMoreChats({ commit }: any, last_chat_id: number) {
     // @ts-ignore
     let { chats, threads, total_chats_count } = await this._vm.$http().get(`/chats/${last_chat_id}`)
-    commit('updateChats', chats)
-    commit('updateMoreChats', chats)
     this.commit('threads/updateThreads', threads)
     this.commit('settings/setTotalChats', total_chats_count)
+    commit('updateMoreChats', chats)
   },
   async CASCADE_DELETE({ rootState, commit }, task) {
     rootState.task_users.task_users.forEach((task_user: ITaskUser) => {
