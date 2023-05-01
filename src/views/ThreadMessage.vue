@@ -186,6 +186,8 @@ export default {
     handleEnter(e) {
       if (e.ctrlKey) {
         this.s_message = this.s_message + '\n'
+      } else if (e.shiftKey) {
+        return
       } else {
         this.saveMessage()
       }
