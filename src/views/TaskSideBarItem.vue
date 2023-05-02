@@ -28,7 +28,7 @@
         </span>
       </div>
       <div class="task-sidebar-last-message" style="margin-top: 0 !important;" @click="showTaskDetail">
-        <span class="task-sidebar-date">{{ chat.last_message.created_at | showDate }}</span>
+        <span class="task-sidebar-date">{{ chat.last_message.createdAt | showDate }}</span>
       </div>
       <!-- <span class="task-sidebar_go-to-task" @click="showTaskDetail">[ Go to task]</span> -->
     </div>
