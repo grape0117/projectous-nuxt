@@ -345,7 +345,7 @@ export default {
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             that.$store.commit('ADD_ONE', { module: 'task_messages', entity: e.data }, { root: true })
             that.$store.dispatch('tasks/updateLastMessage', e.data)
-            if (e.data.user.id == user_id) {
+            if (e.data.user.user_id == user_id) {
               this.$store.commit('tasks/readChat', thread_id)
               this.$store.commit('threads/readThread', thread_id)
             }
