@@ -146,6 +146,15 @@ export const mutations: MutationTree<IModuleState> = {
     newChats.splice(chatIndex, 1)
     newChats.unshift(updatedChat)
     state.chats = newChats
+  },
+  readChat(state: IModuleState, threadId) {
+    const chatIndex = state.chats.findIndex(({ thread_id }) => thread_id == threadId)
+    if (chatIndex < 0) {
+      return
+    }
+    let newChats = [...state.chats]
+    newChats[chatIndex] = { ...newChats[chatIndex], num_unread: 0 }
+    state.chats = newChats
   }
   /*,
   uuid_to_id(state: IModuleState, { uuid, id }) {

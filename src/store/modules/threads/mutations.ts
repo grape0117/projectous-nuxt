@@ -33,5 +33,13 @@ export const mutations: MutationTree<IModuleState> = {
     //@ts-ignore
     let thread_index = state.threads.findIndex(({ id }) => id == threadInfo.thread_id)
     state.threads[thread_index].responsibility_company_user_id = threadInfo.responsibility_company_user_id
+  },
+  readThread(state: IModuleState, thread_id) {
+    let thread_index = state.threads.findIndex(({ id }) => id == thread_id)
+
+    let newThreads = [...state.threads]
+    //@ts-ignore
+    newThreads[thread_index] = { ...newThreads[thread_index], num_unread: 0 }
+    state.threads = newThreads
   }
 }
