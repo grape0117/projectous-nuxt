@@ -41,5 +41,13 @@ export const mutations: MutationTree<IModuleState> = {
     //@ts-ignore
     newThreads[thread_index] = { ...newThreads[thread_index], num_unread: 0 }
     state.threads = newThreads
+  },
+  unReadThread(state: IModuleState, thread_id) {
+    let thread_index = state.threads.findIndex(({ id }) => id == thread_id)
+
+    let newThreads = [...state.threads]
+    //@ts-ignore
+    newThreads[thread_index] = { ...newThreads[thread_index], num_unread: newThreads[thread_index].num_unread + 1 }
+    state.threads = newThreads
   }
 }

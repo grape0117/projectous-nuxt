@@ -309,7 +309,6 @@ export default {
           // task_message_id: this.messageId,
           // timestamp: this.thread_message.timestamp
         })
-        console.log('task_message', task_message)
         this.$nextTick(() => {
           this.last_message_timestamp = task_message.timestamp
           let container = this.$refs.msgContainer
