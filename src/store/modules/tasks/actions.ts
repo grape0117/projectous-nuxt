@@ -184,6 +184,17 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     let { chats } = await this._vm.$http().get(`/chats/${last_chat_id}`)
     commit('updateMoreChats', chats)
   },
+  async updateLastMessage({ commit, state }: any, task_message: any) {
+    // @ts-ignore
+    let lastMessage = {
+      company_user_id: task_message.company_user_id,
+      createdAt: task_message.created_at,
+      id: task_message.id,
+      text: task_message.text,
+      user: { ...task_message.user, role: task_message.user.user_role }
+    }
+    commit('updateLastMessage', { thread_id: task_message.thread_id, lastMessage: lastMessage, users_to_notify: task_message.users_to_notify })
+  },
   async CASCADE_DELETE({ rootState, commit }, task) {
     rootState.task_users.task_users.forEach((task_user: ITaskUser) => {
       if (task_user.task_id === task.id) {

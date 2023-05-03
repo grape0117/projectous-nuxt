@@ -344,7 +344,7 @@ export default {
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             that.$store.commit('ADD_ONE', { module: 'task_messages', entity: e.data }, { root: true })
 
-            that.$store.dispatch('tasks/updateChats')
+            that.$store.dispatch('tasks/updateLastMessage', e.data)
           }
 
           break
