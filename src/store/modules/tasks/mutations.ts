@@ -133,19 +133,20 @@ export const mutations: MutationTree<IModuleState> = {
   },
   updateLastMessage(state: IModuleState, lastMessage) {
     const user_id = getCookie('user_id')
-
     const chatIndex = state.chats.findIndex(({ thread_id }) => thread_id == lastMessage.thread_id)
-    let newChats = [...state.chats]
-    // @ts-ignore
-    if (Object.values(lastMessage.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
-      newChats[chatIndex] = { ...newChats[chatIndex], last_message: lastMessage.lastMessage, num_unread: newChats[chatIndex].num_unread + 1 }
-    } else {
-      newChats[chatIndex] = { ...newChats[chatIndex], last_message: lastMessage.lastMessage }
+    if (chatIndex > 0) {
+      let newChats = [...state.chats]
+      // @ts-ignore
+      if (Object.values(lastMessage.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
+        newChats[chatIndex] = { ...newChats[chatIndex], last_message: lastMessage.lastMessage, num_unread: newChats[chatIndex].num_unread + 1 }
+      } else {
+        newChats[chatIndex] = { ...newChats[chatIndex], last_message: lastMessage.lastMessage }
+      }
+      const updatedChat = { ...newChats[chatIndex] }
+      newChats.splice(chatIndex, 1)
+      newChats.unshift(updatedChat)
+      state.chats = newChats
     }
-    const updatedChat = { ...newChats[chatIndex] }
-    newChats.splice(chatIndex, 1)
-    newChats.unshift(updatedChat)
-    state.chats = newChats
   },
   readChat(state: IModuleState, threadId) {
     const chatIndex = state.chats.findIndex(({ thread_id }) => thread_id == threadId)
