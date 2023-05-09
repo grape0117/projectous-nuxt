@@ -134,7 +134,7 @@ export const mutations: MutationTree<IModuleState> = {
   updateLastMessage(state: IModuleState, lastMessage) {
     const user_id = getCookie('user_id')
     const chatIndex = state.chats.findIndex(({ thread_id }) => thread_id == lastMessage.thread_id)
-    if (chatIndex > 0) {
+    if (chatIndex >= 0) {
       let newChats = [...state.chats]
       // @ts-ignore
       if (Object.values(lastMessage.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
