@@ -366,7 +366,12 @@ export default {
           title = e.data.title
           body = JSON.stringify(e.data.message)
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
-            that.$store.dispatch('tasks/updateChats')
+            if (e.data.state === 'new') {
+              that.$store.commit('threads/addNewThread', e.data.thread)
+              that.$store.commit('tasks/addNewChat', e.data.chat)
+            } else {
+              that.$store.dispatch('tasks/updateChats')
+            }
           }
           break
         case 'UPDATE_TASK':

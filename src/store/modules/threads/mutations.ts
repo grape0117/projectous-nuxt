@@ -25,6 +25,10 @@ export const mutations: MutationTree<IModuleState> = {
     let thread_index = state.threads.findIndex(({ id }) => id == thread_id)
     state.threads[thread_index].status = 'open'
   },
+  addNewThread(state: IModuleState, thread) {
+    //@ts-ignore
+    state.threads = [...state.threads, thread]
+  },
   updateThreads(state: IModuleState, threads) {
     //@ts-ignore
     state.threads = threads
