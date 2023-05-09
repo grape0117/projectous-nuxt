@@ -312,7 +312,7 @@ export default Vue.extend({
     },
     async completeTask() {
       this.task.status = 'completed'
-      this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
+      this.$store.dispatch('UPDATE', { module: 'tasks', entity: this.task })
       // await EventBus.$emit('showTask', {})
       // this.task = false
     },

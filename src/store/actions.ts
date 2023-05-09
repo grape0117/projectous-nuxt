@@ -37,6 +37,7 @@ export const actions: ActionTree<IRootState, IRootState> = {
     let key = state[module].lookup[entity.id]
     // @ts-ignore
     const isUpdate = state[module][module].findIndex(item => item.id == entity.id) >= 0
+    console.log('isUpdate', isUpdate)
     if (isUpdate) {
       dispatch('UPDATE', { module, entity })
     } else {
