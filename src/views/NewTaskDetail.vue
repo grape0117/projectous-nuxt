@@ -237,7 +237,8 @@ export default Vue.extend({
         user_id,
         current_company_user_id
       })
-      this.$store.dispatch('tasks/updateChats')
+      this.$store.commit('tasks/readChat', thread_id)
+      this.$store.commit('threads/readThread', thread_id)
       this.showThread = true
     },
     async addResource() {

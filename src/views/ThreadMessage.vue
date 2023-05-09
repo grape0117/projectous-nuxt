@@ -186,6 +186,8 @@ export default {
     handleEnter(e) {
       if (e.ctrlKey) {
         this.s_message = this.s_message + '\n'
+      } else if (e.shiftKey) {
+        return
       } else {
         this.saveMessage()
       }
@@ -307,7 +309,6 @@ export default {
           // task_message_id: this.messageId,
           // timestamp: this.thread_message.timestamp
         })
-        console.log('task_message', task_message)
         this.$nextTick(() => {
           this.last_message_timestamp = task_message.timestamp
           let container = this.$refs.msgContainer
