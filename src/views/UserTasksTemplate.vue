@@ -552,7 +552,12 @@ export default {
       if (this.tab !== 'my_tasks') {
         path += 'tab=' + this.tab + '&'
       }
-      this.$router.push({ path: path })
+      const query = this.$router.history.current.query
+      if (query.task) {
+        path += `task=${query.task}&showChatSection=${query.showChatSection}&`
+      }
+
+      this.$router.push({ path })
       sessionStorage.setItem('tasks', path)
     },
     clearSearch() {

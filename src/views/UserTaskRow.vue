@@ -435,7 +435,9 @@ export default {
       return this.$store.getters['company_users/getById'](task_user.company_user_id)['name']
     },
     async showTaskDetail() {
-      await this.$router.push({ query: { task: this.task.id, showChatSection: 'true' } })
+      const updated_path = `/user-tasks?task=${this.task.id}&showChatSection=true&tab=${this.tab}`
+      sessionStorage.setItem('tasks', updated_path)
+      await this.$router.push({ query: { task: this.task.id, showChatSection: 'true', tab: this.tab } })
     },
     getNeed() {
       const need = prompt('What is blocking this task?', this.task.settings ? (this.task.settings.needs ? this.task.settings.needs : '') : '')
