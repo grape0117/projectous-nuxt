@@ -488,6 +488,8 @@ export default {
         data = await this.storeDataInIndexedDb()
       }
       this.$store.dispatch('PROCESS_INCOMING_DATA', data)
+      this.$store.dispatch('tasks/updateChats')
+
       //TODO: user created lists are breaking since commit f7cd86c85cb00b58cf59ad1232595e3eaec8f115 for no apparent reason
       // const userLists = createUserLists(data.lists)
       // this.$store.commit('lists/lists/CREATE_LISTS', {
