@@ -125,6 +125,9 @@ export const mutations: MutationTree<IModuleState> = {
       //} //Project?
     })
   },
+  addNewChat(state: IModuleState, chat) {
+    state.chats = [chat, ...state.chats]
+  },
   updateChats(state: IModuleState, chats) {
     state.chats = chats
   },

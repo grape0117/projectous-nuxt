@@ -271,7 +271,7 @@ export default Vue.extend({
     },
     async saveTask(isRedirect = true) {
       this.task.files = this.selectedFile
-      await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
+      await this.$store.dispatch('UPDATE', { module: 'tasks', entity: this.task })
       if (isRedirect) {
         this.isEditResource = null
 

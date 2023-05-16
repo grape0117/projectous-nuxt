@@ -15,8 +15,6 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
     // @ts-ignore
     const res = await this._vm.$http().post('/thread', { task_thread: thread })
-    // @ts-ignore
-    commit('ADD_ONE', { module: 'threads', entity: { ...res.task_thread, owner: user } }, { root: true })
     return res
   },
   async closeThread({ commit }, { thread_id }: any) {
