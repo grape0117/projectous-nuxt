@@ -290,6 +290,7 @@ export default {
     async saveMessage() {
       if (this.$refs.chatDropzone && this.$refs.chatDropzone.getActiveFiles().length > 0) {
         this.$refs.chatDropzone.processQueue()
+        console.log('Image should be uploaded here!')
       }
       if (this.s_message == '\n' || this.s_message == '') {
         this.s_message = ''
