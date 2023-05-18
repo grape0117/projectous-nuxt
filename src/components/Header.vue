@@ -10,6 +10,9 @@
         </div>
       </div>
       <div class="nav-buttons" style="align-items: center;" v-if="showItems">
+        <a class="nav-buttons__button" @click="goToUserTask" :style="{ 'text-decoration': $route.path === '/user-tasks' ? 'underline' : '' }" key="user-tasks">
+          TASKS
+        </a>
         <router-link class="nav-buttons__button" :to="button.path" v-for="(button, index) in navLinks" :style="{ 'text-decoration': $route.path === button.path ? 'underline' : '' }" :key="index">
           {{ button.name | toUpperCase }}
         </router-link>
@@ -151,8 +154,6 @@ export default Vue.extend({
       timerRunning: false,
       // projectName: 'P',
       navLinks: [
-        // { name: 'Task Cloud', path: '/tasks' },
-        { name: 'Tasks', path: '/user-tasks' },
         { name: 'Projects', path: '/projects' },
         { name: 'clients', path: '/clients' },
         { name: 'users', path: '/users' },
@@ -338,6 +339,14 @@ export default Vue.extend({
     })
   },
   methods: {
+    goToUserTask() {
+      const user_tasks_tab = sessionStorage.getItem('tasks')
+      if (user_tasks_tab) {
+        this.$router.push({ path: user_tasks_tab })
+      } else {
+        this.$router.push({ path: '/user-tasks' })
+      }
+    },
     goTo(path) {
       this.$router.push(path)
     },
