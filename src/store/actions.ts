@@ -35,7 +35,7 @@ export const actions: ActionTree<IRootState, IRootState> = {
 
     // @ts-ignore
     let key = state[module].lookup[entity.id]
-
+    // @ts-ignore
     if (state[module][module][key]) {
       dispatch('UPDATE', { module, entity })
     } else {

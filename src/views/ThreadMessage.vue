@@ -162,7 +162,7 @@ export default {
     getNextMessages: _.debounce(function() {
       const msgContainer = this.$refs.msgContainer
       let topOfWindow = msgContainer.scrollTop
-      if (topOfWindow < 20) {
+      if (topOfWindow < 20 && this.chatMessages.length > 0) {
         const result = this.$store.dispatch('task_messages/getMoreMessages', this.chatMessages[0])
       }
     }, 1000),
@@ -186,6 +186,8 @@ export default {
     handleEnter(e) {
       if (e.ctrlKey) {
         this.s_message = this.s_message + '\n'
+      } else if (e.shiftKey) {
+        return
       } else {
         this.saveMessage()
       }
@@ -288,6 +290,7 @@ export default {
     async saveMessage() {
       if (this.$refs.chatDropzone && this.$refs.chatDropzone.getActiveFiles().length > 0) {
         this.$refs.chatDropzone.processQueue()
+        console.log('Image should be uploaded here!')
       }
       if (this.s_message == '\n' || this.s_message == '') {
         this.s_message = ''
@@ -307,7 +310,6 @@ export default {
           // task_message_id: this.messageId,
           // timestamp: this.thread_message.timestamp
         })
-        console.log('task_message', task_message)
         this.$nextTick(() => {
           this.last_message_timestamp = task_message.timestamp
           let container = this.$refs.msgContainer

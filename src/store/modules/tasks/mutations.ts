@@ -3,6 +3,7 @@ import { MutationTree } from 'vuex'
 import { IModuleState, ITask } from './types'
 import Vue from 'vue'
 import { IRootState } from '@/store/types'
+import { getCookie } from '@/utils/util-functions'
 
 export const mutations: MutationTree<IModuleState> = {
   CASCADE_DELETE(state: IModuleState, entity) {
@@ -124,11 +125,40 @@ export const mutations: MutationTree<IModuleState> = {
       //} //Project?
     })
   },
+  addNewChat(state: IModuleState, chat) {
+    state.chats = [chat, ...state.chats]
+  },
   updateChats(state: IModuleState, chats) {
     state.chats = chats
   },
   updateMoreChats(state: IModuleState, chats) {
     state.chats = [...state.chats, ...chats]
+  },
+  updateLastMessage(state: IModuleState, lastMessage) {
+    const user_id = getCookie('user_id')
+    const chatIndex = state.chats.findIndex(({ thread_id }) => thread_id == lastMessage.thread_id)
+    if (chatIndex >= 0) {
+      let newChats = [...state.chats]
+      // @ts-ignore
+      if (Object.values(lastMessage.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
+        newChats[chatIndex] = { ...newChats[chatIndex], last_message: lastMessage.lastMessage, num_unread: newChats[chatIndex].num_unread + 1 }
+      } else {
+        newChats[chatIndex] = { ...newChats[chatIndex], last_message: lastMessage.lastMessage }
+      }
+      const updatedChat = { ...newChats[chatIndex] }
+      newChats.splice(chatIndex, 1)
+      newChats.unshift(updatedChat)
+      state.chats = newChats
+    }
+  },
+  readChat(state: IModuleState, threadId) {
+    const chatIndex = state.chats.findIndex(({ thread_id }) => thread_id == threadId)
+    if (chatIndex < 0) {
+      return
+    }
+    let newChats = [...state.chats]
+    newChats[chatIndex] = { ...newChats[chatIndex], num_unread: 0 }
+    state.chats = newChats
   }
   /*,
   uuid_to_id(state: IModuleState, { uuid, id }) {

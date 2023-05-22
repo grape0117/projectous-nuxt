@@ -184,7 +184,7 @@ export default Vue.extend({
       immediate: true,
       handler(query) {
         if (query.task && Object.keys(query.task).length > 0) {
-          this.getChat(query.task, query.thread)
+          this.getChat(query.task, query.thread || 0)
         }
 
         if (query.showChat && query.showChat === 'true') {
@@ -230,15 +230,20 @@ export default Vue.extend({
 
       // this.$store.dispatch('task_messages/updateChats')
       this.$store.dispatch('PROCESS_INCOMING_DATA', {
-        task_messages: chat.messages,
+        task_messages: chat.messages || [],
         company_users: company_users,
         task_users: task_users,
         current_company_id,
         user_id,
         current_company_user_id
       })
-      this.$store.dispatch('tasks/updateChats')
-      this.showThread = true
+      if (thread_id) {
+        this.$store.commit('tasks/readChat', thread_id)
+        this.$store.commit('threads/readThread', thread_id)
+        this.showThread = true
+      } else {
+        this.showThread = false
+      }
     },
     async addResource() {
       if (!this.task.settings) {
@@ -266,7 +271,7 @@ export default Vue.extend({
     },
     async saveTask(isRedirect = true) {
       this.task.files = this.selectedFile
-      await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
+      await this.$store.dispatch('UPDATE', { module: 'tasks', entity: this.task })
       if (isRedirect) {
         this.isEditResource = null
 
@@ -307,7 +312,7 @@ export default Vue.extend({
     },
     async completeTask() {
       this.task.status = 'completed'
-      this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
+      this.$store.dispatch('UPDATE', { module: 'tasks', entity: this.task })
       // await EventBus.$emit('showTask', {})
       // this.task = false
     },

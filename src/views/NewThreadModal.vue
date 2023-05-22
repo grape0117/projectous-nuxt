@@ -55,7 +55,6 @@ export default {
       })
       await this.$router.push({ query: { task: this.task_id, thread: task_thread.id, showChat: 'true' } })
 
-      this.$store.dispatch('tasks/updateChats')
       $('.close').click()
     },
     updateButtonStyle: function() {
