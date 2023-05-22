@@ -303,9 +303,15 @@ function addTimer(id, data){
 
 
 
-function setInvoiceNotes(id, invoice_notes){
+function setInvoiceNotes(id, invoice_notes, task_title){
+	var new_invoice_note = ''
+	if (task_title) {
+		new_invoice_note = invoice_notes.split(`${task_title}-`)[1]
+	} else {
+		new_invoice_note = invoice_notes
+	}
 	
-	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save', {invoice_notes: invoice_notes});
+	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save', {invoice_notes: new_invoice_note});
 }
 
 function setClientRate(id, client_rate){
