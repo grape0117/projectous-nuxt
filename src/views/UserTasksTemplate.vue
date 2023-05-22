@@ -56,9 +56,26 @@
       <div class="tab-content">
         <ul>
           <li>
-            <b-form-checkbox v-if="tab == 'my_tasks'" v-model="is_owner" name="check-button" switch variant="warning">
-              Owner
-            </b-form-checkbox>
+            <div class="mb-2 form-inline">
+              <b-form-checkbox v-if="tab == 'my_tasks'" v-model="is_owner" name="check-button" switch variant="warning">
+                Owner
+              </b-form-checkbox>
+              <button class="btn btn-primary mx-2" @click="showBulkAction()">Bulk Action</button>
+              <!-- <label class="mr-sm-2" for="action-list">Action:</label> -->
+              <select id="action-list" class="form-control select2-select" v-model="action_name" v-if="show_checkbox" @change="changeBulk">
+                <option value="" selected> Select Action </option>
+                <option value="complete">Complete</option>
+                <option value="delete">Delete</option>
+                <option value="high_priority">High Priority</option>
+                <option value="regular_priority">Regular Priority</option>
+                <option value="low_priority">Low Priority</option>
+                <option value="hold_priority">Hold Priority</option>
+                <option value="remove_due_date">Remove Due Date</option>
+                <option value="set_due_date">Set Due Date</option>
+              </select>
+            </div>
+          </li>
+          <li>
             <b-input-group prepend="Search" style="width:30%">
               <b-form-input v-model="task_filter" :class="'form-control input-sm ' + taskFilterClass()"></b-form-input>
               <b-input-group-append>
@@ -89,7 +106,7 @@
         </div>-->
         <div role="tabpanel" class="tab-pane active" id="active">
           <h3 v-if="current_project_id">{{ getCurrentProjectNameById() }}</h3>
-          <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab" @updateData="updateData"> </tasks-tab>
+          <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab" @updateData="updateData" v-bind:showCheckbox="show_checkbox"> </tasks-tab>
         </div>
       </div>
     </div>
@@ -376,7 +393,9 @@ export default {
       today_high_count: 0,
       past_due_count: 0,
       past_due_high_count: 0,
-      is_owner: false
+      is_owner: false,
+      show_checkbox: false,
+      action_name: ''
     }
   },
   watch: {
@@ -413,6 +432,9 @@ export default {
     }
   },
   methods: {
+    showBulkAction() {
+      this.show_checkbox = !this.show_checkbox
+    },
     abbrName(name) {
       if (!name) return ''
       let matches = name.match(/\b(\w)/g) // ['J','S','O','N']
@@ -620,6 +642,59 @@ export default {
     client_name(client_company_id) {
       let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
       return client ? client.name : ''
+    },
+    async changeBulk(e) {
+      let task_ids = []
+      $('[name="task_checkbox"]:checked').each(function() {
+        task_ids.push(this.id)
+      })
+      if (task_ids.length == 0) {
+        // this.makeToast('danger', 'Please select at least one task')
+        alert('Please select at least one task')
+        this.action_name = ''
+      }
+      for (let i = 0; i < task_ids.length; i++) {
+        const task_id = task_ids[i]
+        let task = this.$store.getters['tasks/getById'](task_id)
+
+        if (this.action_name == 'delete') {
+          await this.$store.dispatch('DELETE', { module: 'tasks', entity: task }, { root: true })
+        } else {
+          switch (this.action_name) {
+            case 'complete':
+              task.status = 'completed'
+              break
+            case 'delete':
+              break
+            case 'high_priority':
+              task.priority = 'high'
+              break
+            case 'regular_priority':
+              task.priority = 'regular'
+              break
+            case 'low_priority':
+              task.priority = 'low'
+
+              break
+            case 'hold_priority':
+              task.priority = 'hold'
+              break
+            case 'remove_due_date':
+              task.due_date = ''
+              break
+            default:
+              break
+          }
+          await this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
+        }
+      }
+      $('[name="task_checkbox"]:checked').prop('checked', false)
+    },
+    makeToast(variant = null, title, content) {
+      this.$bvToast.toast(content, {
+        title: title,
+        variant: variant
+      })
     },
     async getData() {
       if (this.current_company_user_id) {

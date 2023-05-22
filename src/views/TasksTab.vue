@@ -20,7 +20,7 @@
   </div> -->
 
   <div class="row" style="display: table; margin: 0 3px;">
-    <user-task-row v-for="(task, index) in task_list" v-bind:task="task" v-bind:index="index" v-bind:key="index" v-bind:tab="tab" @showSnoozeModal="showSnoozeModal" @showModal="showModal" @updateStatus="updateStatus" @showUpdateModal="showUpdateModal"></user-task-row>
+    <user-task-row v-for="(task, index) in task_list" v-bind:task="task" v-bind:index="index" v-bind:key="index" v-bind:tab="tab" @showSnoozeModal="showSnoozeModal" @showModal="showModal" @updateStatus="updateStatus" @showUpdateModal="showUpdateModal" v-bind:showCheckbox="showCheckbox"></user-task-row>
     <b-modal v-model="show_udpate_status" id="update-status-modal" class="update-status-modal" style="min-height: 500px" :size="'lg'">
       <template #modal-header>
         <div class="header">
@@ -134,7 +134,7 @@ import UserTaskRow from './UserTaskRow'
 import { abbrName } from '@/utils/util-functions'
 import moment from 'moment'
 export default {
-  props: ['tasks', 'tab'],
+  props: ['tasks', 'tab', 'showCheckbox'],
   name: 'tasks-tab',
   components: {
     'tasks-tab-row': TasksTabRow,

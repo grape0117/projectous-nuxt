@@ -1,5 +1,6 @@
 <template>
   <div :id="'task_' + task.id" @mouseenter="addHoverClass" @mouseleave="removeHoverClass" :style="{ border: isNewTask ? 'white dashed 3px' : 'none', display: 'table-row', background: 'rgba(0,0,0,.4)' }" class="col-md-12 user-task-row" v-show="showTimer">
+    <b-form-checkbox name="task_checkbox" :id="task.id" class="mr-2 color-white" v-if="showCheckbox"> </b-form-checkbox>
     <div :style="{ 'white-space': 'nowrap', 'text-align': 'right', display: 'table-cell' }">
       <b-icon v-if="task['isToday']" :icon="is_mouse_enter ? 'star' : 'star-fill'" font-scale="1" variant="warning" class="mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 0)"></b-icon>
       <b-icon v-else :icon="is_mouse_enter ? 'star-fill' : 'star'" font-scale="1" variant="warning" class="show-on-hovered mr-2" @mouseenter="is_mouse_enter = true" @mouseleave="is_mouse_enter = false" @click="changeNextWorkDay(task.id, 1)"></b-icon>
@@ -64,7 +65,7 @@ import moment from 'moment'
 import { Datetime } from 'vue-datetime'
 import { abbrName } from '@/utils/util-functions'
 export default {
-  props: ['task', 'tab'],
+  props: ['task', 'tab', 'showCheckbox'],
   extends: TaskActionRow,
   components: {
     datetime: Datetime
