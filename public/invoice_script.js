@@ -303,15 +303,25 @@ function addTimer(id, data){
 
 
 
-function setInvoiceNotes(id, invoice_notes, task_title){
+function noteFocus(target, id, invoice_notes, task_title){
+	console.log(target)
 	var new_invoice_note = ''
 	if (task_title) {
-		new_invoice_note = invoice_notes.split(`${task_title}-`)[1]
-	} else {
-		new_invoice_note = invoice_notes
+		new_invoice_note = invoice_notes.split(task_title)[1]
+		target.innerHTML = new_invoice_note
+	} 
+
+}
+
+
+function setInvoiceNotes(target, id, invoice_notes, task_title){
+	var new_invoice_note = ''
+	if (task_title) {
+		new_invoice_note = `${task_title}-${invoice_notes}`
+		target.innerHTML = new_invoice_note
 	}
 	
-	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save', {invoice_notes: new_invoice_note});
+	$.post('https://app2.projectous.com/api/invoice-timer/'+id+'/save', {invoice_notes: invoice_notes});
 }
 
 function setClientRate(id, client_rate){
