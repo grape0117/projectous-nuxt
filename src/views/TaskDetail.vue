@@ -219,7 +219,7 @@ export default Vue.extend({
       selectedFile: [],
       selected_tab: '',
       chat: {},
-      showTab: 0,
+      showTab: 1,
       newResource: false,
       user_filter: false
     }
@@ -295,10 +295,10 @@ export default Vue.extend({
 
       const { chat } = await this.$http().get(`/chat/${task_id}`)
       this.chat = chat
+      this.$store.dispatch('tasks/updateChats')
     },
     async addResource() {
       // add or update action
-      console.log(this.task)
       if (!this.task.settings) {
         this.task.settings = {}
         await Vue.set(this.task.settings, 'resources', [])
@@ -323,7 +323,6 @@ export default Vue.extend({
         this.task.settings.resources[index].name = document.getElementById('add-resource-name').value
         this.task.settings.resources[index].href = document.getElementById('add-resource-href').value
       }
-      console.log(this.task)
     },
     async saveTask(isRedirect = true) {
       // NOTE: uncommented temporarily since it fails to do the UPSERT with module tasks
@@ -331,7 +330,6 @@ export default Vue.extend({
       this.task.files = this.selectedFile
       await this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
 
-      // console.log(this.$route.query)
       if (isRedirect) {
         this.isEditResource = null
         // EventBus.$emit('showTask', null)
@@ -403,7 +401,6 @@ export default Vue.extend({
       return client ? client.name : ''
     },
     Images_onFileChanged(event) {
-      console.log('adding file')
       this.selectedFile = event.target.files[0]
     },
     task_user(company_user) {
@@ -432,7 +429,6 @@ export default Vue.extend({
       window.open(url, '_blank')
     },
     openprojects: function(client) {
-      //console.log('client', client)
       return this.$store.getters['projects/getOpenCompanyProjects'](client.client_company_id)
     },
     Images_onUpload() {
@@ -461,11 +457,9 @@ export default Vue.extend({
 
     //   // Get all elements with class="tablinks" and remove the class "active"
     //   let tablinks = document.getElementsByClassName('tablinks')
-    //   console.log(tablinks)
 
     //   for (let i = 0; i < tablinks.length; i++) {
     //     tablinks[i].className = tablinks[i].className.replace(' active', '')
-    //     console.log(tablinks[i].innerHTML.trim(), resourceName)
     //     if (tablinks[i].innerHTML.trim() == resourceName) {
     //       tablinks[i].className += ' active'
     //     }
@@ -502,7 +496,6 @@ export default Vue.extend({
     },
     drop(event) {
       event.preventDefault()
-      // console.log(event.dataTransfer.files)
 
       this.$refs.file.files = event.dataTransfer.files
       this.onChange() // Trigger the onChange event manually

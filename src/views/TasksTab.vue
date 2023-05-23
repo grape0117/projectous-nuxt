@@ -19,8 +19,8 @@
     </div>
   </div> -->
 
-  <div class="row">
-    <user-task-row v-for="task in task_list" v-bind:task="task" @showSnoozeModal="showSnoozeModal" @showModal="showModal" @updateStatus="updateStatus" @showUpdateModal="showUpdateModal"></user-task-row>
+  <div class="row" style="display: table; margin: 0 3px;">
+    <user-task-row v-for="(task, index) in task_list" v-bind:task="task" v-bind:index="index" v-bind:key="index" v-bind:tab="tab" @showSnoozeModal="showSnoozeModal" @showModal="showModal" @updateStatus="updateStatus" @showUpdateModal="showUpdateModal" v-bind:showCheckbox="showCheckbox"></user-task-row>
     <b-modal v-model="show_udpate_status" id="update-status-modal" class="update-status-modal" style="min-height: 500px" :size="'lg'">
       <template #modal-header>
         <div class="header">
@@ -134,7 +134,7 @@ import UserTaskRow from './UserTaskRow'
 import { abbrName } from '@/utils/util-functions'
 import moment from 'moment'
 export default {
-  props: ['tasks', 'tab'],
+  props: ['tasks', 'tab', 'showCheckbox'],
   name: 'tasks-tab',
   components: {
     'tasks-tab-row': TasksTabRow,
@@ -319,16 +319,8 @@ export default {
       }
       const result = await this.$http().post(`/tasks-progress/del/${this.selected_task}`, task_progress_info)
       if (result.status === 'success') {
-        const task_index = this.tasks.findIndex(task => task.id === this.selected_task)
-        const users = this.tasks[task_index].users.filter(user => user.company_user_id !== this.selected_user.id)
-        this.tasks[task_index].users = users
-        this.task_list = this.tasks
+        this.$store.commit('task_users/deleteByTaskIdAndCompanyUserId', task_progress_info)
         this.$bvModal.hide('update-status-modal')
-        this.selected_task = null
-        this.selected_user = null
-        this.selected_step = null
-        this.task_notes = null
-        this.user_rate = ''
       }
     },
 

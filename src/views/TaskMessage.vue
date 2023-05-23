@@ -4,7 +4,7 @@
     <b-list-group class="message-panel_inner" ref="msgContainer" v-if="chat && Object.keys(chat).length > 0" @dragover="dragOver" @drop="dropFile">
       <div v-for="(message, index) in chatMessages" :key="message.id">
         <div class="date" v-if="isShowDate(index, message, chat.messages)">
-          {{ date(message.createdAt) }}
+          {{ date(message.created_at) }}
         </div>
         <task-message-item :message="message" @edit-message="editMessage" @delete-message="deleteMessage" :is_me="message.company_user_id == current_company_user_id" />
       </div>
@@ -86,15 +86,16 @@ export default {
       return Notification.permission === 'granted'
     },
     chatMessages() {
-      let messages = this.chat.messages.sort(function(a, b) {
-        return new Date(b.createdAt) - new Date(a.createdAt)
+      const task_id = this.chat.chat_id
+      let messages = this.$store.getters['task_messages/getByTaskId'](task_id)
+      messages = messages.sort(function(a, b) {
+        return new Date(b.created_at) - new Date(a.created_at)
       })
       setTimeout(() => {
         let container = this.$refs.msgContainer
         container.scrollTop = container.scrollHeight + 120
       }, 100)
 
-      console.log('computed')
       return messages.reverse()
     },
     // getMessages() {
@@ -106,6 +107,10 @@ export default {
     // },
     current_company_user_id() {
       return this.$store.state.settings.current_company_user_id
+    },
+    current_company_user() {
+      const me = this.$store.getters['company_users/getMe']
+      return me
     }
   },
   mounted() {
@@ -120,7 +125,6 @@ export default {
       if (notificationPermission == 'granted') {
         this.enabledNotification = true
       }
-      console.log(notificationPermission)
     },
     handleEnter(e) {
       if (e.ctrlKey) {
@@ -149,6 +153,7 @@ export default {
       this.fileExist = true
     },
     filesAdded(file) {
+      $('#dropzone').addClass('dropzone-file-contentainer')
       this.showDropzone = true
       this.fileExist = true
     },
@@ -161,35 +166,34 @@ export default {
       let company_user_id = this.current_company_user_id
       let message = this.s_message
       let task
+      let me = this.current_company_user
       if (this.selected_message == null) {
         let task_message = this.$store.dispatch('task_messages/createTaskMessage', {
           task_id,
           company_user_id,
           file_path: response.file_path,
           message: response.name,
-          is_file: true
+          is_file: true,
+          thumbnail: response.thumbnail_path,
+          user: me
         })
         this.s_message = ''
         return
       }
     },
     afterComplete(response) {
-      console.log('complete')
       this.showDropzone = false
       this.$refs.chatDropzone.removeAllFiles()
     },
-    cancelUpload(file) {
-      console.log('cancel')
-    },
+    cancelUpload(file) {},
     removedFile(file, error, xhr) {
-      console.log('remove')
       if (this.$refs.chatDropzone.getActiveFiles().length == 0) {
         this.showDropzone = false
       }
     },
     isShowDate(index, message, messages) {
       if (index === 0) return true
-      return messages && messages.length > 0 && this.date(message.createdAt) !== this.date(messages[index > 0 ? index - 1 : index].createdAt)
+      return messages && messages.length > 0 && this.date(message.created_at) !== this.date(messages[index > 0 ? index - 1 : index].created_at)
     },
     date(date) {
       return moment(date).format('MMM DD, YYYY | ddd')
@@ -242,15 +246,16 @@ export default {
         //   created_at: moment().format('YYYY-MM-DD HH:mm:ss')
         // }
         // this.$store.dispatch('ADD_ONE', { module: 'task_messages', entity: [message] }, { root: true })
+        let me = this.current_company_user
         let task_message = this.$store.dispatch('task_messages/createTaskMessage', {
           task_id,
           company_user_id,
-          message
+          message,
+          user: me
         })
         // .then(res => {
 
         // })
-        console.log(task_message.task_messages)
         this.s_message = ''
         return
         task = this.$store.getters['tasks/getById'](task_id)
@@ -284,6 +289,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#dropzone {
+  height: calc(100% - 238px);
+
+  .dropzone-custom-content {
+    margin-top: 40% !important;
+  }
+}
+.dropzone-file-contentainer {
+  display: flex;
+  align-items: end;
+}
+.dropzone .dz-message {
+  margin-top: 40% !important;
+}
 .date {
   display: flex;
   justify-content: center;
@@ -299,17 +318,10 @@ export default {
 .dropzone {
   position: absolute;
   width: 100%;
-  bottom: 130px;
+  bottom: 126px;
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.2);
   border: none;
-}
-
-.dropzone .dz-message {
-  height: 600px;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
 }
 
 .dropzone-custom-title,

@@ -16,23 +16,16 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   async ADD_MANY(state: IRootState, { module, entities }: any) {
-    // console.log('ADD_MANY ' + module)
     if (!state[module]) {
       console.error('Module ' + module + ' does not exist.')
       return
     }
-    console.log(module, entities)
     //@ts-ignore
     entities.forEach((entity, index) => {
       try {
         if (entity.deleted_at == null) {
           //@ts-ignore
-          if (typeof state[module].lookup[entities[index].id] == 'undefined') {
-            // console.log(entities[index], 'not found', state[module].lookup)
-            //@ts-ignore
-            state[module][module].push(entity)
-          } else {
-            // console.log('ADD_MANY entity found', state[module].lookup[entities[index].id], entity, state[module][module])
+          if (state[module].lookup && typeof state[module].lookup[entities[index].id] != 'undefined') {
             //@ts-ignore
             let key = state[module].lookup[entities[index].id]
             for (let property in entity) {
@@ -41,6 +34,8 @@ export const mutations: MutationTree<IRootState> = {
                 Vue.set(state[module][module][key], property, entity[property])
               }
             }
+          } else {
+            state[module][module].push(entity)
           }
 
           // @ts-ignore
@@ -75,17 +70,20 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   ADD_ONE(state: IRootState, { module, entity }) {
-    console.log('ADD_ONE')
     if (!state[module]) return
     //@ts-ignore
-    state[module][module].push(entity)
+    const isNew = state[module][module].filter(({ id }) => id == entity.id).length == 0
+    if (isNew) {
+      state[module][module].push(entity)
+    }
 
     //@Mikhail is there a faster way to find the index? Can I search from the bottom of the array first?
     //@ts-ignore
-    console.log(state[module][module])
     //TODO: call LOOKUP
     state[module][module].forEach((item: any, key: any) => {
-      state[module].lookup[item.id] = key
+      if (state[module].lookup) {
+        state[module].lookup[item.id] = key
+      }
     })
 
     // @ts-ignore
@@ -107,13 +105,10 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   UPSERT(state: IRootState, { module, entity }: any) {
-    console.log('UPSERT Mutation', module, entity)
     if (!state[module]) return
-    //console.log('module exists')
+
     // @ts-ignore
     let key = state[module].lookup[entity.id]
-    console.log('key', key)
-    console.log(state[module][module][key])
     if (state[module][module][key]) {
       //TODO: call 'UPDATE' here? How to share key?
       for (let property in entity) {
@@ -123,11 +118,11 @@ export const mutations: MutationTree<IRootState> = {
         }
       }
     } else {
-      // @ts-ignore
-      this.commit('ADD_ONE', { entity: entity, module: module })
+      if (module === 'timers' && state[module][module].findIndex((timer: any) => timer.id == entity.id) < 0) {
+        // @ts-ignore
+        this.commit('ADD_ONE', { entity: entity, module: module })
+      }
     }
-    console.log('done')
-    console.log(state[module][module])
 
     // @ts-ignore
     if (this._mutations[module + '/UPSERT']) {
@@ -147,9 +142,7 @@ export const mutations: MutationTree<IRootState> = {
    * @constructor
    */
   UPDATE(state: IRootState, { module, entity }) {
-    console.log('UPDATE', module, entity)
     if (!state[module]) {
-      console.log('Module ' + module + ' not found!')
       return
     }
     let modulestate = state[module]
@@ -159,11 +152,9 @@ export const mutations: MutationTree<IRootState> = {
     }
     let key = modulestate.lookup[entity.id]
     if (!modulestate[module][key]) {
-      console.log('UPDATE: entity not found in ' + module + ' lookup', entity.id, modulestate.lookup)
       return
     }
     if (modulestate[module][key].id !== entity.id) {
-      console.log('mismatched ids!')
       return
     }
     if (key >= 0) {
@@ -171,7 +162,6 @@ export const mutations: MutationTree<IRootState> = {
         if (entity.hasOwnProperty(property)) {
           //TODO likely unneeded
           if (!has(modulestate[module][key], property)) {
-            console.log('Error: Property not found: ' + property, modulestate[module][key])
             continue
           }
           // @ts-ignore
@@ -186,21 +176,21 @@ export const mutations: MutationTree<IRootState> = {
     // @ts-ignore
     if (this._mutations[module + '/UPDATE']) {
       // @ts-ignore
-      this.commit(module + '/UPDATE', entities)
+      this.commit(module + '/UPDATE', entity)
     }
   },
   UPDATE_ATTRIBUTE(state: IRootState, { module, id, attribute, value }) {
     if (!state[module]) return
-    console.log('lookup', id, state[module].lookup[id])
     // @ts-ignore
-    state[module][module][state[module].lookup[id]][attribute] = value
+    let lookup_id = state[module][module].findIndex(item => item.id == id)
+    state[module][module][lookup_id][attribute] = value
+    // state[module][module][state[module].lookup[id]][attribute] = value
 
     // @ts-ignore
     this.commit('updateCreateIndexDBEntity', { module, entity: state[module][module][state[module].lookup[id]] })
   },
   UPDATE_SETTING(state: IRootState, { module, id, setting }) {
     if (!state[module]) return
-    console.log('lookup', id, state[module].lookup[id])
 
     // @ts-ignore
     state[module][module][state[module].lookup[id]][setting] = value
@@ -211,7 +201,7 @@ export const mutations: MutationTree<IRootState> = {
   // iterate(state: IRootState, { module, id, setting }) {
   //   Object.keys(setting).forEach(key => {
   //
-  //     console.log(`key: ${key}, value: ${setting[key]}`)
+
   //
   //     if (typeof setting[key] === 'object') {
   //       if ( typeof state[module][module][state[module].lookup[id]][setting][key] == 'undefined') {
@@ -303,9 +293,7 @@ export const mutations: MutationTree<IRootState> = {
       }
       await idbKeyval.set(entity.id, entity, module)
     } catch (e) {
-      console.log('+++++++++++++++++++')
       console.error(e, entity)
-      console.log('+++++++++++++++++++')
     }
   },
   async deleteIndexDBEntity(state: IRootState, { module, id }) {

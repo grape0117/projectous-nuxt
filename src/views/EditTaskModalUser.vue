@@ -52,18 +52,15 @@ export default {
     client() {
       if (!this.task.project_id) return ''
       const client = this.project.client_id ? this.$store.getters['clients/getByClientCompanyId'](this.project.client_id) : null
-      console.log(this.user.name + ' client', client)
       return client
     },
     client_user() {
       const client_user = this.client ? this.$store.getters['client_users/getByClientIdAndCompanyUserId']({ client_id: this.client.id, company_user_id: this.user.id }) : null
-      console.log(this.user.name, this.client, 'client_user', client_user)
       return client_user
     }
   },
   watch: {
     user_rate(user_rate) {
-      console.log('user rate changed to ', user_rate)
       if (user_rate !== '') {
         this.$emit('change', { message: this.user.name + ' given user_rate of ' + user_rate + ' by current user' })
       } else {
@@ -97,27 +94,20 @@ export default {
   },
   methods: {
     toggleShow() {
-      // console.log(this.user.name)
       this.show = !this.show
     },
     userRatePlaceholder() {
-      console.log('task_user.user_rate ' + this.task_user.user_rate)
       if (this.project_user) console.log('project_user.user_rate ' + this.project_user.default_user_rate, this.project_user)
       if (this.client_user) console.log('client_user.user_rate ' + this.client_user.default_user_rate, this.client_user)
       if (this.task_user && this.task_user.user_rate * 1 > 0) {
-        console.log('task_user.user_rate ' + this.task_user.user_rate)
         return this.task_user.user_rate
       } else if (this.project_user && this.project_user.default_user_rate > 0) {
-        console.log('project_user.user_rate ' + this.project_user.default_user_rate)
         return project_user.default_user_rate
       } else if (this.client_user && this.client_user.default_user_rate > 0) {
-        console.log('client_user.user_rate ' + this.client_user.default_user_rate)
         return this.client_user.default_user_rate
       } else if (this.user.user_rate) {
-        console.log('user.user_rate')
         return this.user.user_rate
       } else {
-        console.log(this.user.name + ' user_rate not set')
         return null
       }
     },
@@ -147,7 +137,6 @@ export default {
       }
     },*/
     userRateClass() {
-      console.log(this.user.name + ' task_user.rate', this.task_user.user_rate)
       return this.task_user.user_rate > 0 ? 'set-rate' : 'inherited-rate'
     },
     buttonVariant(role) {

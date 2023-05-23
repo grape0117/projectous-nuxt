@@ -9,6 +9,7 @@ export const timers: Module<IModuleState, IRootState> = {
   namespaced: true,
   state: {
     timers: [],
+    other_timers: [],
     lookup: {}
   },
   mutations,

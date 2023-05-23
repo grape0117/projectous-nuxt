@@ -272,14 +272,11 @@ export default {
       this.updateHistory({ message: '' })
     },
     updateHistory({ message }) {
-      console.log('message', message, typeof this.client.history)
-      console.log('This is client user')
       let history = this.client.history
       if (history === 'null') {
         history = []
       }
       history.push({ message, timestamp: new Date() })
-      console.log(history)
       this.client.history = history
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'clients', id: this.client.id, attribute: 'history', value: history })
     },

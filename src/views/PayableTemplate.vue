@@ -241,7 +241,6 @@ export default {
     }
   },
   beforeCreate: function() {
-    console.log(sessionStorage.getItem('payable'))
     if (sessionStorage.getItem('payable')) {
       this.$router.push({ path: '/payable?' + new URLSearchParams(sessionStorage.getItem('payable')).toString() }).catch(() => {
         console.log('catching redundant navigation link')
@@ -249,7 +248,6 @@ export default {
     }
   },
   mounted() {
-    console.log('reports mounted', this.$route.query, this.$route, this.chosen_clients, this.total_time, 'test')
     this.getData()
   },
   methods: {

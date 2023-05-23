@@ -12,16 +12,16 @@
       </template>
 
       <div class="row-no-padding">
-        <Header v-on:reload="reload" />
+        <Header v-on:reload="reload" :showItems="!$route.meta.hideNavbar" />
         <div class="d-flex justify-content-between">
           <div class="router-view-class" style="width: 100px">
-            <task-detail v-if="has_route_query_task" class="app_task-detail" :task="task" :newMessage="newMessage" />
+            <new-task-detail v-if="has_route_query_task" class="app_task-detail" :task_id="route_query_taskId" :thread_id="route_query_threadId" :thread="thread" />
             <router-view style="width: 100%; height: 100%" />
           </div>
           <div class="d-flex">
             <task-tray v-show="showTaskSection" />
             <task-side-bar :updated_at="updated_at" :new_message="newMessage1" v-show="has_route_query_showChatSection || showChatSection" :show="has_route_query_showChatSection || showChatSection" />
-            <timer-tab v-show="showTimerSection" />
+            <timer-tab v-show="showTimerSection" :show="showTimerSection" />
           </div>
         </div>
       </div>
@@ -90,6 +90,7 @@ export default {
     TaskTray: () => import('./views/TaskTray.vue'),
     TaskSideBar: () => import('./views/TaskSideBar.vue'),
     TaskDetail: () => import('./views/TaskDetail.vue'),
+    NewTaskDetail: () => import('./views/NewTaskDetail.vue'),
     EditClientModal,
     EditUserModal,
     InviteUserModal,
@@ -123,6 +124,12 @@ export default {
     has_route_query_task() {
       return this.route_query && this.route_query.task ? true : false
     },
+    route_query_threadId() {
+      if (this.route_query.thread) {
+        return this.route_query.thread
+      }
+      return null
+    },
     has_route_query_showChatSection() {
       return this.route_query.showChatSection === 'true' ? true : false
     },
@@ -140,6 +147,9 @@ export default {
       const task = this.$store.state.tasks.tasks.find(t => t.id === this.route_query_taskId)
       return task
     },
+    thread() {
+      return this.route_query && this.route_query.thread
+    },
     has_background_theme() {
       return !!this.bgTheme && !!this.bgStyle
     },
@@ -147,14 +157,12 @@ export default {
       if (typeof this.bgStyle === 'object') {
         return `url(${this.bgStyle.image})`
       }
-      console.log('HERE')
       return this.bgStyle
     },
     current_edit_task: function() {
       return this.$store.getters['settings/get_current_edit_task']
     },
     current_edit_project: function() {
-      console.log('cureent edit projec')
       return this.$store.getters['settings/get_current_edit_project']
     }
     // getBackground() {
@@ -311,13 +319,20 @@ export default {
 
     SocketioService.setupSocketConnection()
     SocketioService.socketListener('chat-message', e => {
-      console.log('-----Called getNewData!----' + e.data.item_type, e.data)
       let body = ''
       let title = ''
+      console.log('socket data', e.data)
       switch (e.data.item_type) {
         case 'timelog':
           title = ''
           body = '' //JSON.stringify(data.username + ' has been ' + data.data.value.status + ' timelog at ' + data.data.value.status_changed_at)
+          let timerInfo = JSON.parse(e.data.value)
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            that.$store.dispatch('timers/updateTimer', timerInfo)
+          }
+          if (e.data.user_id != user_id) {
+            that.$store.commit('settings/increaseWatchTimer')
+          }
           break
         case 'tasks':
           title = ''
@@ -325,12 +340,17 @@ export default {
           break
         case 'TASK_MESSAGE':
           title = e.data.title
+          const thread_id = e.data.thread_id
           body = JSON.stringify(e.data.sender + ' : ' + e.data.message)
-          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0) {
-            that.newMessage1 = e.data
-            that.updated_at = new Date().getTime()
-            if (this.route_query_taskId === e.data.task_id) {
-              that.newMessage = e.data
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            that.$store.commit('ADD_ONE', { module: 'task_messages', entity: e.data }, { root: true })
+            that.$store.dispatch('tasks/updateLastMessage', e.data)
+            if (e.data.user.user_id == user_id) {
+              this.$store.commit('tasks/readChat', thread_id)
+              this.$store.commit('threads/readThread', thread_id)
+            }
+            if (Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
+              that.$store.commit('threads/unReadThread', thread_id)
             }
           }
 
@@ -338,19 +358,77 @@ export default {
         case 'NEW_TASK':
           title = e.data.title
           body = JSON.stringify(e.data.message)
-          if (e.data.users_list.indexOf(parseInt(user_id)) >= 0 && this.route_query_taskId === e.data.task_id) {
-            that.newMessage = e.data
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            that.$store.dispatch('PROCESS_INCOMING_DATA', { new_task: JSON.parse(e.data.new_task) })
+          }
+          break
+        case 'THREAD':
+          title = e.data.title
+          body = JSON.stringify(e.data.message)
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            if (e.data.state === 'new') {
+              that.$store.commit('threads/addNewThread', e.data.thread)
+              that.$store.commit('tasks/addNewChat', e.data.chat)
+            } else {
+              that.$store.dispatch('tasks/updateChats')
+            }
+          }
+          break
+        case 'UPDATE_TASK':
+          title = e.data.title
+          body = JSON.stringify(e.data.message)
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            that.$store.dispatch('PROCESS_INCOMING_DATA', { updated_task: JSON.parse(e.data.updated_task) })
+          }
+          break
+        case 'TASK_USER':
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            that.$store.dispatch('task_users/update', JSON.parse(e.data.task_user))
+          }
+          break
+        case 'DELETE_TASK_USER':
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            let taskUserInfo = JSON.parse(e.data.task_user)
+            const task_progress_info = {
+              task_id: taskUserInfo.task_id,
+              company_user_id: taskUserInfo.company_user_id
+            }
+            that.$store.commit('task_users/deleteByTaskIdAndCompanyUserId', task_progress_info)
+            if (taskUserInfo.user.id == user_id) {
+              that.$store.commit('tasks/removeMyTask', taskUserInfo.task_id) // for regular users
+            }
+          }
+          break
+        case 'clients':
+          let clientInfo = JSON.parse(e.data.value)
+          that.$store.commit('clients/updateClient', clientInfo)
+          break
+        case 'COMPANY_USER':
+          let userInfo = JSON.parse(e.data.value)
+          that.$store.commit('company_users/updateUser', userInfo)
+          break
+        case 'TASK_COMPLETED':
+          title = e.data.title
+          body = JSON.stringify(e.data.message)
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            that.$store.dispatch('tasks/updateChats')
           }
           break
       }
-      if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) var notification = new Notification(title, { body: body, icon: 'img' })
+      if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
+        var notification = new Notification(title, { body: body, icon: 'img' })
+        notification.onclick = event => {
+          event.preventDefault()
+          window.open(e.data.link, '_blank')
+        }
+      }
 
       // that.$store.dispatch('GET_NEW_DATA')
     })
     if (user_id) {
       this.$store.state.settings.logged_in = true
       try {
-        that.$store.dispatch('GET_NEW_DATA')
+        // that.$store.dispatch('GET_NEW_DATA')
       } catch (e) {
         console.error('Websockets not running?')
       }
@@ -367,7 +445,7 @@ export default {
   },
   methods: {
     // getNewData() {
-    //   console.log('-getNewData--app.vue---')
+
     //   this.$http()
     //     .get('/get-new-data/' + window.sessionStorage.last_poll_timestamp)
     //     .then(response => {
@@ -380,9 +458,7 @@ export default {
     async getAppDataFromApi(updated_at) {
       try {
         return await this.$http().get('/test-tasks/' + updated_at)
-      } catch (e) {
-        console.log(e)
-      }
+      } catch (e) {}
     },
     async getAppData() {
       this.$store.state.loading = false //Right now it's just blocking everything
@@ -398,7 +474,6 @@ export default {
       let data = {}
       //TODO: find out why adding a table breaks
       if (false && indexDBExists && dataValidation) {
-        console.log('----------------loading from IDB!------------------')
         for (let propertyName of modulesNamesList) {
           const allEntities = await idbGetAll(propertyName)
           if (propertyName === 'properties') {
@@ -410,10 +485,11 @@ export default {
           }
         }
       } else {
-        console.log('----------------loading from API (/test-tasks) !------------------')
         data = await this.storeDataInIndexedDb()
       }
       this.$store.dispatch('PROCESS_INCOMING_DATA', data)
+      this.$store.dispatch('tasks/updateChats')
+
       //TODO: user created lists are breaking since commit f7cd86c85cb00b58cf59ad1232595e3eaec8f115 for no apparent reason
       // const userLists = createUserLists(data.lists)
       // this.$store.commit('lists/lists/CREATE_LISTS', {
@@ -427,7 +503,6 @@ export default {
       setInterval(this.dateInterval, 1800000)
     },
     async fetchData() {
-      console.log(window.sessionStorage.last_poll_timestamp, 'poll')
       if (!window.sessionStorage.last_poll_timestamp) return
       const appData = await this.getAppDataFromApi(window.sessionStorage.last_poll_timestamp)
       this.$store.dispatch('PROCESS_INCOMING_DATA', appData)
@@ -447,7 +522,6 @@ export default {
     },
     async storeDataInIndexedDb() {
       const appData = await this.getAppDataFromApi(0)
-      console.log('appData', appData)
       if (appData) {
         document.cookie = `company_user_id=${appData.current_company_user_id}`
       }
@@ -460,10 +534,10 @@ export default {
               }
               await idbKeyval.set(entity.id, entity, key)
             } catch (e) {
-              console.error('---------------------')
-              console.error(e)
-              console.error(entity)
-              console.error('---------------------')
+              // console.error('---------------------')
+              // console.error(e)
+              // console.error(entity)
+              // console.error('---------------------')
             }
           })
         } else {
@@ -475,10 +549,8 @@ export default {
     async clear_idb() {
       let oRequest = indexedDB.open('projectous-data')
       oRequest.onsuccess = function() {
-        console.log('clearing', modulesNamesList)
         let db = oRequest.result
         for (module of modulesNamesList) {
-          console.log(module)
           let tx = db.transaction(module, 'readwrite')
           let st = tx.objectStore(module)
           st.clear(module)
@@ -486,7 +558,6 @@ export default {
       }
     },
     async reload() {
-      // console.log('reloading')
       // this.$store.state.loading = true
       // this.clear_idb()
       // let data = {}
@@ -503,7 +574,6 @@ export default {
         return
       }
       this.scrolling = true
-      console.log(this.scrolling, this.$refs['wrapper1'].scrollLeft)
       this.$refs['wrapper2'].scrollLeft = this.$refs['wrapper1'].scrollLeft
     },
     handleScroll2: function() {
@@ -512,7 +582,6 @@ export default {
         return
       }
       this.scrolling = true
-      console.log(this.scrolling, this.$refs['wrapper2'].scrollLeft)
       this.$refs['wrapper1'].scrollLeft = this.$refs['wrapper2'].scrollLeft
     }
   }

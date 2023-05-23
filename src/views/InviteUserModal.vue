@@ -1,13 +1,8 @@
 <template>
   <b-modal id="invite-modal" class="modal fade" role="dialog">
+    <template #modal-title> Invite User </template>
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title">Invite User</h4>
-        </div>
         <div class="modal-body">
           <form id="invite-user-form" class="form-horizontal">
             <div class="form-group">
@@ -33,17 +28,17 @@
             </div>
           </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">
-            Close
-          </button>
-          <button type="button" class="btn btn-primary" v-on:click="inviteUser()">
-            Invite User
-          </button>
-        </div>
       </div>
       <!-- /.modal-content -->
     </div>
+    <template #modal-footer>
+      <b-button class="btn btn-default mt-3" @click="$bvModal.hide('invite-modal')">
+        Close
+      </b-button>
+      <b-button class="mt-3" variant="primary" @click="inviteUser()">
+        Invite User
+      </b-button>
+    </template>
     <!-- /.modal-dialog -->
   </b-modal>
   <!-- /.modal -->
@@ -67,6 +62,13 @@ export default {
         .post('/invite', { token, name: this.name, user_role: this.user_role, email: this.email })
         .then(response => {
           //TODO: add to invites?
+          this.$store.dispatch('ADD_MANY', { module: 'pending_invites', entities: [response.invite] }, { root: true })
+          this.$store.dispatch('settings/closeModal', {
+            modal: 'invite',
+            object: null,
+            pop: false,
+            push: true
+          })
         })
     }
   }

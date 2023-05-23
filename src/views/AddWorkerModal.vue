@@ -1,13 +1,8 @@
 <template>
   <b-modal id="add-worker-modal" class="modal fade" role="dialog">
+    <template #modal-title> Add Worker </template>
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title">Add Worker</h4>
-        </div>
         <div class="modal-body">
           <form id="add-worker-form" class="form-horizontal">
             <div class="form-group">
@@ -30,17 +25,17 @@
             </div>
           </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">
-            Close
-          </button>
-          <button type="button" class="btn btn-primary" v-on:click="addWorker()">
-            Add Worker
-          </button>
-        </div>
       </div>
       <!-- /.modal-content -->
     </div>
+    <template #modal-footer>
+      <b-button class="btn btn-default mt-3" @click="$bvModal.hide('add-worker-modal')">
+        Close
+      </b-button>
+      <b-button class="mt-3" variant="primary" @click="addWorker()">
+        Add Worker
+      </b-button>
+    </template>
     <!-- /.modal-dialog -->
   </b-modal>
   <!-- /.modal -->
@@ -64,6 +59,13 @@ export default {
         .post('/add-worker', { name: this.name, user_role: this.user_role, email: this.email })
         .then(response => {
           //TODO: add to workers?
+          this.$store.commit('company_users/updateUser', response.company_user)
+          this.$store.dispatch('settings/closeModal', {
+            modal: 'add-worker',
+            object: null,
+            pop: false,
+            push: true
+          })
         })
     }
   }

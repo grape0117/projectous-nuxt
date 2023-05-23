@@ -41,7 +41,6 @@ export default {
   },
   watch: {
     'task.priority'(value) {
-      console.log('priority watcher')
       this.$store.dispatch('UPDATE_ATTRIBUTE', { module: 'tasks', id: this.task.id, attribute: 'priority', value: value })
     }
   },

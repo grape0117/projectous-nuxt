@@ -40,7 +40,7 @@ export default class AcceptInvite extends Vue {
     //fetch data for token
     // @ts-ignore
     this.$http()
-      .get('/invite-data?token=' + this.token + '&email=' + this.email)
+      .get('/invite-data?token=' + this.token + '&email=' + encodeURIComponent(this.email))
       // @ts-ignore
       .then(response => {
         if (response.success) {

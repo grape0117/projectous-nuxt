@@ -11,18 +11,17 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   },
   isAdmin: (state, _getters, rootState, rootGetters) => {
     let company_user = rootGetters['company_users/getById'](state.current_user_id)
-    console.log('company_user', company_user)
     return company_user.user_role === 'admin'
   },
   getCurrentCompanyUser: (state, _getters, rootState, rootGetters) => {
     return 'haa'
-    console.log('getCurrentCompanyUser')
     if (state.current_company_user_id) {
-      console.log(state.current_company_user_id)
       return rootGetters['company_users/getById'](state.current_company_user_id)
     } else {
-      console.log({ id: '', name: '' })
       return { id: '', name: '' }
     }
+  },
+  get_total_chats_count: state => {
+    return state.total_chats_count
   }
 }

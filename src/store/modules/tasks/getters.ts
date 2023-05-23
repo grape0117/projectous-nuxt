@@ -17,9 +17,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
 
   getByProjectId: (state: IModuleState) => (projectId: any) => {
     if (projectId) {
-      console.log(projectId, state.tasks)
       const tasks = state.tasks.filter(task => task.project_id === projectId)
-      console.log('getByProjectId', { tasks })
       return tasks
     }
     return []
@@ -31,7 +29,21 @@ export const getters: GetterTree<IModuleState, IRootState> = {
 
     let tasks: ITask[] = []
     taskUsersByCompanyUserId.forEach((taskUser: ITaskUser) => {
-      tasks.push(_getters['getById'](taskUser.task_id))
+      if (_getters['getById'](taskUser.task_id)) {
+        tasks.push(_getters['getById'](taskUser.task_id))
+      }
+    })
+    return tasks
+  },
+  getOnlyAssignedTasksByCompanyUserId: (state: IModuleState, _getters, rootState, rootGetters) => (company_user_id: any) => {
+    const taskUsersByCompanyUserId = rootGetters['task_users/getByCompanyUserId'](company_user_id)
+    if (!taskUsersByCompanyUserId.length) return []
+
+    let tasks: ITask[] = []
+    taskUsersByCompanyUserId.forEach((taskUser: ITaskUser) => {
+      if (_getters['getById'](taskUser.task_id) && _getters['getById'](taskUser.task_id).status !== 'completed') {
+        tasks.push(_getters['getById'](taskUser.task_id))
+      }
     })
 
     return tasks

@@ -5,7 +5,6 @@ import Vue from 'vue'
 export const mutations: MutationTree<IModuleState> = {
   registerModals(state, bvModal) {
     //@ts-ignore
-    console.log(window.$_app.$bvModal)
   },
   setCurrentEditTimerProject(state, project) {
     state.current_edit_timer.project_id = project.id
@@ -31,8 +30,13 @@ export const mutations: MutationTree<IModuleState> = {
   setCurrentEditCompanyUser(state, company_user) {
     state.current_edit_company_user = JSON.parse(JSON.stringify(company_user))
   },
+  setUnreadMessageNum(state, unread_messages_num) {
+    state.unread_messages_num = unread_messages_num
+  },
+  increaseUnreadMessageNum(state) {
+    state.unread_messages_num = state.unread_messages_num + 1
+  },
   setCurrentEditCompanyClient(state, client) {
-    console.log('open client modal', client)
     state.current_edit_client = client
     if (client.id) {
       // @ts-ignore
@@ -43,7 +47,6 @@ export const mutations: MutationTree<IModuleState> = {
     }
   },
   setCurrentEditProject(state, project) {
-    console.log('open project modal')
     state.current_edit_project = project
     if (project.id) {
       // @ts-ignore
@@ -54,7 +57,6 @@ export const mutations: MutationTree<IModuleState> = {
     }
   },
   setCurrentEditProjectStatus(state, status) {
-    console.log('open project modal')
     state.current_edit_project_status = status
   },
   setCurrentEditTask(state, task) {
@@ -94,6 +96,9 @@ export const mutations: MutationTree<IModuleState> = {
     // @ts-ignore
     state[setting] = value
   },
+  increaseWatchTimer(state) {
+    state.timer_watch = state.timer_watch + 1
+  },
   popActionStack(state) {
     let modal_stack = state.modal_stack
     let popped = modal_stack.pop()
@@ -104,8 +109,9 @@ export const mutations: MutationTree<IModuleState> = {
     state.modal_stack.push(action)
   },
   setCurrentRunningTimer(state, timer) {
-    //console.log('setCurreRunTim')
-    //console.log(timer);
     state.current_running_timer = timer
+  },
+  setTotalChats(state, total_chats_count) {
+    state.total_chats_count = total_chats_count
   }
 }

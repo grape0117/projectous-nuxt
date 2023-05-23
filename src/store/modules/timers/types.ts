@@ -1,5 +1,6 @@
 export interface IModuleState {
   timers: ITimer[]
+  other_timers: ITimer[]
   lookup: any
 }
 

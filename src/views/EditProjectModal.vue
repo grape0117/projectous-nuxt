@@ -16,7 +16,7 @@
         </div>
         <div class="form-group col-sm-12">
           <label class="control-label white-text" for="projectAcronymEdit">Url: </label>
-          <input id="projectAcronymEdit" class="form-control" type="text" name="url" placeholder="Project Acronym" v-model="project.url" />
+          <input id="projectAcronymEdit" class="form-control" type="text" name="url" placeholder="Url" v-model="project.url" />
         </div>
         <div class="form-group col-sm-6">
           <label class="control-label white-text" for="companyClientSelect">Status: </label>
@@ -41,6 +41,10 @@
           </v-select>
           <b-badge variant="light" class="mr-1 mt-2" style="cursor: pointer;" @click="editClient()">Edit Client</b-badge>
           <b-badge variant="light" class="mr-1 mt-2" style="cursor: pointer;" @click="createClient()">Add Client</b-badge>
+        </div>
+        <div class="form-group col-sm-12">
+          <label class="control-label white-text" for="clientRate">Client Rate: </label>
+          <input id="clientRate" class="form-control" name="client_rate" placeholder="Client Rate" v-model="default_client_rate" />
         </div>
         <div class="form-group col-sm-6">
           <label class="control-label white-text" for="projectDueDate">Due Date: </label>
@@ -78,7 +82,8 @@ export default {
     return {
       changed_project_users: [],
       project: {},
-      buttonStyle: ''
+      buttonStyle: '',
+      default_client_rate: 0
     }
   },
   created() {
@@ -150,13 +155,19 @@ export default {
         })
         this.$store.dispatch('clients/createClient')
       }
+    },
+    'project.client_company_id': function() {
+      if (this.project.client_company_id) {
+        let client = this.$store.getters['clients/getByClientCompanyId'](this.project.client_company_id)
+        this.default_client_rate = client.default_client_rate
+      } else {
+        this.default_client_rate = 0
+      }
     }
   },
   methods: {
     applyTheme,
-    checkProject() {
-      console.log(this.project)
-    },
+    checkProject() {},
     reset_project() {
       this.project = {}
     },

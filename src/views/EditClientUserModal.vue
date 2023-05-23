@@ -67,7 +67,6 @@ export default {
   },
   methods: {
     updateUserRate() {
-      console.log('user rate changed to ', this.default_user_rate)
       if (this.default_user_rate !== '') {
         this.$emit('change', { message: this.user.name + ' given default_user_rate of ' + this.default_user_rate + ' by current user' })
       } else {
@@ -94,7 +93,6 @@ export default {
       }
     },
     userRateClass() {
-      console.log('default_user_rate', this.client_user.default_user_rate)
       return this.client_user && !isNull(this.client_user.default_user_rate) && !isUndefined(this.client_user.default_user_rate) && this.client_user.default_user_rate !== '' ? 'set-rate' : 'inherited-rate'
     },
     buttonVariant(role) {

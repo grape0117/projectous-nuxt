@@ -14,7 +14,12 @@ export interface IModuleState {
   when_possible_tasks: ITask[]
   this_week_tasks: ITask[]
   today_tasks: ITask[]
+  my_tasks: ITask[]
+  past_due_tasks: ITask[]
+  others_tasks: ITask[]
+  all_tasks: ITask[]
   tasks_by_project: ITask[]
+  chats: any[]
 }
 
 export interface ITask {
@@ -55,4 +60,5 @@ export interface ITask {
   idList?: string | null
   labels?: string[]
   assignedMembers: []
+  total_time_spent?: number | null
 }

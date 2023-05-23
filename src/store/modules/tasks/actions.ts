@@ -39,7 +39,8 @@ function createDefaultTask(): ITask {
     workflowy_id: null,
     settings: {},
     last_task_message_id: null,
-    last_task_message_created_at: null
+    last_task_message_created_at: null,
+    total_time_spent: 0
   }
 }
 
@@ -133,16 +134,13 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     return newTask
   },
   async saveTask({ commit, state, rootState }: any, { task, task_users }: any) {
-    console.log('last task edited', task, task_users)
     commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
 
     task_users.forEach((task_user: any) => {
       //if(!isNaN(task_user.id - parseFloat(task_user.id))) { //jQuery implementation of is_numeric: https://stackoverflow.com/a/21070520/193930
       if (!task_user.user_checked) {
-        console.log('forget / delete from edit', task_user)
         commit('DELETE', { module: 'task_users', entity: task_user }, { root: true })
       } else {
-        console.log('upsert from edit', task_user)
         commit('UPSERT', { module: 'task_users', entity: task_user }, { root: true })
       }
       //}
@@ -150,13 +148,12 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
     // @ts-ignore
     const response = await this._vm.$http().post('/tasks/' + task.id, { task, task_users })
-    /*console.log(response)
-    for (let uuid in response.new_task_user_ids) {
-      if (response.new_task_user_ids.hasOwnProperty(uuid)) {
-        let id = response.new_task_user_ids[uuid]
-        commit('uuid_to_id', { module: 'task_users', id, uuid }, { root: true })
-      }
-    }*/
+    // for (let uuid in response.new_task_user_ids) {
+    //   if (response.new_task_user_ids.hasOwnProperty(uuid)) {
+    //     let id = response.new_task_user_ids[uuid]
+    //     commit('uuid_to_id', { module: 'task_users', id, uuid }, { root: true })
+    //   }
+    // }
   },
   async updateTask({ commit }: any, task: any) {
     console.log('task', task)
@@ -164,6 +161,42 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     await this._vm.$http().post('/tasks/' + task.id, { task })
     // TODO @stephane send task to server
     commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
+  },
+  async updateChats({ commit, state }: any) {
+    let newChats = []
+    // @ts-ignore
+    let { chats, threads, total_chats_count } = await this._vm.$http().get('/chats')
+    // @ts-ignore
+    let openChats = state.chats.filter(({ thread_id }) => threads.filter(thread => thread.id === thread_id)[0]['status'] !== 'closed')
+    let restChats = []
+    for (const chat of openChats) {
+      // @ts-ignore
+      const chatIndex = chats.findIndex(({ thread_id }) => thread_id == chat.thread_id)
+      if (chatIndex < 0) {
+        restChats.push(chat)
+      }
+    }
+    newChats = [...chats, ...restChats]
+
+    commit('updateChats', newChats)
+    this.commit('threads/updateThreads', threads)
+    this.commit('settings/setTotalChats', total_chats_count)
+  },
+  async getMoreChats({ commit }: any, last_chat_id: number) {
+    // @ts-ignore
+    let { chats } = await this._vm.$http().get(`/chats/${last_chat_id}`)
+    commit('updateMoreChats', chats)
+  },
+  async updateLastMessage({ commit, state }: any, task_message: any) {
+    // @ts-ignore
+    let lastMessage = {
+      company_user_id: task_message.company_user_id,
+      createdAt: task_message.created_at,
+      id: task_message.id,
+      text: task_message.text,
+      user: { ...task_message.user, role: task_message.user.user_role }
+    }
+    commit('updateLastMessage', { thread_id: task_message.thread_id, lastMessage: lastMessage, users_to_notify: task_message.users_to_notify })
   },
   async CASCADE_DELETE({ rootState, commit }, task) {
     rootState.task_users.task_users.forEach((task_user: ITaskUser) => {
@@ -189,14 +222,12 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     const userRegex = /^@{1,3}[a-zA-Z]+\s|\s@{1,3}[a-zA-Z]+\s|\s@{1,3}[a-zA-Z]+$|^@{1,3}[a-zA-Z]+/gm
 
     const titleMatch = title ? title.match(userRegex) : null
-    console.log(titleMatch)
 
     if (titleMatch && titleMatch.length > 0) {
       const task_users = _getters['task_users/getByTaskId'](task_id)
 
       //get user by match
       const matchedCompanyUsers = _getters['company_users/getByAlias'](titleMatch[0])
-      console.log('matched users', matchedCompanyUsers)
       //assigned vs reviewer vs manager
       const numAts = titleMatch[0].split('@').length - 1
       const role = numAts == 1 ? 'assigned' : numAts == 2 ? 'reviewer' : numAts == 3 ? 'manager' : 'something is wrong'

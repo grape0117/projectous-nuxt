@@ -229,7 +229,6 @@ export default {
       return this.$store.getters['settings/isCurrentUserOrAdmin'](this.expense.user_id)
     },
     deleteExpense: function() {
-      console.log(this.expense)
       this.$store.dispatch('expenses/deleteExpense', this.expense.id)
     },
     editProject: function() {
@@ -277,7 +276,6 @@ export default {
     },
     saveExpense: function(callback) {
       let self = this
-      //console.log($('#expense-modal-project-id').val());
 
       //TODO: change Save button to Saving...
       //TODO: save time? or process on php side?
@@ -293,7 +291,6 @@ export default {
         //return;
       }
       let formData = $('#editExpenseForm').serialize()
-      console.log(formData)
       let project = self.$store.getters['projects/getById']($('#editExpenseForm select[name=project_id]').val())
       if (project) {
         //TODO: checktypeof projectKey == 'number') {
@@ -310,7 +307,7 @@ export default {
         let minutes = ('00' + Math.floor((self.startSeconds % 3600) / 60)).slice(-2)
         let seconds = ('00' + (self.startSeconds % 60)).slice(-2)
         let report_at = $('#expenseUserDate').val() + ' ' + hours + ':' + minutes + ':' + seconds
-        //console.log(report_at);
+
         formData = formData + '&report_at=' + report_at
       }
 

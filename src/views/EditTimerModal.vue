@@ -88,13 +88,37 @@
                         </div>
                       </div>
                     </div>
-                    <div class="form-group">
-                      <label class="control-label col-sm-4" for="timerTaskSelect">Task: </label>
+                    <div v-if="isAdmin" class="form-group">
+                      <label class="control-label col-sm-4" for="timerUserTime">Show not assigned to me </label>
                       <div class="col-sm-8">
-                        <select name="task_id" id="timerTaskSelect" class="form-control" v-model="timer_data.task_id">
-                          <option value="0">***** Select Task *****</option>
-                          <option v-for="task in projecttasks(timer_data.project_id)" :value="task.id" :key="task.id">{{ task.title }}</option>
-                        </select>
+                        <div class="checkbox">
+                          <label>
+                            <input name="not_assigned_to_me" type="checkbox" id="assigneCheckbox" value="0" v-model="not_assigned_to_me" aria-label="..." />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-if="isAdmin" class="form-group">
+                      <label class="control-label col-sm-4" for="timerUserTime">Show completed/closed </label>
+                      <div class="col-sm-8">
+                        <div class="checkbox">
+                          <label>
+                            <input name="completed_closed" type="checkbox" id="completedCheckbox" value="0" v-model="completed_closed" aria-label="..." />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label " for="timerTaskSelect">Task: </label>
+                      <div class="col-sm-12">
+                        <v-select :options="projecttasks" :reduce="task => task.id" label="name" :filter-by="searchTask" v-model="timer_data.task_id" placeholder="Select a task">
+                          <template slot="selected-option" slot-scope="option">
+                            <div class="flex">
+                              <div class="col">{{ option.title }}</div>
+                            </div>
+                          </template>
+                          <template slot="option" slot-scope="option"> {{ option.title }}</template>
+                        </v-select>
                       </div>
                     </div>
                     <div v-if="isAdmin" class="form-group">
@@ -128,7 +152,7 @@
                     <div v-if="isAdmin" class="form-group">
                       <label class="control-label col-sm-4" for="client_rate">Client Rate: </label>
                       <div class="col-sm-8">
-                        <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value()" />
+                        <input name="client_rate" type="datetime" id="client_rate" :placeholder="client_rate_placeholder()" class="form-control" :value="client_rate_value" />
                       </div>
                     </div>
                     <!-- <div class="form-group">
@@ -258,7 +282,10 @@ export default {
       buttonStyle: '',
       client: null,
       timer_data: {},
-      started_at: null
+      started_at: null,
+      not_assigned_to_me: false,
+      completed_closed: false,
+      projecttasks: []
     }
   },
   created() {
@@ -315,6 +342,17 @@ export default {
     clients: function() {
       const clients = this.$store.getters['clients/getActiveCompanyClients']
       return clients
+    },
+    client_rate_value: function() {
+      let timerInfo = this.$store.state.timers.timers.filter(({ id }) => id == this.timer.id)[0]
+      if (timerInfo) {
+        if (timerInfo.invoice_id) {
+          return timerInfo.client_rate
+        }
+        return timerInfo.default_client_rate != timerInfo.client_rate ? timerInfo.client_rate : ''
+      } else {
+        return 0
+      }
     }
   },
   mounted: function() {
@@ -322,6 +360,7 @@ export default {
     // $('#timer-modal').on('hidden.bs.modal', function() {
     //   self.$store.dispatch('settings/closedModal')
     // })
+    this.getProjectTasks(this.timer_data.project_id)
   },
   watch: {
     'timer.id': async function() {
@@ -338,7 +377,6 @@ export default {
       const timer_url = `${window.location.origin}?timer_id=${this.timer.id}`
       this.timer_link = timer_url
       const resp = await this.$http().get('/timer/' + this.timer.id + '/history')
-      console.log(resp.history)
       resp.history.sort(function(a, b) {
         return b.id - a.id
       })
@@ -361,11 +399,40 @@ export default {
           push: true
         })
         this.$store.dispatch('projects/createProject')
+      } else {
+        this.getProjectTasks(project_id)
       }
+    },
+    'timer_data.project_id': function() {
+      this.getProjectTasks(this.timer_data.project_id)
+    },
+    not_assigned_to_me: function() {
+      this.getProjectTasks(this.timer_data.project_id)
+    },
+    completed_closed: function() {
+      this.getProjectTasks(this.timer_data.project_id)
     }
   },
   methods: {
     applyTheme,
+    getProjectTasks: async function(project_id) {
+      if (!this.not_assigned_to_me && !this.completed_closed) {
+        this.projecttasks = this.$store.getters['tasks/getByProjectId'](project_id)
+      } else {
+        var scope = 'me',
+          status = 'available'
+
+        if (this.not_assigned_to_me) {
+          scope = 'all'
+        }
+        if (this.completed_closed) {
+          status = 'all'
+        }
+        const resp = await this.$http().get('/project-tasks/' + project_id + '/' + scope + '/' + status)
+        this.projecttasks = resp.tasks
+      }
+      console.log('PROJEDT TASKS', this.projecttasks)
+    },
     updateDuration(duration) {
       this.timer_data.duration = duration
     },
@@ -386,12 +453,12 @@ export default {
     client_rate_placeholder: function() {
       return this.timer_data.default_client_rate
     },
-    client_rate_value: function() {
-      if (this.timer_data.invoice_id) {
-        return this.timer_data.client_rate
-      }
-      return this.timer_data.default_client_rate != this.timer_data.client_rate ? this.timer_data.client_rate : ''
-    },
+    // client_rate_value: function() {
+    //   if (this.timer_data.invoice_id) {
+    //     return this.timer_data.client_rate
+    //   }
+    //   return this.timer_data.default_client_rate != this.timer_data.client_rate ? this.timer_data.client_rate : ''
+    // },
     user_rate_placeholder: function() {
       return this.timer_data.default_user_rate
     },
@@ -434,9 +501,6 @@ export default {
     isTimerTask: function(task_id) {
       return task_id == this.timer.task_id
     },
-    projecttasks: function(project_id) {
-      return this.$store.getters['tasks/getByProjectId'](project_id)
-    },
     isCurrentUserOrAdmin: function() {
       return this.$store.getters['settings/isCurrentUserOrAdmin'](this.timer.user_id)
     },
@@ -475,7 +539,7 @@ export default {
       //   pop: false,
       //   push: true
       // })
-      // console.log(timer_project.id)
+
       const timer_project = this.timerProject()
       this.$store.commit('settings/setCurrentEditProject', cloneDeep(timer_project))
       this.$store.commit('settings/setCurrentEditProjectStatus', 'edit')
@@ -488,7 +552,6 @@ export default {
       //   push: true
       // })
       const timer_client = this.timerClient()
-      console.log(timer_client)
       this.$store.dispatch('clients/editClient', timer_client.id)
       this.$store.commit('settings/setCheckModalStack', true)
     },
@@ -503,7 +566,6 @@ export default {
       return this.timer.project_id === project_id
     },
     isTimerUser: function(user_id) {
-      console.log(this.timer.user_id, user_id)
       return this.timer.user_id === user_id
     },
     checkInputValue: function(input) {
@@ -568,6 +630,7 @@ export default {
       }
 
       this.$store.dispatch('timers/saveTimer', this.timer_data).then(function(response) {
+        self.$store.commit('settings/increaseWatchTimer')
         if (self.timer_data.notes != self.timer.notes) {
           self.$store.dispatch('UPDATE_ATTRIBUTE', {
             module: 'timers',
@@ -607,6 +670,10 @@ export default {
           .toLowerCase()
           .indexOf(search_value) > -1
       )
+    },
+    searchTask: function(option, label, search) {
+      let search_value = search.toLowerCase()
+      return option.title.toLowerCase().indexOf(search_value) > -1
     },
     addProject: function() {
       this.$router.push({ query: { new_project_client_company_id: this.client.client_company_id } })

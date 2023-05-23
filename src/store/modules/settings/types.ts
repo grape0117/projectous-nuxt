@@ -27,6 +27,8 @@ export interface IModuleState {
   last_seen_at: string
   notes: string
   timer_watch: number
+  unread_messages_num: number
+  total_chats_count: number
 }
 
 type EditProjectStatus = 'add' | 'edit'

@@ -28,8 +28,6 @@ export const actions: ActionTree<IRootState, IRootState> = {
     return result
   },
   UPSERT({ dispatch, commit, state }, { module, entity }: any) {
-    console.log('UPSERT ACTION', module, entity)
-
     if (!state[module]) {
       console.error('Module ' + module + ' not found.')
       return
@@ -37,8 +35,7 @@ export const actions: ActionTree<IRootState, IRootState> = {
 
     // @ts-ignore
     let key = state[module].lookup[entity.id]
-    console.log('key', key, state[module][module][key])
-
+    // @ts-ignore
     if (state[module][module][key]) {
       dispatch('UPDATE', { module, entity })
     } else {
@@ -46,7 +43,6 @@ export const actions: ActionTree<IRootState, IRootState> = {
     }
   },
   UPDATE({ commit, dispatch }, { module, entity }) {
-    console.log('update entity', entity)
     commit('UPDATE', { module, entity })
     // @ts-ignore
     this._vm
@@ -87,7 +83,6 @@ export const actions: ActionTree<IRootState, IRootState> = {
    * Dispatch cascade deletes, commit delete then send delete to backend
    */
   DELETE({ dispatch, commit }, { module, entity }) {
-    console.log('delete')
     // @ts-ignore
     if (this._actions[module + '/CASCADE_DELETE']) {
       // @ts-ignore
@@ -100,7 +95,6 @@ export const actions: ActionTree<IRootState, IRootState> = {
     this._vm.$http().delete('/' + module + '/', entity.id)
   },
   PROCESS_INCOMING_DATA({ commit, rootState }, data) {
-    // console.log('PROCESS_INCOMING_DATA', data)
     // @ts-ignore
     for (const module in data) {
       if (rootState[module]) {
@@ -116,6 +110,9 @@ export const actions: ActionTree<IRootState, IRootState> = {
       } else {
         switch (module) {
           //TODO: store in IndexedDB
+          case 'unread_messages_num':
+            rootState.settings.unread_messages_num = data[module]
+            break
           case 'current_company_id':
             rootState.settings.current_company_id = data[module]
             break
@@ -128,6 +125,15 @@ export const actions: ActionTree<IRootState, IRootState> = {
           case 'my_tasks':
             rootState.tasks.my_tasks = data[module]
             break
+          case 'new_task':
+            rootState.tasks.my_tasks = [data[module], ...rootState.tasks.my_tasks]
+            break
+          case 'updated_task':
+            const task_index = rootState.tasks.my_tasks.findIndex((task: any) => task.id === data[module].id)
+            const new_my_task_list = [...rootState.tasks.my_tasks]
+            new_my_task_list[task_index] = data[module]
+            rootState.tasks.my_tasks = new_my_task_list
+            break
           case 'today_tasks':
             rootState.tasks.today_tasks = data[module]
             break
@@ -139,6 +145,9 @@ export const actions: ActionTree<IRootState, IRootState> = {
             break
           case 'all_tasks':
             rootState.tasks.all_tasks = data[module]
+            break
+          case 'other_timers':
+            rootState.timers.other_timers = data[module]
             break
           case 'last_poll_timestamp':
             window.sessionStorage.last_poll_timestamp = data[module]

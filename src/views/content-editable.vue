@@ -18,16 +18,13 @@ export default {
       let matches = regex.exec(new_title)
       alert('regex')
       if (matches) {
-        console.log(matches)
-        console.log(this.projects)
         let project = this.projects.find(proj => {
-          console.log(proj)
           return proj.acronym + ':' === matches[0]
         })
         new_title = new_title.replace(regex, '<span style="color: red;">$&</span>')
         //this.task.title = new_title;
         //return;
-        //console.log(new_title);
+
         this.$store.commit('tasks/updateTaskAttribute', {
           id: this.task.id,
           attribute: 'title',
@@ -43,8 +40,6 @@ export default {
     createTaskFromEnter: function(event) {
       alert('enter')
       event.preventDefault()
-      console.log(event)
-      console.log(this.index)
       this.$emit('createTaskFromEnter', { index: this.index })
       //this.$store.dispatch('tasks/createTaskFromEnter', {from_id: task.id});
       //return false;

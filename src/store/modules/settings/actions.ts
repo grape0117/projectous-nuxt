@@ -33,7 +33,6 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   openModal(context, modal) {
     // @ts-ignore
-    console.log(modal + '-modal')
     // @ts-ignore
     window.$_app.$bvModal.show(modal + '-modal')
   },
@@ -71,16 +70,11 @@ export const actions: ActionTree<IModuleState, IRootState> = {
    * @param context
    */
   closedModal(context) {
-    console.log('closedModal')
-    console.log('check_modal_stack', context.state.check_modal_stack)
-    console.log('modal_stack', context.state.modal_stack)
     if (context.state.check_modal_stack) {
       let next_modal = context.state.modal_stack.pop()
-      console.log('next_modal', next_modal)
       // @ts-ignore
       window.$_app.$bvModal.show(next_modal + '-modal')
     }
-    console.log('setting check to true')
     context.commit('setCheckModalStack', true)
   },
   /**
@@ -97,7 +91,6 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   closeModal(context, { modal, entity, pop, push }) {
     //1. We want to make sure we are manually opening the next modal in the stack
     context.commit('setCheckModalStack', false)
-    console.log('closing ' + modal)
 
     //2. Hide the current modal
     // @ts-ignore
@@ -112,7 +105,6 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     if (true || pop) {
       let next_modal = context.state.modal_stack.pop() //TODO: does this work properly?
       if (modal === 'client' && next_modal === 'project') {
-        console.log('client', entity)
         context.commit('settings/setCurrentEditProjectClient', entity, {
           root: true
         })
@@ -125,11 +117,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
   },
   checkForRunningTimers(context) {
     let running_timer = context.rootState.timers.timers.find((timer: any) => {
-      //console.log(timer.status);
       return timer.status === 'running'
     })
 
-    //console.log(running_timer);
     context.commit('setCurrentRunningTimer', running_timer)
   },
   setCurrentEditInvoice(context, invoice) {
@@ -147,9 +137,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     let company_user = context.rootState.company_users.company_users.find(({ company_id: companyId, user_id: userId }: ICompanyUser) => companyId == company_id && userId == user_id)
     context.commit('setCurrentCompanyUser', company_user)
   },
-  setCurrentCompany({ commit, dispatch, rootState }, company_id) {
+  async setCurrentCompany({ commit, dispatch, rootState }, company_id) {
     // @ts-ignore
-    const company = this._vm.$http().put('/set-current-company/' + company_id, {}, function() {
+    const company = await this._vm.$http().post('/set-current-company/' + company_id, {}, function() {
       rootState.companies.companies.find((c: any) => {
         if (company_id == c.id) {
           commit('setCurrentCompany', company)
@@ -159,7 +149,16 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       })
     })
   },
+  setCurrentCompanyId(context, company_id) {
+    context.commit('setCurrentCompanyId', company_id)
+  },
   setCurrentProject: (context, project) => {
     context.commit('setCurrentProject', project)
+  },
+  setUnreadMessageNum: (context, unread_messages_num) => {
+    context.commit('setUnreadMessageNum', unread_messages_num)
+  },
+  increaseUnreadMessageNum: context => {
+    context.commit('increaseUnreadMessageNum')
   }
 }

@@ -86,9 +86,11 @@ export default {
   methods: {
     inviteUser: function() {
       this.$store.dispatch('company_users/inviteUser')
+      this.selectedFilter = 'pending'
     },
     addWorker: function() {
       this.$store.dispatch('company_users/addWorker')
+      this.selectedFilter = 'active'
     }
   }
 }

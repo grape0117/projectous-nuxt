@@ -13,8 +13,17 @@
         <span class="makeBtn" @click="startTimer()">Start New</span>
         <span>{{ total_time_today }}</span>
       </div>
+      <div class="timer-tab" v-if="isAdmin">
+        <ul class="nav nav-tabs">
+          <li :class="tabClass('my_timer')" @click="setTab('my_timer')">
+            <a class="nav-link" href="#">My</a>
+          </li>
+          <li :class="tabClass('other_timer')" @click="setTab('other_timer')">
+            <a class="nav-link" href="#">Other</a>
+          </li>
+        </ul>
+      </div>
     </div>
-
     <div class="timer-tray-timer-card">
       <my-sidebar-timer :class="getSidebarClass()" v-bind:only_hidden="false" v-bind:timer_filter="timer_filter"></my-sidebar-timer>
     </div>
@@ -33,17 +42,33 @@ import { EventBus } from '@/components/event-bus'
 import MySideBarTimer from './MySidebarTimer.vue'
 
 export default {
+  props: ['show'],
   name: 'timer-tab',
   data: function() {
     return {
       tray_expanded: true,
-      timer_filter: '',
+      timer_filter: 'my_timer',
       keys: [],
       month_stats: 0
-      // profit
+    }
+  },
+  watch: {
+    show: {
+      immediate: true,
+      handler(val) {
+        if (this.is_loggedIn && val) {
+          this.getTimers()
+        }
+      }
     }
   },
   computed: {
+    is_loggedIn() {
+      return this.$store.state.settings.logged_in
+    },
+    isAdmin() {
+      return this.$store.getters['settings/isAdmin']
+    },
     total_time_today: function() {
       let self = this
       let total_time_today = 0
@@ -51,16 +76,9 @@ export default {
       let timers = this.$store.state.timers.timers.filter(function(timer) {
         if (timer.company_user_id === self.$store.state.settings.current_company_user_id) {
           let timertime = new Date(timer.report_at)
-          //console.log(timertime)
-          //console.log(midnight)
-          /*if(timertime > midnight){
-            console.log('greater')
-          } else {
-            console.log('less than')
-          }*/
 
           if (new Date(timer.report_at) > midnight) {
-            total_time_today += timer.duration
+            total_time_today += timer.duration || 0
           }
         }
       })
@@ -71,10 +89,12 @@ export default {
     'my-sidebar-timer': MySideBarTimer
   },
   methods: {
+    async getTimers() {
+      this.$store.dispatch('timers/getTimers')
+    },
     async getMonthStats() {
-      const { profit } = await this.$http().get('/stats/month')
-      console.log(profit)
-      this.month_stats = profit
+      // const { profit } = await this.$http().get('/stats/month')
+      // this.month_stats = profit
     },
     trayClass: function() {
       return this.tray_expanded ? 'expanded' : ''
@@ -113,16 +133,24 @@ export default {
         return
       }
       start()
+    },
+    async setTab(tab) {
+      this.timer_filter = tab
+    },
+    tabClass(tab) {
+      if (this.timer_filter === tab) {
+        return 'active'
+      }
     }
   },
   mounted() {
     EventBus.$on('toggle_timers', () => {
       this.getMonthStats()
     })
-    window.addEventListener('keyup', this.startTimer)
+    // window.addEventListener('keyup', this.startTimer)
   },
   beforeDestroy() {
-    window.removeEventListener('keyup', this.startTimer)
+    // window.removeEventListener('keyup', this.startTimer)
   }
 }
 </script>
@@ -175,5 +203,24 @@ export default {
 }
 .makeBtn:hover {
   background-color: rgba(0, 0, 0, 0.7);
+}
+.timer-tab ul > li {
+  cursor: pointer;
+  font-weight: bold;
+  margin-right: 5px;
+  border-radius: 5px;
+}
+.timer-tab ul > li a {
+  color: white;
+}
+.timer-tab ul > li.active {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+  border-color: rgba(0, 0, 0, 0.7);
+}
+.nav-tabs {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
 }
 </style>

@@ -24,13 +24,6 @@
               <span v-if="others_high_count > 0" class="badge badge-danger label-primary" v-html="others_high_count"></span>
             </a>
           </li>
-          <li @click="setCompanyUserId(user.id)" :class="tabClass(user.id)" role="presentation" v-for="user in usersNotMe" v-bind:user="user">
-            <a aria-controls="closed" role="tab" data-toggle="tab"
-              >{{ user.name }}
-              <span v-if="filter_task_count(user.id) > 0" :class="badgeClass(user)" v-html="filter_task_count(user.id)"></span>
-              <span v-if="filter_task_high_count(user.id).length > 0 && filter_task_high_count(user.id)[0]['count'] > 0" class="badge badge-danger label-primary" v-html="filter_task_high_count(user.id)[0]['count']"></span>
-            </a>
-          </li>
           <li @click="setTab('today_tasks')" :class="tabClass('today_tasks')" role="presentation">
             <a aria-controls="closed" role="tab" data-toggle="tab"
               >Today
@@ -46,27 +39,57 @@
             </a>
           </li>
         </ul>
+        <ul class="nav nav-tabs" role="tablist">
+          <li @click="setCompanyUserId(user.id)" :class="tabClass(user.id)" role="presentation" v-for="user in usersNotMe" v-bind:user="user">
+            <a aria-controls="closed" role="tab" data-toggle="tab"
+              ><span v-if="user.id" :title="`${user.name}`" :class="`mr-1 pointer ${user.status}`" :style="{ color: 'white', cursor: 'pointer', display: 'inline-flex' }">
+                {{ user.name }}
+              </span>
+              <span v-if="filter_task_count(user.id) > 0" :class="badgeClass(user)" v-html="filter_task_count(user.id)"></span>
+              <span v-if="filter_task_high_count(user.id).length > 0 && filter_task_high_count(user.id)[0]['count'] > 0" class="badge badge-danger label-primary" v-html="filter_task_high_count(user.id)[0]['count']"></span>
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
     <div class="col-md-12" v-if="isAdmin">
       <div class="tab-content">
         <ul>
           <li>
-            <b-form-checkbox v-if="tab == 'my_tasks'" v-model="is_owner" name="check-button" switch variant="warning">
-              Owner
-            </b-form-checkbox>
-            <span class="input-group" style="display: inline;">
-              <input v-model="task_filter" :class="'form-control input-sm ' + taskFilterClass()" style="width: 200px; background: transparent;" /><button v-if="task_filter" class="btn btn-sm btn-default" @click="clearSearch()">&times;</button><button class="btn btn-sm btn-default"><i class="glyphicon glyphicon-search"></i></button>
-            </span>
+            <div class="mb-2 form-inline">
+              <b-form-checkbox v-if="tab == 'my_tasks'" v-model="is_owner" name="check-button" switch variant="warning">
+                Owner
+              </b-form-checkbox>
+              <button class="btn btn-primary mx-2" @click="showBulkAction()">Bulk Action</button>
+              <!-- <label class="mr-sm-2" for="action-list">Action:</label> -->
+              <select id="action-list" class="form-control select2-select" v-model="action_name" v-if="show_checkbox" @change="changeBulk">
+                <option value="" selected> Select Action </option>
+                <option value="complete">Complete</option>
+                <option value="delete">Delete</option>
+                <option value="high_priority">High Priority</option>
+                <option value="regular_priority">Regular Priority</option>
+                <option value="low_priority">Low Priority</option>
+                <option value="hold_priority">Hold Priority</option>
+                <option value="remove_due_date">Remove Due Date</option>
+                <option value="set_due_date">Set Due Date</option>
+              </select>
+            </div>
+          </li>
+          <li>
+            <b-input-group prepend="Search" style="width:30%">
+              <b-form-input v-model="task_filter" :class="'form-control input-sm ' + taskFilterClass()"></b-form-input>
+              <b-input-group-append>
+                <b-button variant="light" @click="clearSearch()"><i class="icon-close"/></b-button>
+              </b-input-group-append>
+            </b-input-group>
           </li>
         </ul>
-        <b style="font-size:13px;">Project: </b>
         <b v-for="project_id in project_list">
-          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'background-color': isActiveProjectFilter(project_id) ? getClientAcronymColor(project_id) : 'white', color: isActiveProjectFilter(project_id) ? 'white' : 'black', cursor: 'pointer' }" v-b-tooltip.hover :title="taskProjectName(project_id) && taskProjectName(project_id)">
+          <b-badge @click="updateProjectFilter(project_id)" variant="primary" class="mr-1" :style="{ 'background-color': getClientAcronymColor(project_id), color: 'white', cursor: 'pointer', border: isActiveProjectFilter(project_id) ? 'none' : 'solid 2px white' }" :title="taskProjectName(project_id) && taskProjectName(project_id)">
             {{ getProjectDetails(project_id) }}
           </b-badge>
         </b>
-        <div>
+        <!--<div>
           <b style="font-size:13px;">Status: </b>
           <b-badge @click="updateStatusFilter('open')" :variant="isActiveStatusFilter('open') ? 'secondary' : 'light'" class="mr-1" style="cursor:pointer">Open</b-badge>
           <b-badge @click="updateStatusFilter('turned-in')" :variant="isActiveStatusFilter('turned-in') ? 'info' : 'light'" class="mr-1" style="cursor:pointer">Turned-In</b-badge>
@@ -80,14 +103,17 @@
           <b-badge @click="updateStepFilter('test')" :variant="isActiveStepFilter('test') ? 'info' : 'light'" class="mr-1" style="cursor:pointer">Test</b-badge>
           <b-badge @click="updateStepFilter('get client feedback')" :variant="isActiveStepFilter('get client feedback') ? 'primary' : 'light'" class="mr-1" style="cursor:pointer">Get Client Feedback</b-badge>
           <b-badge @click="updateStepFilter('notify client')" :variant="isActiveStepFilter('notify client') ? 'success' : 'light'" class="mr-1" style="cursor:pointer">Notify Client</b-badge>
-        </div>
+        </div>-->
         <div role="tabpanel" class="tab-pane active" id="active">
           <h3 v-if="current_project_id">{{ getCurrentProjectNameById() }}</h3>
-          <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab" @updateData="updateData"> </tasks-tab>
+          <tasks-tab v-bind:tasks="filtered_tasks" v-bind:tab="tab" @updateData="updateData" v-bind:showCheckbox="show_checkbox"> </tasks-tab>
         </div>
       </div>
     </div>
     <div v-if="!isAdmin">
+      <b-form-checkbox v-model="is_owner" name="check-button" switch variant="warning">
+        Owner
+      </b-form-checkbox>
       <tasks-tab v-bind:tasks="my_tasks" @updateData="updateData"> </tasks-tab>
     </div>
   </div>
@@ -104,8 +130,9 @@ export default {
     'tasks-tab': TasksTab
   },
   mounted() {
-    EventBus.$on('update', ({ company_user_id }) => {
-      this.setTab(company_user_id)
+    EventBus.$on('update', async ({ company_user_id, task_id }) => {
+      await this.setTab(company_user_id)
+      document.getElementById(`task_${task_id}`).scrollIntoView()
     })
   },
   computed: {
@@ -117,23 +144,79 @@ export default {
       return this.$store.getters['settings/isAdmin']
     },
     my_tasks() {
-      this.my_high_count = this.$store.state.tasks.my_tasks.filter(({ priority }) => priority == 'high').length
-      return this.$store.state.tasks.my_tasks
+      this.my_high_count = this.$store.state.tasks.my_tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
+      const current_user_id = this.$store.state.settings.current_company_user_id
+      if (this.is_owner) {
+        return this.$store.state.tasks.tasks.filter(({ owner }) => owner == current_user_id)
+      }
+      let my_tasks = this.$store.state.tasks.my_tasks.filter(({ status }) => status !== 'completed')
+      // let my_tasks = this.$store.getters['tasks/getByCompanyUserId'](current_user_id)
+      let self = this
+      var now = new Date().getTime()
+      const distantFuture = new Date(8640000000000000)
+
+      let dueTasks = my_tasks
+        .filter(task => {
+          let dueDate = task['due_date'] ? new Date(task['due_date']) : distantFuture
+          if (dueDate.getTime() && dueDate.getTime() <= now) {
+            return true
+          } else {
+            return false
+          }
+        })
+        .sort((a, b) => {
+          let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
+          let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
+          if (dateA !== dateB) {
+            return dateA.getTime() - dateB.getTime()
+          } else if (a.priority !== b.priority) {
+            return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
+          }
+        })
+      let notDueTasks = my_tasks
+        .filter(task => {
+          let dueDate = task['due_date'] ? new Date(task['due_date']) : distantFuture
+          if (!dueDate.getTime() || dueDate.getTime() > now) {
+            return true
+          } else {
+            return false
+          }
+        })
+        .sort((a, b) => {
+          let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
+          let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
+          if (a.priority !== b.priority) {
+            return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
+          } else {
+            return dateA.getTime() - dateB.getTime()
+          }
+        })
+      my_tasks = [...dueTasks, ...notDueTasks]
+      let tmp_priority = my_tasks.length > 0 ? my_tasks[0].priority : ''
+      my_tasks.forEach((task, i) => {
+        if (task.priority !== tmp_priority) {
+          task['hasMargin'] = true
+          tmp_priority = task.priority
+        } else {
+          task['hasMargin'] = false
+        }
+      })
+      return my_tasks
     },
     all_tasks() {
-      this.all_high_count = this.$store.state.tasks.all_tasks.filter(({ priority }) => priority == 'high').length
+      this.all_high_count = this.$store.state.tasks.all_tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
       return this.$store.state.tasks.all_tasks
     },
     others_tasks() {
-      this.others_high_count = this.$store.state.tasks.others_tasks.filter(({ priority }) => priority == 'high').length
+      this.others_high_count = this.$store.state.tasks.others_tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
       return this.$store.state.tasks.others_tasks
     },
     for_today_tasks() {
-      this.others_high_count = this.$store.state.tasks.today_tasks.filter(({ priority }) => priority == 'high').length
+      this.others_high_count = this.$store.state.tasks.today_tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
       return this.$store.state.tasks.today_tasks
     },
     due_tasks() {
-      this.others_high_count = this.$store.state.tasks.past_due_tasks.filter(({ priority }) => priority == 'high').length
+      this.others_high_count = this.$store.state.tasks.past_due_tasks.filter(({ priority, status }) => priority == 'high' || status !== 'completed').length
       return this.$store.state.tasks.past_due_tasks
     },
     getUserProjects(user_tasks) {},
@@ -144,14 +227,12 @@ export default {
       const current_user_id = this.$store.state.settings.current_company_user_id
 
       if (this.tab === 'all') {
-        tasks = this.$store.state.tasks.all_tasks
-        // console.log("tasks==>", tasks);
-        this.all_count = tasks.length
-        this.all_high_count = tasks.filter(({ priority }) => priority == 'high').length
+        tasks = this.$store.state.tasks.tasks
+        // this.all_count = this.$store.state.tasks.all_tasks.length
+        this.all_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'others') {
         tasks = this.$store.state.tasks.others_tasks
-        this.others_count = tasks.length
-        this.others_high_count = tasks.filter(({ priority }) => priority == 'high').length
+        this.others_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'my_tasks') {
         user_id = self.current_company_user.id
         if (this.is_owner) {
@@ -159,57 +240,85 @@ export default {
         } else {
           tasks = this.$store.state.tasks.my_tasks
         }
-        this.my_high_count = tasks.filter(task => task.priority == 'high').length
+        this.my_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'today_tasks') {
         user_id = self.current_company_user.id
         tasks = this.$store.state.tasks.today_tasks
         this.today_count = tasks.length
-        this.today_high_count = tasks.filter(task => task.priority == 'high').length
+        this.today_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'past_due') {
         user_id = self.current_company_user.id
         tasks = this.$store.state.tasks.past_due_tasks
         this.past_due_count = tasks.length
-        this.past_due_high_count = tasks.filter(task => task.priority == 'high').length
+        this.past_due_high_count = tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
       } else if (this.tab === 'managing') {
       } else if (isFinite(this.tab)) {
         user_id = this.tab
         tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
       }
 
-      tasks = tasks
-        .filter(task => {
-          if ((self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter))) {
+      tasks = tasks.filter(task => {
+        if (!task || (self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter)) || task.status === 'completed') {
+          return false
+        }
+        if (self.project_filter.length > 0 || self.status_filter.length > 0 || self.step_filter.length > 0) {
+          const check_project_filter = self.project_filter.includes(task.project_id)
+          const check_status_filter = self.status_filter.includes(task.status)
+          let check_step_filter = false
+          for (let i = 0; i < task.users.length; i++) {
+            const user = task.users[i]
+            if (user.step === self.step_filter[0]) {
+              check_step_filter = true
+              break
+            }
+          }
+          if (check_project_filter || check_status_filter || check_step_filter) {
+            return true
+          } else {
             return false
           }
-          if (self.project_filter.length > 0 || self.status_filter.length > 0 || self.step_filter.length > 0) {
-            const check_project_filter = self.project_filter.includes(task.project_id)
-            const check_status_filter = self.status_filter.includes(task.status)
-            let check_step_filter = false
-            for (let i = 0; i < task.users.length; i++) {
-              const user = task.users[i]
-              if (user.step === self.step_filter[0]) {
-                check_step_filter = true
-                break
-              }
-            }
-            if (check_project_filter || check_status_filter || check_step_filter) {
-              return true
-            } else {
-              return false
-            }
+        }
+        return true
+      })
+      var now = new Date().getTime()
+      const distantFuture = new Date(8640000000000000)
+      let dueTasks = tasks
+        .filter(task => {
+          let dueDate = task['due_date'] ? new Date(task['due_date']) : distantFuture
+          if (dueDate.getTime() && dueDate.getTime() <= now) {
+            return true
+          } else {
+            return false
           }
-          return true
         })
         .sort((a, b) => {
+          let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
+          let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
+          if (dateA !== dateB) {
+            return dateA.getTime() - dateB.getTime()
+          } else if (a.priority !== b.priority) {
+            return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
+          }
+        })
+      let notDueTasks = tasks
+        .filter(task => {
+          let dueDate = task['due_date'] ? new Date(task['due_date']) : distantFuture
+          if (!dueDate.getTime() || dueDate.getTime() > now) {
+            return true
+          } else {
+            return false
+          }
+        })
+        .sort((a, b) => {
+          let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
+          let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
           if (a.priority !== b.priority) {
             return self.getNumericPriority(b.priority) - self.getNumericPriority(a.priority)
           } else {
-            const distantFuture = new Date(8640000000000000)
-            let dateA = a['due_date'] ? new Date(a['due_date']) : distantFuture
-            let dateB = b['due_date'] ? new Date(b['due_date']) : distantFuture
             return dateA.getTime() - dateB.getTime()
           }
         })
+      tasks = [...dueTasks, ...notDueTasks]
       let tmp_priority = tasks.length > 0 ? tasks[0].priority : ''
       tasks.forEach((task, i) => {
         const { project_id } = task
@@ -223,10 +332,18 @@ export default {
         if (task.priority !== tmp_priority) {
           task['hasMargin'] = true
           tmp_priority = task.priority
+        } else {
+          task['hasMargin'] = false
         }
         const task_user = this.$store.getters['task_users/getByTaskIdAndCompanyUserId']({ task_id: task.id, company_user_id: current_user_id })[0]
         task['isToday'] = task_user && task_user['next_work_day'] && moment(task_user['next_work_day']).format('yyyy-MM-DD') <= moment().format('yyyy-MM-DD')
       })
+
+      if (this.tab === 'all') {
+        this.all_count = tasks.length
+      } else if (this.tab === 'others') {
+        this.others_count = tasks.length
+      }
       return tasks
     },
 
@@ -276,7 +393,9 @@ export default {
       today_high_count: 0,
       past_due_count: 0,
       past_due_high_count: 0,
-      is_owner: false
+      is_owner: false,
+      show_checkbox: false,
+      action_name: ''
     }
   },
   watch: {
@@ -313,6 +432,22 @@ export default {
     }
   },
   methods: {
+    showBulkAction() {
+      this.show_checkbox = !this.show_checkbox
+    },
+    abbrName(name) {
+      if (!name) return ''
+      let matches = name.match(/\b(\w)/g) // ['J','S','O','N']
+      if (matches) {
+        let acronym = matches.join('') // JSON
+        return acronym.toUpperCase()
+      }
+    },
+    getCompanyUserDetails(company_user_id) {
+      const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
+
+      return user_details
+    },
     getClientAcronymColor(project_id) {
       return this.getProjectDetails(project_id, true)
     },
@@ -322,6 +457,8 @@ export default {
       if (is_color && project) {
         client_data = this.$store.getters['clients/getByClientCompanyId'](project.client_company_id)
         return client_data.color
+      } else if (!project) {
+        return is_color ? 'gray' : 'No project'
       }
       return project.acronym ? project.acronym : project.name
     },
@@ -407,12 +544,12 @@ export default {
       this.current_company_user_id = company_user_id
       this.setTab(company_user_id)
     },
-    setTab(tab) {
+    async setTab(tab) {
       this.project_list = []
       this.project_filter = []
       this.tab = tab
       this.current_company_user_id = tab
-      this.getData()
+      const data = await this.getData()
     },
     tabClass(tab) {
       if (this.tab === tab) {
@@ -437,7 +574,12 @@ export default {
       if (this.tab !== 'my_tasks') {
         path += 'tab=' + this.tab + '&'
       }
-      this.$router.push({ path: path })
+      const query = this.$router.history.current.query
+      if (query.task) {
+        path += `task=${query.task}&showChatSection=${query.showChatSection}&`
+      }
+
+      this.$router.push({ path })
       sessionStorage.setItem('tasks', path)
     },
     clearSearch() {
@@ -492,7 +634,7 @@ export default {
       this.new_task_project_id = null
     },
     filter_task_count(company_user_id) {
-      return this.$store.getters['task_users/getByCompanyUserId'](company_user_id).length
+      return this.$store.getters['tasks/getOnlyAssignedTasksByCompanyUserId'](company_user_id).length
     },
     filter_task_high_count(company_user_id) {
       return this.high_count_of_users.filter(({ user_id }) => user_id == company_user_id)
@@ -501,19 +643,72 @@ export default {
       let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
       return client ? client.name : ''
     },
+    async changeBulk(e) {
+      let task_ids = []
+      $('[name="task_checkbox"]:checked').each(function() {
+        task_ids.push(this.id)
+      })
+      if (task_ids.length == 0) {
+        // this.makeToast('danger', 'Please select at least one task')
+        alert('Please select at least one task')
+        this.action_name = ''
+      }
+      for (let i = 0; i < task_ids.length; i++) {
+        const task_id = task_ids[i]
+        let task = this.$store.getters['tasks/getById'](task_id)
+
+        if (this.action_name == 'delete') {
+          await this.$store.dispatch('DELETE', { module: 'tasks', entity: task }, { root: true })
+        } else {
+          switch (this.action_name) {
+            case 'complete':
+              task.status = 'completed'
+              break
+            case 'delete':
+              break
+            case 'high_priority':
+              task.priority = 'high'
+              break
+            case 'regular_priority':
+              task.priority = 'regular'
+              break
+            case 'low_priority':
+              task.priority = 'low'
+
+              break
+            case 'hold_priority':
+              task.priority = 'hold'
+              break
+            case 'remove_due_date':
+              task.due_date = ''
+              break
+            default:
+              break
+          }
+          await this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
+        }
+      }
+      $('[name="task_checkbox"]:checked').prop('checked', false)
+    },
+    makeToast(variant = null, title, content) {
+      this.$bvToast.toast(content, {
+        title: title,
+        variant: variant
+      })
+    },
     async getData() {
       if (this.current_company_user_id) {
         const response = await this.$http().get('/company_users/' + this.current_company_user_id + '/tasks')
-        let count_of_heigh = response.tasks.filter(task => task.priority == 'high').length
+        let count_of_heigh = response.tasks.filter(({ priority, status }) => priority == 'high' && status !== 'completed').length
         if (this.high_count_of_users.filter(({ user_id }) => user_id == this.current_company_user_id).length == 0) {
           this.high_count_of_users.push({
             user_id: this.current_company_user_id,
             count: count_of_heigh
           })
         }
-        this.$store.dispatch('PROCESS_INCOMING_DATA', response)
+        const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', response)
+        // const update_result = await this.$store.dispatch('PROCESS_INCOMING_DATA', { task_users: response.task_users, tasks: response.tasks, all_tasks: response.tasks })
       }
-      return
     },
     async updateData() {
       // const result = await this.getData();
@@ -639,15 +834,15 @@ table {
   /* border-radius: 2px !important; */
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
-  border-top: solid 3px #7e5813;
-  background: #7e5813;
+  border-top: solid 3px rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.4);
   margin-bottom: 0;
   margin-right: 2px;
   cursor: pointer;
   padding: 4px;
 }
 .nav-tabs li:hover {
-  background: #ffa500 !important;
+  background: rgba(0, 0, 0, 0.8) !important;
 }
 
 .nav-tabs li a {
@@ -657,10 +852,10 @@ table {
 }
 
 .nav-tabs li.active {
-  background: #ffa500;
-  border-top: solid 3px #007bff;
-  border-left: solid 2px #bb7c08;
-  border-right: solid 2px #bb7c08;
+  background: rgba(0, 0, 0, 0.1);
+  border-top: solid 3px rgba(0, 0, 0, 0.4);
+  border-left: solid 2px rgba(0, 0, 0, 0.4);
+  border-right: solid 2px rgba(0, 0, 0, 0.4);
   margin-bottom: 1px;
   font-weight: bold;
 }

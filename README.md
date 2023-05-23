@@ -6,6 +6,14 @@
 npm install
 ```
 
+### Set up .env.development file (assuming defaults)
+
+```VUE_APP_API_URL=http://localhost:8000/api
+   VUE_APP_SHOW_DEBUG=on
+   VUE_APP_TITLE=Dev Projectous
+   VUE_APP_WEB_SOCKET_SERVER_URL=http://localhost:3000
+```
+
 ### Compiles and hot-reloads for development
 
 ```

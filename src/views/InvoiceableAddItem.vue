@@ -206,7 +206,6 @@ export default {
             company_user_id: 1, //TODO: figure out what to set here
             recurs: this.invoiceable_item.repeat ? this.invoiceable_item.repeat_option : null
           }
-          console.log(invoiceable_item)
           await this.$store.dispatch('ADD_ONE', { module: 'invoiceable_items', entity: invoiceable_item })
 
           // reset

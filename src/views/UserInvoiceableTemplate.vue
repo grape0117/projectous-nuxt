@@ -316,12 +316,12 @@ export default {
     },
     received_check_id: function() {
       this.getData('received_check_id')
-    },
-    is_admin(newValue, oldValue) {
-      if (newValue) {
-        this.getData()
-      }
     }
+    // is_admin(newValue, oldValue) {
+    //   if (newValue) {
+    //     this.getData()
+    //   }
+    // }
   },
   beforeCreate: function() {
     if (sessionStorage.getItem('user_report')) {
@@ -329,7 +329,7 @@ export default {
     }
   },
   mounted() {
-    console.log('reports mounted', this.$route.query, this.$route, this.chosen_clients, this.total_time, 'test')
+    this.getData()
   },
   methods: {
     timeToDecimal,
@@ -580,30 +580,30 @@ export default {
       this.$router.push({ path: `/user_report?${queryString}` })
       sessionStorage.setItem('user_report', queryString)
 
-      if (this.isAdmin()) {
-        const { invoice_items, timers } = await this.$http().post('/payable-timers', data)
+      // if (this.isAdmin()) {
+      const { invoice_items, timers } = await this.$http().post('/payable-timers', data)
 
-        this.invoice_items = invoice_items
-        this.timers = timers
-        this.total_time = 0
-        this.total_earned = 0
-        this.total_unpaid = 0
-        this.total_unbillable = 0
-        this.total_invoiceable = 0
+      this.invoice_items = invoice_items
+      this.timers = timers
+      this.total_time = 0
+      this.total_earned = 0
+      this.total_unpaid = 0
+      this.total_unbillable = 0
+      this.total_invoiceable = 0
 
-        for (const timer of this.timers) {
-          this.total_time += timer.duration
-          this.total_earned += (timer.duration / 3600) * timer.user_rate
-          if (!timer.is_paid) {
-            this.total_unpaid += (timer.duration / 3600) * timer.user_rate
-          }
-          if (!timer.is_billable) {
-            this.total_unbillable++
-          } else {
-            this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
-          }
+      for (const timer of this.timers) {
+        this.total_time += timer.duration
+        this.total_earned += (timer.duration / 3600) * timer.user_rate
+        if (!timer.is_paid) {
+          this.total_unpaid += (timer.duration / 3600) * timer.user_rate
+        }
+        if (!timer.is_billable) {
+          this.total_unbillable++
+        } else {
+          this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
         }
       }
+      // }
       this.loading_data = false
     }
   }

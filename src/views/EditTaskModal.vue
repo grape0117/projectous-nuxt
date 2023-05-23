@@ -109,7 +109,6 @@ export default {
   computed: {
     task: function() {
       let task = this.$store.state.settings.current_edit_task
-      console.log('modal task', task)
       return task
     },
     users: function() {
@@ -124,7 +123,7 @@ export default {
     },
     clients: function() {
       let clients = this.$store.getters['clients/getActiveCompanyClients']
-      //console.log('clients', clients)
+
       return clients
     },
     current_company: function() {
@@ -136,8 +135,7 @@ export default {
     task_users: function() {
       let self = this
       let task_users = this.$store.state.task_users.task_users.filter(task_user => task_user.task_id === this.task.id)
-      // console.log('task_users', task_users)
-      //console.log(this.$store.state.task_users.task_users.pop())
+
       return task_users
     }
   },
@@ -173,7 +171,6 @@ export default {
       }
     },
     setSetting(key, value) {
-      console.log(value)
       this.task['settings']['task_type'] = value
     },
     deleteTask() {
@@ -228,7 +225,6 @@ export default {
       return client ? client.name : ''
     },
     openprojects: function(client) {
-      //console.log('client', client)
       return this.$store.getters['projects/getOpenCompanyProjects'](client.client_company_id)
     },
     due_date: function() {
@@ -242,7 +238,6 @@ export default {
       this.saveTask()
     },
     saveTask() {
-      console.log('saveTask', this.task)
       this.$store.dispatch('UPSERT', { module: 'tasks', entity: this.task })
       this.$store.commit('settings/setCurrentEditTask', {})
     },

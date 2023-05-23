@@ -134,6 +134,10 @@
                       <span id="actionLink"> </span>
                       <button :style="buttonStyle" class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
                     </div>
+                    Sort&nbsp;by&nbsp;<b-form-select v-model="sort_by">
+                      <b-form-select-option value="date">By Date</b-form-select-option>
+                      <b-form-select-option value="task">By Task</b-form-select-option>
+                    </b-form-select>
                   </div>
                 </td>
               </tr>
@@ -184,7 +188,7 @@
             </tbody>
 
             <tbody>
-              <tr :item="item" v-for="item in invoice_items" :key="item.id" :checkbox_all_checked="checkbox_all_checked" is="invoiceable-item-row"></tr>
+              <tr :item="item" v-for="item in sorted_timers" :key="item.id" :checkbox_all_checked="checkbox_all_checked" is="invoiceable-timer-row"></tr>
               <tr :timer="timer" v-for="(timer, index) in timers" :key="index" :checkbox_all_checked="checkbox_all_checked" :is_user_report="is_user_report" is="report-timer-row"></tr>
             </tbody>
             <tbody>
@@ -211,10 +215,11 @@
 <script>
 import Vue from 'vue'
 import moment from 'moment'
-import InvoiceableTimerRow from './InvoiceableItemRow.vue'
+import InvoiceableTimerRow from './InvoiceableItemRow.vue' //TODO: itemrow vs timerrow?
 import ReportTimerRow from './ReportTimerRow.vue'
 import { timeToDecimal, totalToDecimal } from '@/utils/util-functions'
 import { applyTheme } from '@/utils/util-functions'
+import { EventBus } from '@/components/event-bus'
 
 export default {
   name: 'invoiceable-template',
@@ -233,6 +238,7 @@ export default {
       total_unpaid: 0,
       total_unbillable: 0,
       total_invoiceable: 0,
+      sort_by: 'date',
       anytime: this.$route.query.anytime,
       show_paid: this.$route.query.is_paid == 1,
       current_date: new Date(),
@@ -278,6 +284,21 @@ export default {
     },
     current_company_user: function() {
       return this.$store.state.settings.current_company_user
+    },
+    sorted_timers() {
+      let self = this
+      let timers = self.timers
+      if (self.sort_by !== 'task') {
+        return timers
+      }
+      console.log('sorting 123')
+      if (timers.length)
+        return timers.sort(function(a, b) {
+          console.log(a.task_title, b.task_title)
+          if (a.task_title > b.task_title) return -1
+          if (a.task_title < b.task_title) return 1
+          return 0
+        })
     },
     timer_watch() {
       return this.$store.state.settings.timer_watch
@@ -348,16 +369,13 @@ export default {
   beforeCreate: function() {
     //labeledConsole('beforeCreate', $('#project').val())
     if (sessionStorage.getItem('invoiceable')) {
-      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() }).catch(() => {
-        console.log('catching redundant navigation link')
-      })
+      this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() }).catch(() => {})
     }
   },
   created() {
     this.buttonStyle = this.applyTheme()
   },
   mounted() {
-    console.log('reports mounted', this.$route.query, this.$route, this.chosen_clients, this.total_time, 'test')
     this.getData()
 
     // background
@@ -402,7 +420,6 @@ export default {
       this.isShowInvoiceableItems = false
     },
     generateInvoiceButton(timers, invoice_id) {
-      console.log(this.$store)
       const client = document.getElementById('client').value
       const params = {
         timers,
@@ -420,7 +437,6 @@ export default {
           const create_invoice_button = document.getElementById('createInvoiceButton')
           create_invoice_button.classList.add('btn')
           create_invoice_button.classList.add('btn-primary')
-          console.log('Response', response)
           // this.$store.dispatch('invoices/clearInvoiceableItems', response[0])
         })
     },
@@ -547,7 +563,7 @@ export default {
     //     Vue.set(this.settings, 'search', event.target.value)
     //   },
     //   toggleUsers(event) {
-    //     //console.log('toggle users'+ event.target.checked)
+
     //     Vue.set(this.settings, 'show_inactive_users', event.target.checked)
     //   },
     filteredusers() {
@@ -584,7 +600,6 @@ export default {
       } else {
         //this.chosen_clients.push(e.target.value*1)
       }
-      //console.log(this.chosen_clients)
     },
     async getData(where) {
       this.loading_data = true
@@ -639,9 +654,7 @@ export default {
 
       const queryString = new URLSearchParams(data).toString()
 
-      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {
-        console.log('catching redundant navigation link')
-      })
+      this.$router.push({ path: '/invoiceable?' + queryString }).catch(() => {})
       sessionStorage.setItem('invoiceable', queryString)
 
       // if (this.isAdmin()) {
@@ -667,7 +680,6 @@ export default {
           this.total_invoiceable += (timer.invoice_duration / 3600) * timer.client_rate
         }
       }
-      console.log(this.total_time)
       // }
       this.loading_data = false
       for (const timer of document.querySelectorAll('.timer-action:checked')) {

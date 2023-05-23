@@ -163,7 +163,6 @@ export default class Custom extends Vue {
       sort_order: item.sort_order
     }
     //await this.createTaskUserVuex(taskUser)
-    console.log(task, taskUser)
     //this.$store.dispatch('ADD_ONE', { module: 'tasks', entity: task })
     this.$store
       .dispatch('task_users/createUserTask', {
@@ -180,13 +179,11 @@ export default class Custom extends Vue {
           // @ts-ignore
           elements[0].focus()
         } else {
-          console.log(elements)
         }
       })
   }
 
   public async updateTaskUser({ id, task_id, title, listId, sort_order }: any) {
-    console.log('************* TaskTray updateTaskUser *************')
     if (this.currentListsBlockName !== this.listsBlockNames.TASKS_USERS) return
     const taskUser = cloneDeep(this.getTaskUserById(id)) //TODO: test this.$store.getters...
 
@@ -194,29 +191,23 @@ export default class Custom extends Vue {
     taskUser.user_task_list_id = null
 
     if (listId === 'Past') {
-      console.log('Past')
       //TODO: see note on create function
       const date = new Date()
       taskUser.next_work_day = formatDateToYYYY_MM_DD(new Date(date.setMonth(date.getMonth() - 1)))
 
       //If listId is 'Unmarked' keep everything null
     } else if (listId === 'Unmarked') {
-      console.log('Unmarked')
-
       //If listId is a date, set next_work_day
     } else if (!!Date.parse(listId) && isNaN(listId)) {
-      console.log('Date!')
       taskUser.next_work_day = formatDateToYYYY_MM_DD(listId)
 
       //If listId is a number, this is a user-created list
     } else if (Number.isInteger(Number(listId))) {
-      console.log('Custom list!')
       //Only user-created lists have a listId set on task_user object
       taskUser.user_task_list_id = listId
     }
 
     taskUser.sort_order = sort_order
-    console.log('taskUser', taskUser)
     await this.$store.dispatch('UPDATE', { module: 'task_users', entity: taskUser })
     //TODO: why is updating a title mixed in with moving a task?
     /*const task = cloneDeep(this.$store.getters['tasks/getById'](task_id))
@@ -228,7 +219,6 @@ export default class Custom extends Vue {
   }
 
   public async deleteTaskUser(taskUser: any) {
-    console.log('DELETE NEEDS TO CLEAR TASK')
     await this.$store.dispatch('DELETE', { module: 'task_users', entity: taskUser })
   }
 
@@ -245,19 +235,15 @@ export default class Custom extends Vue {
     const RUNNING = 'running'
 
     const task = this.$store.getters['tasks/getById'](taskId)
-    console.log('task', task)
     let timer = {
       task_id: taskId
     }
     if (task.project_id) {
-      console.log('fetching project')
       const project = this.$store.getters['projects/getById'](task.project_id)
       // @ts-ignore
       timer['project_id'] = project.id
-      console.log(timer)
     }
     let hasActiveTimer = this.$store.state.timers.timers.find((proj: any) => proj.task_id === taskId && proj.status === RUNNING)
-    console.log(hasActiveTimer)
 
     if (hasActiveTimer) {
       this.$store.dispatch('timers/stopTimer', hasActiveTimer)
@@ -291,8 +277,7 @@ export default class Custom extends Vue {
     const id = this.$store.state.settings.current_user_id
     // let user = this.sortedCompanyUsers.find((user: any) => user.user_id === 345)
     let user = this.sortedCompanyUsers.find((u: any) => u.user_id === id)
-    // console.log('[USER]')
-    // console.log(user)
+
     this.selectedCompanyUserId = user.id
   }
 
@@ -323,9 +308,9 @@ export default class Custom extends Vue {
   }
   // mounted() {
   //   let companyUsers = this.sortedCompanyUsers
-  //   console.log('[companyUsers]')
+
   //   // let result = companyUsers.find(async (user: any) => user.user_id === await getCookie('id'))
-  //   console.log(this.sortedCompanyUsers)
+
   // }
 }
 </script>

@@ -18,12 +18,18 @@ const router = new Router({
     {
       path: '/login',
       name: 'Login',
-      component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
+      component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue'),
+      meta: {
+        hideNavbar: true
+      }
     },
     {
       path: '/register',
       name: 'Register',
-      component: () => import(/* webpackChunkName: "login" */ '@/views/Register.vue')
+      component: () => import(/* webpackChunkName: "login" */ '@/views/Register.vue'),
+      meta: {
+        hideNavbar: true
+      }
     },
     {
       path: '/graph',
@@ -33,17 +39,31 @@ const router = new Router({
     {
       path: '/forgot-password',
       name: 'Forgot Password',
-      component: () => import(/* webpackChunkName: "forgot-password" */ '@/views/ForgotPassword.vue')
+      component: () => import(/* webpackChunkName: "forgot-password" */ '@/views/ForgotPassword.vue'),
+      meta: {
+        hideNavbar: true
+      }
+    },
+    {
+      path: '/change-company',
+      name: 'Change Company',
+      component: () => import(/* webpackChunkName: "forgot-password" */ '@/views/ChangeCompany.vue')
     },
     {
       path: '/reset-password/:api_token',
       name: 'Reset Password',
-      component: () => import(/* webpackChunkName: "reset-password" */ '@/views/ResetPassword.vue')
+      component: () => import(/* webpackChunkName: "reset-password" */ '@/views/ResetPassword.vue'),
+      meta: {
+        hideNavbar: true
+      }
     },
     {
       path: '/accept-invite',
       name: 'AcceptInvite',
-      component: () => import(/* webpackChunkName: "accept-invite" */ '@/views/AcceptInvite.vue')
+      component: () => import(/* webpackChunkName: "accept-invite" */ '@/views/AcceptInvite.vue'),
+      meta: {
+        hideNavbar: true
+      }
     },
     {
       path: '/tasks',
@@ -105,6 +125,12 @@ const router = new Router({
       name: 'Invoiceable',
       meta: { adminOnly: true },
       component: () => import(/* webpackChunkName: "Custom" */ '@/views/InvoiceableTemplate.vue')
+    },
+    {
+      path: '/daily-report',
+      name: 'DailyReport',
+      meta: { adminOnly: true },
+      component: () => import(/* webpackChunkName: "Custom" */ '@/views/DailyReportTemplate.vue')
     },
     {
       path: '/payable',

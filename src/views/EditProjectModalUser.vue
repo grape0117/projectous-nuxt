@@ -43,7 +43,6 @@ export default {
   },
   watch: {
     default_user_rate(default_user_rate) {
-      console.log('user rate changed to ', default_user_rate)
       if (default_user_rate !== '') {
         this.$emit('change', { message: this.user.name + ' given default_user_rate of ' + default_user_rate + ' by current user' })
       } else {
@@ -65,7 +64,6 @@ export default {
         this.$emit('change', { message: this.user.name + ' given role of ' + role + ' by current user' })
         this.$store.dispatch('UPSERT', { module: 'project_users', entity: project_user }, { root: true })
       } else {
-        console.log('deleting project user')
         this.$emit('change', { message: this.user.name + ' removed from project by current user' })
         this.$store.dispatch('DELETE', { module: 'project_users', entity: project_user }, { root: true })
       }
@@ -98,7 +96,6 @@ export default {
       }
     },*/
     userRateClass() {
-      console.log('default_user_rate', this.project_user.default_user_rate)
       return this.default_user_rate !== '' ? 'set-rate' : 'inherited-rate'
     },
     buttonVariant(role) {

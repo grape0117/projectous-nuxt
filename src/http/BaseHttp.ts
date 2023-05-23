@@ -4,7 +4,7 @@ import store from '@/store'
 
 export class BaseHttp implements IHttp {
   protected baseUrl: any = process.env.VUE_APP_API_URL
-  protected baseUrl2: any = 'http://testing.projectous.com'
+  protected baseUrl2: any = 'https://testing.projectous.com'
   protected headers: any = {
     InstanceID: store.state.settings.instance_id,
     Authorization: 'Bearer ' + getCookie('auth_token'),
@@ -41,7 +41,6 @@ export class BaseHttp implements IHttp {
   }
   protected notifyUser(message: string) {
     // @stephane later we can add notification for user
-    console.log(message)
   }
   private throwError() {
     throw Error('Method is not implemented')

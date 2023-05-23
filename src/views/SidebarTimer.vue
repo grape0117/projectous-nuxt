@@ -1,5 +1,5 @@
 <template>
-  <li v-if="isCurrentUser()" class="timer-row-template sidebar-timer" :style="{ 'background-color': status_running ? default_theme_color : null }" v-bind:data-restarted="timer.restart_at">
+  <li v-if="isCurrentUser() || isAdmin" class="timer-row-template sidebar-timer" :style="{ 'background-color': status_running ? default_theme_color : null }" v-bind:data-restarted="timer.restart_at">
     <div v-if="client_name() && !project.acronym">
       <p class="title-project-client-name sidebar-timer-client-name">{{ client_name() }}</p>
     </div>
@@ -74,6 +74,9 @@ export default {
     }
   },
   computed: {
+    isAdmin() {
+      return this.$store.getters['settings/isAdmin']
+    },
     status_running() {
       return this.timer.status === 'running'
     },
@@ -163,8 +166,8 @@ export default {
     if (this.timer.notes == '&#8203;') {
       this.timer.notes = ''
     }
-    this.$refs.noteInput.value = this.timer.notes
-    if (this.index === 0 && this.timer.notes === null) {
+    this.$refs.noteInput.value = this.timer.notes || ''
+    if (this.index === 0) {
       this.$refs['noteInput'].focus()
     }
     this.resize()
@@ -272,7 +275,7 @@ export default {
           start_time = Math.round(datetimeToJS(self.timer.created_at).getTime() / 1000)
         }
         self.running_timers[self.timer.id] = window.setInterval(function() {
-          const duration = Math.round(new Date().getTime() / 1000) - start_time + Number(self.timer.duration)
+          const duration = Math.round(new Date().getTime() / 1000) - start_time + Number(self.timer.duration ? self.timer.duration : 0)
           self.totalDuration = duration
         }, 500)
       } else if (self.running_timers[self.timer.id] && self.timer.status != 'running') {
@@ -329,11 +332,9 @@ export default {
       return format_report_at(datetimeToJS(this.timer.report_at))
     },
     editTimer: function() {
-      console.log('editTimer')
       this.applyTheme()
       this.$store.commit('settings/setCurrentEditTimerStatus', 'edit')
       Vue.set(this.$store.state.settings, 'current_edit_timer', this.timer)
-      console.log(this.$store.state.settings.current_edit_timer)
       this.$bvModal.show('timer-modal')
     },
     notesClass: function() {
@@ -342,51 +343,49 @@ export default {
       }
       return ''
     },
+    updateNote() {
+      this.timer.notes = this.$refs['noteInput'].value
+      let notesWithAcronym = this.timer.notes
+      const projectRegex = /^([A-Z-]+):\s*/
+      const acronym_match = notesWithAcronym ? notesWithAcronym.match(projectRegex) : null
+      let notes
+      if (acronym_match && acronym_match[1]) {
+        const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === acronym_match[1])
+        if (projects_by_acronym.length === 1) {
+          this.timer.project_id = projects_by_acronym[0].id
+          notes = notesWithAcronym.replace(acronym_match[0], '')
+        } else {
+          notes = notesWithAcronym
+        }
+      } else {
+        notes = notesWithAcronym
+      }
+      this.timer.notes = notes
+      this.$refs['noteInput'].value = notes
+    },
     restartTimer: function() {
+      this.updateNote()
       this.$store.dispatch('timers/restartTimer', this.timer)
+      this.$refs['noteInput'].focus()
     },
     stopTimer: function() {
+      this.updateNote()
       this.$store.dispatch('timers/stopTimer', this.timer)
     },
     pauseTimer: function() {
+      this.updateNote()
       this.$store.dispatch('timers/pauseTimer', this.timer)
     },
     async saveTimer() {
       await this.$store.dispatch('timers/saveTimer', this.timer)
     },
     saveNotes: async function(event) {
-      this.timer.notes = event.target.value
-      let notesWithAcronym = this.timer.notes
-      console.log('notesWithAcronym', notesWithAcronym)
-      // Check for ABC: //TODO: move somewhere else to common area?
-      const projectRegex = /^([A-Z-]+):\s*/ //TODO: fix the :[:space] not being captured
-      const acronym_match = notesWithAcronym ? notesWithAcronym.match(projectRegex) : null
-      console.log('notesWithAcronym.match(projectRegex)', notesWithAcronym.match(projectRegex))
-      // We have an acronym. Look for a matching project
-      let notes
-      if (acronym_match && acronym_match[1]) {
-        console.log('IF', acronym_match, acronym_match[1])
-        const projects_by_acronym = this.$store.state.projects.projects.filter(project => project.acronym === acronym_match[1])
-        if (projects_by_acronym.length === 1) {
-          //TODO: update history
-          this.timer.project_id = projects_by_acronym[0].id
-          notes = notesWithAcronym.replace(acronym_match[0], '')
-          console.log('IF projects_by_acronym.length === 1', notes)
-        } else {
-          notes = notesWithAcronym
-          console.log('ELSE', notes)
+      setTimeout(() => {
+        if (this.timer.notes != this.$refs['noteInput'].value) {
+          this.updateNote()
+          this.saveTimer()
         }
-      } else {
-        notes = notesWithAcronym
-        console.log('ELSE2', notes)
-      }
-      console.log('NOTES', notes)
-      this.timer.notes = notes
-      event.target.value = notes
-      // event.target.innerHTML = notes //If you just change the project using ABC: it doesn't change the underlying object so the DOM doesn't update
-
-      // await this.$store.dispatch('timers/saveTimer', this.timer)
-      await this.saveTimer()
+      }, 500)
     },
     checkPathTimerId: function() {
       const query = this.$route.query

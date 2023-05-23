@@ -29,7 +29,9 @@ export const settings = {
     notes: '',
     timer_watch: 1,
     logged_in: false,
-    invoices_status: 'open'
+    invoices_status: 'open',
+    unread_messages_num: 0,
+    total_chats_count: 0
   },
   mutations,
   actions,
@@ -69,6 +71,9 @@ export const settings = {
         return a.pivot.sort_order - b.pivot.sort_order
       })
     },
+    getUnreadMessagesNum: (state: any) => {
+      return state.unread_messages_num
+    },
     isCurrentUserOrAdmin: (state: any, getters: any) => (user_id: any) => {
       // TODO: user company_user_id
       if (getters['settings/isAdmin']) {
@@ -92,10 +97,8 @@ export const settings = {
       return state.current_company.id === 1
     },
     isAdmin(state: any, getters: any, rootState: any, rootGetters: any) {
-      console.log('isadmin')
       const current_company_user = rootGetters['company_users/getById'](state.current_company_user_id)
       if (!current_company_user) {
-        console.log('no current company user', state.current_company_user_id)
         return false
       }
       return current_company_user.user_role === 'admin' // TODO: add more roles
