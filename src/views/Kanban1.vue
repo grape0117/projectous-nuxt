@@ -88,7 +88,7 @@
             </div>
           </div>
 
-          <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
+          <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" :project_id="selectedProjectId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
       </b-row>
     </b-container>
@@ -111,6 +111,7 @@ import uuid from 'uuid'
 import { colorThemes } from '@/mixins/colorThemes'
 import { getCookie } from '@/utils/util-functions'
 import { EventBus } from '@/components/event-bus'
+import { deleteDB } from 'idb'
 
 const CompanyClients = namespace('clients')
 const CompanyUsers = namespace('company_users')
@@ -282,19 +283,24 @@ export default class Custom extends Vue {
   }
   get selectedProjectTasksForStatusesColumns() {
     const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
+
+    console.log(projectTasks)
+    // if (false) {
     if (this.$store.state.lists.lists.length > 0) {
       const lists = this.$store.state.lists.lists
       let columns = new Array(lists.length)
       for (let i = 0; i < lists.length; i++) {
         const list = lists[i]
-        let tasks = projectTasks.filter(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => idList === list.id).sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
-        if (i === 0) {
-          let unassigned_tasks = projectTasks.filter(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => idList === null).sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
-          tasks = [...tasks, ...unassigned_tasks]
-        }
+        // let tasks = projectTasks.filter(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => idList === list.id).sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+        let tasks = projectTasks.filter(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => list.tasks.indexOf(id) >= 0).sort(({ id: task_a_id }: any, { id: task_b_id }: any) => list.tasks.indexOf(task_a_id) - list.tasks.indexOf(task_b_id))
+
+        // if (i === 0) {
+        //   let unassigned_tasks = projectTasks.filter(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => idList === null).sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+        //   tasks = [...tasks, ...unassigned_tasks]
+        // }
         columns[i] = {
-          title: list.name,
-          idList: list.id,
+          title: list.title,
+          // idList: list.id,
           tasks: tasks
         }
       }
@@ -340,6 +346,8 @@ export default class Custom extends Vue {
   }
 
   get taskPerStatusLists() {
+    return []
+
     if (this.$store.state.lists.lists.length > 0) {
       return this.$store.state.lists.lists
     }
@@ -361,7 +369,7 @@ export default class Custom extends Vue {
   @TaskUsers.Action('updateSortOrders')
   private updateTaskUsersSortOrdersVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
-  @Tasks.Action('createProjectTask') private createProjectTaskVuex!: any
+  @Tasks.Action('createProjectTaskWithTaskList') private createProjectTaskVuex!: any
   @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('updateSortOrders') private updateTaskSortOrdersVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
@@ -442,18 +450,22 @@ export default class Custom extends Vue {
     return project ? project.name : ''
   }
 
-  public async createTask({ title, idList, assignedMembers }: any) {
+  public async createTask(task: any) {
     console.log('CREATE TASK CUSTOM')
 
     this.createProjectTaskVuex({
-      title: title,
-      project_id: this.selectedProjectId,
-      // sort_order: item.sort_order,
-      // status: item.status,
-      status: 'open',
-      temp: false,
-      idList: idList,
-      assignedMembers: assignedMembers
+      task: {
+        // title: title,
+        ...task.task,
+        project_id: this.selectedProjectId,
+        // sort_order: item.sort_order,
+        // status: item.status,
+        status: 'open',
+        temp: false
+        // idList: idList,
+        // assignedMembers: assignedMembers
+      },
+      task_list: task.task_list
     })
   }
 

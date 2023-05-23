@@ -15,7 +15,8 @@
             <draggable :animation="200" ghost-class="ghost-card" group="tasks" class="task-card-container px-2" @start="isDragging = true" @end="isDragging = false" v-model="columns[index].tasks">
               <task-card @showEditModal="showEditMoal(task, index, task_index)" v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @completeAddTask="completeAddTask" @editTask="editTask($event, index, task_index)" @creatingTask="creatingTask($event, index)" :idList="column.idList"></task-card>
             </draggable>
-            <div class="field" v-show="newColumnIndex !== index">
+            <div class="field">
+              <!-- <div class="field" v-show="newColumnIndex !== index"> -->
               <button class="add-task" @click="addTask(index)"><i class="icon-add" />Add a Task</button>
             </div>
           </div>
@@ -157,7 +158,7 @@ export default {
     draggable,
     Badge
   },
-  props: ['data'],
+  props: ['data', 'project_id'],
   data() {
     return {
       columns: [
@@ -361,6 +362,17 @@ export default {
       this.$nextTick(() => {
         this.delayedDragging = false
         console.log(this.columns)
+        let task_list = []
+        this.columns.forEach(column => {
+          if (column.type !== 'new_list') {
+            const tasks = column.tasks.map(task => task.id)
+            task_list.push({
+              title: column.title,
+              tasks: tasks
+            })
+          }
+        })
+        this.$store.dispatch('projects/updateList', { project_id: this.project_id, task_list: task_list })
       })
     },
     isListDragging(newValue) {
@@ -372,6 +384,17 @@ export default {
         this.delayedListDragging = false
         console.log('list dragging')
         console.log(this.columns)
+        let task_list = []
+        this.columns.forEach(column => {
+          if (column.type !== 'new_list') {
+            const tasks = column.tasks.map(task => task.id)
+            task_list.push({
+              title: column.title,
+              tasks: tasks
+            })
+          }
+        })
+        this.$store.dispatch('projects/updateList', { project_id: this.project_id, task_list: task_list })
       })
     },
     showMembers(newValue) {
@@ -388,12 +411,18 @@ export default {
     data(newValue) {
       // console.log("data", newValue)
       this.columns = cloneDeep(newValue)
+      this.columns.push({
+        title: 'New list',
+        type: 'new_list',
+        tasks: []
+      })
     }
   },
   methods: {
     hideModalHandle() {
       let task = this.editTaskData
-      this.$store.dispatch('tasks/updateTask', this.editTaskData)
+      // this.$store.dispatch('tasks/updateTask', this.editTaskData)
+      this.$store.dispatch('UPDATE', { module: 'tasks', entity: task })
     },
     hidePopOver(event) {
       const add_member_pop_over = document.getElementById('add-member-pop-over')
@@ -547,10 +576,14 @@ export default {
         this.new_task_title = task_title
       }
     },
-    updateTask() {
+    async updateTask() {
       this.columns[this.edit_list_index].tasks[this.edit_task_index].title = this.new_task_title
+      const task_id = this.columns[this.edit_list_index].tasks[this.edit_task_index].id
       this.edit_task = false
       this.showMembers = false
+      let task = this.$store.getters['tasks/getById'](task_id)
+      task.title = this.new_task_title
+      await this.$store.dispatch('UPDATE', { module: 'tasks', entity: task }, { root: true })
     },
     showMembersPopOver() {
       this.members = this.$store.getters['company_users/getActive']
@@ -579,9 +612,21 @@ export default {
       })
       this.newColumnIndex = null
 
+      let task_list = []
+      this.columns.forEach(column => {
+        if (column.type !== 'new_list') {
+          const tasks = column.tasks.map(task_item => task_item.id)
+          task_list.push({
+            title: column.title,
+            tasks: tasks
+          })
+        }
+      })
+
+      console.log('task_list', task_list)
       if (task) {
         console.log(task)
-        this.$emit('createItem', task)
+        this.$emit('createItem', { task, task_list })
       }
     },
     assignUser(member) {

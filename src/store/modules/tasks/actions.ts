@@ -78,6 +78,60 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
     return newTask
   },
+  async createTaskWithTaskList({ commit, getters }: any, { id, title, project_id, sort_order, status, temp, users = [], owner, priority = 'active', due_date, task_list = [] }: any) {
+    const task = {
+      ...createDefaultTask(),
+      id,
+      title,
+      project_id,
+      sort_order,
+      status,
+      users,
+      owner,
+      priority,
+      due_date
+    }
+    // @ts-ignore
+    await this._vm.$http().post('/projects/task_list/' + project_id, { task_list: task_list })
+    let newTask
+    if (temp) {
+      newTask = {
+        ...task,
+        //id: generateUUID(),
+        temp: true
+      }
+    } else {
+      //TODO: should we do this? task.id = uuid.v4();
+      // @ts-ignore
+      newTask = (await this._vm.$http().post('/tasks', { task }))[0]
+      // commit('removeTempTasks')
+    }
+    commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
+    return newTask
+  },
+  async createProjectTaskWithTaskList({ commit, getters }: any, { task, task_list }: any) {
+    const new_task = {
+      ...createDefaultTask(),
+      id: task.id,
+      title: task.title,
+      project_id: task.project_id,
+      sort_order: task.sort_order,
+      status: task.status,
+      idList: task.idList,
+      users: task.assignedMembers
+    }
+    // @ts-ignore
+    await this._vm.$http().post('/projects/task_list/' + task.project_id, { task_list: task_list })
+    this.commit('UPDATE', { module: 'lists', entity: task_list }, { root: true })
+
+    let newTask
+
+    // @ts-ignore
+    newTask = (await this._vm.$http().post('/tasks', { task: new_task })).task
+    commit('ADD_ONE', { module: 'tasks', entity: new_task }, { root: true })
+
+    return newTask
+  },
   async createProjectTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, idList, assignedMembers }: any) {
     const task = {
       ...createDefaultTask(),

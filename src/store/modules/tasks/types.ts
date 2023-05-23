@@ -59,6 +59,6 @@ export interface ITask {
   last_task_message_created_at?: string | null
   idList?: string | null
   labels?: string[]
-  assignedMembers: []
+  assignedMembers?: []
   total_time_spent?: number | null
 }

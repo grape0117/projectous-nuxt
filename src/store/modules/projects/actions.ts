@@ -28,6 +28,13 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // const response = await this._vm
     //   .$http()
     //   .post('/project-user/', { project_id: id })
+  },
+  async updateList({ commit, state }, { project_id, task_list }) {
+    // @ts-ignore
+    await this._vm.$http().post('/projects/task_list/' + project_id, { task_list: task_list })
+    this.commit('UPDATE', { module: 'lists', entity: task_list }, { root: true })
+    // TODO @stephane send task to server
+    // commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
   }
   /*saveProject({ commit, state, rootState }: any, { project, project_users }: any) {
     // @ts-ignore

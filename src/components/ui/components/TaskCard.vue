@@ -40,6 +40,7 @@
 import Badge from './Badge.vue'
 import { abbrName } from '@/utils/util-functions'
 import moment from 'moment'
+import uuid from 'uuid'
 export default {
   components: {
     Badge
@@ -135,6 +136,7 @@ export default {
       this.task['title'] = this.new_task_title
       this.task['idList'] = this.idList
       this.task['type'] = ''
+      this.task['id'] = uuid.v4()
       this.$emit('completeAddTask', this.task)
     },
     addTaskWithEnter() {
@@ -187,6 +189,7 @@ export default {
       this.task['title'] = this.new_task_title
       this.task['type'] = ''
       this.task['idList'] = this.idList
+      this.task['id'] = uuid.v4()
       this.$emit('completeAddTask', this.task)
       this.$emit('addTask', '')
     },
@@ -195,6 +198,9 @@ export default {
     },
     changeTitle: _.debounce(function(e) {
       this.task['title'] = this.new_task_title
+      if (!this.$refs.new_task) {
+        return
+      }
       const left = this.$refs.new_task.getBoundingClientRect().left
       const top = this.$refs.new_task.getBoundingClientRect().top
       this.$emit('creatingTask', { new_task_title: this.new_task_title, left: left, top: top })
