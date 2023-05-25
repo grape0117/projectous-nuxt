@@ -8,14 +8,19 @@
         <p style="font-size: 14px;">{{ task.title }}</p>
       </div>
       <div class="d-flex mt-4 justify-content-between items-center">
-        <span style="font-size: 14px; color: gray;" v-show="task.due"><i class="icon-date_range"></i>{{ dueDate(task.due) }}</span>
+        <span style="font-size: 14px; color: gray;" v-show="task.due_date"><i class="icon-date_range"></i>{{ dueDate(task.due_date) }}</span>
       </div>
-      <div class="assigned-members d-flex" v-if="task.assignedMembers">
-        <span v-for="member_id in task.assignedMembers">
+      <div class="assigned-members d-flex" v-if="task_users">
+        <span v-for="user in task_users">
+          <span :title="`${getCompanyUserDetails(user.company_user_id).name}`" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
+            {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
+          </span>
+        </span>
+        <!-- <span v-for="member_id in task.assignedMembers">
           <span :title="`${getCompanyUserDetails(member_id).name}`" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(member_id).color, cursor: 'pointer', display: 'inline-flex' }">
             {{ abbrName(getCompanyUserDetails(member_id).name) }}
           </span>
-        </span>
+        </span> -->
       </div>
       <a href="#none">
         <i class="icon-edit" @click="editTask"></i>
@@ -50,7 +55,12 @@ export default {
       new_task_title: ''
     }
   },
-  props: ['task', 'idList'],
+  props: ['task', 'idList', 'columnIndex'],
+  computed: {
+    task_users: function() {
+      return this.$store.getters['task_users/getByTaskId'](this.task.id)
+    }
+  },
   mounted() {
     this.task.assignedMembers = this.$store.getters['task_users/getByTaskId'](this.task.id).map(user => user.company_user_id)
   },
@@ -191,7 +201,10 @@ export default {
       this.task['idList'] = this.idList
       this.task['id'] = uuid.v4()
       this.$emit('completeAddTask', this.task)
-      this.$emit('addTask', '')
+      var columnIndex = this.columnIndex
+      this.$nextTick(() => {
+        document.getElementById(`add-task-btn-${columnIndex}`).click()
+      })
     },
     completeAddTask() {
       this.$emit('completeAddTask', '')
@@ -210,7 +223,8 @@ export default {
       const top = this.$refs.card_element.getBoundingClientRect().top
       const height = this.$refs.card_element.getBoundingClientRect().height
       const width = this.$refs.card_element.getBoundingClientRect().width
-      this.$emit('editTask', { top, left, height, width, task: this.task })
+      const bottom = window.innerHeight - this.$refs.card_element.getBoundingClientRect().bottom
+      this.$emit('editTask', { top, left, height, width, task: this.task, bottom })
     },
     abbrName,
     getCompanyUserDetails(company_user_id) {

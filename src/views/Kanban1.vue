@@ -291,13 +291,9 @@ export default class Custom extends Vue {
       let columns = new Array(lists.length)
       for (let i = 0; i < lists.length; i++) {
         const list = lists[i]
-        // let tasks = projectTasks.filter(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => idList === list.id).sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
-        let tasks = projectTasks.filter(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => list.tasks.indexOf(id) >= 0).sort(({ id: task_a_id }: any, { id: task_b_id }: any) => list.tasks.indexOf(task_a_id) - list.tasks.indexOf(task_b_id))
+        let tasks = projectTasks.filter((task: ITask) => list.tasks.indexOf(task.id) >= 0)
+        tasks = [...tasks].sort(({ id: task_a_id }: any, { id: task_b_id }: any) => (list.tasks.indexOf(task_a_id) > list.tasks.indexOf(task_b_id) ? 1 : -1))
 
-        // if (i === 0) {
-        //   let unassigned_tasks = projectTasks.filter(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => idList === null).sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
-        //   tasks = [...tasks, ...unassigned_tasks]
-        // }
         columns[i] = {
           title: list.title,
           // idList: list.id,

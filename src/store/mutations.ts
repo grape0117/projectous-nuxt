@@ -35,6 +35,14 @@ export const mutations: MutationTree<IRootState> = {
               }
             }
           } else {
+            if (module == 'task_users') {
+              // @ts-ignore
+              const task_user_index = state[module][module].findIndex(({ task_id, role, company_user_id }) => entity.task_id == task_id && entity.role == role && entity.company_user_id == company_user_id)
+              if (task_user_index >= 0) {
+                state[module][module][task_user_index] = { ...entity }
+                return
+              }
+            }
             state[module][module].push(entity)
           }
 

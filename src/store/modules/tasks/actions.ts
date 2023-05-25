@@ -120,17 +120,25 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       idList: task.idList,
       users: task.assignedMembers
     }
+    // // create a new task user here
+    // const task_user = {}
+    // commit('ADD_ONE', { module: 'task_users', entity: task_user }, { root: true })
+    // @ts-ignore
+    let task_users = task.assignedMembers.map(assignedMember => {
+      return { task_id: task.id, company_user_id: assignedMember, role: 'assigned' }
+    })
+    console.log('task_users', task_users)
+
+    commit('ADD_MANY', { module: 'task_users', entities: task_users }, { root: true })
+    commit('ADD_ONE', { module: 'tasks', entity: new_task }, { root: true })
+    this.commit('UPDATE', { module: 'lists', entity: task_list }, { root: true })
     // @ts-ignore
     await this._vm.$http().post('/projects/task_list/' + task.project_id, { task_list: task_list })
-    this.commit('UPDATE', { module: 'lists', entity: task_list }, { root: true })
-
     let newTask
-
     // @ts-ignore
-    newTask = (await this._vm.$http().post('/tasks', { task: new_task })).task
-    commit('ADD_ONE', { module: 'tasks', entity: new_task }, { root: true })
+    const result = await this._vm.$http().post('/tasks', { task: new_task })
 
-    return newTask
+    return result
   },
   async createProjectTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, idList, assignedMembers }: any) {
     const task = {

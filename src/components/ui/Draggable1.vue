@@ -13,11 +13,11 @@
             </div>
 
             <draggable :animation="200" ghost-class="ghost-card" group="tasks" class="task-card-container px-2" @start="isDragging = true" @end="isDragging = false" v-model="columns[index].tasks">
-              <task-card @showEditModal="showEditMoal(task, index, task_index)" v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @completeAddTask="completeAddTask" @editTask="editTask($event, index, task_index)" @creatingTask="creatingTask($event, index)" :idList="column.idList"></task-card>
+              <task-card :columnIndex="index" @showEditModal="showEditMoal(task, index, task_index)" v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @completeAddTask="completeAddTask" @editTask="editTask($event, task, index, task_index)" @creatingTask="creatingTask($event, index)" :idList="column.idList"></task-card>
             </draggable>
-            <div class="field">
-              <!-- <div class="field" v-show="newColumnIndex !== index"> -->
-              <button class="add-task" @click="addTask(index)"><i class="icon-add" />Add a Task</button>
+            <!-- <div class="field"> -->
+            <div class="field" v-show="newColumnIndex !== index">
+              <button class="add-task" @click="addTask(index)" :id="`add-task-btn-${index}`"><i class="icon-add" />Add a Task</button>
             </div>
           </div>
           <div v-else>
@@ -28,8 +28,8 @@
     </div>
 
     <!-- edit -->
-    <div class="quick-card-editor" v-show="edit_task" @click="hideEditCard">
-      <span class="icon-lg icon-close quick-card-editor-close-icon js-close-editor" @click="edit_task = false"></span>
+    <div class="quick-card-editor" v-show="quick_edit_task" @click="hideEditCard">
+      <span class="icon-lg icon-close quick-card-editor-close-icon js-close-editor" @click="quick_edit_task = false"></span>
       <div class="quick-card-editor-card" :style="{ top: cadInfo.top + 'px', left: cadInfo.left + 'px', height: cadInfo.height + 'px', width: cadInfo.width + 'px' }">
         <div class="list-card list-card-quick-edit js-stop">
           <div class="list-card-details js-card-details">
@@ -40,9 +40,9 @@
         </div>
         <b-button variant="primary" @click="updateTask">Save</b-button>
         <div class="quick-card-editor-buttons fade-in" :style="{ top: card_editor_button_top + 'px' }">
-          <a class="quick-card-editor-buttons-item" href="#"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open card</span></a>
-          <a class="quick-card-editor-buttons-item js-edit-labels" href="#" @click="showAddLabels"><span class="icon-sm icon-label light"></span><span class="quick-card-editor-buttons-item-text">Edit labels</span></a>
-          <a class="quick-card-editor-buttons-item js-edit-members" href="#"><span class="icon-sm icon-member light"></span><span class="quick-card-editor-buttons-item-text">Change members</span></a>
+          <a class="quick-card-editor-buttons-item" href="#" @click="showEditMoal(editTaskData, edit_list_index, edit_task_index)"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open card</span></a>
+          <a class="js-edit-labels quick-card-editor-buttons-item " href="#" @click="showAddLabels"><span class="edit-labels icon-sm icon-label light "></span><span class="edit-labels quick-card-editor-buttons-item-text ">Edit labels</span></a>
+          <a class="quick-card-editor-buttons-item js-edit-members" href="#" @click="showMembersPopOver"><span class="icon-sm icon-member light"></span><span class="quick-card-editor-buttons-item-text">Change members</span></a>
           <a class="quick-card-editor-buttons-item js-edit-cover" href="#"><span class="icon-sm icon-card-cover light"></span><span class="quick-card-editor-buttons-item-text">Change cover</span></a>
           <a class="quick-card-editor-buttons-item js-move-card" href="#"><span class="icon-sm icon-move light"></span><span class="quick-card-editor-buttons-item-text">Move</span></a>
           <a class="quick-card-editor-buttons-item js-copy-card" href="#"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Copy</span></a>
@@ -118,7 +118,7 @@
           </b-form-group>
           <b-form-group class="mb-5" label="Members:" label-for="select-user">
             <div class="assigned-members d-flex" ref="add_member">
-              <span v-for="member_id in editTaskData.assignedMembers">
+              <span v-for="member_id in assignedMembers">
                 <span :title="`${getCompanyUserDetails(member_id).name}`" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(member_id).color, cursor: 'pointer', display: 'inline-flex' }">
                   {{ abbrName(getCompanyUserDetails(member_id).name) }}
                 </span>
@@ -129,10 +129,10 @@
             </div>
           </b-form-group>
           <b-form-group class="mb-5" label="Due due:" label-for="task-due-date">
-            <b-form-datepicker id="task-due-date" v-model="editTaskData.due" class="mb-2"></b-form-datepicker>
+            <b-form-datepicker id="task-due-date" v-model="editTaskData.due_date" class="mb-2"></b-form-datepicker>
           </b-form-group>
           <b-form-group class="mb-5" label="Description:" label-for="task-description">
-            <b-form-textarea id="task-description" v-model="editTaskData.description" placeholder="Enter something..." rows="3" max-rows="6"></b-form-textarea>
+            <b-form-textarea id="task-description" v-model="editTaskData.note" placeholder="Enter something..." rows="3" max-rows="6"></b-form-textarea>
           </b-form-group>
         </div>
       </div>
@@ -150,6 +150,7 @@ import TaskCard from './components/TaskCard.vue'
 import TaskActionRow from '../../views/TaskActionRow.vue'
 import { abbrName } from '@/utils/util-functions'
 import _ from 'lodash'
+import uuid from 'uuid'
 export default {
   extends: TaskActionRow,
   name: 'Draggable1',
@@ -161,166 +162,167 @@ export default {
   props: ['data', 'project_id'],
   data() {
     return {
-      columns: [
-        {
-          title: 'Backlog',
-          tasks: [
-            {
-              id: 1,
-              title: 'Add discount code to checkout page',
-              description: 'Here is a description',
-              due: 'Sep 14',
-              type: 'Feature Request',
-              assignedMembers: [],
-              labels: ['Urgent', 'Top Priority', 'Medimun Priority']
-            },
-            {
-              id: 2,
-              title: 'Provide documentation on integrations',
-              description: 'Here is a description',
-              due: 'Sep 12',
-              assignedMembers: [],
-              labels: ['Top Priority']
-            },
-            {
-              id: 3,
-              title: 'Design shopping cart dropdown',
-              description: 'Here is a description',
-              due: 'Sep 9',
-              type: 'Design',
-              labels: ['Medimun Priority'],
-              assignedMembers: []
-            },
-            {
-              id: 4,
-              title: 'Add discount code to checkout page',
-              description: 'Here is a description',
-              due: 'Sep 14',
-              type: 'Feature Request',
-              assignedMembers: [],
-              labels: ['Low Priority']
-            },
-            {
-              id: 5,
-              title: 'Test checkout flow',
-              description: 'Here is a description',
-              due: 'Sep 15',
-              type: 'QA',
-              assignedMembers: [],
-              labels: ['Very Low Priority']
-            }
-          ]
-        },
-        {
-          title: 'In Progress',
-          tasks: [
-            {
-              id: 6,
-              title: 'Design shopping cart dropdown',
-              description: 'Here is a description',
-              due: 'Sep 9',
-              type: 'Design',
-              assignedMembers: []
-            },
-            {
-              id: 7,
-              title: 'Add discount code to checkout page',
-              description: 'Here is a description',
-              due: 'Sep 14',
-              type: 'Feature Request',
-              assignedMembers: []
-            },
-            {
-              id: 8,
-              title: 'Provide documentation on integrations',
-              description: 'Here is a description',
-              due: 'Sep 12',
-              type: 'Backend',
-              assignedMembers: []
-            }
-          ]
-        },
-        {
-          title: 'Review',
-          tasks: [
-            {
-              id: 9,
-              title: 'Provide documentation on integrations',
-              description: 'Here is a description',
-              due: 'Sep 12',
-              assignedMembers: []
-            },
-            {
-              id: 10,
-              title: 'Design shopping cart dropdown',
-              description: 'Here is a description',
-              due: 'Sep 9',
-              type: 'Design',
-              assignedMembers: []
-            },
-            {
-              id: 11,
-              title: 'Add discount code to checkout page',
-              description: 'Here is a description',
-              due: 'Sep 14',
-              type: 'Feature Request',
-              assignedMembers: []
-            },
-            {
-              id: 12,
-              title: 'Design shopping cart dropdown',
-              description: 'Here is a description',
-              due: 'Sep 9',
-              type: 'Design'
-            },
-            {
-              id: 13,
-              title: 'Add discount code to checkout page',
-              description: 'Here is a description',
-              due: 'Sep 14',
-              type: 'Feature Request'
-            }
-          ]
-        },
-        {
-          title: 'Done',
-          tasks: [
-            {
-              id: 14,
-              title: 'Add discount code to checkout page',
-              description: 'Here is a description',
-              due: 'Sep 14',
-              type: 'Feature Request'
-            },
-            {
-              id: 15,
-              title: 'Design shopping cart dropdown',
-              description: 'Here is a description',
-              due: 'Sep 9',
-              type: 'Design'
-            },
-            {
-              id: 16,
-              title: 'Add discount code to checkout page',
-              description: 'Here is a description',
-              due: 'Sep 14',
-              type: 'Feature Request'
-            }
-          ]
-        },
-        {
-          title: 'New list',
-          type: 'new_list',
-          tasks: []
-        }
-      ],
+      columns: [],
+      // columns: [
+      //   {
+      //     title: 'Backlog',
+      //     tasks: [
+      //       {
+      //         id: 1,
+      //         title: 'Add discount code to checkout page',
+      //         description: 'Here is a description',
+      //         due: 'Sep 14',
+      //         type: 'Feature Request',
+      //         assignedMembers: [],
+      //         labels: ['Urgent', 'Top Priority', 'Medimun Priority']
+      //       },
+      //       {
+      //         id: 2,
+      //         title: 'Provide documentation on integrations',
+      //         description: 'Here is a description',
+      //         due: 'Sep 12',
+      //         assignedMembers: [],
+      //         labels: ['Top Priority']
+      //       },
+      //       {
+      //         id: 3,
+      //         title: 'Design shopping cart dropdown',
+      //         description: 'Here is a description',
+      //         due: 'Sep 9',
+      //         type: 'Design',
+      //         labels: ['Medimun Priority'],
+      //         assignedMembers: []
+      //       },
+      //       {
+      //         id: 4,
+      //         title: 'Add discount code to checkout page',
+      //         description: 'Here is a description',
+      //         due: 'Sep 14',
+      //         type: 'Feature Request',
+      //         assignedMembers: [],
+      //         labels: ['Low Priority']
+      //       },
+      //       {
+      //         id: 5,
+      //         title: 'Test checkout flow',
+      //         description: 'Here is a description',
+      //         due: 'Sep 15',
+      //         type: 'QA',
+      //         assignedMembers: [],
+      //         labels: ['Very Low Priority']
+      //       }
+      //     ]
+      //   },
+      //   {
+      //     title: 'In Progress',
+      //     tasks: [
+      //       {
+      //         id: 6,
+      //         title: 'Design shopping cart dropdown',
+      //         description: 'Here is a description',
+      //         due: 'Sep 9',
+      //         type: 'Design',
+      //         assignedMembers: []
+      //       },
+      //       {
+      //         id: 7,
+      //         title: 'Add discount code to checkout page',
+      //         description: 'Here is a description',
+      //         due: 'Sep 14',
+      //         type: 'Feature Request',
+      //         assignedMembers: []
+      //       },
+      //       {
+      //         id: 8,
+      //         title: 'Provide documentation on integrations',
+      //         description: 'Here is a description',
+      //         due: 'Sep 12',
+      //         type: 'Backend',
+      //         assignedMembers: []
+      //       }
+      //     ]
+      //   },
+      //   {
+      //     title: 'Review',
+      //     tasks: [
+      //       {
+      //         id: 9,
+      //         title: 'Provide documentation on integrations',
+      //         description: 'Here is a description',
+      //         due: 'Sep 12',
+      //         assignedMembers: []
+      //       },
+      //       {
+      //         id: 10,
+      //         title: 'Design shopping cart dropdown',
+      //         description: 'Here is a description',
+      //         due: 'Sep 9',
+      //         type: 'Design',
+      //         assignedMembers: []
+      //       },
+      //       {
+      //         id: 11,
+      //         title: 'Add discount code to checkout page',
+      //         description: 'Here is a description',
+      //         due: 'Sep 14',
+      //         type: 'Feature Request',
+      //         assignedMembers: []
+      //       },
+      //       {
+      //         id: 12,
+      //         title: 'Design shopping cart dropdown',
+      //         description: 'Here is a description',
+      //         due: 'Sep 9',
+      //         type: 'Design'
+      //       },
+      //       {
+      //         id: 13,
+      //         title: 'Add discount code to checkout page',
+      //         description: 'Here is a description',
+      //         due: 'Sep 14',
+      //         type: 'Feature Request'
+      //       }
+      //     ]
+      //   },
+      //   {
+      //     title: 'Done',
+      //     tasks: [
+      //       {
+      //         id: 14,
+      //         title: 'Add discount code to checkout page',
+      //         description: 'Here is a description',
+      //         due: 'Sep 14',
+      //         type: 'Feature Request'
+      //       },
+      //       {
+      //         id: 15,
+      //         title: 'Design shopping cart dropdown',
+      //         description: 'Here is a description',
+      //         due: 'Sep 9',
+      //         type: 'Design'
+      //       },
+      //       {
+      //         id: 16,
+      //         title: 'Add discount code to checkout page',
+      //         description: 'Here is a description',
+      //         due: 'Sep 14',
+      //         type: 'Feature Request'
+      //       }
+      //     ]
+      //   },
+      //   {
+      //     title: 'New list',
+      //     type: 'new_list',
+      //     tasks: []
+      //   }
+      // ],
       isDragging: false,
       isListDragging: false,
       delayedDragging: false,
       delayedListDragging: false,
       editField: 'empty',
       newColumnIndex: null,
-      edit_task: false,
+      quick_edit_task: false,
       cadInfo: {
         left: 0,
         top: 0
@@ -341,11 +343,12 @@ export default {
       show_add_labels: false,
       editTaskData: null,
       labels: ['Design', 'Feature Request', 'Backend', 'QA', 'default', 'Urgent', 'Top Priority', 'Medimun Priority', 'Low Priority', 'Very Low Priority', 'On Staging', 'Done', 'ToDo', 'Working', 'Hold', 'Testing'],
-      isEdit: true
+      isEdit: true,
+      task_users: []
     }
   },
   mounted() {
-    this.editTaskData = this.columns[0].tasks[0]
+    this.editTaskData = this.columns[0] ? this.columns[0].tasks[0] : null
 
     this.$root.$on('bv::modal::hidden', e => {
       if (e.componentId === 'task-card-edit') {
@@ -421,13 +424,22 @@ export default {
   methods: {
     hideModalHandle() {
       let task = this.editTaskData
-      // this.$store.dispatch('tasks/updateTask', this.editTaskData)
       this.$store.dispatch('UPDATE', { module: 'tasks', entity: task })
+      this.editTaskData = null
+      this.showMembers = false
+      this.show_add_labels = false
     },
     hidePopOver(event) {
       const add_member_pop_over = document.getElementById('add-member-pop-over')
       const add_label_pop_over = document.getElementById('add-label-pop-over')
-      if ((add_member_pop_over && add_member_pop_over.contains(event.target)) || event.target.className == 'icon-add' || (add_label_pop_over && add_label_pop_over.contains(event.target))) {
+      if (
+        (add_member_pop_over && add_member_pop_over.contains(event.target)) ||
+        event.target.className == 'icon-add' ||
+        (add_label_pop_over && add_label_pop_over.contains(event.target)) ||
+        $(event.target)
+          .parent()
+          .hasClass('quick-card-editor-buttons-item')
+      ) {
         return
       }
       this.showMembers = false
@@ -435,6 +447,7 @@ export default {
     },
     showAddLabels() {
       this.show_add_labels = true
+      this.showMembers = false
       this.select_position_left = this.$refs.add_label ? this.$refs.add_label.getBoundingClientRect().left : this.cadInfo.left
       this.select_position_top = this.$refs.add_label ? this.$refs.add_label.getBoundingClientRect().top : this.cadInfo.top
     },
@@ -460,15 +473,21 @@ export default {
       return mappings[label] || mappings.default
     },
     showEditMoal(task, list_index, task_index) {
+      this.quick_edit_task = false
       this.show_edit_modal = true
       this.edit_list_index = list_index
       this.edit_task_index = task_index
       this.editTaskData = task
+      this.task_users = this.$store.getters['task_users/getByTaskId'](task.id)
+      this.assignedMembers = this.task_users.map(({ company_user_id }) => company_user_id)
       this.editTaskData['list'] = this.columns[list_index].title
     },
     hideEditCard($event) {
       if ($event.target.classList.contains('quick-card-editor')) {
-        this.edit_task = false
+        this.quick_edit_task = false
+        let task = this.editTaskData
+        this.$store.dispatch('UPDATE', { module: 'tasks', entity: task })
+        this.editTaskData = null
       }
     },
     addLabel(label) {
@@ -566,6 +585,7 @@ export default {
           this.members = new_company_users
           this.is_edit = false
           this.showMembers = true
+          this.show_add_labels = false
         } else {
           this.showMembers = false
         }
@@ -579,7 +599,7 @@ export default {
     async updateTask() {
       this.columns[this.edit_list_index].tasks[this.edit_task_index].title = this.new_task_title
       const task_id = this.columns[this.edit_list_index].tasks[this.edit_task_index].id
-      this.edit_task = false
+      this.quick_edit_task = false
       this.showMembers = false
       let task = this.$store.getters['tasks/getById'](task_id)
       task.title = this.new_task_title
@@ -589,16 +609,20 @@ export default {
       this.members = this.$store.getters['company_users/getActive']
       this.is_edit = true
       this.showMembers = true
+      this.show_add_labels = false
       this.select_position_left = this.$refs.add_member ? this.$refs.add_member.getBoundingClientRect().left : this.cadInfo.left
       this.select_position_top = this.$refs.add_member ? this.$refs.add_member.getBoundingClientRect().top : this.cadInfo.top
     },
-    editTask(cadInfo, list_index, task_index) {
+    editTask(cadInfo, task, list_index, task_index) {
       this.cadInfo = cadInfo
-      this.card_editor_button_top = cadInfo.top > 200 ? -114 : 0
+      this.card_editor_button_top = cadInfo.top > 200 ? (cadInfo.bottom > 100 ? -114 : -200) : 0
       this.new_task_title = cadInfo.task.title
       this.edit_list_index = list_index
       this.edit_task_index = task_index
-      this.edit_task = true
+      this.quick_edit_task = true
+      this.editTaskData = task
+      this.task_users = this.$store.getters['task_users/getByTaskId'](task.id)
+      this.assignedMembers = this.task_users.map(({ company_user_id }) => company_user_id)
       this.$nextTick(() => {
         this.$refs.updateTextRef.focus()
         this.$refs.updateTextRef.select()
@@ -630,14 +654,27 @@ export default {
       }
     },
     assignUser(member) {
+      let task_user = {
+        // id: this.id,
+        task_id: this.editTaskData.id,
+        company_user_id: member.id,
+        role: 'assigned'
+      }
       if (this.is_edit) {
         this.editTaskData['assignedMembers'] = this.editTaskData['assignedMembers'] || []
         this.assignedMembers = this.editTaskData['assignedMembers']
         const member_index = this.editTaskData['assignedMembers'].indexOf(member['id'])
+
         if (member_index < 0) {
+          task_user['id'] = uuid.v4()
+          this.$store.dispatch('UPSERT', { module: 'task_users', entity: task_user }, { root: true })
           this.assignedMembers.push(member['id'])
         } else {
           this.assignedMembers.splice(member_index, 1)
+          task_user = this.task_users.filter(({ company_user_id }) => company_user_id == member.id)[0]
+          if (task_user) {
+            this.$store.dispatch('DELETE', { module: 'task_users', entity: task_user }, { root: true })
+          }
         }
       } else {
         const new_task_index = this.columns[this.newColumnIndex].tasks.length

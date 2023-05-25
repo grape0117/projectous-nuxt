@@ -1,3 +1,5 @@
+import { ICompanyUser } from '../company_users/types'
+
 export interface IModuleState {
   tasks: ITask[]
   lookup: any
@@ -51,7 +53,7 @@ export interface ITask {
   for_today: number | null
   messages: string[]
   next_work_day: string | null
-  users: number[]
+  users: ICompanyUser[]
   workflowy_id: number | null
   temp?: boolean
   settings: object
