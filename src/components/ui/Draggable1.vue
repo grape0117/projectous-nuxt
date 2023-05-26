@@ -128,7 +128,7 @@
               </a>
             </div>
           </b-form-group>
-          <b-form-group class="mb-5" label="Due due:" label-for="task-due-date">
+          <b-form-group class="mb-5" label="Due date:" label-for="task-due-date">
             <b-form-datepicker id="task-due-date" v-model="editTaskData.due_date" class="mb-2"></b-form-datepicker>
           </b-form-group>
           <b-form-group class="mb-5" label="Description:" label-for="task-description">

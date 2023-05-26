@@ -8,7 +8,7 @@
         <p style="font-size: 14px;">{{ task.title }}</p>
       </div>
       <div class="d-flex mt-4 justify-content-between items-center">
-        <span style="font-size: 14px; color: gray;" v-show="task.due_date"><i class="icon-date_range"></i>{{ dueDate(task.due_date) }}</span>
+        <span :style="`font-size: 14px; color: ${dueDateDetails(task.due_date, true)};`" v-show="task.due_date"><i class="icon-date_range"></i>{{ dueDate(task.due_date) }}</span>
       </div>
       <div class="assigned-members d-flex" v-if="task_users">
         <span v-for="user in task_users">
@@ -67,6 +67,45 @@ export default {
   methods: {
     dueDate(date) {
       return moment(date).format('MM/DD')
+    },
+    dueDateDetails(due_date, return_color) {
+      if (!due_date && !return_color) {
+        return ''
+      }
+      const timezone = moment.tz.guess()
+      const timezone_date = moment()
+        .tz(timezone)
+        .format('YYYY-MM-DD')
+      const task_due_date = moment(due_date).format('YYYY-MM-DD')
+
+      const diff = moment.duration(moment(task_due_date).diff(moment(timezone_date)))
+      const days = diff.asDays()
+      const near_due_date = [1, 2, 3]
+      let return_value
+      let color
+      if (days < 0) {
+        return_value = 'Past due'
+        color = 'red'
+      } else if (days === 0) {
+        return_value = 'Due today'
+        color = 'red'
+      } else if (near_due_date.includes(days)) {
+        return_value = `Due in ${days} ${days === 1 ? 'day' : 'days'}`
+        color = 'orange'
+      } else {
+        return_value = `Due on ${moment(due_date).format('MMMM DD')}`
+        if (due_date === '0000-00-00 00:00:00') {
+          return_value = 'No due date selected'
+        }
+        color = '#17a2b8'
+      }
+      if (!due_date) {
+        color = '#28a745'
+      }
+      if (return_color) {
+        return_value = color
+      }
+      return return_value
     },
     badgeColor(label) {
       const mappings = {
