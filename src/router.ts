@@ -93,14 +93,14 @@ const router = new Router({
       name: 'Profile',
       component: () => import(/* webpackChunkName: "Profile" */ '@/views/Profile.vue')
     },
+    // {
+    //   path: '/projects',
+    //   name: 'Projects',
+    //   component: () => import(/* webpackChunkName: "Project" */ '@/views/Kanban.vue')
+    // },
     {
       path: '/projects',
       name: 'Projects',
-      component: () => import(/* webpackChunkName: "Project" */ '@/views/Kanban.vue')
-    },
-    {
-      path: '/projects1',
-      name: 'Projects1',
       component: () => import(/* webpackChunkName: "Project" */ '@/views/Kanban1.vue')
     },
     {
