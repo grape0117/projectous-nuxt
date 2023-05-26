@@ -131,7 +131,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
     commit('ADD_MANY', { module: 'task_users', entities: task_users }, { root: true })
     commit('ADD_ONE', { module: 'tasks', entity: new_task }, { root: true })
-    this.commit('UPDATE', { module: 'lists', entity: task_list }, { root: true })
+    this.commit('projects/updateTaskList', { project_id: task.project_id, task_list: task_list })
     // @ts-ignore
     await this._vm.$http().post('/projects/task_list/' + task.project_id, { task_list: task_list })
     let newTask

@@ -303,5 +303,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
     }) //.sort(Vue.projectSort)
 
     return projects
+  },
+  getTaskListByProjectId: (state: IModuleState) => (projectId: any) => {
+    const res = state.task_list.filter(list => list.project_id === projectId)[0]
+    return res ? res.task_list : []
   }
 }

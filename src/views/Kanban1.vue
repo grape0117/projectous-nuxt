@@ -283,14 +283,12 @@ export default class Custom extends Vue {
   }
   get selectedProjectTasksForStatusesColumns() {
     const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
+    const task_list = this.getTaskListByProjectId(this.selectedProjectId)
 
-    console.log(projectTasks)
-    // if (false) {
-    if (this.$store.state.lists.lists.length > 0) {
-      const lists = this.$store.state.lists.lists
-      let columns = new Array(lists.length)
-      for (let i = 0; i < lists.length; i++) {
-        const list = lists[i]
+    if (task_list.length > 0) {
+      let columns = new Array(task_list.length)
+      for (let i = 0; i < task_list.length; i++) {
+        const list = task_list[i]
         let tasks = projectTasks.filter((task: ITask) => list.tasks.indexOf(task.id) >= 0)
         tasks = [...tasks].sort(({ id: task_a_id }: any, { id: task_b_id }: any) => (list.tasks.indexOf(task_a_id) > list.tasks.indexOf(task_b_id) ? 1 : -1))
 
@@ -372,6 +370,7 @@ export default class Custom extends Vue {
   @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
+  @Projects.Getter private getTaskListByProjectId!: any
 
   private show_all_active_projects: boolean = false
   private editedTaskTimerId: number | string | null = null

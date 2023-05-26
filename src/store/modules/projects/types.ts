@@ -2,6 +2,7 @@ import { ICompanyUser } from '@/store/modules/company_users/types'
 
 export interface IModuleState {
   projects: IProject[]
+  task_list: ITaskList[]
   selectedProjectId: string | number | null
   pinnedProjects: number[]
   lookup: any
@@ -31,4 +32,9 @@ export interface IProject {
   project_url: string
   completed_at: string
   is_open_tasked: boolean
+}
+
+export interface ITaskList {
+  task_list: []
+  project_id: string
 }
