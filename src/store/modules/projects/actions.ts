@@ -32,9 +32,10 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     //   .post('/project-user/', { project_id: id })
   },
   async updateList({ commit, state }, { project_id, task_list }) {
+    this.commit('projects/updateTaskList', { project_id, task_list })
     // @ts-ignore
     await this._vm.$http().post('/projects/task_list/' + project_id, { task_list: task_list })
-    this.commit('projects/updateTaskList', { project_id, task_list })
+
     // TODO @stephane send task to server
     // commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
   }

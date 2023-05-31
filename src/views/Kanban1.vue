@@ -88,7 +88,7 @@
             </div>
           </div>
 
-          <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" :project_id="selectedProjectId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
+          <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :projectColumns="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" :project_id="selectedProjectId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
       </b-row>
     </b-container>
@@ -110,7 +110,7 @@ import TaskSideBar from './TaskSideBar.vue'
 import uuid from 'uuid'
 import { colorThemes } from '@/mixins/colorThemes'
 import { getCookie } from '@/utils/util-functions'
-import { EventBus } from '@/components/event-bus'
+// import { EventBus } from '@/components/event-bus'
 import { deleteDB } from 'idb'
 
 const CompanyClients = namespace('clients')
@@ -282,8 +282,11 @@ export default class Custom extends Vue {
     return this.$store.state.settings.current_company_user_id
   }
   get selectedProjectTasksForStatusesColumns() {
-    const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
-    const task_list = this.getTaskListByProjectId(this.selectedProjectId)
+    console.log('here')
+    // const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
+    // const task_list = this.getTaskListByProjectId(this.selectedProjectId)
+    const projectTasks = this.$store.getters['tasks/getByProjectId'](this.selectedProjectId)
+    const task_list = this.$store.getters['projects/getTaskListByProjectId'](this.selectedProjectId)
 
     if (task_list.length > 0) {
       let columns = new Array(task_list.length)
@@ -322,21 +325,8 @@ export default class Custom extends Vue {
           tasks: tasks
         }
       ]
-
       return columns
     }
-    return projectTasks
-      .map(({ id, title, status, sort_order, temp, idList, labels }: ITask) => ({
-        id,
-        title,
-        status,
-        listId: status,
-        sort_order,
-        temp,
-        idList: idList || 'backlog',
-        labels
-      }))
-      .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
   }
 
   get taskPerStatusLists() {
@@ -541,17 +531,17 @@ export default class Custom extends Vue {
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
 
-  // created() {
-  //   EventBus.$on('toggle_tasks', () => {
-  //     this.showTask = !this.showTask
-  //   })
-  //   EventBus.$on('toggle_timers', () => {
-  //     this.showTimer = !this.showTimer
-  //   })
-  //   EventBus.$on('toggle_chat', () => {
-  //     this.showChat = !this.showChat
-  //   })
-  // }
+  created() {
+    // EventBus.$on('toggle_tasks', () => {
+    //   this.showTask = !this.showTask
+    // })
+    // EventBus.$on('toggle_timers', () => {
+    //   this.showTimer = !this.showTimer
+    // })
+    // EventBus.$on('toggle_chat', () => {
+    //   this.showChat = !this.showChat
+    // })
+  }
 }
 </script>
 <style lang="scss">

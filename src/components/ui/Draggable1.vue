@@ -151,6 +151,8 @@ import TaskActionRow from '../../views/TaskActionRow.vue'
 import { abbrName } from '@/utils/util-functions'
 import _ from 'lodash'
 import uuid from 'uuid'
+import { EventBus } from '@/components/event-bus'
+
 export default {
   extends: TaskActionRow,
   name: 'Draggable1',
@@ -159,7 +161,7 @@ export default {
     draggable,
     Badge
   },
-  props: ['data', 'project_id'],
+  props: ['projectColumns', 'project_id'],
   data() {
     return {
       columns: [],
@@ -356,6 +358,56 @@ export default {
       }
     })
   },
+  created() {
+    console.log('draggable created')
+    // @ts-ignore
+    EventBus.$on('renderTaskList', ({ task_list }) => {
+      // this.$forceUpdate()
+      console.log('renderTaskList', task_list)
+
+      const projectTasks = this.$store.getters['tasks/getByProjectId'](this.project_id)
+      // const task_list = this.$store.getters['projects/getTaskListByProjectId'](this.project_id)
+      let columns = []
+      if (task_list.length > 0) {
+        columns = new Array(task_list.length)
+        for (let i = 0; i < task_list.length; i++) {
+          const list = task_list[i]
+          let tasks = projectTasks.filter(task => list.tasks.indexOf(task.id) >= 0)
+          tasks = [...tasks].sort(({ id: task_a_id }, { id: task_b_id }) => (list.tasks.indexOf(task_a_id) > list.tasks.indexOf(task_b_id) ? 1 : -1))
+
+          columns[i] = {
+            title: list.title,
+            // idList: list.id,
+            tasks: tasks
+          }
+        }
+      } else {
+        let tasks = projectTasks
+          .map(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }) => ({
+            id,
+            title,
+            status,
+            listId: status,
+            sort_order,
+            temp,
+            idList: idList || 'backlog',
+            labels,
+            detail,
+            due_date,
+            assignedMembers
+          }))
+          .sort(({ sort_order: a }, { sort_order: b }) => a - b)
+
+        columns = [
+          {
+            title: 'Backlog',
+            tasks: tasks
+          }
+        ]
+      }
+      this.columns = columns
+    })
+  },
   watch: {
     isDragging(newValue) {
       if (newValue) {
@@ -411,7 +463,7 @@ export default {
         this.add_member_pop_over = false
       }
     },
-    data(newValue) {
+    projectColumns(newValue) {
       // console.log("data", newValue)
       this.columns = cloneDeep(newValue)
       this.columns.push({
