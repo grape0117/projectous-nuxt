@@ -601,7 +601,7 @@ export default {
       let self = this
       let badgeClass = ''
       self.tasks.forEach(task => {
-        if (task && task.for_today && task.users.length) {
+        if (task && task.for_today && task.users && task.users.length) {
           task.users.forEach(task_user => {
             if (task_user.company_user_id === user.id) {
               badgeClass = 'badge for-today'
