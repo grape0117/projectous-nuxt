@@ -165,159 +165,6 @@ export default {
   data() {
     return {
       columns: [],
-      // columns: [
-      //   {
-      //     title: 'Backlog',
-      //     tasks: [
-      //       {
-      //         id: 1,
-      //         title: 'Add discount code to checkout page',
-      //         description: 'Here is a description',
-      //         due: 'Sep 14',
-      //         type: 'Feature Request',
-      //         assignedMembers: [],
-      //         labels: ['Urgent', 'Top Priority', 'Medimun Priority']
-      //       },
-      //       {
-      //         id: 2,
-      //         title: 'Provide documentation on integrations',
-      //         description: 'Here is a description',
-      //         due: 'Sep 12',
-      //         assignedMembers: [],
-      //         labels: ['Top Priority']
-      //       },
-      //       {
-      //         id: 3,
-      //         title: 'Design shopping cart dropdown',
-      //         description: 'Here is a description',
-      //         due: 'Sep 9',
-      //         type: 'Design',
-      //         labels: ['Medimun Priority'],
-      //         assignedMembers: []
-      //       },
-      //       {
-      //         id: 4,
-      //         title: 'Add discount code to checkout page',
-      //         description: 'Here is a description',
-      //         due: 'Sep 14',
-      //         type: 'Feature Request',
-      //         assignedMembers: [],
-      //         labels: ['Low Priority']
-      //       },
-      //       {
-      //         id: 5,
-      //         title: 'Test checkout flow',
-      //         description: 'Here is a description',
-      //         due: 'Sep 15',
-      //         type: 'QA',
-      //         assignedMembers: [],
-      //         labels: ['Very Low Priority']
-      //       }
-      //     ]
-      //   },
-      //   {
-      //     title: 'In Progress',
-      //     tasks: [
-      //       {
-      //         id: 6,
-      //         title: 'Design shopping cart dropdown',
-      //         description: 'Here is a description',
-      //         due: 'Sep 9',
-      //         type: 'Design',
-      //         assignedMembers: []
-      //       },
-      //       {
-      //         id: 7,
-      //         title: 'Add discount code to checkout page',
-      //         description: 'Here is a description',
-      //         due: 'Sep 14',
-      //         type: 'Feature Request',
-      //         assignedMembers: []
-      //       },
-      //       {
-      //         id: 8,
-      //         title: 'Provide documentation on integrations',
-      //         description: 'Here is a description',
-      //         due: 'Sep 12',
-      //         type: 'Backend',
-      //         assignedMembers: []
-      //       }
-      //     ]
-      //   },
-      //   {
-      //     title: 'Review',
-      //     tasks: [
-      //       {
-      //         id: 9,
-      //         title: 'Provide documentation on integrations',
-      //         description: 'Here is a description',
-      //         due: 'Sep 12',
-      //         assignedMembers: []
-      //       },
-      //       {
-      //         id: 10,
-      //         title: 'Design shopping cart dropdown',
-      //         description: 'Here is a description',
-      //         due: 'Sep 9',
-      //         type: 'Design',
-      //         assignedMembers: []
-      //       },
-      //       {
-      //         id: 11,
-      //         title: 'Add discount code to checkout page',
-      //         description: 'Here is a description',
-      //         due: 'Sep 14',
-      //         type: 'Feature Request',
-      //         assignedMembers: []
-      //       },
-      //       {
-      //         id: 12,
-      //         title: 'Design shopping cart dropdown',
-      //         description: 'Here is a description',
-      //         due: 'Sep 9',
-      //         type: 'Design'
-      //       },
-      //       {
-      //         id: 13,
-      //         title: 'Add discount code to checkout page',
-      //         description: 'Here is a description',
-      //         due: 'Sep 14',
-      //         type: 'Feature Request'
-      //       }
-      //     ]
-      //   },
-      //   {
-      //     title: 'Done',
-      //     tasks: [
-      //       {
-      //         id: 14,
-      //         title: 'Add discount code to checkout page',
-      //         description: 'Here is a description',
-      //         due: 'Sep 14',
-      //         type: 'Feature Request'
-      //       },
-      //       {
-      //         id: 15,
-      //         title: 'Design shopping cart dropdown',
-      //         description: 'Here is a description',
-      //         due: 'Sep 9',
-      //         type: 'Design'
-      //       },
-      //       {
-      //         id: 16,
-      //         title: 'Add discount code to checkout page',
-      //         description: 'Here is a description',
-      //         due: 'Sep 14',
-      //         type: 'Feature Request'
-      //       }
-      //     ]
-      //   },
-      //   {
-      //     title: 'New list',
-      //     type: 'new_list',
-      //     tasks: []
-      //   }
-      // ],
       isDragging: false,
       isListDragging: false,
       delayedDragging: false,
@@ -406,6 +253,11 @@ export default {
         ]
       }
       this.columns = columns
+      this.columns.push({
+        title: 'New list',
+        type: 'new_list',
+        tasks: []
+      })
     })
   },
   watch: {

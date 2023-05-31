@@ -418,7 +418,9 @@ export default {
           title = e.data.title
           const { task_list, project_id } = JSON.parse(e.data.value)
           this.$store.commit('projects/updateTaskList', { project_id, task_list })
-          EventBus.$emit('renderTaskList', { task_list })
+          if (user_id != e.data.user.id) {
+            EventBus.$emit('renderTaskList', { task_list })
+          }
           break
       }
       if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
