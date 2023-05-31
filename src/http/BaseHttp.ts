@@ -27,6 +27,9 @@ export class BaseHttp implements IHttp {
   public async post2(url: string, data: any): Promise<any> {
     this.throwError()
   }
+  public async postImage(url: string, data: any): Promise<any> {
+    this.throwError()
+  }
   public async put(url: string, id: number | string, data: any): Promise<any> {
     this.throwError()
   }

@@ -34,6 +34,7 @@
               </select> -->
               <vue-bootstrap-typeahead ref="projectsTypeahead" :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
               <input type="text" id="task" ref="noteInput" class="form-control" placeholder="@assign" @keyup.enter="createTask" @input="creatingTask" style="width: 70%;" />
+              <ScreenCap></ScreenCap>
             </div>
             <div class="search_result" v-if="showResult">
               <h6 class="card-text">
@@ -126,12 +127,16 @@ import { EventBus } from '@/components/event-bus'
 import { idbKeyval } from '@/plugins/idb.ts'
 import { getCookie } from '@/utils/util-functions'
 import TaskActionRow from '../views/TaskActionRow.vue'
+import ScreenCap from '@/views/ScreenCap.vue'
 import { abbrName } from '@/utils/util-functions'
 import _ from 'lodash'
 import moment from 'moment'
 
 export default Vue.extend({
   props: ['showItems'],
+  components: {
+    ScreenCap
+  },
   extends: TaskActionRow,
   watch: {
     projectSearch: _.debounce(function(project_name) {
