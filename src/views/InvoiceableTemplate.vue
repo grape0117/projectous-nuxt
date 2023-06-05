@@ -133,6 +133,7 @@
                     <div style="width: 100%" class="ml-3">
                       <span id="actionLink"> </span>
                       <button :style="buttonStyle" class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
+                      <button :style="buttonStyle" class="btn btn-primary ml-2" @click="showRecurringItems" v-if="isAdmin()">Recurring Items</button>
                     </div>
                     Sort&nbsp;by&nbsp;<b-form-select v-model="sort_by">
                       <b-form-select-option value="date">By Date</b-form-select-option>
@@ -209,6 +210,9 @@
     </div>
     <!-- Add Invoiceable Item Modal -->
     <invoiceable-add-item :show="isShowInvoiceableItems" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
+
+    <!-- Recurring items modal -->
+    <recurring-items :show="is_show_recurring_items" @hide="hideRecurringItems" :clients="clients" :chosen_clients="chosen_clients" />
   </div>
 </template>
 
@@ -226,7 +230,8 @@ export default {
   components: {
     'invoiceable-timer-row': InvoiceableTimerRow,
     'report-timer-row': ReportTimerRow,
-    'invoiceable-add-item': () => import('./InvoiceableAddItem.vue')
+    'invoiceable-add-item': () => import('./InvoiceableAddItem.vue'),
+    'recurring-items': () => import('./RecurringItems.vue')
   },
   data: function() {
     return {
@@ -261,7 +266,8 @@ export default {
       invoice_items: [],
       settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false },
       loading_data: false,
-      is_user_report: false
+      is_user_report: false,
+      is_show_recurring_items: false
     }
   },
   computed: {
@@ -418,6 +424,12 @@ export default {
     },
     hideAddInvoiceable() {
       this.isShowInvoiceableItems = false
+    },
+    hideRecurringItems() {
+      this.is_show_recurring_items = false
+    },
+    showRecurringItems() {
+      this.is_show_recurring_items = true
     },
     generateInvoiceButton(timers, invoice_id) {
       const client = document.getElementById('client').value
