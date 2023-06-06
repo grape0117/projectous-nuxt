@@ -123,10 +123,6 @@ export default {
       required: false,
       default: () => {}
     },
-    chat: {
-      type: Object,
-      require: true
-    },
     showChat: false,
     thread_id: null
   },
