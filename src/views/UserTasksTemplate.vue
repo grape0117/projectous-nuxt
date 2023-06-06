@@ -79,7 +79,7 @@
             <b-input-group prepend="Search" style="width:30%">
               <b-form-input v-model="task_filter" :class="'form-control input-sm ' + taskFilterClass()"></b-form-input>
               <b-input-group-append>
-                <b-button variant="light" @click="clearSearch()"><i class="icon-close"/></b-button>
+                <b-button variant="light" @click="clearSearch()">✕</b-button>
               </b-input-group-append>
             </b-input-group>
           </li>
