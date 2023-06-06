@@ -26,6 +26,11 @@
             <b-dropdown-item-button @click="$router.push('/user_report')"><router-link id="report-menu-link" to="/user_report">My Report</router-link></b-dropdown-item-button>
           </b-dropdown>
           <b-dropdown id="new-task-menu" class="transparent-button" text="New Task" ref="newtask_dropdown">
+            <div class="block-spinner-bar" style="position: absolute; display: flex; height: 100%; z-index: 10; justify-content: center!important; align-items: center; width: 100%; top: 0; right: 0;">
+              <div class="bounce1"></div>
+              <div class="bounce2"></div>
+              <div class="bounce3"></div>
+            </div>
             <div class="new-task-container">
               <!-- <select v-model="new_task_project_id" id="task-project-id2" class="form-control select2-select" name="project_id" style="width: 30%;">
                 <option value="">No Project</option>
@@ -34,7 +39,6 @@
               </select> -->
               <vue-bootstrap-typeahead ref="projectsTypeahead" :serializer="s => client_name(s.client_company_id) + '-' + s.name" class="mb-5" v-model="projectSearch" id="task-project-id2" :minMatchingChars="1" :data="openprojects()" @hit="selectProject" placeholder="Select a project" />
               <input type="text" id="task" ref="noteInput" class="form-control" placeholder="@assign" @keyup.enter="createTask" @input="creatingTask" style="width: 70%;" />
-              <ScreenCap></ScreenCap>
             </div>
             <div class="search_result" v-if="showResult">
               <h6 class="card-text">
@@ -60,6 +64,7 @@
               </h6>
               <!-- end result -->
             </div>
+            <ScreenCap class="w-100"></ScreenCap>
             <b-button class="float-right" variant="outline-primary" @click="closeNewTask">Close</b-button>
           </b-dropdown>
         </div>
@@ -277,7 +282,8 @@ export default Vue.extend({
       new_task_project_id: null,
       showResult: false,
       assignedUser: {},
-      hideNewTask: false
+      hideNewTask: false,
+      video_link: ''
     }
   },
   computed: {
@@ -323,6 +329,9 @@ export default Vue.extend({
         return (this.timerRunning = true)
       }
       this.timerRunning = false
+    })
+    EventBus.$on('stopRecord', file_path => {
+      this.video_link = file_path
     })
 
     this.updateBackground()
@@ -503,9 +512,11 @@ export default Vue.extend({
         users: [this.new_company_user_id],
         owner: this.$store.state.settings.current_company_user_id,
         priority: this.new_priority,
-        due_date: this.new_task_due_date
+        due_date: this.new_task_due_date,
+        video_link: this.video_link
       })
       EventBus.$emit('update', { company_user_id: this.new_company_user_id, task_id: newTask.id })
+      EventBus.$emit('clear_screen', { company_user_id: this.new_company_user_id, task_id: newTask.id })
       this.new_task_title = ''
       this.new_task_project_id = null
       setTimeout(() => {
@@ -677,6 +688,7 @@ export default Vue.extend({
   beforeDestroy() {
     EventBus.$off('timerEmptyFields')
     EventBus.$off('timerStatus')
+    EventBus.$off('stopRecord')
   }
 })
 </script>
@@ -687,11 +699,13 @@ export default Vue.extend({
     -moz-transform: rotate(-360deg);
   }
 }
+
 @-webkit-keyframes spin {
   100% {
     -webkit-transform: rotate(-360deg);
   }
 }
+
 @keyframes spin {
   100% {
     -webkit-transform: rotate(-360deg);
@@ -699,11 +713,61 @@ export default Vue.extend({
   }
 }
 
+@-webkit-keyframes bounceDelay {
+  0%,
+  80%,
+  100% {
+    -webkit-transform: scale(0);
+  }
+  40% {
+    -webkit-transform: scale(1);
+  }
+}
+@keyframes bounceDelay {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    -webkit-transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+    -webkit-transform: scale(1);
+  }
+}
+
+.block-spinner-bar {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+.block-spinner-bar > div {
+  margin: 0 2px;
+  width: 15px;
+  height: 15px;
+  background: #996300;
+  border-radius: 100% !important;
+  display: inline-block;
+  -webkit-animation: bounceDelay 1.4s infinite ease-in-out;
+  animation: bounceDelay 1.4s infinite ease-in-out;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+.block-spinner-bar .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+.block-spinner-bar .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+
 .reload-rotate {
   -webkit-animation: spin 1s linear infinite;
   -moz-animation: spin 1s linear infinite;
   animation: spin 1s linear infinite;
 }
+
 .header {
   // border: 10px solid red !important;
   // flex-wrap: wrap;
@@ -733,6 +797,7 @@ export default Vue.extend({
         align-items: center;
       }
     }
+
     .reload-text {
       font-size: 10px;
       line-height: 10px;
@@ -740,10 +805,12 @@ export default Vue.extend({
     }
   }
 }
+
 .header_menu-wrapper {
   // border: 1px solid red;
   position: relative;
 }
+
 .header_menu {
   border-radius: 3px;
   position: absolute;
@@ -758,6 +825,7 @@ export default Vue.extend({
   border: 1px solid rgba($color: #000000, $alpha: 0.4);
   box-shadow: 0px 0px 15px rgba($color: #000000, $alpha: 0.8);
 }
+
 .header_menu-item-list {
   margin: 15px 0;
   cursor: pointer;
@@ -765,20 +833,25 @@ export default Vue.extend({
   flex-direction: column;
   font-weight: 500;
 }
+
 .header_menu-item {
   padding: 2px 20px;
   white-space: nowrap;
 }
+
 .header_menu-item:hover {
   background-color: rgba($color: #000000, $alpha: 0.2);
   // color: white;
 }
+
 .nav-buttons {
   display: flex;
 }
+
 .nav-buttons__button {
   margin-right: 5px;
 }
+
 .timers-right-icons {
   display: flex;
   flex-direction: column;
@@ -796,12 +869,14 @@ export default Vue.extend({
     height: 10px !important;
   }
 }
+
 .chat-right-icons {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 3px 1px;
 }
+
 .chat-right-icon {
   width: 15px;
   height: 15px;
@@ -811,10 +886,12 @@ export default Vue.extend({
   justify-content: center;
   align-items: center;
 }
+
 .chat-right-icon-text {
   font-size: 10px;
   color: white;
 }
+
 .red-circle-icon .red-circle-icon-text {
   font-size: 10px;
   font-weight: bold;
@@ -832,6 +909,7 @@ export default Vue.extend({
   justify-content: center;
   align-items: center;
 }
+
 /* .header { */
 /* display: flex; */
 /* flex-direction: column; */
@@ -849,11 +927,13 @@ export default Vue.extend({
   /* background-color: #616161; */
   background-color: rgba(0, 0, 0, 0.4);
 }
+
 .header-nav {
   display: flex;
   align-items: center;
   padding-left: 30px;
 }
+
 .logo-name {
   display: flex;
   justify-content: center;
@@ -863,9 +943,11 @@ export default Vue.extend({
   // color: white;
   // text-decoration: none;
 }
+
 .logo-name:hover {
   cursor: pointer;
 }
+
 .profile-icon {
   width: 35px;
   height: 35px;
@@ -873,15 +955,18 @@ export default Vue.extend({
   border-radius: 50%;
   cursor: pointer;
 }
+
 .header-bottom {
   height: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .nav-buttons {
   margin-left: 27px;
 }
+
 .nav-buttons__button {
   /* font-size: 17px; */
   margin-right: 20px;
@@ -889,9 +974,11 @@ export default Vue.extend({
   font-weight: 500;
   text-decoration: none;
 }
+
 .nav-buttons__button:hover {
   cursor: pointer;
 }
+
 .nav-icons {
   display: flex;
   align-items: center;
@@ -905,9 +992,11 @@ export default Vue.extend({
     margin-left: 15px;
   }
 }
+
 .nav-icons-active {
   color: white;
 }
+
 .nav-icon {
   display: flex;
   flex-direction: column;
@@ -919,14 +1008,17 @@ export default Vue.extend({
 .nav-icon:hover {
   cursor: pointer;
 }
+
 .nav-icon__icon {
   font-size: 24px;
   display: flex;
 }
+
 .nav-icon__name {
   font-size: 10px;
   line-height: 10px;
 }
+
 .header-paint {
   position: absolute;
   display: flex;
@@ -948,6 +1040,7 @@ export default Vue.extend({
   grid-row-gap: 10px;
   grid-column-gap: 21px;
 }
+
 .header-paint-color {
   display: inline-block;
   width: 35px;
@@ -960,6 +1053,7 @@ export default Vue.extend({
 .header-paint-images {
   display: flex;
 }
+
 .header-paint-image {
   width: 35px;
   height: 35px;
@@ -968,6 +1062,7 @@ export default Vue.extend({
   background-size: cover !important;
   cursor: pointer;
 }
+
 .search_result {
   color: white;
   margin-top: 27px;
@@ -977,16 +1072,20 @@ export default Vue.extend({
   color: #fff;
   border-color: #fff;
 }
+
 .btn-outline-primary:hover {
   color: #fff;
   background-color: #ffa500;
   border-color: #fff;
 }
+
 .search_result .card-text {
   width: fit-content;
 }
+
 #task-list-due-date {
   margin-left: 20px;
 }
+
 /* paletteColors: ['red', 'green', 'blue', 'rgba($color: orange, $alpha: 0.6)', 'pink', 'violet', 'rgba(255, 165, 0, 0.6)' ] */
 </style>

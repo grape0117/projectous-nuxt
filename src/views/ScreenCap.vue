@@ -1,42 +1,44 @@
 <template>
-  <div class="container mx-auto py-8 px-4">
-    <h2 class="text-xl text-gray-500 uppercase font-light mb-4">
-      Video recorder
+  <div class="mx-auto py-8 d-flex flex-column">
+    <h2 class="text-xl text-gray-500 uppercase font-light mx-auto mb-4" style="color: #996300">
+      Screen recorder
     </h2>
-
-    <video src="" autplay class="video-feedback bg-black w-full h-auto mb-4"></video>
-
-    <div class="flex flex-wrap -mx-4 mb-8">
-      <button @click="startRecording" class="start-recording mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50">
-        Record Screen
-      </button>
-      <input type="checkbox" checked v-model="include_audio" /> Include Audio?
-      <button @click="stopRecording" class="stop-recording mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50">
-        Stop Recording
-      </button>
+    <div class="d-flex justify-content-between">
+      <video src="" autplay class="video-feedback bg-black w-full h-auto rounded border border-warning w-48 mw-48 mx-auto mb-4" style="max-width: 48%;"></video>
+      <video class="recorded-video bg-black h-auto mx-auto mb-4 border rounded border-warning w-48 mw-48" :src="downloadUrl" style="max-width: 48%;"></video>
     </div>
 
-    <div class="recorded-video-wrap hidden">
-      <h2 class="text-xl text-gray-500 uppercase font-light mb-4">
-        Recorded video
-      </h2>
+    <div class="flex flex-wrap -mx-4 mb-8 form-inline m-auto">
+      <b-form-checkbox v-if="!isStarted" v-model="include_audio" name="check-button" switch variant="warning" class="text-white">
+        Include Audio?
+      </b-form-checkbox>
+      <button @click="startRecording" v-if="!isStarted" class="start-recording mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50 d-flex" style="font-size: 22px; border-radius: 50px;">
+        <span
+          style="color: red;
+                      width: 40px;
+                      height: 40px;
+                      border: 12px solid;
+                      border-radius: 50%;"
+        ></span
+        >&nbsp;&nbsp; Start Screen
+      </button>
 
-      <video class="recorded-video bg-black w-full h-auto mb-8" :src="downloadUrl"></video>
-      <div class="flex flex-wrap -mx-4">
-        <a download="video.mp4" :href="downloadUrl" class="download-video text-center mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50">
-          Download
-        </a>
-      </div>
-      <div class="flex flex-wrap -mx-4">
-        <button @click="saveVideo" class="download-video text-center mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50">
-          Save to Task
-        </button>
-      </div>
+      <button @click="stopRecording" v-if="isStarted" class="start-recording mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50 d-flex" style="font-size: 22px; border-radius: 50px;">
+        <span
+          style=" background-color: red;
+                      width: 40px;
+                      height: 40px;
+                     "
+        ></span
+        >&nbsp;&nbsp; Stop Recording
+      </button>
     </div>
   </div>
 </template>
 
 <script>
+import { EventBus } from '@/components/event-bus'
+
 export default {
   data() {
     return {
@@ -49,16 +51,42 @@ export default {
       stopButton: null,
       downloadUrl: null,
       recordedVideo: null,
-      include_audio: true
+      include_audio: true,
+      isStarted: false
     }
   },
+  // clear_screen
+  mounted() {
+    this.hideLoading()
+    EventBus.$on('clear_screen', count => {
+      this.chunks = []
+      this.stream = null
+      this.audio = null
+      this.mixedStream = null
+      this.recorder = null
+      this.startButton = null
+      this.stopButton = null
+      this.downloadUrl = null
+      this.recordedVideo = null
+      this.include_audio = null
+      this.isStarted = null
+      this.hideLoading()
+    })
+  },
   methods: {
-    saveVideo() {
+    async saveVideo() {
+      this.showLoading()
       const data = new FormData()
       let fileName = `video.mp4`
-      let file = new File([new Blob(this.chunks, { type: 'video/mp4' })], fileName)
-      data.append('file', file, file.name)
-      this.$http().postImage('/upload', data)
+      const stream_video = new Blob(this.chunks, { type: 'video/mp4' })
+      // let file = new File([stream_video], fileName)
+
+      data.append('files', stream_video, 'video.mp4')
+      // console.log("files", file)
+      const res = await this.$http().postImage('/upload', data)
+      // console.log(res[0]['file_path'])
+      EventBus.$emit('stopRecord', res[0]['file_path'])
+      this.hideLoading()
     },
     async setupStream() {
       try {
@@ -91,6 +119,7 @@ export default {
     },
 
     async startRecording() {
+      this.chunks = []
       await this.setupStream()
 
       if (this.stream) {
@@ -103,7 +132,7 @@ export default {
         this.recorder.ondataavailable = this.handleDataAvailable
         this.recorder.onstop = this.handleStop
         this.recorder.start(1000)
-
+        this.isStarted = true
         console.log('Recording started')
       } else {
         console.warn('No stream available.')
@@ -112,26 +141,37 @@ export default {
 
     stopRecording() {
       this.recorder.stop()
+      this.isStarted = false
     },
 
     handleDataAvailable(e) {
       this.chunks.push(e.data)
     },
-
+    showLoading() {
+      const loadingElement = document.getElementsByClassName('block-spinner-bar')
+      loadingElement[0].style.display = 'flex'
+    },
+    hideLoading() {
+      const loadingElement = document.getElementsByClassName('block-spinner-bar')
+      loadingElement[0].style.display = 'none'
+    },
     handleStop(e) {
       const blob = new Blob(this.chunks, { type: 'video/mp4' })
-      this.chunks = []
+      // this.chunks = []
 
       this.downloadUrl = URL.createObjectURL(blob)
-
+      // const link = document.getElementById('video-download');
+      // link.href = this.downloadUrl;
+      // link.download = 'test.mp4'
+      // link.click()
       // this.recordedVideo.src = URL.createObjectURL(blob);
 
       const recordedVideo = document.getElementsByClassName('recorded-video')[0]
       recordedVideo.load()
       recordedVideo.onloadeddata = function() {
-        const rc = document.querySelector('.recorded-video-wrap')
-        rc.classList.remove('hidden')
-        rc.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        // const rc = document.querySelector('.recorded-video-wrap')
+        // rc.classList.remove('hidden')
+        // rc.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
         recordedVideo.play()
       }
@@ -140,6 +180,7 @@ export default {
       this.audio.getTracks().forEach(track => track.stop())
 
       console.log('Recording stopped')
+      this.saveVideo()
     }
   }
 }

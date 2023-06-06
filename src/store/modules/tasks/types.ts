@@ -60,6 +60,7 @@ export interface ITask {
   last_task_message_id?: string | null
   last_task_message_created_at?: string | null
   idList?: string | null
+  video_link?: string | null
   labels?: string[]
   assignedMembers?: []
   total_time_spent?: number | null

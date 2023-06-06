@@ -15,7 +15,7 @@ export class Http extends BaseHttp implements IHttp {
     return await this.provider.post(url, data)
   }
   public async post2(url: string, data: any) {
-    return await this.provider.post(url, data)
+    return await this.provider.post2(url, data)
   }
   public async postImage(url: string, data: any) {
     return await this.provider.postImage(url, data)

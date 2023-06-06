@@ -40,7 +40,8 @@ function createDefaultTask(): ITask {
     settings: {},
     last_task_message_id: null,
     last_task_message_created_at: null,
-    total_time_spent: 0
+    total_time_spent: 0,
+    video_link: null
   }
 }
 
@@ -50,7 +51,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
     state.tasks_by_project = tasks.filter((task: ITask) => (task.project_id = project_id))
   },
-  async createTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, users = [], owner, priority = 'active', due_date }: any) {
+  async createTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, users = [], owner, priority = 'active', due_date, video_link }: any) {
     const task = {
       ...createDefaultTask(),
       title,
@@ -60,7 +61,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       users,
       owner,
       priority,
-      due_date
+      due_date,
+      video_link
     }
     let newTask
     if (temp) {

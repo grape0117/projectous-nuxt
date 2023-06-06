@@ -4,7 +4,7 @@ import store from '@/store'
 
 export class BaseHttp implements IHttp {
   protected baseUrl: any = process.env.VUE_APP_API_URL
-  protected baseUrl2: any = 'https://testing.projectous.com'
+  protected baseUrl2: any = process.env.VUE_APP_WEB_SOCKET_SERVER_URL //'https://testing.projectous.com'
   protected headers: any = {
     InstanceID: store.state.settings.instance_id,
     Authorization: 'Bearer ' + getCookie('auth_token'),

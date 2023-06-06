@@ -88,8 +88,7 @@ export class AxiosHttp extends BaseHttp implements IHttp {
     }
     try {
       const { data: response } = await axios.post(`${this.baseUrl2}${url}`, data, {
-        headers: { ...this.headers, 'Content-Type': `multipart/form-data` },
-        responseType: 'blob'
+        headers: { ...this.headers, 'Content-Type': `multipart/form-data` }
       })
       Store.state.totalActiveRequests--
       return response
