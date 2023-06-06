@@ -177,7 +177,9 @@ export default {
       }
 
       this.stream.getTracks().forEach(track => track.stop())
-      this.audio.getTracks().forEach(track => track.stop())
+      if (this.audio) {
+        this.audio.getTracks().forEach(track => track.stop())
+      }
 
       console.log('Recording stopped')
       this.saveVideo()
