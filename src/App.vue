@@ -322,6 +322,7 @@ export default {
       let body = ''
       let title = ''
       console.log('socket data', e.data)
+      user_id = getCookie('user_id')
       switch (e.data.item_type) {
         case 'timelog':
           title = ''

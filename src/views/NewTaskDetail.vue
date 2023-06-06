@@ -270,14 +270,17 @@ export default Vue.extend({
       }
     },
     async saveTask(isRedirect = true) {
-      this.task.files = this.selectedFile
-      await this.$store.dispatch('UPDATE', { module: 'tasks', entity: this.task })
+      if (this.task) {
+        this.task.files = this.selectedFile
+        await this.$store.dispatch('UPDATE', { module: 'tasks', entity: this.task })
+      }
       if (isRedirect) {
         this.isEditResource = null
 
         if (this.$route.query && Object.keys(this.$route.query).length > 0) {
           let query = Object.assign({}, this.$route.query)
           delete query.task
+          delete query.thread
           delete query.showChat
           delete query.showChatSection
           await this.$router.replace({ query })
