@@ -66,10 +66,10 @@ export default {
       this.recorder = null
       this.startButton = null
       this.stopButton = null
-      this.downloadUrl = null
-      this.recordedVideo = null
-      this.include_audio = null
-      this.isStarted = null
+      this.downloadUrl = ''
+      this.recordedVideo = ''
+      this.include_audio = true
+      this.isStarted = false
       this.hideLoading()
     })
   },
