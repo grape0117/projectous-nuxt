@@ -4,8 +4,8 @@
       Screen recorder
     </h2>
     <div class="d-flex justify-content-between">
-      <video src="" autplay class="video-feedback bg-black w-full h-auto rounded border border-warning w-48 mw-48 mx-auto mb-4" style="max-width: 48%;"></video>
-      <video class="recorded-video bg-black h-auto mx-auto mb-4 border rounded border-warning w-48 mw-48" :src="downloadUrl" style="max-width: 48%;"></video>
+      <video src="" autplay class="video-feedback bg-black w-full h-auto rounded border border-[#e7dcbc] border-8 w-48 mw-48 mx-auto mb-4" style="max-width: 48%;"></video>
+      <video class="recorded-video bg-black h-auto mx-auto mb-4 border rounded border-[#e7dcbc] border-8 w-48 mw-48" :src="downloadUrl" style="max-width: 48%;"></video>
     </div>
 
     <div class="flex flex-wrap -mx-4 mb-8 form-inline m-auto">
@@ -14,7 +14,7 @@
       </b-form-checkbox>
       <button @click="startRecording" v-if="!isStarted" class="start-recording mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50 d-flex" style="font-size: 22px; border-radius: 50px;">
         <span
-          style="color: red;
+          style="color: #ff5454;
                       width: 40px;
                       height: 40px;
                       border: 12px solid;
@@ -25,9 +25,10 @@
 
       <button @click="stopRecording" v-if="isStarted" class="start-recording mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50 d-flex" style="font-size: 22px; border-radius: 50px;">
         <span
-          style=" background-color: red;
+          style=" background-color: #ff5454;
                       width: 40px;
                       height: 40px;
+                      border-radius: 4px;
                      "
         ></span
         >&nbsp;&nbsp; Stop Recording
