@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="bg-white shadow rounded px-1 pt-1 pb-1 border border-white card-content" v-if="task.type !== 'new'" ref="card_element" @click="showEditMoal">
+    <div class="bg-white shadow rounded px-1 pt-1 pb-1 border border-white card-content" v-if="task.type !== 'new'" ref="card_element" @click="showTaskDetail">
       <div class="badge-container" v-if="task.labels">
         <badge v-for="label in task.labels" :color="badgeColor(label)" :label="label">{{ label }}</badge>
       </div>
@@ -177,6 +177,14 @@ export default {
         return
       }
       this.$emit('showEditModal')
+    },
+    async showTaskDetail(e) {
+      if (e.target.className == 'icon-edit') {
+        return
+      }
+      const updated_path = `/user-tasks?task=${this.task.id}&showChatSection=true`
+      sessionStorage.setItem('tasks', updated_path)
+      await this.$router.push({ query: { task: this.task.id, showChatSection: 'true' } })
     },
     addTask() {
       if (!this.new_task_title) {

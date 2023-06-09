@@ -2,53 +2,8 @@
   <div class="kanban-page">
     <b-container fluid class="overflow-hidden">
       <b-row class="kanban-page-innerwrapper">
-        <b-col class="client-section scroll-col">
-          <div class="d-flex justify-content-center mb-3">
-            <v-select v-model="selectedClient" label="name" :options="activeClients" style="width: 100px"> </v-select>
-          </div>
-
-          <div v-if="clientVisible(client)" v-for="(client, index) in selectedClient.id ? filteredClient : activeClients" :key="index">
-            <div class="client-name">
-              <span class="mr-2">{{ client.name }}</span>
-              <b-icon class="pointer mr-2" v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon>
-              <div class="add-client">
-                <i class="icon-add pointer" :style="{ color: default_theme_color }" @click="addProject(client)" />
-              </div>
-            </div>
-
-            <div class="d-flex align-items-center pl-1">
-              <div class="d-flex" v-for="(user, user_index) in client_users.filter(({ client_id }) => client_id === client.id)" :key="user.id">
-                <span v-if="user_index < 5" v-b-tooltip.hover :title="company_users.filter(c_user => c_user.id === user.company_user_id)[0].name" class="avatar mr-1 pointer" :style="{ 'background-color': company_users.filter(c_user => c_user.id === user.company_user_id)[0].color }">
-                  {{ abbrName(company_users.filter(c_user => c_user.id === user.company_user_id)[0].name) }}
-                </span>
-
-                <span v-if="client_users.filter(({ client_id }) => client_id === client.id) && client_users.filter(({ client_id }) => client_id === client.id).length > 5 && user_index - 1 === client_users.filter(({ client_id }) => client_id === client.id).length" class="avatar pointer" ref="client_user_names" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> + {{ client_users.filter(({ client_id }) => client_id === client.id) - 5 }} </span>
-              </div>
-
-              <b-tooltip :target="() => $refs['client_user_names']" placement="right" v-if="company_users && company_users.length">
-                <div class="d-flex flex-column align-items-start">
-                  <span v-for="(user, user_index) in client_users.filter(({ client_id }) => client_id === client.id)" :key="user.id" v-show="user_index >= 5">
-                    {{ company_users.filter(c_user => c_user.id === user.company_user_id)[0].name }}
-                  </span>
-                </div>
-              </b-tooltip>
-            </div>
-
-            <div class="client-project-name" v-for="{ name, id, acronym } in clientProjects(client)" :key="id" @click="setProjectId(id)">
-              <div @click="setPinnedProject(id)" class="project-item-status">
-                <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
-                <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
-              </div>
-              <p style="margin-bottom: 0 !important">
-                <span class="client-section-acronym" :style="{ 'background-color': client.color }" v-if="acronym">{{ acronym }}</span>
-                <span class="client-project-name__name">{{ name }}</span>
-              </p>
-            </div>
-          </div>
-        </b-col>
-
         <b-col v-if="selectedProjectId" class="kanban-draggable custom-width">
-          <div class="kanban_title-part mb-1">
+          <!-- <div class="kanban_title-part mb-1">
             <h4 class="kanban-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
             <div class="d-flex flex-column ml-3" v-if="project_users && project_users.length">
               <span class="avatar-titles ml-1">Project Users:</span>
@@ -86,14 +41,12 @@
                 </b-tooltip>
               </div>
             </div>
-            <button class="btn btn-primary mx-2" @click="copyShareLink()">Copy Share Link</button>
-          </div>
+          </div> -->
 
           <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :projectColumns="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" :project_id="selectedProjectId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
       </b-row>
     </b-container>
-    <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
   </div>
 </template>
 <script lang="ts">
@@ -345,7 +298,9 @@ export default class Custom extends Vue {
     }))
   }
 
-  mounted() {}
+  mounted() {
+    this.setProjectId(this.$route.params.project_id)
+  }
 
   @TaskUsers.Getter('getById') private getTaskUserById!: any
   @TaskUsers.Getter private sortedByDays!: any
@@ -405,18 +360,6 @@ export default class Custom extends Vue {
       })
   }
 
-  public makeToast(variant: any, title: string, content: string) {
-    this.$bvToast.toast(content, {
-      title: title,
-      // @ts-ignore
-      variant: variant
-    })
-  }
-
-  public copyShareLink() {
-    navigator.clipboard.writeText(`http://localhost:8080/shared-project/${this.selectedProjectId}`)
-    this.makeToast('success', 'Success', 'Copied Successfully')
-  }
   // public clientProjectUsers(projects: any) {
   //   const project_users = projects.reduce((acc:any, project:any) => {
 
