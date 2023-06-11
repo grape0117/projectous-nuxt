@@ -1,37 +1,50 @@
 <template>
-  <b-modal id="recurring-items" class="recurring-items" scrollable title="Recurring Items" :size="tab_index === 0 ? 'lg' : 'md'" @hidden="hide" @ok="saveInvoiceable">
+  <b-modal id="recurring-items" class="recurring-items" scrollable title="Recurring Items" :size="tab_index === 0 ? 'xl' : 'md'">
     <b-tabs content-class="mt-3" v-model="tab_index" lazy>
       <b-tab title="Items">
         <b-table striped hover :sticky-header="true" :items="table_items" :fields="table_fields">
           <template #cell(client)="data">
-            {{ data.item.client }}
+            {{ projectDetails(data.item.client, true) }}
+          </template>
+          <template #cell(project)="data">
+            {{ projectDetails(data.item.project) }}
           </template>
           <template #cell(description)="data">
-            <b-form-textarea v-model="data.item.description" style="min-width: 80px; color: black !important; padding: 0px !important" class="transparent-input-note" debounce="500" rows="0" max-rows="7" cols="100"></b-form-textarea>
+            <b-form-textarea v-model="data.item.description" style="min-width: 80px; color: black !important; padding: 0px !important" class="transparent-input-note" debounce="500" rows="0" max-rows="7" cols="60" @change="setUpdatedData($event, data.item)"></b-form-textarea>
           </template>
           <template #cell(cost)="data">
-            <div style="display:flex">$ <b-form-textarea v-model="data.item.cost" style="min-width: 10px; color: black !important; padding: 0px !important; margin-left: 5px" class="transparent-input-note" debounce="500" rows="0" max-rows="7" cols="30"></b-form-textarea></div>
+            <div style="display:flex">$ <b-form-textarea v-model="data.item.cost" @input="handledCostInput(data.item)" style="min-width: 10px; color: black !important; padding: 0px !important; margin-left: 5px" class="transparent-input-note" debounce="500" rows="0" max-rows="7" cols="10" @change="setUpdatedData($event, data.item)"></b-form-textarea></div>
+          </template>
+          <template #cell(action)="data">
+            <b-badge variant="danger" style="cursor: pointer; margin-right: 5px" @click="deleteRecurringItems(data.item.id)"><b-icon icon="trash"></b-icon></b-badge>
+            <b-badge variant="primary" style="cursor: pointer;" @click="enableEditMode(true, data.item)"><b-icon icon="pencil-square"></b-icon></b-badge>
           </template>
         </b-table>
       </b-tab>
-      <b-tab title="Add Item">
+      <b-tab title="Add/Edit Item">
         <label>Project:</label>
-        <v-select :options="open_projects()" :reduce="project => project.id" label="name" :filter-by="searchProject" style="margin-bottom: 15px;">
+        <v-select :options="openProjects()" :reduce="project => project.id" v-model="new_item_project_id" label="name" :filter-by="searchProject" style="margin-bottom: 15px;">
           <template slot="selected-option" slot-scope="option">
             <div class="flex">
-              <div class="col">{{ client_name(option.client_company_id) }} - {{ option.name }}</div>
+              <div class="col">{{ clientName(option.client_company_id) }} - {{ option.name }}</div>
             </div>
           </template>
-          <template slot="option" slot-scope="option"> {{ client_name(option.client_company_id) }} - {{ option.name }} <b-badge v-if="option.is_new" variant="success">New</b-badge></template>
+          <template slot="option" slot-scope="option"> {{ clientName(option.client_company_id) }} - {{ option.name }} <b-badge v-if="option.is_new" variant="success">New</b-badge></template>
         </v-select>
         <b-form-group id="input-group-2" label="Description:" label-for="description">
-          <b-form-input id="description" required></b-form-input>
+          <b-form-input id="description" v-model="new_item_descrition" required></b-form-input>
         </b-form-group>
         <b-form-group id="input-group-2" label="Cost:" label-for="cost">
-          <b-form-input id="cost" required></b-form-input>
+          <b-form-input type="number" id="cost" v-model="new_item_cost" required></b-form-input>
         </b-form-group>
       </b-tab>
     </b-tabs>
+    <template #modal-footer>
+      <div>
+        <b-button variant="secondary" @click="hide" style="margin-right: 5px">Close</b-button>
+        <b-button v-if="tab_index === 1" variant="primary" @click="addRecurringItems">Save</b-button>
+      </div>
+    </template>
   </b-modal>
 </template>
 
@@ -39,17 +52,12 @@
 import moment from 'moment'
 
 export default {
-  props: ['show', 'clients', 'chosen_clients'],
+  props: ['show', 'clients', 'chosen_clients', 'hideModal'],
   data() {
     return {
       tab_index: 0,
       saving_status: '',
-      table_fields: [
-        { key: 'client', sortable: true },
-        { key: 'project', sortable: true },
-        { key: 'description', sortable: true },
-        { key: 'cost', sortable: true }
-      ],
+      table_fields: [{ key: 'client', sortable: true }, { key: 'project', sortable: true }, { key: 'description', sortable: true }, { key: 'cost', sortable: true }, { key: 'action' }],
       table_items: [
         {
           client: 'TechAround',
@@ -58,18 +66,11 @@ export default {
           cost: '1000'
         }
       ],
-      invoiceable_items: [],
-      invoiceable_item: {
-        item_selected: {},
-        description: null,
-        date: moment(new Date()).format('YYYY-MM-DD'),
-        rate: null,
-        paid_amount: null,
-        // repeat
-        repeat: false,
-        repeat_option: 'Monthly',
-        repeat_options: ['Daily', 'Weekly', 'Monthly', 'Annually', 'Every weekday (Monday to Friday)', 'Custom...']
-      }
+      new_item_project_id: null,
+      new_item_descrition: '',
+      new_item_cost: null,
+      is_edit_mode: false,
+      item_to_edit: null
     }
   },
   watch: {
@@ -77,125 +78,150 @@ export default {
       if (val) {
         this.$bvModal.show('recurring-items')
       }
+    },
+    tab_index() {
+      if (this.tab_index === 0) {
+        this.resetForm()
+      }
     }
   },
   mounted() {
     //   this.init()
+    this.getRecurringItems()
   },
   methods: {
-    open_projects: function() {
+    enableEditMode(edit_mode, data) {
+      this.is_edit_mode = edit_mode
+      if (edit_mode) {
+        const { project, description, cost, id } = data
+        this.new_item_project_id = project
+        this.new_item_descrition = description
+        this.new_item_cost = cost
+        this.tab_index = 1
+        this.item_to_edit = { ...data }
+      } else {
+        this.resetForm()
+      }
+    },
+    openProjects: function() {
       const result = this.$store.getters['projects/getOpenProjectsSortedByClient'] || []
-      console.log('proj result', result)
       const projectsUniqueById = [...new Map(result.map(item => [item['id'], item])).values()]
-      console.log('project unique', projectsUniqueById)
       return projectsUniqueById
     },
-    client_name: function(client_company_id) {
-      let client = this.$store.getters['clients/getByClientCompanyId'](client_company_id)
+    clientName: function(client_company_id) {
+      let client = this.$store.state.clients.clients.find(e => e.client_company_id === client_company_id)
       return client ? client.name : ''
+    },
+    hide() {
+      this.tab_index = 0
+      this.$bvModal.hide('recurring-items')
     },
     searchProject: function(option, label, search) {
       let search_value = search.toLowerCase()
       return (
         option.name.toLowerCase().indexOf(search_value) > -1 ||
-        this.client_name(option.client_company_id)
+        this.clientName(option.client_company_id)
           .toLowerCase()
           .indexOf(search_value) > -1
       )
     },
-    //   async init() {
-    //     // const { invoiceable_items } = await this.$http().get('/invoiceable_items')
+    projectDetails(project_id, return_client_name = false) {
+      const project = this.$store.getters['projects/getById'](project_id)
 
-    //     // for (const invoiceable_item of invoiceable_items) {
-    //     //   const items = {
-    //     //     id: invoiceable_item.id,
-    //     //     Description: invoiceable_item.description,
-    //     //     Rate: invoiceable_item.invoice_amount,
-    //     //     Cost: invoiceable_item.paid_amount,
-    //     //     Quantity: invoiceable_item.quantity,
-    //     //     Date: invoiceable_item.date
-    //     //   }
-    //     //   this.table_items.push(items)
-    //     // }
-    //     // this.invoiceable_items = invoiceable_items
-    //   },
-    hide() {
-      this.$emit('hide')
+      if (return_client_name) {
+        return project ? this.clientName(project.client_company_id) : 0
+      }
+      return project ? project.name : ''
     },
-    //   async editInvoiceable(item) {
-    //     const { Description, Rate, Cost, Date } = item
-    //     let invoiceable_item = this.invoiceable_items.find(itm => itm.id === item.id)
-    //     invoiceable_item.description = Description
-    //     invoiceable_item.invoice_amount = Rate
-    //     invoiceable_item.paid_amount = Cost
-    //     invoiceable_item.date = Date
+    handledCostInput(data) {
+      data.cost = data.cost.replace(/[^\d.]/g, '')
 
-    //     this.$store.dispatch('UPDATE', { module: 'invoiceable_items', entity: invoiceable_item }, { root: true })
-    //   },
-    async saveInvoiceable(bvModalEvt) {
-      // if (this.tab_index === 1) {
-      //   this.saving_status = 'saving'
-      //   bvModalEvt.preventDefault()
-      //   if (!this.invoiceable_item.description || !this.invoiceable_item.rate || !this.invoiceable_item.paid_amount) {
-      //     this.saving_status = 'failed'
-      //     return
-      //   }
-      //   this.$nextTick(async () => {
-      //     const invoiceable_item = {
-      //       description: this.invoiceable_item.description,
-      //       date: this.invoiceable_item.date,
-      //       company_id: this.$store.state.settings.current_company_id,
-      //       client_id: this.$store.getters['clients/getByClientCompanyId'](this.invoiceable_item.item_selected.client_company_id).id,
-      //       project_id: this.invoiceable_item.item_selected.id,
-      //       invoice_amount: this.invoiceable_item.rate,
-      //       paid_amount: this.invoiceable_item.paid_amount,
-      //       quantity: this.invoiceable_item.quantity,
-      //       company_user_id: 1, //TODO: figure out what to set here
-      //       recurs: this.invoiceable_item.repeat ? this.invoiceable_item.repeat_option : null
-      //     }
-      //     await this.$store.dispatch('ADD_ONE', { module: 'invoiceable_items', entity: invoiceable_item })
-      //     // reset
-      //     this.invoiceable_item = {
-      //       item_selected: {},
-      //       description: null,
-      //       date: moment(new Date()).format('YYYY-MM-DD'),
-      //       rate: null,
-      //       // repeat
-      //       repeat: false,
-      //       repeat_option: 'Monthly',
-      //       repeat_options: ['Daily', 'Weekly', 'Monthly', 'Annually', 'Every weekday (Monday to Friday)', 'Custom...']
-      //     }
-      //     this.saving_status = ''
-      //     this.$bvModal.hide('recurring-items')
-      //   })
-      // }
+      // Remove leading zeros
+      data.cost = data.cost.replace(/^0+/, '')
+
+      // Limit to one decimal point
+      const decimalCount = data.cost.split('.').length - 1
+      if (decimalCount > 1) {
+        data.cost = data.cost.slice(0, data.cost.lastIndexOf('.'))
+      }
+    },
+    async getRecurringItems() {
+      const { recurring_items } = await this.$http().get('/recurring_items')
+      const updated_items = []
+      for (const items of recurring_items.reverse()) {
+        updated_items.push({
+          client: items.project_id,
+          project: items.project_id,
+          description: items.description,
+          cost: items.cost,
+          id: items.id,
+          action: items.id
+        })
+      }
+      this.table_items = updated_items
+    },
+    resetForm() {
+      this.new_item_project_id = null
+      this.new_item_descrition = ''
+      this.new_item_cost = null
+      this.item_to_edit = null
+    },
+    async addRecurringItems() {
+      if (this.is_edit_mode) {
+        const updated_data = {
+          project: this.new_item_project_id,
+          description: this.new_item_descrition,
+          cost: this.new_item_cost,
+          is_active: 1,
+          id: this.item_to_edit.id
+        }
+        this.updateRecurringItems(updated_data)
+      } else {
+        const new_recurring_items = {
+          project_id: this.new_item_project_id,
+          description: this.new_item_descrition,
+          cost: this.new_item_cost,
+          is_active: 1
+        }
+
+        const { recurring_items, message } = await this.$http().post('/store_recurring_items', new_recurring_items)
+        if (message) {
+          this.resetForm()
+          this.getRecurringItems()
+          this.tab_index = 0
+          alert(message)
+        }
+      }
+    },
+    setUpdatedData: _.debounce(function(value, updated_data) {
+      this.updateRecurringItems(updated_data)
+    }, 500),
+    async updateRecurringItems(data) {
+      const { project, description, cost, id } = data
+      const updated_recurring_items = {
+        project_id: project,
+        description,
+        cost,
+        is_active: 1
+      }
+      const { recurring_items, message } = await this.$http().put('/update_recurring_items/', id, updated_recurring_items)
+      if (message) {
+        this.getRecurringItems()
+        this.resetForm()
+        this.tab_index = 0
+        if (this.is_edit_mode) alert(message)
+      }
+    },
+    async deleteRecurringItems(id) {
+      const confirm_delete = confirm('Are you sure do you want to delete this item?')
+      if (confirm_delete) {
+        const data = await this.$http().delete('/delete_recurring_items/', id)
+        if (data.data.message) {
+          this.getRecurringItems()
+          alert(data.data.message)
+        }
+      }
     }
-    //   client_projects(client) {
-    //     //labeledConsole('client', client)
-    //     return this.$store.getters['projects/openprojects']().filter(function(project) {
-    //       return project.client_company_id == client.client_company_id
-    //     })
-    //   },
-    //   filteredclients(chosen_clients) {
-    //     let self = this
-    //     return this.clients //TODO: make this work:
-    //     // return self.clients.filter(function(client) {
-    //     //   if (chosen_clients.indexOf('0') === -1) {
-    //     //     if (typeof chosen_clients[0] !== 'number') {
-    //     //       return chosen_clients.indexOf(client.id.toString()) !== -1
-    //     //     } else {
-    //     //       return chosen_clients.indexOf(client.id) !== -1
-    //     //     }
-    //     //   }
-    //     //   return true
-    //     // })
-    //   },
-    //   clearDropdown(option) {
-    //     if (option === 'invoicableItem') {
-    //       return (this.invoiceable_item.item_selected = {})
-    //     }
-    //     this.invoiceable_item.repeat_option = null
-    //   }
   }
 }
 </script>

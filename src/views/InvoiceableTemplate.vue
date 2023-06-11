@@ -297,10 +297,9 @@ export default {
       if (self.sort_by !== 'task') {
         return timers
       }
-      console.log('sorting 123')
+
       if (timers.length)
         return timers.sort(function(a, b) {
-          console.log(a.task_title, b.task_title)
           if (a.task_title > b.task_title) return -1
           if (a.task_title < b.task_title) return 1
           return 0
@@ -426,10 +425,10 @@ export default {
       this.isShowInvoiceableItems = false
     },
     hideRecurringItems() {
-      this.is_show_recurring_items = false
+      this.$bvModal.hide('recurring-items')
     },
     showRecurringItems() {
-      this.is_show_recurring_items = true
+      this.$bvModal.show('recurring-items')
     },
     generateInvoiceButton(timers, invoice_id) {
       const client = document.getElementById('client').value
