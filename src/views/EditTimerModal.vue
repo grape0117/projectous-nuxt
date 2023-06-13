@@ -351,7 +351,7 @@ export default {
         }
         return timerInfo.default_client_rate != timerInfo.client_rate ? timerInfo.client_rate : ''
       } else {
-        return 0
+        return ''
       }
     }
   },
