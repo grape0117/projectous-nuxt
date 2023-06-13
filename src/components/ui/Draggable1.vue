@@ -17,7 +17,7 @@
             </draggable>
             <!-- <div class="field"> -->
             <div class="field" v-show="newColumnIndex !== index">
-              <button class="add-task" @click="addTask(index)" :id="`add-task-btn-${index}`"><i class="icon-add" />Add a Task</button>
+              <button class="add-task text-white" @click="addTask(index)" :id="`add-task-btn-${index}`" style="background: rgba(0,0,0,0.6);"><i class="icon-add" />Add a Task</button>
             </div>
           </div>
           <div v-else>
@@ -653,7 +653,8 @@ export default {
   overflow-x: hidden;
   overflow-y: auto;
   max-height: calc(100% - 120px);
-  background-color: rgb(235, 236, 240);
+  /* background-color: rgb(235, 236, 240); */
+  background-color: rgba(0, 0, 0, 0.6);
 }
 
 .task-card-container:first-child {
@@ -665,7 +666,8 @@ export default {
 }
 
 .field {
-  background-color: rgb(235, 236, 240);
+  /* background-color: rgb(235, 236, 240); */
+  background-color: rgba(0, 0, 0, 0.6);
 }
 
 .field.title {
@@ -684,6 +686,7 @@ export default {
   padding: 4px 14px;
   margin-bottom: 0px;
   width: fit-content;
+  color: white;
 }
 
 input.field-value {
@@ -698,10 +701,9 @@ input.field-value {
 
 .add-task {
   width: 100%;
-  padding: 3px;
-  margin: 5px 0px;
+  padding: 8px 0px;
   border-radius: 5px;
-  color: #5e6c84;
+  background: rgba(0, 0, 0, 0.6);
   border: none;
 }
 

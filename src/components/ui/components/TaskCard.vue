@@ -1,14 +1,14 @@
 <template>
   <div>
-    <div class="bg-white shadow rounded px-1 pt-1 pb-1 border border-white card-content" v-if="task.type !== 'new'" ref="card_element" @click="showTaskDetail">
+    <div class="shadow rounded px-1 pt-1 pb-1 card-content" v-if="task.type !== 'new'" ref="card_element" @click="showTaskDetail">
       <div class="badge-container" v-if="task.labels">
         <badge v-for="label in task.labels" :color="badgeColor(label)" :label="label">{{ label }}</badge>
       </div>
       <div class="flex justify-content-between">
-        <p style="font-size: 14px;">{{ task.title }}</p>
+        <p style="font-size: 14px;" class="text-white">{{ task.title }}</p>
       </div>
       <div class="d-flex mt-4 justify-content-between items-center">
-        <span :style="`font-size: 14px; color: ${dueDateDetails(task.due_date, true)};`" v-show="task.due_date"><i class="icon-date_range"></i>{{ dueDate(task.due_date) }}</span>
+        <span :style="`font-size: 14px; color: ${dueDateDetails(task.due_date, true)};`" v-show="task.due_date" class="text-white"><i class="icon-date_range"></i>{{ dueDate(task.due_date) }}</span>
       </div>
       <div class="assigned-members d-flex" v-if="task_users">
         <span v-for="user in task_users">
@@ -317,5 +317,12 @@ export default {
 }
 .card-content:hover .icon-edit {
   visibility: visible;
+}
+
+.task-card-item {
+  box-shadow: 0px 0px 16px -7px white;
+}
+.task-card-item > div {
+  background-color: rgba(0, 0, 0, 0.4);
 }
 </style>
