@@ -212,7 +212,7 @@
     <invoiceable-add-item :show="isShowInvoiceableItems" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
 
     <!-- Recurring items modal -->
-    <recurring-items :show="is_show_recurring_items" @hide="hideRecurringItems" :clients="clients" :chosen_clients="chosen_clients" />
+    <recurring-items :show="is_show_recurring_items" @hide="hideRecurringItems" :clients="clients" :chosen_clients="chosen_clients" :getData="getData" />
   </div>
 </template>
 
@@ -372,7 +372,6 @@ export default {
     }
   },
   beforeCreate: function() {
-    //labeledConsole('beforeCreate', $('#project').val())
     if (sessionStorage.getItem('invoiceable')) {
       this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() }).catch(() => {})
     }
