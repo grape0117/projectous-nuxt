@@ -316,6 +316,15 @@ export default Vue.extend({
     async completeTask() {
       this.task.status = 'completed'
       this.$store.dispatch('UPDATE', { module: 'tasks', entity: this.task })
+      if (this.$route.query && Object.keys(this.$route.query).length > 0) {
+        let query = Object.assign({}, this.$route.query)
+        delete query.task
+        delete query.thread
+        delete query.showChat
+        delete query.showChatSection
+        await this.$router.replace({ query })
+      }
+      this.$store.dispatch('tasks/updateChats')
       // await EventBus.$emit('showTask', {})
       // this.task = false
     },
