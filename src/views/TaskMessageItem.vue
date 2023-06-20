@@ -23,21 +23,21 @@
           <pre v-if="!message.thumbnail && !isVideo()" class="msg-content" style="color: white;">{{ message.message }}</pre>
         </div>
         <div class="message-actions" v-if="current_company_user_id == message.company_user_id">
-          <!-- <i class="icon-more_vert" @click="open_actions = !open_actions" /> -->
-          <div class="message-actions-options">
+          <i class="icon-more_vert" @click="open_actions = !open_actions" />
+          <div class="message-actions-options" v-if="open_actions">
             <i class="icon-edit" @click="editMessage(message)" />
             <i class="icon-delete" @click="deleteMessage(message)" />
-            <i class="icon-message" @click="showThread(message)" />
+            <!-- <i class="icon-message" @click="showThread(message)" /> -->
             <i v-if="message.isFile" class="icon-download" @click="downloadFile(message)" />
           </div>
         </div>
-        <div class="message-actions" v-else>
-          <!-- <i class="icon-more_vert" @click="open_actions = !open_actions" /> -->
+        <!-- <div class="message-actions" v-else>
+          <i class="icon-more_vert" @click="open_actions = !open_actions" />
           <div class="message-actions-options">
             <i class="icon-message" @click="showThread(message)" />
             <i v-if="message.isFile" class="icon-download" @click="downloadFile(message)" />
           </div>
-        </div>
+        </div> -->
       </div>
       <span class="message-dateTime">{{ formatTime(message.created_at) }}</span>
     </div>
@@ -116,14 +116,16 @@ export default {
       return moment(datetime).format('hh:mm A')
     },
     editMessage(message) {
+      this.open_actions = false
       this.$emit('edit-message', message)
     },
     deleteMessage(message) {
+      this.open_actions = false
       this.$emit('delete-message', message)
-    },
-    showThread(message) {
-      EventBus.$emit('show-thread', message)
     }
+    // showThread(message) {
+    //   EventBus.$emit('show-thread', message)
+    // }
   }
 }
 </script>
@@ -161,7 +163,7 @@ export default {
   visibility: visible;
 }
 .message-panel_inner .message-actions {
-  visibility: hidden;
+  visibility: visible;
 }
 .message-wrapper {
   // border: 1px solid red;
@@ -194,13 +196,14 @@ export default {
   }
 
   .message-actions {
-    visibility: hidden;
+    visibility: visible;
     padding-top: 5px;
     // border: 1px solid red;
     position: relative;
 
     i {
       cursor: pointer;
+      font-size: 24px;
     }
 
     .message-actions-options {

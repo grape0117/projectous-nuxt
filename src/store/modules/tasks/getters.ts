@@ -7,7 +7,8 @@ import { ITask } from '@/store/modules/tasks/types'
 
 export const getters: GetterTree<IModuleState, IRootState> = {
   getById: (state: IModuleState) => (id: any) => {
-    return state.tasks[state.lookup[id]]
+    // return state.tasks[state.lookup[id]]
+    return state.tasks.filter(task => task.id === id)[0]
   },
 
   // TODO: delete if task will be added through server
