@@ -116,6 +116,7 @@
       </b-form-checkbox>
       <tasks-tab v-bind:tasks="my_tasks" @updateData="updateData"> </tasks-tab>
     </div>
+    <complete-confirm-modal id="complete-confirm" :task_id="this.complete_task_id" />
   </div>
 </template>
 
@@ -124,15 +125,26 @@ import moment from 'moment'
 import { EventBus } from '@/components/event-bus'
 import TasksTab from './TasksTab'
 import TaskActionRow from './TaskActionRow.vue'
+import CompleteConfirmModal from './CompleteConfirmModal.vue'
 export default {
   name: 'user-dashboard-template',
   components: {
-    'tasks-tab': TasksTab
+    'tasks-tab': TasksTab,
+    CompleteConfirmModal
+  },
+  data: function() {
+    return {
+      complete_task_id: null
+    }
   },
   mounted() {
     EventBus.$on('update', async ({ company_user_id, task_id }) => {
       await this.setTab(company_user_id)
       document.getElementById(`task_${task_id}`).scrollIntoView()
+    })
+    EventBus.$on('complete_task', async ({ task_id }) => {
+      this.complete_task_id = task_id
+      this.$bvModal.show('complete-confirm-modal')
     })
   },
   computed: {
