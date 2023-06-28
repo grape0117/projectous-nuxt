@@ -291,7 +291,10 @@ export default {
     },
 
     closeRcording() {
-      this.show_share_screen = false
+      const really = confirm('Are you sure want to close?')
+      if (really) {
+        this.show_share_screen = false
+      }
     },
 
     getNextMessages: _.debounce(function() {

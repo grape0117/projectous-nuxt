@@ -121,7 +121,14 @@ export default {
     },
     deleteMessage(message) {
       this.open_actions = false
-      this.$emit('delete-message', message)
+      if (message.isFile && message.text == 'video.mp4') {
+        const really = confirm('Are you sure want to delete this video?')
+        if (really) {
+          this.$emit('delete-message', message)
+        }
+      } else {
+        this.$emit('delete-message', message)
+      }
     }
     // showThread(message) {
     //   EventBus.$emit('show-thread', message)
