@@ -271,7 +271,7 @@ export default {
       }
       const { task_thread } = await this.$store.dispatch('threads/createThread', {
         task_id: task_id,
-        title: `${this.current_company_user.fullname} Completed`,
+        title: `${this.current_company_user.name} Completed`,
         user: this.current_company_user
       })
       await this.$router.push({ query: { task: task_id, thread: task_thread.id, showChat: 'true' } })
