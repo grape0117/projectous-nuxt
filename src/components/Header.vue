@@ -354,12 +354,12 @@ export default Vue.extend({
   },
   methods: {
     goToUserTask() {
-      const user_tasks_tab = sessionStorage.getItem('tasks')
-      if (user_tasks_tab) {
-        this.$router.push({ path: user_tasks_tab })
-      } else {
-        this.$router.push({ path: '/user-tasks' })
-      }
+      // const user_tasks_tab = sessionStorage.getItem('tasks')
+      // if (user_tasks_tab) {
+      //   this.$router.push({ path: user_tasks_tab })
+      // } else {
+      this.$router.push({ path: '/user-tasks' })
+      // }
     },
     goTo(path) {
       this.$router.push(path)

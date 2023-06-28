@@ -116,7 +116,7 @@
       </b-form-checkbox>
       <tasks-tab v-bind:tasks="my_tasks" @updateData="updateData"> </tasks-tab>
     </div>
-    <complete-confirm-modal id="complete-confirm" :task_id="this.complete_task_id" />
+    <complete-confirm-modal id="complete-confirm" :task_id="complete_task_id" />
   </div>
 </template>
 
@@ -134,7 +134,7 @@ export default {
   },
   data: function() {
     return {
-      complete_task_id: null
+      complete_task_id: false
     }
   },
   mounted() {
@@ -144,8 +144,15 @@ export default {
     })
     EventBus.$on('complete_task', async ({ task_id }) => {
       this.complete_task_id = task_id
-      this.$bvModal.show('complete-confirm-modal')
+      this.$nextTick(() => {
+        this.$bvModal.show('complete-confirm-modal')
+      })
     })
+    const project_filter = sessionStorage.getItem('project_filter')
+    this.project_filter = project_filter ? [project_filter] : []
+
+    const task_filter = sessionStorage.getItem('task_filter')
+    this.task_filter = task_filter ? task_filter : ''
   },
   computed: {
     current_company_user() {
@@ -269,6 +276,21 @@ export default {
         tasks = user_id ? this.$store.getters['tasks/getByCompanyUserId'](user_id) : this.$store.getters['tasks/getMyTasks']
       }
 
+      tasks.forEach((task, i) => {
+        const { project_id } = task
+        if (typeof project_id !== 'undefined') {
+          if (!self.project_list.includes(project_id)) {
+            if (project_id) {
+              self.project_list.push(project_id)
+            }
+          }
+        }
+      })
+
+      if (self.project_filter > 0 && !self.project_list.includes(self.project_filter[0])) {
+        self.project_filter = []
+      }
+
       tasks = tasks.filter(task => {
         if (!task || (self.current_project_id && task.project_id !== self.current_project_id) || (task.title && !task.title.toLowerCase().includes(self.task_filter)) || task.status === 'completed') {
           return false
@@ -333,14 +355,6 @@ export default {
       tasks = [...dueTasks, ...notDueTasks]
       let tmp_priority = tasks.length > 0 ? tasks[0].priority : ''
       tasks.forEach((task, i) => {
-        const { project_id } = task
-        if (typeof project_id !== 'undefined') {
-          if (!self.project_list.includes(project_id)) {
-            if (project_id) {
-              self.project_list.push(project_id)
-            }
-          }
-        }
         if (task.priority !== tmp_priority) {
           task['hasMargin'] = true
           tmp_priority = task.priority
@@ -415,6 +429,7 @@ export default {
       this.storeChanges()
     },
     task_filter() {
+      sessionStorage.setItem('task_filter', this.task_filter)
       this.storeChanges()
     },
     show_completed() {
@@ -514,6 +529,7 @@ export default {
       } else {
         this.project_filter = [project_id]
       }
+      sessionStorage.setItem('project_filter', this.project_filter)
     },
     isActiveProjectFilter(project_id) {
       let is_selected
@@ -558,7 +574,8 @@ export default {
     },
     async setTab(tab) {
       this.project_list = []
-      this.project_filter = []
+      const project_filter = sessionStorage.getItem('project_filter')
+      this.project_filter = project_filter ? [project_filter] : []
       this.tab = tab
       this.current_company_user_id = tab
       const data = await this.getData()

@@ -44,9 +44,6 @@ export default {
         const footer = document.querySelector('.modal-footer')
         footer.style = updated_style
       }
-      this.$nextTick(() => {
-        this.$refs.thread_title.focus()
-      })
     }
   }
 }
