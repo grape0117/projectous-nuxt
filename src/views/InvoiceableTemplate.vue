@@ -133,6 +133,7 @@
                     <div style="width: 100%" class="ml-3">
                       <span id="actionLink"> </span>
                       <button :style="buttonStyle" class="btn btn-primary" @click="showInvoiceableItems" v-if="isAdmin()">Invoiceable Items</button>
+                      <button :style="buttonStyle" class="btn btn-primary ml-2" @click="showRecurringItems" v-if="isAdmin()">Recurring Items</button>
                     </div>
                     Sort&nbsp;by&nbsp;<b-form-select v-model="sort_by">
                       <b-form-select-option value="date">By Date</b-form-select-option>
@@ -209,6 +210,9 @@
     </div>
     <!-- Add Invoiceable Item Modal -->
     <invoiceable-add-item :show="isShowInvoiceableItems" @hide="hideAddInvoiceable" :clients="clients" :chosen_clients="chosen_clients" />
+
+    <!-- Recurring items modal -->
+    <recurring-items :show="is_show_recurring_items" @hide="hideRecurringItems" :clients="clients" :chosen_clients="chosen_clients" :getData="getData" />
   </div>
 </template>
 
@@ -226,7 +230,8 @@ export default {
   components: {
     'invoiceable-timer-row': InvoiceableTimerRow,
     'report-timer-row': ReportTimerRow,
-    'invoiceable-add-item': () => import('./InvoiceableAddItem.vue')
+    'invoiceable-add-item': () => import('./InvoiceableAddItem.vue'),
+    'recurring-items': () => import('./RecurringItems.vue')
   },
   data: function() {
     return {
@@ -261,7 +266,8 @@ export default {
       invoice_items: [],
       settings: { search: '', show_inactive_users: false, show_closed_projects: false, show_all_clients: false },
       loading_data: false,
-      is_user_report: false
+      is_user_report: false,
+      is_show_recurring_items: false
     }
   },
   computed: {
@@ -291,10 +297,9 @@ export default {
       if (self.sort_by !== 'task') {
         return timers
       }
-      console.log('sorting 123')
+
       if (timers.length)
         return timers.sort(function(a, b) {
-          console.log(a.task_title, b.task_title)
           if (a.task_title > b.task_title) return -1
           if (a.task_title < b.task_title) return 1
           return 0
@@ -367,7 +372,6 @@ export default {
     }
   },
   beforeCreate: function() {
-    //labeledConsole('beforeCreate', $('#project').val())
     if (sessionStorage.getItem('invoiceable')) {
       this.$router.push({ path: '/invoiceable?' + new URLSearchParams(sessionStorage.getItem('invoiceable')).toString() }).catch(() => {})
     }
@@ -418,6 +422,12 @@ export default {
     },
     hideAddInvoiceable() {
       this.isShowInvoiceableItems = false
+    },
+    hideRecurringItems() {
+      this.$bvModal.hide('recurring-items')
+    },
+    showRecurringItems() {
+      this.$bvModal.show('recurring-items')
     },
     generateInvoiceButton(timers, invoice_id) {
       const client = document.getElementById('client').value
