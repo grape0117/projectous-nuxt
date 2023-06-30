@@ -15,10 +15,24 @@
         <div class="subtitle">...or click to select a file from your computer</div>
       </div>
     </vue-dropzone>
+    <div class="video-container" v-if="show_share_screen">
+      <i class="icon-close" @click="closeRcording" />
+      <video src="" autplay class="video-preview bg-black w-full h-auto w-48 mw-48 mx-auto mb-4" style="max-width: 48%;"></video>
+      <video class="recorded-video-result bg-black h-auto mx-auto mb-4 w-48 mw-48" :src="downloadUrl" style="max-width: 48%;" controls></video>
+    </div>
+    <div class="chat-block-spinner-bar" style="position: absolute; display: flex; height: 100%; z-index: 10; justify-content: center!important; align-items: center; width: 100%; top: 0; right: 0;">
+      <div class="bounce1"></div>
+      <div class="bounce2"></div>
+      <div class="bounce3"></div>
+    </div>
     <div class="send-message" v-if="thread && thread.status == 'open'">
       <b-form-textarea type="text" ref="message_content" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3" @keyup.enter.exact="changeText" @keydown.enter="handleEnter" @paste="$event => onMessagePaste($event)"> </b-form-textarea>
       <i class="icon-attach_file" @click="attachFile()" />
-      <i class="icon-send" :style="(s_message !== '' && s_message !== '\n') || fileExist ? 'color: darkorange;' : 'color: gray;'" @click="saveMessage()" />
+      <!-- <b-form-checkbox v-if="!isStarted" v-model="include_audio" name="check-button" switch variant="warning" class="text-white">
+      </b-form-checkbox> -->
+      <i class="icon-screen_share" @click="startRecording" v-if="!isStarted" />
+      <i class="icon-stop" @click="stopRecording" v-if="isStarted" />
+      <i class="icon-send" :style="(s_message !== '' && s_message !== '\n') || fileExist || stream_video ? 'color: darkorange;' : 'color: gray;'" @click="saveMessage()" />
     </div>
     <div class="thread-btns" v-if="thread && thread.status == 'open'">
       <b-button @click="closeThread">CLOSE THREAD</b-button>
@@ -67,12 +81,23 @@ export default {
           'X-Requested-With': '',
           'Access-Control-Allow-Origin': '*'
         }
-        // paramName: function(n) {
-        //   return "files[]";
-        // },
       },
       thread_message: null,
-      last_message_timestamp: null
+      last_message_timestamp: null,
+
+      stream: null,
+      audio: null,
+      mixedStream: null,
+      chunks: [],
+      recorder: null,
+      startButton: null,
+      stopButton: null,
+      downloadUrl: null,
+      recordedVideo: null,
+      include_audio: true,
+      isStarted: false,
+      stream_video: null,
+      show_share_screen: false
     }
   },
   components: {
@@ -152,6 +177,7 @@ export default {
     }
   },
   mounted() {
+    this.hideLoading()
     setTimeout(() => {
       let container = this.$refs.msgContainer
       container.scrollTop = container.scrollHeight + 120
@@ -159,6 +185,118 @@ export default {
     this.getNextMessages()
   },
   methods: {
+    clearScreen() {
+      this.chunks = []
+      this.stream = null
+      this.audio = null
+      this.mixedStream = null
+      this.recorder = null
+      this.startButton = null
+      this.stopButton = null
+      this.downloadUrl = ''
+      this.recordedVideo = ''
+      this.include_audio = true
+      this.isStarted = false
+      this.stream_video = null
+      this.hideLoading()
+    },
+    async saveVideo() {
+      this.showLoading()
+      const data = new FormData()
+      let fileName = `video.mp4`
+      this.stream_video = new Blob(this.chunks, { type: 'video/mp4' })
+      this.hideLoading()
+    },
+    async setupStream() {
+      try {
+        this.stream = await navigator.mediaDevices.getDisplayMedia({
+          video: true
+        })
+        if (this.include_audio) {
+          this.audio = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              sampleRate: 44100
+            }
+          })
+        }
+        this.setupVideoFeedback()
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    setupVideoFeedback() {
+      if (this.stream) {
+        const video = document.querySelector('.video-preview')
+        video.srcObject = this.stream
+        video.play()
+      } else {
+        console.warn('No stream available')
+      }
+    },
+    async startRecording() {
+      this.show_share_screen = true
+      this.chunks = []
+      await this.setupStream()
+
+      if (this.stream) {
+        if (this.audio) {
+          this.mixedStream = new MediaStream([...this.stream.getTracks(), ...this.audio.getTracks()])
+        } else {
+          this.mixedStream = new MediaStream([...this.stream.getTracks()])
+        }
+        this.recorder = new MediaRecorder(this.mixedStream)
+        this.recorder.ondataavailable = this.handleDataAvailable
+        this.recorder.onstop = this.handleStop
+        this.recorder.start(1000)
+        this.isStarted = true
+        console.log('Recording started')
+      } else {
+        console.warn('No stream available.')
+      }
+    },
+
+    stopRecording() {
+      this.recorder.stop()
+      this.isStarted = false
+    },
+
+    handleDataAvailable(e) {
+      this.chunks.push(e.data)
+    },
+    showLoading() {
+      const loadingElement = document.getElementsByClassName('chat-block-spinner-bar')
+      loadingElement[0].style.display = 'flex'
+    },
+    hideLoading() {
+      const loadingElement = document.getElementsByClassName('chat-block-spinner-bar')
+      loadingElement[0].style.display = 'none'
+    },
+    handleStop(e) {
+      const blob = new Blob(this.chunks, { type: 'video/mp4' })
+
+      this.downloadUrl = URL.createObjectURL(blob)
+      const recordedVideo = document.getElementsByClassName('recorded-video-result')[0]
+      recordedVideo.load()
+      recordedVideo.onloadeddata = function() {
+        recordedVideo.play()
+      }
+
+      this.stream.getTracks().forEach(track => track.stop())
+      if (this.audio) {
+        this.audio.getTracks().forEach(track => track.stop())
+      }
+      this.saveVideo()
+    },
+
+    closeRcording() {
+      const really = confirm('Are you sure want to close?')
+      if (really) {
+        this.show_share_screen = false
+      }
+    },
+
     getNextMessages: _.debounce(function() {
       const msgContainer = this.$refs.msgContainer
       let topOfWindow = msgContainer.scrollTop
@@ -288,6 +426,32 @@ export default {
       }
     },
     async saveMessage() {
+      if (this.stream_video) {
+        this.showLoading()
+        const data = new FormData()
+        let fileName = `video.mp4`
+        let file = new File([this.stream_video], fileName)
+
+        data.append('files', this.stream_video, 'video.mp4')
+        console.log('files', file)
+        const res = await this.$http().postImage('/upload', data)
+        let file_path = res[0]['file_path']
+        console.log(file_path)
+        this.show_share_screen = false
+        let task_id = this.task_id
+        let company_user_id = this.current_company_user_id
+        let task_message = this.$store.dispatch('task_messages/createThreadMessage', {
+          task_id,
+          thread_id: this.thread_id,
+          company_user_id,
+          file_path: file_path,
+          message: fileName,
+          is_file: true
+        })
+
+        this.hideLoading()
+        this.clearScreen()
+      }
       if (this.$refs.chatDropzone && this.$refs.chatDropzone.getActiveFiles().length > 0) {
         this.$refs.chatDropzone.processQueue()
         console.log('Image should be uploaded here!')
@@ -363,6 +527,48 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@-moz-keyframes spin {
+  100% {
+    -moz-transform: rotate(-360deg);
+  }
+}
+
+@-webkit-keyframes spin {
+  100% {
+    -webkit-transform: rotate(-360deg);
+  }
+}
+
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(-360deg);
+    transform: rotate(-360deg);
+  }
+}
+
+@-webkit-keyframes bounceDelay {
+  0%,
+  80%,
+  100% {
+    -webkit-transform: scale(0);
+  }
+  40% {
+    -webkit-transform: scale(1);
+  }
+}
+@keyframes bounceDelay {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    -webkit-transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+    -webkit-transform: scale(1);
+  }
+}
+
 #message-container {
   position: relative;
   background-color: #cdcdcd;
@@ -425,6 +631,64 @@ export default {
   color: gray;
   font-size: 24px;
   // float: right;
+}
+.icon-stop,
+.icon-screen_share {
+  color: rgb(255, 84, 84);
+  font-size: 24px;
+}
+.icon-stop_screen_share {
+  color: rgb(255, 84, 84);
+  font-size: 24px;
+}
+
+.video-container {
+  position: absolute;
+  width: 100%;
+  min-height: 105px;
+  height: calc(100vh - 379px);
+  top: 48px;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+}
+.video-container video {
+  border: solid 3px rgb(255, 84, 84);
+  border-radius: 10px;
+  max-width: 48%;
+  width: 48%;
+}
+.video-container .icon-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
+
+.chat-block-spinner-bar {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+.chat-block-spinner-bar > div {
+  margin: 0 2px;
+  width: 15px;
+  height: 15px;
+  background: #996300;
+  border-radius: 100% !important;
+  display: inline-block;
+  -webkit-animation: bounceDelay 1.4s infinite ease-in-out;
+  animation: bounceDelay 1.4s infinite ease-in-out;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+.chat-block-spinner-bar .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+.chat-block-spinner-bar .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
 }
 .icon-send {
   color: gray;

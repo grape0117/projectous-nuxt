@@ -63,6 +63,7 @@ import TaskActionRow from './TaskActionRow.vue'
 import ProjectIcon from '../components/ui/ProjectIcon'
 import moment from 'moment'
 import { Datetime } from 'vue-datetime'
+import { EventBus } from '@/components/event-bus'
 import { abbrName } from '@/utils/util-functions'
 export default {
   props: ['task', 'tab', 'showCheckbox'],
@@ -167,6 +168,10 @@ export default {
       //   return false
       // }
       return true
+    },
+    current_company_user() {
+      const me = this.$store.getters['company_users/getMe']
+      return me
     }
   },
   methods: {
@@ -264,6 +269,13 @@ export default {
       } else {
         this.makeToast('danger', result.message)
       }
+      const { task_thread } = await this.$store.dispatch('threads/createThread', {
+        task_id: task_id,
+        title: `${this.current_company_user.name} Completed`,
+        user: this.current_company_user
+      })
+      await this.$router.push({ query: { task: task_id, thread: task_thread.id, showChat: 'true' } })
+      EventBus.$emit('complete_task', { task_id: task_id })
     },
     async notCompleteMyTask(task_id) {
       const task_progress_info = {

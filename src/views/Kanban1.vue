@@ -1,6 +1,6 @@
 <template>
   <div class="kanban-page">
-    <b-container fluid>
+    <b-container fluid class="overflow-hidden">
       <b-row class="kanban-page-innerwrapper">
         <b-col class="client-section scroll-col">
           <div class="d-flex justify-content-center mb-3">
@@ -86,9 +86,10 @@
                 </b-tooltip>
               </div>
             </div>
+            <button class="btn btn-primary mx-2" @click="copyShareLink()">Copy Share Link</button>
           </div>
 
-          <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
+          <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :projectColumns="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" :project_id="selectedProjectId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
       </b-row>
     </b-container>
@@ -110,7 +111,8 @@ import TaskSideBar from './TaskSideBar.vue'
 import uuid from 'uuid'
 import { colorThemes } from '@/mixins/colorThemes'
 import { getCookie } from '@/utils/util-functions'
-import { EventBus } from '@/components/event-bus'
+// import { EventBus } from '@/components/event-bus'
+import { deleteDB } from 'idb'
 
 const CompanyClients = namespace('clients')
 const CompanyUsers = namespace('company_users')
@@ -119,7 +121,7 @@ const Tasks = namespace('tasks')
 const Lists = namespace('lists')
 const Projects = namespace('projects')
 
-const taskStatuses = ['open', 'in-progress', 'turned-in', 'completed', 'closed']
+const taskStatuses = ['backlog', 'in-progress', 'turned-in', 'completed', 'closed']
 
 interface ITaskTimerToggle {
   taskId: number | string
@@ -281,21 +283,60 @@ export default class Custom extends Vue {
     return this.$store.state.settings.current_company_user_id
   }
   get selectedProjectTasksForStatusesColumns() {
-    const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
-    console.log('projectTasks', projectTasks)
-    return projectTasks
-      .map(({ id, title, status, sort_order, temp }: ITask) => ({
-        id,
-        title,
-        status,
-        listId: status,
-        sort_order,
-        temp
-      }))
-      .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+    console.log('here')
+    // const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
+    // const task_list = this.getTaskListByProjectId(this.selectedProjectId)
+    const projectTasks = this.$store.getters['tasks/getByProjectId'](this.selectedProjectId)
+    const task_list = this.$store.getters['projects/getTaskListByProjectId'](this.selectedProjectId)
+
+    if (task_list.length > 0) {
+      let columns = new Array(task_list.length)
+      for (let i = 0; i < task_list.length; i++) {
+        const list = task_list[i]
+        let tasks = projectTasks.filter((task: ITask) => list.tasks.indexOf(task.id) >= 0)
+        tasks = [...tasks].sort(({ id: task_a_id }: any, { id: task_b_id }: any) => (list.tasks.indexOf(task_a_id) > list.tasks.indexOf(task_b_id) ? 1 : -1))
+
+        columns[i] = {
+          title: list.title,
+          // idList: list.id,
+          tasks: tasks
+        }
+      }
+      return columns
+    } else {
+      let tasks = projectTasks
+        .map(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => ({
+          id,
+          title,
+          status,
+          listId: status,
+          sort_order,
+          temp,
+          idList: idList || 'backlog',
+          labels,
+          detail,
+          due_date,
+          assignedMembers
+        }))
+        .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+
+      let columns = [
+        {
+          title: 'Backlog',
+          tasks: tasks
+        }
+      ]
+      return columns
+    }
   }
 
   get taskPerStatusLists() {
+    return []
+
+    if (this.$store.state.lists.lists.length > 0) {
+      return this.$store.state.lists.lists
+    }
+
     return taskStatuses.map(status => ({
       title: status,
       id: status,
@@ -313,13 +354,14 @@ export default class Custom extends Vue {
   @TaskUsers.Action('updateSortOrders')
   private updateTaskUsersSortOrdersVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
-  @Tasks.Action('createProjectTask') private createProjectTaskVuex!: any
+  @Tasks.Action('createProjectTaskWithTaskList') private createProjectTaskVuex!: any
   @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('updateSortOrders') private updateTaskSortOrdersVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
   @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
+  @Projects.Getter private getTaskListByProjectId!: any
 
   private show_all_active_projects: boolean = false
   private editedTaskTimerId: number | string | null = null
@@ -363,6 +405,18 @@ export default class Custom extends Vue {
       })
   }
 
+  public makeToast(variant: any, title: string, content: string) {
+    this.$bvToast.toast(content, {
+      title: title,
+      // @ts-ignore
+      variant: variant
+    })
+  }
+
+  public copyShareLink() {
+    navigator.clipboard.writeText(`http://localhost:8080/shared-project/${this.selectedProjectId}`)
+    this.makeToast('success', 'Success', 'Copied Successfully')
+  }
   // public clientProjectUsers(projects: any) {
   //   const project_users = projects.reduce((acc:any, project:any) => {
 
@@ -394,15 +448,22 @@ export default class Custom extends Vue {
     return project ? project.name : ''
   }
 
-  public async createTask({ item, ids_of_items_to_shift_up }: any) {
+  public async createTask(task: any) {
     console.log('CREATE TASK CUSTOM')
 
     this.createProjectTaskVuex({
-      title: item.title,
-      project_id: this.selectedProjectId,
-      sort_order: item.sort_order,
-      status: item.status,
-      temp: false
+      task: {
+        // title: title,
+        ...task.task,
+        project_id: this.selectedProjectId,
+        // sort_order: item.sort_order,
+        // status: item.status,
+        status: 'open',
+        temp: false
+        // idList: idList,
+        // assignedMembers: assignedMembers
+      },
+      task_list: task.task_list
     })
   }
 
@@ -483,17 +544,17 @@ export default class Custom extends Vue {
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
 
-  // created() {
-  //   EventBus.$on('toggle_tasks', () => {
-  //     this.showTask = !this.showTask
-  //   })
-  //   EventBus.$on('toggle_timers', () => {
-  //     this.showTimer = !this.showTimer
-  //   })
-  //   EventBus.$on('toggle_chat', () => {
-  //     this.showChat = !this.showChat
-  //   })
-  // }
+  created() {
+    // EventBus.$on('toggle_tasks', () => {
+    //   this.showTask = !this.showTask
+    // })
+    // EventBus.$on('toggle_timers', () => {
+    //   this.showTimer = !this.showTimer
+    // })
+    // EventBus.$on('toggle_chat', () => {
+    //   this.showChat = !this.showChat
+    // })
+  }
 }
 </script>
 <style lang="scss">
@@ -519,8 +580,8 @@ export default class Custom extends Vue {
 }
 .kanban-draggable {
   width: 100px;
-  height: calc(100vh - 50px);
-  overflow-x: auto;
+  height: calc(100vh - 77px);
+  overflow-x: hidden;
   overflow-y: hidden;
 }
 .client-section-acronym {
@@ -562,7 +623,7 @@ export default class Custom extends Vue {
 .project-item-status {
 }
 .scroll-col {
-  height: calc(100vh - 40px);
+  height: calc(100vh - 50px);
   overflow-y: auto;
 }
 /* .custom-width {
@@ -570,6 +631,7 @@ export default class Custom extends Vue {
 } */
 .kanban-page-title {
   color: white;
+  margin-bottom: 0px;
 }
 .client-name {
   display: flex;

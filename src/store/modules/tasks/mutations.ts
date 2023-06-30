@@ -159,7 +159,7 @@ export const mutations: MutationTree<IModuleState> = {
     let newChats = [...state.chats]
     newChats[chatIndex] = { ...newChats[chatIndex], num_unread: 0 }
     state.chats = newChats
-  }
+  },
   /*,
   uuid_to_id(state: IModuleState, { uuid, id }) {
     state.tasks[state.lookup[uuid]].id = id
@@ -167,4 +167,8 @@ export const mutations: MutationTree<IModuleState> = {
 
     //TODO: do we need to delete from lookup? Doesn't seem to matter
   }*/
+  updateTask(state: IModuleState, task) {
+    console.log('here', task)
+    // this.commit('UPDATE_ATTRIBUTE', task)
+  }
 }

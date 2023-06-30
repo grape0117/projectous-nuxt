@@ -40,7 +40,8 @@ function createDefaultTask(): ITask {
     settings: {},
     last_task_message_id: null,
     last_task_message_created_at: null,
-    total_time_spent: 0
+    total_time_spent: 0,
+    video_link: null
   }
 }
 
@@ -50,7 +51,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
 
     state.tasks_by_project = tasks.filter((task: ITask) => (task.project_id = project_id))
   },
-  async createTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, users = [], owner, priority = 'active', due_date }: any) {
+  async createTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, users = [], owner, priority = 'active', due_date, video_link }: any) {
     const task = {
       ...createDefaultTask(),
       title,
@@ -60,7 +61,8 @@ export const actions: ActionTree<IModuleState, IRootState> = {
       users,
       owner,
       priority,
-      due_date
+      due_date,
+      video_link
     }
     let newTask
     if (temp) {
@@ -78,13 +80,77 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
     return newTask
   },
-  async createProjectTask({ commit, getters }: any, { title, project_id, sort_order, status, temp }: any) {
+  async createTaskWithTaskList({ commit, getters }: any, { id, title, project_id, sort_order, status, temp, users = [], owner, priority = 'active', due_date, task_list = [] }: any) {
+    const task = {
+      ...createDefaultTask(),
+      id,
+      title,
+      project_id,
+      sort_order,
+      status,
+      users,
+      owner,
+      priority,
+      due_date
+    }
+    // @ts-ignore
+    await this._vm.$http().post('/projects/task_list/' + project_id, { task_list: task_list })
+    let newTask
+    if (temp) {
+      newTask = {
+        ...task,
+        //id: generateUUID(),
+        temp: true
+      }
+    } else {
+      //TODO: should we do this? task.id = uuid.v4();
+      // @ts-ignore
+      newTask = (await this._vm.$http().post('/tasks', { task }))[0]
+      // commit('removeTempTasks')
+    }
+    commit('ADD_ONE', { module: 'tasks', entity: newTask }, { root: true })
+    return newTask
+  },
+  async createProjectTaskWithTaskList({ commit, getters }: any, { task, task_list }: any) {
+    const new_task = {
+      ...createDefaultTask(),
+      id: task.id,
+      title: task.title,
+      project_id: task.project_id,
+      sort_order: task.sort_order,
+      status: task.status,
+      idList: task.idList,
+      users: task.assignedMembers
+    }
+    // // create a new task user here
+    // const task_user = {}
+    // commit('ADD_ONE', { module: 'task_users', entity: task_user }, { root: true })
+    // @ts-ignore
+    let task_users = task.assignedMembers.map(assignedMember => {
+      return { task_id: task.id, company_user_id: assignedMember, role: 'assigned' }
+    })
+    console.log('task_users', task_users)
+
+    commit('ADD_MANY', { module: 'task_users', entities: task_users }, { root: true })
+    commit('ADD_ONE', { module: 'tasks', entity: new_task }, { root: true })
+    this.commit('projects/updateTaskList', { project_id: task.project_id, task_list: task_list })
+    // @ts-ignore
+    await this._vm.$http().post('/projects/task_list/' + task.project_id, { task_list: task_list })
+    let newTask
+    // @ts-ignore
+    const result = await this._vm.$http().post('/tasks', { task: new_task })
+
+    return result
+  },
+  async createProjectTask({ commit, getters }: any, { title, project_id, sort_order, status, temp, idList, assignedMembers }: any) {
     const task = {
       ...createDefaultTask(),
       title,
       project_id,
       sort_order,
-      status
+      status,
+      idList,
+      users: assignedMembers
     }
     let newTask
     if (temp) {
@@ -154,6 +220,7 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // }
   },
   async updateTask({ commit }: any, task: any) {
+    console.log('task', task)
     // @ts-ignore
     await this._vm.$http().post('/tasks/' + task.id, { task })
     // TODO @stephane send task to server

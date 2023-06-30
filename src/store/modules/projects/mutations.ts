@@ -33,5 +33,13 @@ export const mutations: MutationTree<IModuleState> = {
     this.commit('project_users/deleteByProjectId', project.id)
     // @ts-ignore
     this.commit('tasks/deleteByProjectId', project.id)
+  },
+  updateTaskList(state: IModuleState, task_list) {
+    const index = state.task_list.findIndex(({ project_id }) => project_id == task_list.project_id)
+    if (index >= 0) {
+      state.task_list[index] = task_list
+    } else {
+      state.task_list.push(task_list)
+    }
   }
 }

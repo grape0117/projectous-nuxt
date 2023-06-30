@@ -8,29 +8,36 @@
             <img v-if="!image_loaded" src="@/assets/img/no-image.png" width="300" height="260" alt="thumbnail" style="position: absolute;" />
             <img :src="'https://projectous-chat-bucket.sfo3.digitaloceanspaces.com/' + message.thumbnail" width="300" height="260" alt="thumbnail" @load="imgLoaded" />
           </div>
-          <img v-if="!message.thumbnail && message.isFile" src="@/assets/img/attach-file.png" width="30" height="34" alt="thumbnail" style="margin-top: 3px; margin-left: 5px;" />
-          <div class="download-bg" v-if="message.isFile && showDownloadBtn">
+          <div v-else-if="isVideo()" style="position: relative; display: flex; flex-direction: column; flex-grow: 0; flex-shrink: 0; overflow: hidden; align-items: center; justify-content: center; app-region: no-drag; background-color: transparent; border-color: transparent; text-align: left; border-width: 0px; width: 350px; border-radius: 0px 10px 10px; padding: 0px; cursor: pointer; border-style: solid;">
+            <video width="100%" height="auto" controls>
+              <source :src="`https://projectous-chat-bucket.sfo3.digitaloceanspaces.com/${message.filePath}`" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+          <img v-else-if="!message.thumbnail && message.isFile" src="@/assets/img/attach-file.png" width="30" height="34" alt="thumbnail" style="margin-top: 3px; margin-left: 5px;" />
+          <div class="download-bg" v-if="message.isFile && showDownloadBtn && !isVideo()">
             <i class="icon-download" @click="downloadFile(message)" />
             <i v-if="message.thumbnail" class="icon-open_in_new" @click="openImage()" />
           </div>
-          <pre v-if="!message.thumbnail" class="msg-content" style="color: white;">{{ message.message }}</pre>
+          <pre v-if="!message.thumbnail && !isVideo()" class="msg-content" style="color: white;">{{ message.message }}</pre>
         </div>
         <div class="message-actions" v-if="current_company_user_id == message.company_user_id">
-          <!-- <i class="icon-more_vert" @click="open_actions = !open_actions" /> -->
-          <div class="message-actions-options">
+          <i class="icon-more_vert" @click="open_actions = !open_actions" />
+          <div class="message-actions-options" v-if="open_actions">
             <i class="icon-edit" @click="editMessage(message)" />
             <i class="icon-delete" @click="deleteMessage(message)" />
-            <i class="icon-message" @click="showThread(message)" />
+            <!-- <i class="icon-message" @click="showThread(message)" /> -->
             <i v-if="message.isFile" class="icon-download" @click="downloadFile(message)" />
           </div>
         </div>
-        <div class="message-actions" v-else>
-          <!-- <i class="icon-more_vert" @click="open_actions = !open_actions" /> -->
+        <!-- <div class="message-actions" v-else>
+          <i class="icon-more_vert" @click="open_actions = !open_actions" />
           <div class="message-actions-options">
             <i class="icon-message" @click="showThread(message)" />
             <i v-if="message.isFile" class="icon-download" @click="downloadFile(message)" />
           </div>
-        </div>
+        </div> -->
       </div>
       <span class="message-dateTime">{{ formatTime(message.created_at) }}</span>
     </div>
@@ -69,6 +76,12 @@ export default {
     }
   },
   methods: {
+    isVideo() {
+      if (this.message.message == 'video.mp4' && this.message.isFile) {
+        return true
+      }
+      return false
+    },
     openImage() {
       var image = new Image()
       image.src = 'https://projectous-chat-bucket.sfo3.digitaloceanspaces.com/' + this.message.filePath
@@ -103,14 +116,23 @@ export default {
       return moment(datetime).format('hh:mm A')
     },
     editMessage(message) {
+      this.open_actions = false
       this.$emit('edit-message', message)
     },
     deleteMessage(message) {
-      this.$emit('delete-message', message)
-    },
-    showThread(message) {
-      EventBus.$emit('show-thread', message)
+      this.open_actions = false
+      if (message.isFile && message.text == 'video.mp4') {
+        const really = confirm('Are you sure want to delete this video?')
+        if (really) {
+          this.$emit('delete-message', message)
+        }
+      } else {
+        this.$emit('delete-message', message)
+      }
     }
+    // showThread(message) {
+    //   EventBus.$emit('show-thread', message)
+    // }
   }
 }
 </script>
@@ -148,7 +170,7 @@ export default {
   visibility: visible;
 }
 .message-panel_inner .message-actions {
-  visibility: hidden;
+  visibility: visible;
 }
 .message-wrapper {
   // border: 1px solid red;
@@ -181,13 +203,14 @@ export default {
   }
 
   .message-actions {
-    visibility: hidden;
+    visibility: visible;
     padding-top: 5px;
     // border: 1px solid red;
     position: relative;
 
     i {
       cursor: pointer;
+      font-size: 24px;
     }
 
     .message-actions-options {

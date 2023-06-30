@@ -1,54 +1,9 @@
 <template>
   <div class="kanban-page">
-    <b-container fluid>
+    <b-container fluid class="overflow-hidden">
       <b-row class="kanban-page-innerwrapper">
-        <b-col class="client-section scroll-col">
-          <div class="d-flex justify-content-center mb-3">
-            <v-select v-model="selectedClient" label="name" :options="activeClients" style="width: 100px"> </v-select>
-          </div>
-
-          <div v-if="clientVisible(client)" v-for="(client, index) in selectedClient.id ? filteredClient : activeClients" :key="index">
-            <div class="client-name">
-              <span class="mr-2">{{ client.name }}</span>
-              <b-icon class="pointer mr-2" v-if="isAdmin" icon="pencil" variant="info" @click="editClient(client.id)"></b-icon>
-              <div class="add-client">
-                <i class="icon-add pointer" :style="{ color: default_theme_color }" @click="addProject(client)" />
-              </div>
-            </div>
-
-            <div class="d-flex align-items-center pl-1">
-              <div class="d-flex" v-for="(user, user_index) in client_users.filter(({ client_id }) => client_id === client.id)" :key="user.id">
-                <span v-if="user_index < 5" v-b-tooltip.hover :title="company_users.filter(c_user => c_user.id === user.company_user_id)[0].name" class="avatar mr-1 pointer" :style="{ 'background-color': company_users.filter(c_user => c_user.id === user.company_user_id)[0].color }">
-                  {{ abbrName(company_users.filter(c_user => c_user.id === user.company_user_id)[0].name) }}
-                </span>
-
-                <span v-if="client_users.filter(({ client_id }) => client_id === client.id) && client_users.filter(({ client_id }) => client_id === client.id).length > 5 && user_index - 1 === client_users.filter(({ client_id }) => client_id === client.id).length" class="avatar pointer" ref="client_user_names" style="background-color: rgba(0, 0, 0, 0.2); color: rgba(0, 0, 0, 0.6); border: 1.5px dashed;"> + {{ client_users.filter(({ client_id }) => client_id === client.id) - 5 }} </span>
-              </div>
-
-              <b-tooltip :target="() => $refs['client_user_names']" placement="right" v-if="company_users && company_users.length">
-                <div class="d-flex flex-column align-items-start">
-                  <span v-for="(user, user_index) in client_users.filter(({ client_id }) => client_id === client.id)" :key="user.id" v-show="user_index >= 5">
-                    {{ company_users.filter(c_user => c_user.id === user.company_user_id)[0].name }}
-                  </span>
-                </div>
-              </b-tooltip>
-            </div>
-
-            <div class="client-project-name" v-for="{ name, id, acronym } in clientProjects(client)" :key="id" @click="setProjectId(id)">
-              <div @click="setPinnedProject(id)" class="project-item-status">
-                <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
-                <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
-              </div>
-              <p style="margin-bottom: 0 !important">
-                <span class="client-section-acronym" :style="{ 'background-color': client.color }" v-if="acronym">{{ acronym }}</span>
-                <span class="client-project-name__name">{{ name }}</span>
-              </p>
-            </div>
-          </div>
-        </b-col>
-
         <b-col v-if="selectedProjectId" class="kanban-draggable custom-width">
-          <div class="kanban_title-part mb-1">
+          <!-- <div class="kanban_title-part mb-1">
             <h4 class="kanban-page-title" v-if="selectedProjectId">{{ clientNameFromProject(selectedProjectId) }} -- {{ projectName(selectedProjectId) }} <b-icon icon="pencil" variant="info" @click="editProject(selectedProjectId)"></b-icon></h4>
             <div class="d-flex flex-column ml-3" v-if="project_users && project_users.length">
               <span class="avatar-titles ml-1">Project Users:</span>
@@ -86,13 +41,12 @@
                 </b-tooltip>
               </div>
             </div>
-          </div>
+          </div> -->
 
-          <pj-draggable :listsBlockName="listsBlockNames.PROJECTS" :data="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
+          <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :projectColumns="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" :project_id="selectedProjectId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
         </b-col>
       </b-row>
     </b-container>
-    <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
   </div>
 </template>
 <script lang="ts">
@@ -110,7 +64,8 @@ import TaskSideBar from './TaskSideBar.vue'
 import uuid from 'uuid'
 import { colorThemes } from '@/mixins/colorThemes'
 import { getCookie } from '@/utils/util-functions'
-import { EventBus } from '@/components/event-bus'
+// import { EventBus } from '@/components/event-bus'
+import { deleteDB } from 'idb'
 
 const CompanyClients = namespace('clients')
 const CompanyUsers = namespace('company_users')
@@ -119,7 +74,7 @@ const Tasks = namespace('tasks')
 const Lists = namespace('lists')
 const Projects = namespace('projects')
 
-const taskStatuses = ['open', 'in-progress', 'turned-in', 'completed', 'closed']
+const taskStatuses = ['backlog', 'in-progress', 'turned-in', 'completed', 'closed']
 
 interface ITaskTimerToggle {
   taskId: number | string
@@ -281,21 +236,60 @@ export default class Custom extends Vue {
     return this.$store.state.settings.current_company_user_id
   }
   get selectedProjectTasksForStatusesColumns() {
-    const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
-    console.log('projectTasks', projectTasks)
-    return projectTasks
-      .map(({ id, title, status, sort_order, temp }: ITask) => ({
-        id,
-        title,
-        status,
-        listId: status,
-        sort_order,
-        temp
-      }))
-      .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+    console.log('here')
+    // const projectTasks = this.getTaskByProjectId(this.selectedProjectId)
+    // const task_list = this.getTaskListByProjectId(this.selectedProjectId)
+    const projectTasks = this.$store.getters['tasks/getByProjectId'](this.selectedProjectId)
+    const task_list = this.$store.getters['projects/getTaskListByProjectId'](this.selectedProjectId)
+
+    if (task_list.length > 0) {
+      let columns = new Array(task_list.length)
+      for (let i = 0; i < task_list.length; i++) {
+        const list = task_list[i]
+        let tasks = projectTasks.filter((task: ITask) => list.tasks.indexOf(task.id) >= 0)
+        tasks = [...tasks].sort(({ id: task_a_id }: any, { id: task_b_id }: any) => (list.tasks.indexOf(task_a_id) > list.tasks.indexOf(task_b_id) ? 1 : -1))
+
+        columns[i] = {
+          title: list.title,
+          // idList: list.id,
+          tasks: tasks
+        }
+      }
+      return columns
+    } else {
+      let tasks = projectTasks
+        .map(({ id, title, status, sort_order, temp, idList, labels, detail, due_date, assignedMembers }: ITask) => ({
+          id,
+          title,
+          status,
+          listId: status,
+          sort_order,
+          temp,
+          idList: idList || 'backlog',
+          labels,
+          detail,
+          due_date,
+          assignedMembers
+        }))
+        .sort(({ sort_order: a }: any, { sort_order: b }: any) => a - b)
+
+      let columns = [
+        {
+          title: 'Backlog',
+          tasks: tasks
+        }
+      ]
+      return columns
+    }
   }
 
   get taskPerStatusLists() {
+    return []
+
+    if (this.$store.state.lists.lists.length > 0) {
+      return this.$store.state.lists.lists
+    }
+
     return taskStatuses.map(status => ({
       title: status,
       id: status,
@@ -304,7 +298,9 @@ export default class Custom extends Vue {
     }))
   }
 
-  mounted() {}
+  mounted() {
+    this.setProjectId(this.$route.params.project_id)
+  }
 
   @TaskUsers.Getter('getById') private getTaskUserById!: any
   @TaskUsers.Getter private sortedByDays!: any
@@ -313,13 +309,14 @@ export default class Custom extends Vue {
   @TaskUsers.Action('updateSortOrders')
   private updateTaskUsersSortOrdersVuex!: any
   @Tasks.Action('createTask') private createTaskVuex!: any
-  @Tasks.Action('createProjectTask') private createProjectTaskVuex!: any
+  @Tasks.Action('createProjectTaskWithTaskList') private createProjectTaskVuex!: any
   @Tasks.Action('updateTask') private updateTaskVuex!: any
   @Tasks.Action('updateSortOrders') private updateTaskSortOrdersVuex!: any
   @Tasks.Getter('getById') private getTaskById!: any
   @Tasks.Getter('getByProjectId') private getTaskByProjectId!: any
   @Lists.Getter private getUserLists!: any
   @Projects.Getter private getUserProjects!: any
+  @Projects.Getter private getTaskListByProjectId!: any
 
   private show_all_active_projects: boolean = false
   private editedTaskTimerId: number | string | null = null
@@ -394,15 +391,22 @@ export default class Custom extends Vue {
     return project ? project.name : ''
   }
 
-  public async createTask({ item, ids_of_items_to_shift_up }: any) {
+  public async createTask(task: any) {
     console.log('CREATE TASK CUSTOM')
 
     this.createProjectTaskVuex({
-      title: item.title,
-      project_id: this.selectedProjectId,
-      sort_order: item.sort_order,
-      status: item.status,
-      temp: false
+      task: {
+        // title: title,
+        ...task.task,
+        project_id: this.selectedProjectId,
+        // sort_order: item.sort_order,
+        // status: item.status,
+        status: 'open',
+        temp: false
+        // idList: idList,
+        // assignedMembers: assignedMembers
+      },
+      task_list: task.task_list
     })
   }
 
@@ -483,17 +487,17 @@ export default class Custom extends Vue {
     //this.$store.dispatch('settings/openModal', {modal: 'task', id: task_id})
   }
 
-  // created() {
-  //   EventBus.$on('toggle_tasks', () => {
-  //     this.showTask = !this.showTask
-  //   })
-  //   EventBus.$on('toggle_timers', () => {
-  //     this.showTimer = !this.showTimer
-  //   })
-  //   EventBus.$on('toggle_chat', () => {
-  //     this.showChat = !this.showChat
-  //   })
-  // }
+  created() {
+    // EventBus.$on('toggle_tasks', () => {
+    //   this.showTask = !this.showTask
+    // })
+    // EventBus.$on('toggle_timers', () => {
+    //   this.showTimer = !this.showTimer
+    // })
+    // EventBus.$on('toggle_chat', () => {
+    //   this.showChat = !this.showChat
+    // })
+  }
 }
 </script>
 <style lang="scss">
@@ -519,8 +523,8 @@ export default class Custom extends Vue {
 }
 .kanban-draggable {
   width: 100px;
-  height: calc(100vh - 50px);
-  overflow-x: auto;
+  height: calc(100vh - 77px);
+  overflow-x: hidden;
   overflow-y: hidden;
 }
 .client-section-acronym {
@@ -562,7 +566,7 @@ export default class Custom extends Vue {
 .project-item-status {
 }
 .scroll-col {
-  height: calc(100vh - 40px);
+  height: calc(100vh - 50px);
   overflow-y: auto;
 }
 /* .custom-width {
@@ -570,6 +574,7 @@ export default class Custom extends Vue {
 } */
 .kanban-page-title {
   color: white;
+  margin-bottom: 0px;
 }
 .client-name {
   display: flex;

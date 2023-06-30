@@ -3193,3 +3193,6 @@
 .icon-zoom_out_map:before {
   content: '\ec16';
 } /* '' */
+.icon-fire:before {
+  content: '\1F525';
+} /* '' */

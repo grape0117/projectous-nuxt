@@ -322,6 +322,7 @@ export default {
       let body = ''
       let title = ''
       console.log('socket data', e.data)
+      user_id = getCookie('user_id')
       switch (e.data.item_type) {
         case 'timelog':
           title = ''
@@ -412,6 +413,14 @@ export default {
           body = JSON.stringify(e.data.message)
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             that.$store.dispatch('tasks/updateChats')
+          }
+          break
+        case 'TASK_LIST':
+          title = e.data.title
+          const { task_list, project_id } = JSON.parse(e.data.value)
+          this.$store.commit('projects/updateTaskList', { project_id, task_list })
+          if (user_id != e.data.user.id) {
+            EventBus.$emit('renderTaskList', { task_list })
           }
           break
       }

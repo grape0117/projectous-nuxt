@@ -10,6 +10,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     const response = await this._vm.$http().get('/tasks?project_id=' + id)
     this.commit('ADD_MANY', { module: 'tasks', entities: response.tasks }, { root: true })
     this.commit('ADD_MANY', { module: 'task_users', entities: response.task_users }, { root: true })
+    if (response.lists['project_id']) {
+      this.commit('projects/updateTaskList', response.lists)
+    }
   },
   async pinProject({ commit, state }, { id, userId }) {
     const { projects, lookup } = state
@@ -27,6 +30,14 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // const response = await this._vm
     //   .$http()
     //   .post('/project-user/', { project_id: id })
+  },
+  async updateList({ commit, state }, { project_id, task_list }) {
+    this.commit('projects/updateTaskList', { project_id, task_list })
+    // @ts-ignore
+    await this._vm.$http().post('/projects/task_list/' + project_id, { task_list: task_list })
+
+    // TODO @stephane send task to server
+    // commit('UPSERT', { module: 'tasks', entity: task }, { root: true })
   }
   /*saveProject({ commit, state, rootState }: any, { project, project_users }: any) {
     // @ts-ignore

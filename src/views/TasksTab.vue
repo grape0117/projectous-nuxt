@@ -451,6 +451,6 @@ export default {
   max-width: 325px !important;
 }
 .modal-header {
-  margin: auto;
+  /* margin: auto; */
 }
 </style>
