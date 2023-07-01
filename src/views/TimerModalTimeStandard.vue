@@ -89,8 +89,7 @@ export default {
     },
     invoice_hours: {
       get() {
-        let timerInfo = this.$store.state.timers.timers.filter(({ id }) => id == this.timer.id)[0]
-        return Math.floor(timerInfo.invoice_duration / 3600)
+        return Math.floor(this.timer.invoice_duration / 3600)
       },
       set(value) {
         this.updateInvoiceDuration(value, null, null)
@@ -98,8 +97,7 @@ export default {
     },
     invoice_minutes: {
       get() {
-        let timerInfo = this.$store.state.timers.timers.filter(({ id }) => id == this.timer.id)[0]
-        return ('00' + Math.floor((timerInfo.invoice_duration % 3600) / 60)).slice(-2)
+        return ('00' + Math.floor((this.timer.invoice_duration % 3600) / 60)).slice(-2)
       },
       set(value) {
         this.updateInvoiceDuration(null, value, null)
@@ -107,8 +105,7 @@ export default {
     },
     invoice_seconds: {
       get() {
-        let timerInfo = this.$store.state.timers.timers.filter(({ id }) => id == this.timer.id)[0]
-        return ('00' + Math.floor(timerInfo.invoice_duration % 60)).slice(-2)
+        return ('00' + Math.floor(this.timer.invoice_duration % 60)).slice(-2)
       },
       set(value) {
         this.updateInvoiceDuration(null, null, value)
