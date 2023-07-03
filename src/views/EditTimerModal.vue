@@ -664,12 +664,12 @@ export default {
     },
     searchProject: function(option, label, search) {
       let search_value = search.toLowerCase()
-      return (
-        option.name.toLowerCase().indexOf(search_value) > -1 ||
-        this.client_name(option.client_company_id)
-          .toLowerCase()
-          .indexOf(search_value) > -1
-      )
+      return option.name
+        ? option.name.toLowerCase().indexOf(search_value) > -1 ||
+            this.client_name(option.client_company_id)
+              .toLowerCase()
+              .indexOf(search_value) > -1
+        : false
     },
     searchTask: function(option, label, search) {
       let search_value = search.toLowerCase()
