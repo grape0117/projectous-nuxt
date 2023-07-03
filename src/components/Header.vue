@@ -146,7 +146,7 @@ export default Vue.extend({
   watch: {
     projectSearch: _.debounce(function(project_name) {
       let projects = this.openprojects()
-      projects = projects.filter(project => project.name.toLowerCase().indexOf(project_name.toLowerCase()) >= 0)
+      projects = projects.filter(project => project.name && project.name.toLowerCase().indexOf(project_name.toLowerCase()) >= 0)
       return projects
     }, 500)
   },
