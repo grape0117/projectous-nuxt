@@ -25,7 +25,7 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       return
     }
     // @ts-ignore
-    let client_projects = []
+    var client_projects = []
 
     // @ts-ignore
     active_clients.forEach(function(client) {
@@ -51,8 +51,10 @@ export const getters: GetterTree<IModuleState, IRootState> = {
       projects = projects.concat(
         // @ts-ignore
         client_projects.sort(function(a, b) {
-          if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
-          if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+          if (a.name && b.name) {
+            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+          }
           return 0
         })
       )
