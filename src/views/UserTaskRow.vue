@@ -32,12 +32,16 @@
     </div>
     <div style="display: table-cell; width: 99%">
       <span style="float: right; margin-right: 10px;" class="white-text">{{ durationDisplay }}</span>
-      <span v-if="isCompletedTask" style="margin-right: 5px;"><b-badge variant="success">Completed</b-badge></span>
+      <span v-if="isCompletedTask" style="margin-right: 5px;"><b-badge variant="success">Turned in</b-badge></span>
       <span @click="showTaskDetail" :style="{ cursor: 'pointer', 'font-weight': `${task.messages && task.messages.length > 0 ? 'bolder' : 'normal'}` }" class="white-text">{{ task.title ? task.title : '---' }} </span>
-      <span v-for="user in task_users" v-if="isAdmin() || is_owner">
+      <span v-for="user in task_users" v-if="isAdmin() || is_owner" :class="`${user.status == 'completed' && !isMe(user) ? 'avatar-turned-in' : ''} ${needMyHelp(user) ? 'help' : ''}`">
         <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex', 'margin-left': '5px' }">
           {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
         </span>
+        <span v-if="user.status == 'completed' && !isMe(user)" class="mr-2">
+          <b-badge variant="success">Turned in</b-badge>
+        </span>
+        <span v-if="needMyHelp(user)">help</span>
       </span>
       <span class="show-on-hovered" v-if="isMyTask">
         <span title="Complete" class="add-dev-btn" v-if="!isCompletedTask" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></span>
@@ -175,6 +179,14 @@ export default {
     }
   },
   methods: {
+    isMe(user) {
+      const me = this.$store.getters['company_users/getMe']
+      return user.company_user_id == me.id
+    },
+    needMyHelp(user) {
+      const help = this.$store.getters['helps/getByTaskIdAndUserId'](this.task.id, user.company_user_id).length > 0
+      return help
+    },
     addHoverClass: function(e) {
       e.target.classList.add('hovered')
     },
@@ -545,6 +557,43 @@ span.avatar.notes:before {
   background-size: contain;
   position: absolute;
 }
+@-webkit-keyframes scale-in-center {
+  0% {
+    -webkit-transform: scale(0.5);
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: scale(1.5);
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+@keyframes scale-in-center {
+  0% {
+    -webkit-transform: scale(0.5);
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: scale(1.5);
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+.help .avatar:after {
+  content: '\E9B7';
+  color: #ff5454;
+  /* background: url(notes.png) no-repeat; */
+  display: block;
+  font-family: 'fontello';
+  margin-right: -25px;
+  margin-top: -17px;
+  position: absolute;
+  font-size: 21px;
+  -webkit-animation: scale-in-center 1.5s ease-in infinite both;
+  animation: scale-in-center 1.5s ease-in infinite both;
+}
 .user-task-row .icon-play_arrow,
 .user-task-row .icon-stop {
   border: solid 2px white;
@@ -593,18 +642,12 @@ input[type='date'].show-on-hovered:focus {
   color: transparent !important;
   float: left;
 }
-/* span.avatar.test:after {
-  background: url(../assets/icons/test.png) no-repeat;
-  content: '';
-  display: block;
-  width: 30px;
-  height: 30px;
-  margin-right: -5px;
-  margin-top: 31px;
-  background-size: contain;
-  position: absolute;
+.avatar-turned-in {
+  padding: 2px 1px 7px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
 }
-span.avatar.feedback:after {
+/*span.avatar.feedback:after {
   background: url(../assets/icons/feedback.png) no-repeat;
   content: '';
   display: block;

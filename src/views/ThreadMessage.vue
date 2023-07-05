@@ -32,6 +32,7 @@
       </b-form-checkbox> -->
       <i class="icon-screen_share" @click="startRecording" v-if="!isStarted" />
       <i class="icon-stop" @click="stopRecording" v-if="isStarted" />
+      <i class="icon-help_outline" @click="needHelp" />
       <i class="icon-send" :style="(s_message !== '' && s_message !== '\n') || fileExist || stream_video ? 'color: darkorange;' : 'color: gray;'" @click="saveMessage()" />
     </div>
     <div class="thread-btns" v-if="thread && thread.status == 'open'">
@@ -185,6 +186,13 @@ export default {
     this.getNextMessages()
   },
   methods: {
+    async needHelp() {
+      const result = await this.$http().post(`/need_help`, {
+        task_id: this.task_id,
+        thread_id: this.thread_id,
+        responsibility_company_user_id: this.thread.responsibility_company_user_id
+      })
+    },
     clearScreen() {
       this.chunks = []
       this.stream = null
@@ -633,7 +641,9 @@ export default {
   // float: right;
 }
 .icon-stop,
-.icon-screen_share {
+.icon-screen_share,
+.icon-help_outline {
+  cursor: pointer;
   color: rgb(255, 84, 84);
   font-size: 24px;
 }

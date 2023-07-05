@@ -16,6 +16,9 @@ export const getters: GetterTree<IModuleState, IRootState> = {
   getByTaskId: (state: IModuleState) => (task_id: any) => {
     return state.task_users.filter(task_user => task_user.task_id === task_id && task_user.role == 'assigned')
   },
+  getByTaskIdAllTaskUser: (state: IModuleState) => (task_id: any) => {
+    return state.task_users.filter(task_user => task_user.task_id === task_id)
+  },
   getByTaskIdAndCompanyUserId: (state: IModuleState) => (info: any) => {
     return state.task_users.filter(({ task_id, company_user_id }) => task_id === info.task_id && company_user_id === info.company_user_id)
   },

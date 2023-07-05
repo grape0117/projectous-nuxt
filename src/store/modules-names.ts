@@ -10,7 +10,8 @@ export const modulesNames: object = {
   TASK_MESSAGES: 'task_messages',
   TIMERS: 'timers',
   PROPERTIES: 'properties',
-  COMPANIES: 'companies'
+  COMPANIES: 'companies',
+  HELPS: 'helps'
 }
 
 export const modulesNamesList = Object.values(modulesNames)
