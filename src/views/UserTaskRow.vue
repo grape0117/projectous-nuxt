@@ -35,7 +35,7 @@
       <span v-if="isCompletedTask" style="margin-right: 5px;"><b-badge variant="success">Turned in</b-badge></span>
       <span @click="showTaskDetail" :style="{ cursor: 'pointer', 'font-weight': `${task.messages && task.messages.length > 0 ? 'bolder' : 'normal'}` }" class="white-text">{{ task.title ? task.title : '---' }} </span>
       <span v-for="user in task_users" v-if="isAdmin() || is_owner" :class="`${user.status == 'completed' && !isMe(user) ? 'avatar-turned-in' : ''} ${needMyHelp(user) ? 'help' : ''}`">
-        <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.status} ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex', 'margin-left': '5px' }">
+        <span v-if="getCompanyUserDetails(user.company_user_id)" :title="`${getCompanyUserDetails(user.company_user_id).name}   ${user.step ? user.step : '--'}:${user.notes ? user.notes : '--'}`" @click="updateUser(user)" :class="`avatar mr-1 pointer ${user.step} ${user.notes ? 'notes' : ''}`" :style="{ 'background-color': getCompanyUserDetails(user.company_user_id).color, cursor: 'pointer', display: 'inline-flex', 'margin-left': '5px' }">
           {{ abbrName(getCompanyUserDetails(user.company_user_id).name) }}
         </span>
         <span v-if="user.status == 'completed' && !isMe(user)" class="mr-2">
