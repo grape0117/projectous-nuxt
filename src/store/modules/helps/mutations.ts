@@ -6,5 +6,10 @@ export const mutations: MutationTree<IModuleState> = {
   addNewHelp(state: IModuleState, help) {
     //@ts-ignore
     state.helps = [...state.helps, help]
+  },
+  DELETE(state: IModuleState, entity) {
+    //@ts-ignore
+    let new_helps = state.helps.filter(help => help.id != entity.id)
+    state.helps = [...new_helps]
   }
 }

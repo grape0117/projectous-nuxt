@@ -346,6 +346,8 @@ export default {
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             that.$store.commit('ADD_ONE', { module: 'task_messages', entity: e.data }, { root: true })
             that.$store.dispatch('tasks/updateLastMessage', e.data)
+            // let help = this.$store.getters['helps/getByThreadIdAndUserId'](thread_id, e.data.company_user_id )
+            // this.$store.commit('helps/DELETE', help)
             if (e.data.user.user_id == user_id) {
               this.$store.commit('tasks/readChat', thread_id)
               this.$store.commit('threads/readThread', thread_id)
@@ -354,13 +356,19 @@ export default {
               that.$store.commit('threads/unReadThread', thread_id)
             }
           }
-
           break
         case 'NEW_TASK':
           title = e.data.title
           body = JSON.stringify(e.data.message)
           if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
             that.$store.dispatch('PROCESS_INCOMING_DATA', { new_task: JSON.parse(e.data.new_task) })
+          }
+          break
+        case 'NEED_HELP':
+          title = e.data.title
+          body = JSON.stringify(e.data.message)
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            that.$store.commit('helps/addNewHelp', e.data.help)
           }
           break
         case 'THREAD':

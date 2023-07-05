@@ -41,7 +41,6 @@
         <span v-if="user.status == 'completed' && !isMe(user)" class="mr-2">
           <b-badge variant="success">Turned in</b-badge>
         </span>
-        <span v-if="needMyHelp(user)">help</span>
       </span>
       <span class="show-on-hovered" v-if="isMyTask">
         <span title="Complete" class="add-dev-btn" v-if="!isCompletedTask" variant="outline-success" @click="completeMyTask(task.id)" pill><i class="icon-check"/></span>

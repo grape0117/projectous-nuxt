@@ -132,7 +132,7 @@ export default {
     'tasks-tab': TasksTab,
     CompleteConfirmModal
   },
-  data: function() {
+  data() {
     return {
       complete_task_id: false
     }
