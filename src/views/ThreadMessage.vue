@@ -187,6 +187,10 @@ export default {
   },
   methods: {
     async needHelp() {
+      if (this.thread.responsibility_company_user_id == this.current_company_user_id) {
+        alert('You should change the responsibility')
+        return
+      }
       const result = await this.$http().post(`/need_help`, {
         task_id: this.task_id,
         thread_id: this.thread_id,
