@@ -40,7 +40,7 @@
               <span class="rounded-circle task-sidebar-item_badge">{{ thread.num_unread }}</span>
             </div>
             <div class="need-help" v-if="helpNeeded(thread.id)" style="position: relative;">
-              <i class="icon-help_outline" />
+              <b-badge variant="success">Help</b-badge>
             </div>
             <span @click="selectReponsibility(thread)" v-if="thread.responsibility_company_user_id && getCompanyUserDetails(thread.responsibility_company_user_id)" :class="`avatar mr-1 pointer ml-4 responsibility`" :style="{ 'background-color': getCompanyUserDetails(thread.responsibility_company_user_id).color, cursor: 'pointer', display: 'inline-flex' }">
               {{ abbrName(getCompanyUserDetails(thread.responsibility_company_user_id).name) }}
@@ -419,36 +419,6 @@ b {
 .icon-play_arrow:before,
 .icon-stop:before {
   margin: 0px;
-}
-@-webkit-keyframes scale-in-center {
-  0% {
-    -webkit-transform: scale(0.5);
-    transform: scale(0.5);
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: scale(1.5);
-    transform: scale(1.5);
-    opacity: 1;
-  }
-}
-@keyframes scale-in-center {
-  0% {
-    -webkit-transform: scale(0.5);
-    transform: scale(0.5);
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: scale(1.5);
-    transform: scale(1.5);
-    opacity: 1;
-  }
-}
-.icon-help_outline {
-  color: #ff5454;
-  font-size: 20px;
-  -webkit-animation: scale-in-center 1.5s ease-in infinite both;
-  animation: scale-in-center 1.5s ease-in infinite both;
 }
 .msg-content {
   padding: 8px 12px;
