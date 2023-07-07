@@ -362,6 +362,10 @@ function saveInvoiceTotal(){
 
 }
 
+function setInvoiceNote(real_invoice_id, invoice_notes) {
+	$.post('https://app2.projectous.com/api/invoice/'+real_invoice_id+'/save', {invoice_notes: invoice_notes});
+}
+
 window.addEventListener && document.addEventListener('DOMContentLoaded', onContentLoad);
 
 /*
