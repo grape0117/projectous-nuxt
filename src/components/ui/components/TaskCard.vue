@@ -276,7 +276,7 @@ export default {
     abbrName,
     getCompanyUserDetails(company_user_id) {
       const user_details = this.$store.state.company_users.company_users.find(e => e.id === company_user_id)
-      return user_details
+      return user_details ? user_details : { color: '', name: '' }
     }
   }
 }

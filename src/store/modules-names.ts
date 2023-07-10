@@ -11,7 +11,9 @@ export const modulesNames: object = {
   TIMERS: 'timers',
   PROPERTIES: 'properties',
   COMPANIES: 'companies',
-  HELPS: 'helps'
+  HELPS: 'helps',
+  SHARED_PROJECTS: 'shared_projects',
+  SHARED_PROJECT_USERS: 'shared_project_users'
 }
 
 export const modulesNamesList = Object.values(modulesNames)

@@ -7,6 +7,21 @@
             <v-select v-model="selectedClient" label="name" :options="activeClients" style="width: 100px"> </v-select>
           </div>
 
+          <div class="client-name">
+            <span class="mr-2">Shared Project</span>
+          </div>
+
+          <div class="client-project-name" v-for="{ name, id, acronym } in sharedProjects" :key="id" @click="setSharedProjectId(id)">
+            <!-- <div @click="setPinnedProject(id)" class="project-item-status">
+              <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
+              <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
+            </div> -->
+            <p style="margin-bottom: 0 !important">
+              <!-- <span class="client-section-acronym" :style="{ 'background-color': client.color }" v-if="acronym">{{ acronym }}</span> -->
+              <span class="client-project-name__name">{{ name }}</span>
+            </p>
+          </div>
+
           <div v-if="clientVisible(client)" v-for="(client, index) in selectedClient.id ? filteredClient : activeClients" :key="index">
             <div class="client-name">
               <span class="mr-2">{{ client.name }}</span>
@@ -34,7 +49,7 @@
               </b-tooltip>
             </div>
 
-            <div class="client-project-name" v-for="{ name, id, acronym } in clientProjects(client)" :key="id" @click="setProjectId(id)">
+            <div class="client-project-name" v-for="{ name, id, acronym } in clientProjects(client)" :key="id" @click="setRegularProjectId(id)">
               <div @click="setPinnedProject(id)" class="project-item-status">
                 <img src="@/assets/img/star-pin.svg" alt="star-unpin" v-if="!!pinnedProjects.find(project => project === id)" />
                 <img src="@/assets/img/star-unpin.svg" alt="star-pin" v-else />
@@ -86,7 +101,7 @@
                 </b-tooltip>
               </div>
             </div>
-            <button class="btn btn-primary mx-2" @click="copyShareLink()">Copy Share Link</button>
+            <button class="btn btn-primary mx-2" v-if="!is_shared_project" @click="shareWithClient()">Share with client</button>
           </div>
 
           <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :projectColumns="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" :project_id="selectedProjectId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
@@ -94,6 +109,26 @@
       </b-row>
     </b-container>
     <TaskDetails v-if="taskDetailsDisplayed" :taskId="editedTaskId" />
+    <b-modal ref="taskEditModal" id="task-card-edit" v-model="showShareModal" class="task-edit-modal" style="min-height: 500px" :size="'lg'" v-if="selectedProjectId">
+      <template #modal-header>
+        <div class="header">
+          <h2 class="d-flex justify-content-between title">Share "{{ projectName(selectedProjectId) }}"</h2>
+        </div>
+      </template>
+      <div no-body>
+        <b-form-input v-model="client_email" type="email" placeholder="Add client's email"></b-form-input>
+      </div>
+      <div slot="modal-footer" class="w-100">
+        <div class="w-100">
+          <b-button variant="outline-primary" size="sm" class="float-left" @click="copyShareLink">
+            Copy link
+          </b-button>
+          <b-button variant="primary" size="sm" class="float-right" @click="shareProject">
+            Done
+          </b-button>
+        </div>
+      </div>
+    </b-modal>
   </div>
 </template>
 <script lang="ts">
@@ -120,6 +155,7 @@ const TaskUsers = namespace('task_users')
 const Tasks = namespace('tasks')
 const Lists = namespace('lists')
 const Projects = namespace('projects')
+const SharedProjects = namespace('shared_projects')
 
 const taskStatuses = ['backlog', 'in-progress', 'turned-in', 'completed', 'closed']
 
@@ -148,12 +184,19 @@ export default class Custom extends Vue {
   @Projects.Action public pinProject!: any
   @Projects.State(state => state.selectedProjectId) public selectedProjectId!: string | number | null
   @Projects.State(state => state.pinnedProjects)
+
+  // @SharedProjects.Mutation('shared_projects/SET_SELECTED_PROJECT') public setSharedProjectId!: any
+  // @SharedProjects.State(state => state.selectedProjectId) public selectedSharedProjectId!: string | number | null
+  // @SharedProjects.Action public pinProject!: any
+  // @SharedProjects.State(state => state.pinnedProjects)
   public pinnedProjects!: number[]
   private showTask: boolean = true
   private showTimer: boolean = true
   private showChat: boolean = false
   private selectedClient: object = { id: null }
   private clientNameFilter: string = ''
+  public showShareModal: boolean = false
+  public client_email: string = ''
 
   get client_users() {
     const clientReducer = (acc: any, client: any) => {
@@ -216,7 +259,12 @@ export default class Custom extends Vue {
 
   get project_users() {
     if (!this.selectedProjectId) return []
-    let users = this.$store.state.projects.projects.find(({ id }: any) => id === this.selectedProjectId).users
+    let users = []
+    if (this.is_shared_project) {
+      // users = this.$store.state.shared_projects.shared_projects.find(({ id }: any) => id === this.selectedProjectId).users
+      return []
+    }
+    users = this.$store.state.projects.projects.find(({ id }: any) => id === this.selectedProjectId).users
 
     if (users) {
       const project_users = users.reduce((acc: any, user: any) => {
@@ -345,6 +393,11 @@ export default class Custom extends Vue {
     }))
   }
 
+  get sharedProjects() {
+    const shared_projects = this.$store.getters['shared_projects/openprojects']()
+    return shared_projects
+  }
+
   mounted() {}
 
   @TaskUsers.Getter('getById') private getTaskUserById!: any
@@ -370,6 +423,17 @@ export default class Custom extends Vue {
   private project_search: string = ''
 
   private selectedCompanyUserId: any = null
+
+  private is_shared_project: boolean = false
+
+  public setSharedProjectId(id: any) {
+    this.is_shared_project = true
+    this.setProjectId(id)
+  }
+  public setRegularProjectId(id: any) {
+    this.is_shared_project = false
+    this.setProjectId(id)
+  }
 
   public setPinnedProject(id: number) {
     this.pinProject({ id, userId: this.selectedCompanyUserId })
@@ -414,8 +478,23 @@ export default class Custom extends Vue {
   }
 
   public copyShareLink() {
-    navigator.clipboard.writeText(`http://localhost:8080/shared-project/${this.selectedProjectId}`)
+    navigator.clipboard.writeText(`${document.location.origin}/shared-project/${this.selectedProjectId}`)
     this.makeToast('success', 'Success', 'Copied Successfully')
+  }
+  public shareWithClient() {
+    this.showShareModal = true
+  }
+  public async shareProject() {
+    if (this.client_email) {
+      // @ts-ignore
+      const result = await this.$http().post('/projects/share', { project_id: this.selectedProjectId, client_email: this.client_email })
+      if (result.message == 'Success') {
+        this.makeToast('success', 'Success', 'Invited the client successfully')
+      } else {
+        this.makeToast('error', 'Error', result.message)
+      }
+    }
+    this.showShareModal = false
   }
   // public clientProjectUsers(projects: any) {
   //   const project_users = projects.reduce((acc:any, project:any) => {
@@ -438,13 +517,19 @@ export default class Custom extends Vue {
   }
 
   public clientNameFromProject(project_id: any) {
+    if (this.is_shared_project) {
+      return ''
+    }
     const project = this.$store.getters['projects/getById'](project_id)
     const client = this.$store.getters['clients/getById'](project.client_id)
     return client ? client.name : ''
   }
 
   public projectName(project_id: any) {
-    const project = this.$store.getters['projects/getById'](project_id)
+    let project = this.$store.getters['projects/getById'](project_id)
+    if (this.is_shared_project) {
+      project = this.$store.getters['shared_projects/getById'](project_id)
+    }
     return project ? project.name : ''
   }
 
