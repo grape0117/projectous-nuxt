@@ -1,5 +1,5 @@
 <template>
-  <b-modal ref="project-modal" id="project-modal" class="modal fade" role="dialog" @ok="saveProject" ok-variant="light" ok-title="Save" @hidden="closeModal" @shown="updateButtonStyle()">
+  <b-modal ref="project-modal" id="project-modal" class="modal fade overflow-auto" role="dialog" @ok="saveProject" ok-variant="light" ok-title="Save" @hidden="closeModal" @shown="updateButtonStyle()">
     <template #modal-title>
       <h5 class="white-text">{{ has_route_query_newProjectClientCompanyId ? 'Add' : 'Edit' }} Project</h5>
     </template>
