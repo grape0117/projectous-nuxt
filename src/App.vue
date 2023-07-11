@@ -431,6 +431,11 @@ export default {
             EventBus.$emit('renderTaskList', { task_list })
           }
           break
+        case 'INVOICE':
+          if (Object.values(e.data.users_list).indexOf(parseInt(user_id)) >= 0) {
+            EventBus.$emit('updateInvoice', {})
+          }
+          break
       }
       if (body && user_id && Object.values(e.data.users_to_notify).indexOf(parseInt(user_id)) >= 0) {
         var notification = new Notification(title, { body: body, icon: 'img' })

@@ -241,7 +241,12 @@ export default {
       selected_invoice_logs: null
     }
   },
-  created() {},
+  created() {
+    EventBus.$on('updateInvoice', ({}) => {
+      console.log('update INvoice')
+      this.getData()
+    })
+  },
   computed: {
     invoice_filter() {
       if (this.show_all_status) return this.invoiceSort
