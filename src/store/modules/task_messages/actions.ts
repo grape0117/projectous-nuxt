@@ -53,7 +53,9 @@ export const actions: ActionTree<IModuleState, IRootState> = {
     // @ts-ignore
     let task_message = await this._vm.$http().post('/thread_message', { thread_message: threadMessage })
     commit('ADD_ONE', { module: 'task_messages', entity: { ...task_message.task_messages, user: user } }, { root: true })
-    commit('DELETE', { module: 'helps', entity: task_message.help }, { root: true })
+    if (task_message.help) {
+      commit('DELETE', { module: 'helps', entity: task_message.help }, { root: true })
+    }
     // @ts-ignore
 
     return task_message
