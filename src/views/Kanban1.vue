@@ -493,6 +493,7 @@ export default class Custom extends Vue {
       } else {
         this.makeToast('error', 'Error', result.message)
       }
+      this.client_email = ''
     }
     this.showShareModal = false
   }
