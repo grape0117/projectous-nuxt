@@ -40,6 +40,7 @@
         </div>
         <b-button variant="primary" @click="updateTask">Save</b-button>
         <div class="quick-card-editor-buttons fade-in" :style="{ top: card_editor_button_top + 'px' }">
+          <a class="quick-card-editor-buttons-item" href="#" @click="showTaskDetail(editTaskData)"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open Task</span></a>
           <a class="quick-card-editor-buttons-item" href="#" @click="showEditMoal(editTaskData, edit_list_index, edit_task_index)"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open card</span></a>
           <a class="js-edit-labels quick-card-editor-buttons-item " href="#" @click="showAddLabels"><span class="edit-labels icon-sm icon-label light "></span><span class="edit-labels quick-card-editor-buttons-item-text ">Edit labels</span></a>
           <a class="quick-card-editor-buttons-item js-edit-members" href="#" @click="showMembersPopOver"><span class="icon-sm icon-member light"></span><span class="quick-card-editor-buttons-item-text">Change members</span></a>
@@ -618,6 +619,12 @@ export default {
       const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1)
 
       return capitalize(string)
+    },
+    async showTaskDetail(task) {
+      this.quick_edit_task = false
+      const updated_path = `/user-tasks?task=${task.id}&showChatSection=true`
+      sessionStorage.setItem('tasks', updated_path)
+      await this.$router.push({ query: { task: task.id, showChatSection: 'true' } })
     }
   }
 }
@@ -652,8 +659,7 @@ export default {
 .task-card-container {
   overflow-x: hidden;
   overflow-y: auto;
-  max-height: calc(100% - 120px);
-  /* background-color: rgb(235, 236, 240); */
+  max-height: calc(100% - 144px);
   background-color: rgba(0, 0, 0, 0.6);
 }
 
