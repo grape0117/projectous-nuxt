@@ -1,6 +1,6 @@
 <template>
   <div class="message-panel" id="message-container" @dragover="dragOver" @drop="dropFile">
-    <thread-title :thread="thread" />
+    <thread-title :thread="thread" v-if="!thread_type" />
     <b-list-group class="thread-message-panel_inner" ref="msgContainer" @scroll="getNextMessages">
       <div v-for="(message, index) in chatMessages" :key="message.id">
         <div class="date" v-if="isShowDate(index, message, chatMessages)">
@@ -25,7 +25,7 @@
       <div class="bounce2"></div>
       <div class="bounce3"></div>
     </div>
-    <div class="send-message" v-if="thread && thread.status == 'open'">
+    <div class="send-message" v-if="(thread && thread.status == 'open') || thread_type == 'client'">
       <b-form-textarea type="text" ref="message_content" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3" @keyup.enter.exact="changeText" @keydown.enter="handleEnter" @paste="$event => onMessagePaste($event)"> </b-form-textarea>
       <i class="icon-attach_file" @click="attachFile()" />
       <!-- <b-form-checkbox v-if="!isStarted" v-model="include_audio" name="check-button" switch variant="warning" class="text-white">
@@ -35,8 +35,8 @@
       <i class="icon-help_outline" @click="needHelp" />
       <i class="icon-send" :style="(s_message !== '' && s_message !== '\n') || fileExist || stream_video ? 'color: darkorange;' : 'color: gray;'" @click="saveMessage()" />
     </div>
-    <div class="thread-btns" v-if="thread && thread.status == 'open'">
-      <b-button @click="closeThread">CLOSE THREAD</b-button>
+    <div class="thread-btns" v-if="(thread && thread.status == 'open') || thread_type == 'client'">
+      <b-button v-if="!thread_type" @click="closeThread">CLOSE THREAD</b-button>
       <b-button @click="saveMessage()">SUBMIT</b-button>
     </div>
     <div class="thread-btns" v-else>
@@ -107,14 +107,11 @@ export default {
     vueDropzone: vue2Dropzone
   },
   props: {
-    chat: {
-      type: Object,
-      require: true
-    },
     showChat: false,
     messageId: null,
     task_id: null,
-    thread_id: null
+    thread_id: null,
+    thread_type: null
   },
   created() {
     this.$nextTick(() => {

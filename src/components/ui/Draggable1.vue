@@ -13,7 +13,7 @@
             </div>
 
             <draggable :animation="200" ghost-class="ghost-card" group="tasks" class="task-card-container px-2" @start="isDragging = true" @end="isDragging = false" v-model="columns[index].tasks">
-              <task-card :columnIndex="index" @showEditModal="showEditMoal(task, index, task_index)" v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @completeAddTask="completeAddTask" @editTask="editTask($event, task, index, task_index)" @creatingTask="creatingTask($event, index)" :idList="column.idList"></task-card>
+              <task-card :columnIndex="index" @showEditModal="showEditMoal(task, index, task_index)" v-for="(task, task_index) in column.tasks" :key="task.id" :task="task" class="mb-2 cursor-move task-card-item" @addTask="addTask(index)" @completeAddTask="completeAddTask" @editTask="editTask($event, task, index, task_index)" @creatingTask="creatingTask($event, index)" :idList="column.idList" :is_shared_project="is_shared_project"></task-card>
             </draggable>
             <!-- <div class="field"> -->
             <div class="field" v-show="newColumnIndex !== index">
@@ -40,8 +40,8 @@
         </div>
         <b-button variant="primary" @click="updateTask">Save</b-button>
         <div class="quick-card-editor-buttons fade-in" :style="{ top: card_editor_button_top + 'px' }">
-          <a class="quick-card-editor-buttons-item" href="#" @click="showTaskDetail(editTaskData)"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open Task</span></a>
-          <a class="quick-card-editor-buttons-item" href="#" @click="showEditMoal(editTaskData, edit_list_index, edit_task_index)"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open card</span></a>
+          <a v-if="!is_shared_project" class="quick-card-editor-buttons-item" href="#" @click="showTaskDetail(editTaskData)"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open Task</span></a>
+          <a v-if="isAdmin()" class="quick-card-editor-buttons-item" href="#" @click="showEditMoal(editTaskData, edit_list_index, edit_task_index)"><span class="icon-sm icon-card light"></span><span class="quick-card-editor-buttons-item-text">Open card</span></a>
           <a class="js-edit-labels quick-card-editor-buttons-item " href="#" @click="showAddLabels"><span class="edit-labels icon-sm icon-label light "></span><span class="edit-labels quick-card-editor-buttons-item-text ">Edit labels</span></a>
           <a class="quick-card-editor-buttons-item js-edit-members" href="#" @click="showMembersPopOver"><span class="icon-sm icon-member light"></span><span class="quick-card-editor-buttons-item-text">Change members</span></a>
           <a class="quick-card-editor-buttons-item js-edit-cover" href="#"><span class="icon-sm icon-card-cover light"></span><span class="quick-card-editor-buttons-item-text">Change cover</span></a>
@@ -98,7 +98,7 @@
       </div>
     </div>
 
-    <b-modal ref="taskEditModal" id="task-card-edit" v-model="show_edit_modal" class="task-edit-modal" style="min-height: 500px" :size="'lg'" v-if="editTaskData">
+    <b-modal ref="taskEditModal" id="task-card-edit" v-model="show_edit_modal" class="task-edit-modal" style="min-height: 500px;background-color: #091e420f!important; " :size="'lg'" v-if="editTaskData" header-bg-variant="light" body-bg-variant="light">
       <template #modal-header>
         <div class="header">
           <h2 class="d-flex justify-content-between title">{{ editTaskData.title }}</h2>
@@ -109,35 +109,47 @@
       </template>
       <div no-body>
         <div class="form" @click="hidePopOver">
-          <b-form-group class="mb-5" id="labels" label="Select Labels:" label-for="select-label">
-            <div class="badge-container" id="select-label" ref="add_label">
-              <badge v-if="editTaskData.labels" v-for="label in editTaskData.labels" :color="badgeColor(label)" :label="label" size="lg">{{ label }}</badge>
-              <a class="add-label" href="#" @click="showAddLabels">
-                <i class="icon-add"></i>
-              </a>
-            </div>
-          </b-form-group>
-          <b-form-group class="mb-5" label="Members:" label-for="select-user">
-            <div class="assigned-members d-flex" ref="add_member">
-              <span v-for="member_id in assignedMembers">
-                <span :title="`${getCompanyUserDetails(member_id).name}`" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(member_id).color, cursor: 'pointer', display: 'inline-flex' }">
-                  {{ abbrName(getCompanyUserDetails(member_id).name) }}
-                </span>
-              </span>
-              <a class="add-label" href="#" @click="showMembersPopOver">
-                <i class="icon-add"></i>
-              </a>
-            </div>
-          </b-form-group>
-          <b-form-group class="mb-5" label="Due date:" label-for="task-due-date">
-            <b-form-datepicker id="task-due-date" v-model="editTaskData.due_date" class="mb-2"></b-form-datepicker>
-          </b-form-group>
-          <b-form-group class="mb-5" label="Description:" label-for="task-description">
-            <b-form-textarea id="task-description" v-model="editTaskData.note" placeholder="Enter something..." rows="3" max-rows="6"></b-form-textarea>
-          </b-form-group>
+          <b-row>
+            <b-col cols="8">
+              <b-form-group class="mb-5" label="Description:" label-for="task-description">
+                <b-form-textarea id="task-description" v-model="editTaskData.note" placeholder="Enter something..." rows="3" max-rows="6"></b-form-textarea>
+              </b-form-group>
+
+              <thread-message class="task-cloud_task-message" :showChat="true" :task_id="editTaskData.id" :thread_id="editTaskData.id" :thread_type="'client'"> </thread-message>
+            </b-col>
+            <b-col cols="4">
+              <b-form-group class="mb-5" id="labels" label="Select Labels:" label-for="select-label">
+                <div class="badge-container" id="select-label" ref="add_label">
+                  <badge v-if="editTaskData.labels" v-for="label in editTaskData.labels" :color="badgeColor(label)" :label="label" size="lg">{{ label }}</badge>
+                  <a class="add-label" href="#" @click="showAddLabels">
+                    <i class="icon-add"></i>
+                  </a>
+                </div>
+              </b-form-group>
+              <b-form-group class="mb-5" label="Members:" label-for="select-user">
+                <div class="assigned-members d-flex" ref="add_member">
+                  <span v-for="member_id in assignedMembers">
+                    <span :title="`${getCompanyUserDetails(member_id).name}`" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(member_id).color, cursor: 'pointer', display: 'inline-flex' }">
+                      {{ abbrName(getCompanyUserDetails(member_id).name) }}
+                    </span>
+                  </span>
+                  <a class="add-label" href="#" @click="showMembersPopOver">
+                    <i class="icon-add"></i>
+                  </a>
+                </div>
+              </b-form-group>
+              <b-form-group class="mb-5" label="Due date:" label-for="task-due-date">
+                <b-form-datepicker id="task-due-date" v-model="editTaskData.due_date" class="mb-2"></b-form-datepicker>
+              </b-form-group>
+            </b-col>
+          </b-row>
         </div>
       </div>
-      <div slot="modal-footer" class="w-100"></div>
+      <div slot="modal-footer" class="w-100">
+        <b-button variant="primary" size="sm" class="float-right" @click="show_edit_modal = false">
+          Close
+        </b-button>
+      </div>
     </b-modal>
   </div>
 </template>
@@ -160,9 +172,10 @@ export default {
   components: {
     TaskCard,
     draggable,
-    Badge
+    Badge,
+    'thread-message': () => import('@/views/ThreadMessage.vue')
   },
-  props: ['projectColumns', 'project_id'],
+  props: ['projectColumns', 'project_id', 'is_shared_project'],
   data() {
     return {
       columns: [],
@@ -968,5 +981,12 @@ textarea {
   min-height: 24px;
   padding: 4px 8px;
   resize: none;
+}
+
+.modal-content {
+  background-color: #091e420f !important;
+}
+.task-cloud_task-message {
+  height: 555px !important;
 }
 </style>

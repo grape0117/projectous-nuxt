@@ -104,7 +104,7 @@
             <button class="btn btn-primary mx-2" v-if="!is_shared_project" @click="shareWithClient()">Share with client</button>
           </div>
 
-          <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :projectColumns="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" :project_id="selectedProjectId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" />
+          <pj-draggable1 :listsBlockName="listsBlockNames.PROJECTS" :projectColumns="selectedProjectTasksForStatusesColumns" :lists="taskPerStatusLists" :verticalAlignment="false" :selectedCompanyUserId="selectedCompanyUserId" :project_id="selectedProjectId" @createItem="createTask" @update="updateTask" @delete="deleteTask" @updateSortOrders="updateTaskSortOrders" @setCurrentListsBlockName="currentListsBlockName = listsBlockNames.PROJECTS" :is_shared_project="is_shared_project" />
         </b-col>
       </b-row>
     </b-container>

@@ -55,7 +55,7 @@ export default {
       new_task_title: ''
     }
   },
-  props: ['task', 'idList', 'columnIndex'],
+  props: ['task', 'idList', 'columnIndex', 'is_shared_project'],
   computed: {
     task_users: function() {
       return this.$store.getters['task_users/getByTaskId'](this.task.id)
@@ -180,6 +180,11 @@ export default {
     },
     async showTaskDetail(e) {
       if (e.target.className == 'icon-edit') {
+        return
+      }
+
+      if (this.is_shared_project) {
+        this.$emit('showEditModal')
         return
       }
       const updated_path = `/user-tasks?task=${this.task.id}&showChatSection=true`
