@@ -110,14 +110,14 @@
       <div no-body>
         <div class="form" @click="hidePopOver">
           <b-row>
-            <b-col cols="8">
-              <b-form-group class="mb-5" label="Description:" label-for="task-description">
-                <b-form-textarea id="task-description" v-model="editTaskData.note" placeholder="Enter something..." rows="3" max-rows="6"></b-form-textarea>
-              </b-form-group>
+            <b-col cols="9">
+              <!-- <b-form-group class="mb-1" label="Description:" label-for="task-description">
+                <b-form-textarea id="task-description" v-model="editTaskData.note" placeholder="Enter something..." rows="2" max-rows="6"></b-form-textarea>
+              </b-form-group> -->
 
               <thread-message class="task-cloud_task-message" :showChat="true" :task_id="editTaskData.id" :thread_id="editTaskData.id" :thread_type="'client'"> </thread-message>
             </b-col>
-            <b-col cols="4">
+            <b-col cols="3">
               <b-form-group class="mb-5" id="labels" label="Select Labels:" label-for="select-label">
                 <div class="badge-container" id="select-label" ref="add_label">
                   <badge v-if="editTaskData.labels" v-for="label in editTaskData.labels" :color="badgeColor(label)" :label="label" size="lg">{{ label }}</badge>
@@ -145,11 +145,7 @@
           </b-row>
         </div>
       </div>
-      <div slot="modal-footer" class="w-100">
-        <b-button variant="primary" size="sm" class="float-right" @click="show_edit_modal = false">
-          Close
-        </b-button>
-      </div>
+      <div slot="modal-footer" class="w-100"></div>
     </b-modal>
   </div>
 </template>
@@ -399,6 +395,23 @@ export default {
       this.task_users = this.$store.getters['task_users/getByTaskId'](task.id)
       this.assignedMembers = this.task_users.map(({ company_user_id }) => company_user_id)
       this.editTaskData['list'] = this.columns[list_index].title
+      this.getChat(task.id, task.id)
+    },
+    async getChat(task_id, thread_id) {
+      const { chat, task, company_users, task_users, current_company_id, user_id, current_company_user_id } = await this.$http().get(`/chat-thread/${task_id}/${thread_id}`)
+
+      this.$store.dispatch('PROCESS_INCOMING_DATA', {
+        task_messages: chat.messages || [],
+        company_users: company_users,
+        task_users: task_users,
+        current_company_id,
+        user_id,
+        current_company_user_id
+      })
+      if (thread_id) {
+        this.$store.commit('tasks/readChat', thread_id)
+        this.$store.commit('threads/readThread', thread_id)
+      }
     },
     hideEditCard($event) {
       if ($event.target.classList.contains('quick-card-editor')) {
@@ -987,6 +1000,6 @@ textarea {
   background-color: #091e420f !important;
 }
 .task-cloud_task-message {
-  height: 555px !important;
+  height: 779px !important;
 }
 </style>
