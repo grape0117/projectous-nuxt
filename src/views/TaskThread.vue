@@ -35,7 +35,7 @@
             <span v-if="getCompanyUserDetails(thread.owner.id)" :class="`avatar mr-1 pointer`" :style="{ 'background-color': getCompanyUserDetails(thread.owner.id).color, cursor: 'pointer', display: 'inline-flex' }">
               {{ abbrName(getCompanyUserDetails(thread.owner.id).name) }}
             </span>
-            <p :class="`m-0 ${thread.num_unread > 0 ? 'unread-item' : ''}`" :style="`color: ${thread.num_unread > 0 ? 'white' : ''};`">{{ thread.title }}</p>
+            <p :class="`m-0 ${thread.num_unread > 0 ? 'unread-item' : ''}`" :style="`color: ${thread.num_unread > 0 ? 'white' : ''};`">{{ thread.title ? thread.title : 'Cient thread' }}</p>
             <div class="unread-message-num" v-if="thread.num_unread > 0" style="position: relative;">
               <span class="rounded-circle task-sidebar-item_badge">{{ thread.num_unread }}</span>
             </div>

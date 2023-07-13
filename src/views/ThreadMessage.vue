@@ -25,7 +25,7 @@
       <div class="bounce2"></div>
       <div class="bounce3"></div>
     </div>
-    <div class="send-message" v-if="(thread && thread.status == 'open') || thread_type == 'client'">
+    <div class="send-message" v-if="(thread && thread.status == 'open' && thread_id != task_id) || thread_type == 'client' || (thread_id == task_id && isAdmin)">
       <b-form-textarea type="text" ref="message_content" v-model="s_message" placeholder="Write you message" rows="3" max-rows="3" @keyup.enter.exact="changeText" @keydown.enter="handleEnter" @paste="$event => onMessagePaste($event)"> </b-form-textarea>
       <i class="icon-attach_file" @click="attachFile()" />
       <!-- <b-form-checkbox v-if="!isStarted" v-model="include_audio" name="check-button" switch variant="warning" class="text-white">
@@ -35,12 +35,14 @@
       <i class="icon-help_outline" @click="needHelp" />
       <i class="icon-send" :style="(s_message !== '' && s_message !== '\n') || fileExist || stream_video ? 'color: darkorange;' : 'color: gray;'" @click="saveMessage()" />
     </div>
-    <div class="thread-btns" v-if="(thread && thread.status == 'open') || thread_type == 'client'">
-      <b-button v-if="!thread_type" @click="closeThread">CLOSE THREAD</b-button>
-      <b-button @click="saveMessage()">SUBMIT</b-button>
-    </div>
-    <div class="thread-btns" v-else>
-      <b-button @click="reopenThread">Reopen THREAD</b-button>
+    <div v-if="(thread && thread.status == 'open' && thread_id != task_id) || thread_type == 'client' || (thread_id == task_id && isAdmin)">
+      <div class="thread-btns" v-if="(thread && thread.status == 'open') || thread_type == 'client'">
+        <b-button v-if="!thread_type" @click="closeThread">CLOSE THREAD</b-button>
+        <b-button @click="saveMessage()">SUBMIT</b-button>
+      </div>
+      <div class="thread-btns" v-else>
+        <b-button @click="reopenThread">Reopen THREAD</b-button>
+      </div>
     </div>
   </div>
 </template>
@@ -150,6 +152,9 @@ export default {
   },
 
   computed: {
+    isAdmin: function() {
+      return this.$store.getters['settings/isAdmin']
+    },
     isNotificationEnabled() {
       return Notification.permission === 'granted'
     },
